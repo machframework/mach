@@ -12,6 +12,7 @@ add_library(mach
     src/server/BeastListener.cpp
     src/server/BeastSession.cpp
     src/logging/Logging.cpp
+    src/server/Server.cpp
 )
 
 target_include_directories(mach
