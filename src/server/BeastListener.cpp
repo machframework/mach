@@ -16,7 +16,7 @@
 #include <utility>
 
 #include "BeastSession.hpp"
-#include "Logging.hpp"
+#include <mach/logging/Logging.hpp>
 
 namespace mach::detail::server
 {
@@ -28,28 +28,28 @@ namespace mach::detail::server
         // Open the acceptor
         m_acceptor.open(endpoint.protocol(), ec);
         if (ec) {
-            mach::detail::logging::error("Failed to open acceptor");
+            mach::detail::logging::Logger::error("Failed to open acceptor");
             return;
         }
 
         // Allow address reuse
         m_acceptor.set_option(net::socket_base::reuse_address(true), ec);
         if (ec) {
-            mach::detail::logging::error("Failed to set socket option");
+            mach::detail::logging::Logger::error("Failed to set socket option");
             return;
         }
 
         // Bind to the server address
         m_acceptor.bind(endpoint, ec);
         if (ec) {
-            mach::detail::logging::error("Failed to bind acceptor");
+            mach::detail::logging::Logger::error("Failed to bind acceptor");
             return;
         }
 
         // Start listening for connections
         m_acceptor.listen(net::socket_base::max_listen_connections, ec);
         if (ec) {
-            mach::detail::logging::error("Failed to listen");
+            mach::detail::logging::Logger::error("Failed to listen");
             return;
         }
     }
