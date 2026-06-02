@@ -1,0 +1,80 @@
+//
+// Derived from Boost.Beast examples.
+//
+// Copyright (c) 2016-2019 Vinnie Falco (vinnie dot falco at gmail dot com)
+//
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
+// Official repository: https://github.com/boostorg/beast
+//
+
+#pragma once
+
+#include <boost/asio/dispatch.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/beast/core.hpp>
+#include <boost/beast/http.hpp>
+#include <boost/beast/version.hpp>
+
+namespace mach::detail::server
+{
+    namespace beast = boost::beast;         // from <boost/beast.hpp>
+    namespace http = beast::http;           // from <boost/beast/http.hpp>
+    namespace net = boost::asio;            // from <boost/asio.hpp>
+    using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
+
+    // Handles an HTTP server connection
+    class BeastSession : public std::enable_shared_from_this<BeastSession> {
+        beast::tcp_stream m_stream;
+        beast::flat_buffer m_buffer;
+        http::request<http::string_body> m_req;
+
+    public:
+        BeastSession(tcp::socket&& socket);
+
+        // Start the asynchronous operation
+        void run();
+
+        void do_read();
+
+        void on_read(beast::error_code ec, std::size_t bytes_transferred);
+
+        void send_response(http::message_generator&& msg);
+
+        void on_write(
+            bool keep_alive,
+            beast::error_code ec,
+            std::size_t bytes_transferred
+        );
+
+        void do_close();
+
+    private:
+        // Return a response for the given request.
+        // The concrete type of the response message (which depends on the
+        // request), is type-erased in message_generator.
+        template <typename Body, typename Allocator>
+        http::message_generator handle_request(
+            http::request<Body, http::basic_fields<Allocator>>&& req);
+    };
+
+    template <typename Body, typename Allocator>
+    http::message_generator BeastSession::handle_request(
+        http::request<Body, http::basic_fields<Allocator>>&& req) 
+    {
+        http::response<http::string_body> res{
+            http::status::ok,
+            req.version()
+        };
+
+        res.set(http::field::server, "Mach");
+        res.set(http::field::content_type, "text/plain");
+        res.keep_alive(req.keep_alive());
+
+        res.body() = "Hello from Mach";
+        res.prepare_payload();
+
+        return res;
+    }
+}
