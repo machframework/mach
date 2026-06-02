@@ -17,12 +17,20 @@ add_library(mach
 
 target_include_directories(mach
     PUBLIC
-        include
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
     PRIVATE
-        src
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 target_link_libraries(mach
-    PRIVATE
+    PUBLIC
         Boost::headers
+)
+
+add_executable(mach_hello_world
+    examples/hello_world/main.cpp
+)
+
+target_link_libraries(mach_hello_world
+    PRIVATE mach
 )

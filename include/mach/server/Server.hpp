@@ -9,7 +9,7 @@ namespace mach
 
 	public:
 		Server(const std::string& host, std::uint16_t port, std::size_t thread_count = 1);
-		~Server() = default;
+		~Server();
 		
 		std::string host() const noexcept;
 		std::uint16_t port() const noexcept;

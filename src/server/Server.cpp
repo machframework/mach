@@ -35,6 +35,8 @@ namespace mach
 		: m_impl(std::make_unique<Impl>(boost::asio::ip::make_address(host), port, threadCount))
 	{}
 
+	Server::~Server() = default;
+
 	std::string Server::host() const noexcept {
 		return m_impl->host();
 	}
@@ -50,7 +52,6 @@ namespace mach
 	void Server::run() {
 		m_impl->run();
 	}
-
 
 	Server::Impl::Impl(const boost::asio::ip::address& address, std::uint16_t port, std::size_t threadCount)
 		: m_thread_count(threadCount), 
