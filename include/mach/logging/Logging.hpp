@@ -1,9 +1,10 @@
+#pragma once
+
 #include <string_view>
 
 namespace mach::detail::logging
 {
-	enum class LogLevel
-	{
+	enum class LogLevel {
 		Debug,
 		Info,
 		Warning,

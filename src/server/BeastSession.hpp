@@ -11,11 +11,15 @@
 
 #pragma once
 
+#include <format>
+
 #include <boost/asio/dispatch.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/version.hpp>
+
+#include <mach/logging/Logging.hpp>
 
 namespace mach::detail::server
 {
@@ -23,6 +27,8 @@ namespace mach::detail::server
     namespace http = beast::http;           // from <boost/beast/http.hpp>
     namespace net = boost::asio;            // from <boost/asio.hpp>
     using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
+
+    using mach::detail::logging::Logger;
 
     // Handles an HTTP server connection
     class BeastSession : public std::enable_shared_from_this<BeastSession> {
@@ -63,6 +69,10 @@ namespace mach::detail::server
     http::message_generator BeastSession::handle_request(
         http::request<Body, http::basic_fields<Allocator>>&& req) 
     {
+        Logger::info(std::format("Received request: {} {}", req.method_string(), req.target()));
+
+		auto req_body = req.body();
+
         http::response<http::string_body> res{
             http::status::ok,
             req.version()
@@ -72,7 +82,7 @@ namespace mach::detail::server
         res.set(http::field::content_type, "text/plain");
         res.keep_alive(req.keep_alive());
 
-        res.body() = "Hello from Mach";
+		res.body() = req_body; // echo the request body back in the response
         res.prepare_payload();
 
         return res;

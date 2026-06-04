@@ -67,13 +67,16 @@ namespace mach::detail::server
             return do_close();
         }
 
+		if (ec == beast::error::timeout) {
+			return do_close();
+		}
+
         if (ec) {
-            //return mach::logging::fail(ec, "read");
+            return Logger::error(std::format("Failed to read request: {}", ec.message()));
         }
 
         // Send the response
-        send_response(
-            handle_request(std::move(m_req)));
+        send_response(handle_request(std::move(m_req)));
     }
 
     void BeastSession::send_response(http::message_generator&& msg) {
@@ -95,7 +98,7 @@ namespace mach::detail::server
         boost::ignore_unused(bytes_transferred);
 
         if (ec) {
-            //return mach::logging::fail(ec, "write");
+            return Logger::error(std::format("Failed to write response: {}", ec.message()));
         }
 
         if (!keep_alive) {
