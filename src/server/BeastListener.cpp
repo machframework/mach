@@ -15,6 +15,11 @@
 #include <string>
 #include <utility>
 
+#include <boost/asio/co_spawn.hpp>
+#include <boost/asio/detached.hpp>
+#include <boost/asio/redirect_error.hpp>
+#include <boost/asio/use_awaitable.hpp>
+
 #include "BeastSession.hpp"
 #include <mach/logging/Logging.hpp>
 
@@ -57,34 +62,41 @@ namespace mach::detail::server
     }
 
     // Start accepting incoming connections
-    void BeastListener::run() {
-        do_accept();
+    net::awaitable<void> BeastListener::run() {
+        co_await do_accept();
     }
 
-    void BeastListener::do_accept()
+    net::awaitable<void> BeastListener::do_accept()
     {
+		beast::error_code ec;
+
         // The new connection gets its own strand
-        m_acceptor.async_accept(net::make_strand(m_ioc),
-            beast::bind_front_handler(
-                &BeastListener::on_accept,
-                shared_from_this())
+        tcp::socket socket = co_await m_acceptor.async_accept(
+            net::make_strand(m_ioc), net::redirect_error(net::use_awaitable, ec)
         );
-    }
 
-    void BeastListener::on_accept(beast::error_code ec, tcp::socket socket)
-    {
         if (ec) {
             Logger::error("Failed to accept connection");
-            return; // To avoid infinite loop
-        }
-        else {
-            // Create the session and run it
-            std::make_shared<BeastSession>(
-                std::move(socket)
-            )->run();
-        }
+            co_return; // To avoid infinite loop
+        } 
+
+		auto executor = socket.get_executor();
+
+        // Create the session and run it
+        auto session = std::make_shared<mach::detail::server::BeastSession>(
+            std::move(socket)
+        );
+
+        net::co_spawn(
+            executor,
+            [session]() -> net::awaitable<void>
+            {
+                co_await session->run();
+            }(),
+            net::detached
+        );
 
         // Accept another connection in the same session
-        do_accept();
+        co_await do_accept();
     }
 }

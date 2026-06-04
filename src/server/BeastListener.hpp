@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <boost/asio/awaitable.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/strand.hpp>
@@ -33,11 +34,9 @@ namespace mach::detail::server
         BeastListener(net::io_context& ioc, tcp::endpoint endpoint);
 
         // Start accepting incoming connections
-        void run();
+        net::awaitable<void> run();
 
     private:
-        void do_accept();
-
-        void on_accept(beast::error_code ec, tcp::socket socket);
+        net::awaitable<void> do_accept();
     };
 }

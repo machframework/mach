@@ -4,8 +4,10 @@
 #include <thread>
 #include <vector>
 
-#include <boost/asio/ip/address.hpp>
+#include <boost/asio/detached.hpp>
+#include <boost/asio/co_spawn.hpp>
 #include <boost/asio/io_context.hpp>
+#include <boost/asio/ip/address.hpp>
 
 #include "BeastListener.hpp"
 #include "BeastSession.hpp"
@@ -13,6 +15,8 @@
 
 namespace mach
 {
+	namespace net = boost::asio;
+
 	class Server::Impl {
 	
 	public:
@@ -29,6 +33,7 @@ namespace mach
 		std::size_t m_thread_count;
 		boost::asio::ip::tcp::endpoint m_endpoint;
 		boost::asio::io_context m_ioc;
+		std::shared_ptr<mach::detail::server::BeastListener> m_listener;
 	};
 
 	Server::Server(const std::string& host, std::uint16_t port, std::size_t threadCount)
@@ -72,8 +77,17 @@ namespace mach
 	}
 
 	void Server::Impl::run() {
-		// Create and launch a listening port
-		std::make_shared<mach::detail::server::BeastListener>(m_ioc,m_endpoint)->run();
+		m_listener =
+			std::make_shared<mach::detail::server::BeastListener>(
+				m_ioc,
+				m_endpoint
+			);
+
+		net::co_spawn(
+			m_ioc,
+			m_listener->run(),
+			net::detached
+		);
 
 		// Run the I/O service on the requested number of threads
 		std::vector <std::thread> threads;

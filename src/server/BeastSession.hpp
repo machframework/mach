@@ -13,11 +13,16 @@
 
 #include <format>
 
+#include <boost/asio/awaitable.hpp>
 #include <boost/asio/dispatch.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/beast/core/tcp_stream.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/version.hpp>
+#include <boost/beast/core/flat_buffer.hpp>
+#include <boost/beast/http/string_body.hpp>
+#include <boost/beast/http/message.hpp>
 
 #include <mach/logging/Logging.hpp>
 
@@ -37,22 +42,14 @@ namespace mach::detail::server
         http::request<http::string_body> m_req;
 
     public:
-        BeastSession(tcp::socket&& socket);
+        BeastSession(tcp::socket socket);
 
         // Start the asynchronous operation
-        void run();
+        net::awaitable<void> run();
 
-        void do_read();
+        net::awaitable<void> do_read();
 
-        void on_read(beast::error_code ec, std::size_t bytes_transferred);
-
-        void send_response(http::message_generator&& msg);
-
-        void on_write(
-            bool keep_alive,
-            beast::error_code ec,
-            std::size_t bytes_transferred
-        );
+        net::awaitable<void> send_response(http::message_generator&& msg);
 
         void do_close();
 
