@@ -63,13 +63,14 @@ namespace mach::detail::server
         boost::ignore_unused(bytes_transferred);
 
         // This means they closed the connection
-        if (ec == http::error::end_of_stream) {
+        if (ec == http::error::end_of_stream ||
+            ec == net::error::eof ||
+            ec == net::error::connection_reset ||
+            ec == net::error::connection_aborted ||
+            ec == beast::error::timeout)
+        {
             return do_close();
         }
-
-		if (ec == beast::error::timeout) {
-			return do_close();
-		}
 
         if (ec) {
             return Logger::error(std::format("Failed to read request: {}", ec.message()));
