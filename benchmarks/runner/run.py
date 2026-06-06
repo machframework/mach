@@ -21,10 +21,6 @@ CSV_PATH = ROOT / "benchmarks" / "results" / "wrk_results.csv"
 
 TEST_SETS = [
     {
-        "name": "stress",
-        "runs": [(16, 2000)]
-    },
-    {
         "name": "baseline",
         "runs": [(16, 100), (16, 100)]
     },
@@ -35,6 +31,10 @@ TEST_SETS = [
     {
         "name": "thread_scaling",
         "runs": [(2, 500), (4, 500), (8, 500), (16, 500)]
+    },
+    {
+        "name": "stress",
+        "runs": [(16, 2000)]
     }
 ]
 
@@ -144,6 +144,44 @@ def parse_wrk(output):
 
 # ---------------- CSV ----------------
 
+def get_git_commit():
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "--short", "HEAD"],
+            text=True
+        ).strip()
+    except:
+        return "unknown"
+
+def write_session_header():
+    CSV_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+    today = date.today()
+    file_exists = CSV_PATH.exists()
+
+    with open(CSV_PATH, "a", newline="") as f:
+        writer = csv.writer(f)
+
+        # blank visual separator (optional but fine in CSV viewers)
+        writer.writerow([])
+
+        writer.writerow([
+            "SESSION START",
+            today,
+            get_git_commit()
+        ])
+
+        if not file_exists:
+            writer.writerow([
+                "date",
+                "test_set",
+                "threads",
+                "connections",
+                "rps",
+                "avg_latency_us",
+                "max_latency_us"
+            ])
+
 def write_row(test_set, row):
     CSV_PATH.parent.mkdir(parents=True, exist_ok=True)
 
@@ -169,6 +207,8 @@ def write_row(test_set, row):
 # ---------------- MAIN ----------------
 
 def main():
+    write_session_header()
+    
     for test in TEST_SETS:
         print(f"\n=== Running test set: {test['name']} ===")
 
