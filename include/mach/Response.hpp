@@ -6,6 +6,10 @@
 #include <mach/http/StatusCode.hpp>
 #include <mach/http/Version.hpp>
 
+namespace mach::detail::http::adapter {
+	class BeastRequestAdapter;
+}
+
 namespace mach
 {
 	class Response {
@@ -24,13 +28,14 @@ namespace mach
 	private:
 		Response(
 			http::Version version,
-			http::StatusCode status,
-			std::string body
+			http::StatusCode status = http::StatusCode::OK
 		);
 
 		http::Version m_version;
 		http::StatusCode m_status;
 		std::string m_body;
 		std::unordered_map<std::string, std::string> m_headers;
+
+		friend class mach::detail::http::adapter::BeastRequestAdapter;
 	};
 }

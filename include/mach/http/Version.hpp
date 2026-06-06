@@ -1,11 +1,13 @@
+#pragma once
+
 namespace mach::http
 {
-	enum class Version
-	{
-		HTTP_1_0,
-		HTTP_1_1,
-		HTTP_2,
-		HTTP_3,
-		UNKNOWN
-	};
+    enum class Version
+    {
+        Http10,
+        Http11,
+        Http2,
+        Http3,
+        Unknown
+    };
 }

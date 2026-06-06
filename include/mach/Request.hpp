@@ -6,10 +6,12 @@
 #include <mach/http/Method.hpp>
 #include <mach/http/Version.hpp>
 
+namespace mach::detail::http::adapter {
+	class BeastRequestAdapter;
+}
+
 namespace mach
 {
-	using http::Method;
-
 	class Request {
 
 	public:
@@ -34,5 +36,7 @@ namespace mach
 		std::string m_target;
 		std::string m_body;
 		std::unordered_map<std::string, std::string> m_headers;
+
+		friend class mach::detail::http::adapter::BeastRequestAdapter;
 	};
 }
