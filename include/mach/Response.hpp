@@ -22,6 +22,12 @@ namespace mach
 		void setHeader(std::string name, std::string value) noexcept;
 
 	private:
+		Response(
+			http::Version version,
+			http::StatusCode status,
+			std::string body
+		);
+
 		http::Version m_version;
 		http::StatusCode m_status;
 		std::string m_body;

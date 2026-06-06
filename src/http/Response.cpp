@@ -4,6 +4,16 @@
 
 namespace mach
 {
+	Response::Response(
+		http::Version version,
+		http::StatusCode status,
+		std::string body
+	) :
+		m_version(version),
+		m_status(status),
+		m_body(std::move(body))
+	{}
+
 	mach::http::Version Response::version() const noexcept
 	{
 		return m_version;
