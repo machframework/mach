@@ -16,7 +16,9 @@ add_library(mach
     src/http/Request.cpp
     src/http/Response.cpp
     src/adapter/inbound/BeastRequestAdapter.cpp
-    src/adapter/outbound/BeastResponseAdapter.cpp)
+    src/adapter/outbound/BeastResponseAdapter.cpp
+    src/application/Runtime.cpp
+)
 
 target_include_directories(mach
     PUBLIC
@@ -32,7 +34,7 @@ target_link_libraries(mach
 
 add_executable(mach_hello_world
  "src/http/Request.cpp"    examples/hello_world/main.cpp
-   "src/http/Response.cpp" "src/adapter/inbound/BeastRequestAdapter.cpp" "src/adapter/outbound/BeastResponseAdapter.cpp")
+   "src/http/Response.cpp" "src/adapter/inbound/BeastRequestAdapter.cpp" "src/adapter/outbound/BeastResponseAdapter.cpp" "src/application/Runtime.cpp")
 
 target_link_libraries(mach_hello_world
     PRIVATE mach
