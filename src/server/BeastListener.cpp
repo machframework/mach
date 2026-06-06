@@ -30,11 +30,13 @@ namespace mach::detail::server
     BeastListener::BeastListener(
         net::io_context& ioc,
         tcp::endpoint endpoint,
+        detail::application::Runtime& runtime,
         detail::http::adapter::BeastRequestAdapter& requestAdapter,
         detail::http::adapter::BeastResponseAdapter& responseAdapter
     )
         : m_ioc(ioc),
         m_acceptor(net::make_strand(ioc)),
+        m_runtime(runtime),
         m_requestAdapter(requestAdapter),
         m_responseAdapter(responseAdapter)
     {
@@ -88,11 +90,12 @@ namespace mach::detail::server
             co_return; // To avoid infinite loop
         } 
 
-		auto executor = socket.get_executor();
+		auto& executor = socket.get_executor();
 
         // Create the session and run it
         auto session = std::make_shared<mach::detail::server::BeastSession>(
             std::move(socket),
+            m_runtime,
             m_requestAdapter,
             m_responseAdapter
         );

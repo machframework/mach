@@ -29,6 +29,7 @@
 
 #include "adapter/inbound/BeastRequestAdapter.hpp"
 #include "adapter/outbound/BeastResponseAdapter.hpp"
+#include "application/Runtime.hpp"
 
 namespace mach::detail::server
 {
@@ -48,6 +49,7 @@ namespace mach::detail::server
     public:
         BeastSession(
             tcp::socket socket,
+            detail::application::Runtime& runtime,
             detail::http::adapter::BeastRequestAdapter& requestAdapter,
             detail::http::adapter::BeastResponseAdapter& responseAdapter
         );
@@ -69,6 +71,7 @@ namespace mach::detail::server
         http::message_generator handle_request(
             http::request<Body, http::basic_fields<Allocator>>&& req);
 
+        detail::application::Runtime& m_runtime;
         detail::http::adapter::BeastRequestAdapter& m_requestAdapter;
         detail::http::adapter::BeastResponseAdapter& m_responseAdapter;
     };
@@ -84,15 +87,14 @@ namespace mach::detail::server
      
         Logger::info(std::format("Received request: {}", context.request.target()));
 
-        // machRes = m_application.handle(context);
-        // 
+        m_runtime.handle(context);
+        
         auto res = m_responseAdapter.adapt(std::move(context));
 
         res.set(http::field::server, "Mach");
         res.set(http::field::content_type, "text/plain");
         res.keep_alive(keepAlive);
 
-        res.body() = "Hello from Mach"; // echo the request body back in the response
         res.prepare_payload();
 
         return res;

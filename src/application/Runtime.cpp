@@ -2,6 +2,6 @@
 
 namespace mach::detail::application {
 	void Runtime::handle(mach::Context& context) {
-		context.response.body("Hello from Mach");
+		context.response.body(context.request.body());
 	}
 }

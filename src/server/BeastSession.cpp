@@ -30,10 +30,12 @@ namespace mach::detail::server
     // Take ownership of the stream
     BeastSession::BeastSession(
         tcp::socket socket,
+        detail::application::Runtime& runtime,
         detail::http::adapter::BeastRequestAdapter& requestAdapter,
         detail::http::adapter::BeastResponseAdapter& responseAdapter
     )
         : m_stream(std::move(socket)),
+        m_runtime(runtime),
         m_requestAdapter(requestAdapter),
         m_responseAdapter(responseAdapter)
     {}

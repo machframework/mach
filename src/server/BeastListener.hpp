@@ -17,6 +17,7 @@
 #include <boost/asio/strand.hpp>
 #include <boost/beast/http.hpp>
 
+#include "application/Runtime.hpp"
 #include "adapter/inbound/BeastRequestAdapter.hpp"
 #include "adapter/outbound/BeastResponseAdapter.hpp"
 
@@ -37,6 +38,7 @@ namespace mach::detail::server
         BeastListener(
             net::io_context& ioc,
             tcp::endpoint endpoint,
+            detail::application::Runtime& runtime,
             detail::http::adapter::BeastRequestAdapter& requestAdapter,
             detail::http::adapter::BeastResponseAdapter& responseAdapter
         );
@@ -47,6 +49,7 @@ namespace mach::detail::server
     private:
         net::awaitable<void> do_accept();
 
+        detail::application::Runtime& m_runtime;
         detail::http::adapter::BeastRequestAdapter& m_requestAdapter;
         detail::http::adapter::BeastResponseAdapter& m_responseAdapter;
     };

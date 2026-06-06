@@ -9,11 +9,13 @@
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/address.hpp>
 
+#include <mach/logging/Logging.hpp>
+
 #include "adapter/inbound/BeastRequestAdapter.hpp"
 #include "adapter/outbound/BeastResponseAdapter.hpp"
 #include "BeastListener.hpp"
 #include "BeastSession.hpp"
-#include <mach/logging/Logging.hpp>
+#include "application/Runtime.hpp"
 
 namespace mach::detail::server
 {
@@ -37,6 +39,7 @@ namespace mach::detail::server
 		boost::asio::io_context m_ioc;
 		std::shared_ptr<BeastListener> m_listener;
 
+		detail::application::Runtime m_runtime;
 		detail::http::adapter::BeastRequestAdapter m_requestAdapter;
 		detail::http::adapter::BeastResponseAdapter m_responseAdapter;
 	};
@@ -85,6 +88,7 @@ namespace mach::detail::server
 		m_listener = std::make_shared<BeastListener>(
 			m_ioc,
 			m_endpoint,
+			m_runtime,
 			m_requestAdapter,
 			m_responseAdapter	
 		);
