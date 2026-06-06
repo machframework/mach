@@ -52,4 +52,12 @@ namespace mach
 
 		return std::nullopt;
 	}
+
+	bool Request::containsHeader(std::string_view name) const noexcept
+	{
+		std::string normalizedName = std::string(name);
+		mach::detail::http::toLowercaseInPlace(normalizedName);
+
+		return m_headers.find(normalizedName) != m_headers.end();
+	}
 }

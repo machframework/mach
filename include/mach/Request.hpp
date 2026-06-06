@@ -18,6 +18,7 @@ namespace mach
 		std::string target() const;
 		std::string body() const;
 		std::optional<std::string_view> header(std::string_view name) const;
+		bool containsHeader(std::string_view name) const noexcept;
 
 	private:
 		Request(

@@ -15,6 +15,7 @@ namespace mach
 		http::StatusCode status() const noexcept;
 		std::string body() const;
 		std::optional<std::string_view> header(std::string_view name) const;
+		bool containsHeader(std::string_view name) const noexcept;
 
 		void status(http::StatusCode status) noexcept;
 		void body(std::string body) noexcept;

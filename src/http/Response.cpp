@@ -32,6 +32,13 @@ namespace mach
 		return std::nullopt;
 	}
 
+	bool Response::containsHeader(std::string_view name) const noexcept
+	{
+		std::string normalizedName = std::string(name);
+		mach::detail::http::toLowercaseInPlace(normalizedName);
+		return m_headers.find(normalizedName) != m_headers.end();
+	}
+
 	void Response::status(http::StatusCode status) noexcept
 	{
 		m_status = status;
