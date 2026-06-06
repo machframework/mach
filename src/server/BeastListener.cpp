@@ -27,8 +27,16 @@ namespace mach::detail::server
 {
 	using mach::detail::logging::Logger;
 
-    BeastListener::BeastListener(net::io_context& ioc, tcp::endpoint endpoint)
-        : m_ioc(ioc), m_acceptor(net::make_strand(ioc))
+    BeastListener::BeastListener(
+        net::io_context& ioc,
+        tcp::endpoint endpoint,
+        detail::http::adapter::BeastRequestAdapter& requestAdapter,
+        detail::http::adapter::BeastResponseAdapter& responseAdapter
+    )
+        : m_ioc(ioc),
+        m_acceptor(net::make_strand(ioc)),
+        m_requestAdapter(requestAdapter),
+        m_responseAdapter(responseAdapter)
     {
         beast::error_code ec;
 
@@ -84,7 +92,9 @@ namespace mach::detail::server
 
         // Create the session and run it
         auto session = std::make_shared<mach::detail::server::BeastSession>(
-            std::move(socket)
+            std::move(socket),
+            m_requestAdapter,
+            m_responseAdapter
         );
 
         net::co_spawn(

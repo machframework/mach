@@ -9,6 +9,8 @@
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/address.hpp>
 
+#include "adapter/inbound/BeastRequestAdapter.hpp"
+#include "adapter/outbound/BeastResponseAdapter.hpp"
 #include "BeastListener.hpp"
 #include "BeastSession.hpp"
 #include <mach/logging/Logging.hpp>
@@ -33,7 +35,10 @@ namespace mach::detail::server
 		std::size_t m_thread_count;
 		boost::asio::ip::tcp::endpoint m_endpoint;
 		boost::asio::io_context m_ioc;
-		std::shared_ptr<mach::detail::server::BeastListener> m_listener;
+		std::shared_ptr<BeastListener> m_listener;
+
+		detail::http::adapter::BeastRequestAdapter m_requestAdapter;
+		detail::http::adapter::BeastResponseAdapter m_responseAdapter;
 	};
 
 	Server::Server(const std::string& host, std::uint16_t port, std::size_t threadCount)
@@ -77,11 +82,12 @@ namespace mach::detail::server
 	}
 
 	void Server::Impl::run() {
-		m_listener =
-			std::make_shared<mach::detail::server::BeastListener>(
-				m_ioc,
-				m_endpoint
-			);
+		m_listener = std::make_shared<BeastListener>(
+			m_ioc,
+			m_endpoint,
+			m_requestAdapter,
+			m_responseAdapter	
+		);
 
 		net::co_spawn(
 			m_ioc,
@@ -93,7 +99,7 @@ namespace mach::detail::server
 		std::vector <std::thread> threads;
 		threads.reserve(m_thread_count - 1);
 
-		mach::detail::logging::Logger::info(std::format("Starting Mach server on {}:{} with {} threads", host(), port(), m_thread_count));
+		detail::logging::Logger::info(std::format("Starting Mach server on {}:{} with {} threads", host(), port(), m_thread_count));
 
 		for (int i = 0; i < m_thread_count - 1; ++i) {
 			threads.emplace_back(

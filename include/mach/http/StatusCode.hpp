@@ -1,3 +1,5 @@
+#pragma once
+
 namespace mach::http
 {
 	enum class StatusCode {

@@ -2,7 +2,7 @@
 
 namespace mach::detail::http::adapter
 {
-	beast::http::message_generator BeastResponseAdapter::adapt(mach::Context&& context) {
+	beast::http::response<beast::http::string_body> BeastResponseAdapter::adapt(mach::Context&& context) {
 		beast::http::response<beast::http::string_body> res;
 
 		res.version(fromMachVersion(context.response.version()));
@@ -13,7 +13,7 @@ namespace mach::detail::http::adapter
 			res.set(name, value);
 		}
 
-		return beast::http::message_generator(std::move(res));
+		return res;
 	}
 
 	unsigned int BeastResponseAdapter::fromMachVersion(mach::http::Version version) {

@@ -29,8 +29,13 @@ namespace mach::detail::server
 {
     // Take ownership of the stream
     BeastSession::BeastSession(
-        tcp::socket socket)
-        : m_stream(std::move(socket))
+        tcp::socket socket,
+        detail::http::adapter::BeastRequestAdapter& requestAdapter,
+        detail::http::adapter::BeastResponseAdapter& responseAdapter
+    )
+        : m_stream(std::move(socket)),
+        m_requestAdapter(requestAdapter),
+        m_responseAdapter(responseAdapter)
     {}
 
     // Start the asynchronous operation

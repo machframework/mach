@@ -24,7 +24,11 @@
 #include <boost/beast/http/string_body.hpp>
 #include <boost/beast/http/message.hpp>
 
+#include <mach/Context.hpp>
 #include <mach/logging/Logging.hpp>
+
+#include "adapter/inbound/BeastRequestAdapter.hpp"
+#include "adapter/outbound/BeastResponseAdapter.hpp"
 
 namespace mach::detail::server
 {
@@ -42,7 +46,11 @@ namespace mach::detail::server
         http::request<http::string_body> m_req;
 
     public:
-        BeastSession(tcp::socket socket);
+        BeastSession(
+            tcp::socket socket,
+            detail::http::adapter::BeastRequestAdapter& requestAdapter,
+            detail::http::adapter::BeastResponseAdapter& responseAdapter
+        );
 
         // Start the asynchronous operation
         net::awaitable<void> run();
@@ -60,26 +68,31 @@ namespace mach::detail::server
         template <typename Body, typename Allocator>
         http::message_generator handle_request(
             http::request<Body, http::basic_fields<Allocator>>&& req);
+
+        detail::http::adapter::BeastRequestAdapter& m_requestAdapter;
+        detail::http::adapter::BeastResponseAdapter& m_responseAdapter;
     };
 
     template <typename Body, typename Allocator>
     http::message_generator BeastSession::handle_request(
         http::request<Body, http::basic_fields<Allocator>>&& req) 
     {
-        Logger::info(std::format("Received request: {} {}", std::string(req.method_string()), std::string(req.target())));
+        bool keepAlive = req.keep_alive();
+        auto version = req.version();
 
-		auto req_body = req.body();
+        auto context = m_requestAdapter.adapt(std::move(req));
+     
+        Logger::info(std::format("Received request: {}", context.request.target()));
 
-        http::response<http::string_body> res{
-            http::status::ok,
-            req.version()
-        };
+        // machRes = m_application.handle(context);
+        // 
+        auto res = m_responseAdapter.adapt(std::move(context));
 
         res.set(http::field::server, "Mach");
         res.set(http::field::content_type, "text/plain");
-        res.keep_alive(req.keep_alive());
+        res.keep_alive(keepAlive);
 
-		res.body() = req_body; // echo the request body back in the response
+        res.body() = "Hello from Mach"; // echo the request body back in the response
         res.prepare_payload();
 
         return res;

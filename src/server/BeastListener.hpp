@@ -17,6 +17,9 @@
 #include <boost/asio/strand.hpp>
 #include <boost/beast/http.hpp>
 
+#include "adapter/inbound/BeastRequestAdapter.hpp"
+#include "adapter/outbound/BeastResponseAdapter.hpp"
+
 namespace mach::detail::server
 {
     namespace beast = boost::beast;         // from <boost/beast.hpp>
@@ -31,12 +34,20 @@ namespace mach::detail::server
         tcp::acceptor m_acceptor;
 
     public:
-        BeastListener(net::io_context& ioc, tcp::endpoint endpoint);
+        BeastListener(
+            net::io_context& ioc,
+            tcp::endpoint endpoint,
+            detail::http::adapter::BeastRequestAdapter& requestAdapter,
+            detail::http::adapter::BeastResponseAdapter& responseAdapter
+        );
 
         // Start accepting incoming connections
         net::awaitable<void> run();
 
     private:
         net::awaitable<void> do_accept();
+
+        detail::http::adapter::BeastRequestAdapter& m_requestAdapter;
+        detail::http::adapter::BeastResponseAdapter& m_responseAdapter;
     };
 }
