@@ -16,7 +16,7 @@ namespace mach
 		http::Method method() const noexcept;
 		http::Version version() const noexcept;
 		std::string target() const;
-		std::string body() const;
+		const std::string& body() const noexcept;
 		std::optional<std::string_view> header(std::string_view name) const;
 		bool containsHeader(std::string_view name) const noexcept;
 

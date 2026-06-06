@@ -14,7 +14,7 @@ namespace mach
 		return m_status;
 	}
 
-	std::string Response::body() const
+	const std::string& Response::body() const noexcept
 	{
 		return m_body;
 	}

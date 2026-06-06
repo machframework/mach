@@ -35,7 +35,7 @@ namespace mach
 		return m_target;
 	}
 
-	std::string Request::body() const
+	const std::string& Request::body() const noexcept
 	{
 		return m_body;
 	}
