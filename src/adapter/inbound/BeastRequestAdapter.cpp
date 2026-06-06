@@ -6,18 +6,20 @@ namespace mach::detail::http::adapter
 {
 	mach::Context BeastRequestAdapter::adapt(beast::http::request<beast::http::string_body>&& rawRequest) {
 		// adapt request
-		auto method = fromBeastVerb(rawRequest.method());
 		auto version = fromBeastVersion(rawRequest.version());
-
-		auto target = std::string(rawRequest.target());
-		auto body = rawRequest.body();
-
+		
 		std::unordered_map<std::string, std::string> headers;
 		for (auto const& field : rawRequest.base()) {
 			headers.insert_or_assign(std::string(field.name_string()), std::string(field.value()));
 		};
 
-		mach::Request req(method, version, std::move(target), std::move(body), std::move(headers));
+		mach::Request req(
+			fromBeastVerb(rawRequest.method()),
+			version,
+			std::move(std::string(rawRequest.target())),
+			std::move(rawRequest.body()),
+			std::move(headers)
+		);
 
 		// create an empty response
 		mach::Response res(version);

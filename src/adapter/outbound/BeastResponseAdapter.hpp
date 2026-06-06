@@ -1,4 +1,5 @@
 #include <boost/beast/http.hpp>
+#include <boost/beast/http/message_generator.hpp>
 #include <boost/beast/http/string_body.hpp>
 
 #include <mach/Context.hpp>
@@ -9,13 +10,12 @@ namespace mach::detail::http::adapter
 {
 	namespace beast = boost::beast;
 
-	class BeastRequestAdapter {
-		
+	class BeastResponseAdapter {
+
 	public:
-		mach::Context adapt(beast::http::request<beast::http::string_body>&& rawRequest);
-	
+		beast::http::message_generator adapt(mach::Context&& context);
+
 	private:
-		mach::http::Method fromBeastVerb(beast::http::verb verb);
-		mach::http::Version fromBeastVersion(unsigned int version);
+		unsigned int fromMachVersion(mach::http::Version version);
 	};
 }

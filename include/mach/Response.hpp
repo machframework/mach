@@ -8,6 +8,7 @@
 
 namespace mach::detail::http::adapter {
 	class BeastRequestAdapter;
+	class BeastResponseAdapter;
 }
 
 namespace mach
@@ -37,5 +38,6 @@ namespace mach
 		std::unordered_map<std::string, std::string> m_headers;
 
 		friend class mach::detail::http::adapter::BeastRequestAdapter;
+		friend class mach::detail::http::adapter::BeastResponseAdapter;
 	};
 }
