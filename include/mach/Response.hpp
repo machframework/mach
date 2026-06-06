@@ -3,34 +3,26 @@
 #include <string_view>
 #include <unordered_map>
 
-#include <mach/http/Method.hpp>
+#include <mach/http/StatusCode.hpp>
 #include <mach/http/Version.hpp>
 
 namespace mach
 {
-	using http::Method;
-
-	class Request {
+	class Response {
 
 	public:
-		http::Method method() const noexcept;
 		http::Version version() const noexcept;
-		std::string target() const;
+		http::StatusCode status() const noexcept;
 		std::string body() const;
 		std::optional<std::string_view> header(std::string_view name) const;
 
-	private:
-		Request(
-			http::Method method,
-			http::Version version,
-			std::string target,
-			std::string body,
-			std::unordered_map<std::string, std::string> headers
-		);
+		void status(http::StatusCode status) noexcept;
+		void body(std::string body) noexcept;
+		void setHeader(std::string name, std::string value) noexcept;
 
+	private:
 		http::Version m_version;
-		http::Method m_method;
-		std::string m_target;
+		http::StatusCode m_status;
 		std::string m_body;
 		std::unordered_map<std::string, std::string> m_headers;
 	};

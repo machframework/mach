@@ -1,5 +1,7 @@
 #include "mach/Request.hpp"
 
+#include "HttpUtils.hpp"
+
 #include <optional>
 
 namespace mach
@@ -38,9 +40,12 @@ namespace mach
 		return m_body;
 	}
 
-	std::optional<std::string> Request::header(const std::string& name) const
+	std::optional<std::string_view> Request::header(std::string_view name) const
 	{
-		auto it = m_headers.find(name);
+		std::string normalizedName = std::string(name);
+		mach::detail::http::toLowercaseInPlace(normalizedName);
+
+		auto it = m_headers.find(normalizedName);
 		if (it != m_headers.end()) {
 			return it->second;
 		}

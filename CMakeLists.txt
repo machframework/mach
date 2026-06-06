@@ -14,6 +14,7 @@ add_library(mach
     src/logging/Logging.cpp
     src/server/Server.cpp
     src/http/Request.cpp
+    src/http/Response.cpp
 )
 
 target_include_directories(mach
@@ -30,7 +31,7 @@ target_link_libraries(mach
 
 add_executable(mach_hello_world
  "src/http/Request.cpp"    examples/hello_world/main.cpp
-  )
+   "src/http/Response.cpp")
 
 target_link_libraries(mach_hello_world
     PRIVATE mach
