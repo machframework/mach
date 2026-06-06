@@ -13,6 +13,7 @@ add_library(mach
     src/server/BeastSession.cpp
     src/logging/Logging.cpp
     src/server/Server.cpp
+    src/http/Request.cpp
 )
 
 target_include_directories(mach
@@ -28,8 +29,8 @@ target_link_libraries(mach
 )
 
 add_executable(mach_hello_world
-    examples/hello_world/main.cpp
-)
+ "src/http/Request.cpp"    examples/hello_world/main.cpp
+  )
 
 target_link_libraries(mach_hello_world
     PRIVATE mach
