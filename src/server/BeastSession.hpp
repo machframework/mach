@@ -66,7 +66,7 @@ namespace mach::detail::server
     http::message_generator BeastSession::handle_request(
         http::request<Body, http::basic_fields<Allocator>>&& req) 
     {
-        Logger::info(std::format("Received request: {} {}", req.method_string(), req.target()));
+        Logger::info(std::format("Received request: {} {}", std::string(req.method_string()), std::string(req.target())));
 
 		auto req_body = req.body();
 

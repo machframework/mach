@@ -77,7 +77,7 @@ namespace mach::detail::server
 
         if (ec) {
             Logger::error(std::format("Failed to read request: {}", ec.message()));
-			Logger::error(std::format("Method was '{}', target was '{}'", m_req.method_string(), m_req.target()));
+			Logger::error(std::format("Method was '{}', target was '{}'", std::string( m_req.method_string()), std::string( m_req.target())));
             co_return;
         }
 
