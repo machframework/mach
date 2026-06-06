@@ -13,7 +13,7 @@
 #include "BeastSession.hpp"
 #include <mach/logging/Logging.hpp>
 
-namespace mach
+namespace mach::detail::server
 {
 	namespace net = boost::asio;
 

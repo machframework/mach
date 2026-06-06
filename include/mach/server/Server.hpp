@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 
-namespace mach
+namespace mach::detail::server
 {
 	class Server {
 
