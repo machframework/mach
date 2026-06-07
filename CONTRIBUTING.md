@@ -265,15 +265,21 @@ Example:
 
 ```cpp
 /**
- * Short summary of the function behavior.
+ * Short summary of what the function does.
  *
- * Optional additional details.
+ * More detailed explanation if needed (why, not how).
  *
  * @param parameter Description of the parameter.
+ *
  * @return Description of the return value.
  *
- * Optional notes about exceptions, ownership, lifetime,
- * threading, or important constraints.
+ * @throws Description of any exceptions thrown (if applicable).
+ *
+ * @thread_safety Whether this function is thread-safe or requires external synchronization.
+ *
+ * @ownership Notes about ownership / lifetime transfer (if applicable).
+ *
+ * @notes Any important constraints, invariants, or side effects.
  */
 ```
 
