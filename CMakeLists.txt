@@ -9,6 +9,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Boost REQUIRED)
 
+# -------------------------
+# Core library
+# -------------------------
 add_library(mach
     src/server/BeastListener.cpp
     src/server/BeastSession.cpp
@@ -19,6 +22,7 @@ add_library(mach
     src/adapter/inbound/BeastRequestAdapter.cpp
     src/adapter/outbound/BeastResponseAdapter.cpp
     src/application/Runtime.cpp
+    src/routing/Router.cpp
 )
 
 target_include_directories(mach
@@ -34,9 +38,10 @@ target_link_libraries(mach
 )
 
 add_executable(mach_hello_world
- "src/http/Request.cpp"    examples/hello_world/main.cpp
-   "src/http/Response.cpp" "src/adapter/inbound/BeastRequestAdapter.cpp" "src/adapter/outbound/BeastResponseAdapter.cpp" "src/application/Runtime.cpp")
+    examples/hello_world/main.cpp
+)
 
 target_link_libraries(mach_hello_world
-    PRIVATE mach
+    PRIVATE
+        mach
 )
