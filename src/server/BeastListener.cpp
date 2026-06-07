@@ -25,7 +25,7 @@
 
 namespace mach::detail::server
 {
-	using mach::detail::logging::Logger;
+	using detail::logging::Logger;
 
     BeastListener::BeastListener(
         net::io_context& ioc,
@@ -93,7 +93,7 @@ namespace mach::detail::server
 		auto& executor = socket.get_executor();
 
         // Create the session and run it
-        auto session = std::make_shared<mach::detail::server::BeastSession>(
+        auto session = std::make_shared<BeastSession>(
             std::move(socket),
             m_runtime,
             m_requestAdapter,

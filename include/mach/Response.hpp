@@ -104,7 +104,7 @@ namespace mach
 		 *
 		 * @thread_safety This function is not thread-safe.
 		 */
-		void body(std::string body);
+		void body(std::string body) noexcept;
 
 		/**
 		 * Sets a header in the response.
@@ -127,7 +127,7 @@ namespace mach
 		std::string m_body;
 		std::unordered_map<std::string, std::string> m_headers;
 
-		friend class mach::detail::http::adapter::BeastRequestAdapter;
-		friend class mach::detail::http::adapter::BeastResponseAdapter;
+		friend class detail::http::adapter::BeastRequestAdapter;
+		friend class detail::http::adapter::BeastResponseAdapter;
 	};
 }

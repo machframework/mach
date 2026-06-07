@@ -113,6 +113,6 @@ namespace mach
 		std::string m_body;
 		std::unordered_map<std::string, std::string> m_headers;
 
-		friend class mach::detail::http::adapter::BeastRequestAdapter;
+		friend class detail::http::adapter::BeastRequestAdapter;
 	};
 }
