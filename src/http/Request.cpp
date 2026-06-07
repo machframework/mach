@@ -30,7 +30,7 @@ namespace mach
 		return m_method;
 	}
 
-	std::string Request::target() const
+	std::string Request::target() const noexcept
 	{
 		return m_target;
 	}

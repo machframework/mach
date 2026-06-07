@@ -104,7 +104,7 @@ namespace mach
 		 *
 		 * @thread_safety This function is not thread-safe.
 		 */
-		void body(std::string body) noexcept;
+		void body(std::string body);
 
 		/**
 		 * Sets a header in the response.
@@ -114,7 +114,7 @@ namespace mach
 		 *
 		 * @thread_safety This function is not thread-safe.
 		 */
-		void setHeader(std::string name, std::string value) noexcept;
+		void setHeader(std::string_view name, std::string_view value);
 
 	private:
 		Response(

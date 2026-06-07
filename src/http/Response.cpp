@@ -44,6 +44,7 @@ namespace mach
 	{
 		std::string normalizedName = std::string(name);
 		mach::detail::http::toLowercaseInPlace(normalizedName);
+
 		return m_headers.find(normalizedName) != m_headers.end();
 	}
 
@@ -57,8 +58,11 @@ namespace mach
 		m_body = std::move(body);
 	}
 
-	void Response::setHeader(std::string name, std::string value) noexcept
+	void Response::setHeader(std::string_view name, std::string_view value)
 	{
-		m_headers[std::move(name)] = std::move(value);
+		m_headers.insert_or_assign(
+			std::string(name),
+			std::string(value)
+		);
 	}
 }
