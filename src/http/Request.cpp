@@ -20,17 +20,17 @@ namespace mach
 		m_headers(std::move(headers))
 	{}
 
-	mach::http::Version Request::version() const noexcept
+	http::Version Request::version() const noexcept
 	{
 		return m_version;
 	}
 
-	mach::http::Method Request::method() const noexcept
+	http::Method Request::method() const noexcept
 	{
 		return m_method;
 	}
 
-	std::string Request::target() const
+	std::string Request::target() const noexcept
 	{
 		return m_target;
 	}
@@ -43,7 +43,7 @@ namespace mach
 	std::optional<std::string_view> Request::header(std::string_view name) const
 	{
 		std::string normalizedName = std::string(name);
-		mach::detail::http::toLowercaseInPlace(normalizedName);
+		detail::http::toLowercaseInPlace(normalizedName);
 
 		auto it = m_headers.find(normalizedName);
 		if (it != m_headers.end()) {
@@ -56,7 +56,7 @@ namespace mach
 	bool Request::containsHeader(std::string_view name) const noexcept
 	{
 		std::string normalizedName = std::string(name);
-		mach::detail::http::toLowercaseInPlace(normalizedName);
+		detail::http::toLowercaseInPlace(normalizedName);
 
 		return m_headers.find(normalizedName) != m_headers.end();
 	}

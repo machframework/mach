@@ -12,12 +12,12 @@ namespace mach
 		m_status(status)
 	{}
 
-	mach::http::Version Response::version() const noexcept
+	http::Version Response::version() const noexcept
 	{
 		return m_version;
 	}
 
-	mach::http::StatusCode Response::status() const noexcept
+	http::StatusCode Response::status() const noexcept
 	{
 		return m_status;
 	}
@@ -30,7 +30,7 @@ namespace mach
 	std::optional<std::string_view> Response::header(std::string_view name) const
 	{
 		std::string normalizedName = std::string(name);
-		mach::detail::http::toLowercaseInPlace(normalizedName);
+		detail::http::toLowercaseInPlace(normalizedName);
 
 		auto it = m_headers.find(normalizedName);
 		if (it != m_headers.end()) {
@@ -43,7 +43,8 @@ namespace mach
 	bool Response::containsHeader(std::string_view name) const noexcept
 	{
 		std::string normalizedName = std::string(name);
-		mach::detail::http::toLowercaseInPlace(normalizedName);
+		detail::http::toLowercaseInPlace(normalizedName);
+
 		return m_headers.find(normalizedName) != m_headers.end();
 	}
 
@@ -57,8 +58,11 @@ namespace mach
 		m_body = std::move(body);
 	}
 
-	void Response::setHeader(std::string name, std::string value) noexcept
+	void Response::setHeader(std::string_view name, std::string_view value)
 	{
-		m_headers[std::move(name)] = std::move(value);
+		m_headers.insert_or_assign(
+			std::string(name),
+			std::string(value)
+		);
 	}
 }
