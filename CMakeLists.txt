@@ -23,6 +23,7 @@ add_library(mach
     src/adapter/outbound/BeastResponseAdapter.cpp
     src/application/Runtime.cpp
     src/routing/Router.cpp
+    src/routing/RouteTrie.cpp
 )
 
 target_include_directories(mach
