@@ -50,7 +50,17 @@ namespace mach::detail::routing
 								currSegmentKey
 							)
 						);
-					};
+					}
+
+					// same route, different method
+					else {
+						nextSegment->second->endpointsByMethod.emplace(
+							method,
+							endpoint
+						);
+
+						return;
+					}
 				}
 
 				curr = nextSegment->second.get();
@@ -81,7 +91,6 @@ namespace mach::detail::routing
 				}
 
 				if (nextSegment->second->endpointsByMethod.contains(method)) {
-					std::cout << "found" << std::endl;
 					return routing::RouteMatch(nextSegment->second->endpointsByMethod.find(method)->second);
 				}
 				

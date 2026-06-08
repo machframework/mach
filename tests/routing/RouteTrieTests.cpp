@@ -29,7 +29,7 @@ int main() {
 	t.addRoute({ "users" }, mach::http::Method::Post, &endpoint4);
 
 	auto endpoint5 = mach::detail::routing::Endpoint();
-	//t.addRoute({ "api", "v1", "users" }, mach::http::Method::Get, &endpoint5);
+	t.addRoute({ "api", "v1", "users" }, mach::http::Method::Get, &endpoint5);
 
 	auto endpoint6 = mach::detail::routing::Endpoint();
 	t.addRoute({ "api", "v1", "posts" }, mach::http::Method::Get, &endpoint6);
@@ -40,8 +40,8 @@ int main() {
 	auto endpoint8 = mach::detail::routing::Endpoint();
 	t.addRoute({ "api", "v1", "users" }, mach::http::Method::Delete, &endpoint8);
 
-	t.debugDump();
-	return 0;
+	//t.debugDump();
+	//return 0;
 
 	// -------------------------
 	// Found tests
@@ -98,7 +98,7 @@ int main() {
 		}
 	}
 
-	{
+	{ // Method not allowed instead of Found
 		constexpr auto testName = "Match POST /users";
 
 		auto match = t.matchRoute(
