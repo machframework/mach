@@ -76,16 +76,23 @@ namespace mach::detail::routing
 			}
 
 			if (std::next(it) == segments.end()) {
+				if (nextSegment->second->endpointsByMethod.size() == 0) {
+					return routing::RouteMatch(RouteMatchStatus::NotFound);
+				}
+
 				if (nextSegment->second->endpointsByMethod.contains(method)) {
 					std::cout << "found" << std::endl;
 					return routing::RouteMatch(nextSegment->second->endpointsByMethod.find(method)->second);
 				}
-
+				
 				return routing::RouteMatch(RouteMatchStatus::MethodNotAllowed);
 			}
 
 			curr = nextSegment->second.get();
 		}
+
+		// reached the end of the segment list without finding a match
+		return routing::RouteMatch(routing::RouteMatchStatus::NotFound);
 	}
 
 	void RouteTrie::debugDump() const {
