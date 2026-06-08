@@ -40,6 +40,8 @@ namespace mach::detail::routing
 			{ }
 		};
 
+		static std::string segmentsToPath(const std::vector<std::string>& segments);
+
 		RouteNode m_root;
 	};
 }

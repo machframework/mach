@@ -47,7 +47,7 @@ namespace mach::detail::routing
 							std::format(
 								"Duplicate route registered: {} {}",
 								mach::http::toString(method),
-								currSegmentKey
+								segmentsToPath(segments)
 							)
 						);
 					}
@@ -144,5 +144,19 @@ namespace mach::detail::routing
 
 		print(m_root, "", true);
 		std::cout << std::endl;
+	}
+
+	std::string RouteTrie::segmentsToPath(const std::vector<std::string>& segments) {
+		std::string path = "/";
+
+		for (std::size_t i = 0; i < segments.size(); ++i) {
+			path += segments[i];
+
+			if (i + 1 < segments.size()) {
+				path += '/';
+			}
+		}
+
+		return path;
 	}
 }
