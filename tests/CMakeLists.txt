@@ -7,4 +7,9 @@ target_link_libraries(mach_tests
         mach
 )
 
+target_include_directories(mach_tests
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}/src
+)
+
 add_test(NAME mach_tests COMMAND mach_tests)

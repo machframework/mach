@@ -126,5 +126,6 @@ namespace mach::detail::routing
 			};
 
 		print(m_root, "", true);
+		std::cout << std::endl;
 	}
 }
