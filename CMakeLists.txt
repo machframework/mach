@@ -38,11 +38,8 @@ target_link_libraries(mach
         Boost::headers
 )
 
-add_executable(mach_hello_world
-    examples/hello_world/main.cpp
-)
+option(MACH_BUILD_EXAMPLES "Build Mach examples" ON)
 
-target_link_libraries(mach_hello_world
-    PRIVATE
-        mach
-)
+if(MACH_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()
