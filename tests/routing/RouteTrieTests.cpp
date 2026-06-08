@@ -40,6 +40,43 @@ int main() {
 	auto endpoint8 = mach::detail::routing::Endpoint();
 	t.addRoute({ "api", "v1", "users" }, mach::http::Method::Delete, &endpoint8);
 
+	// -------------------------
+	// Double route definition tests
+	// -------------------------
+
+	try {
+		auto endpoint9 = mach::detail::routing::Endpoint();
+
+		t.addRoute(
+			{ "api", "v1", "users" },
+			mach::http::Method::Delete,
+			&endpoint9);
+
+		std::cerr << RED
+			<< "[FAIL] Expected std::logic_error"
+			<< RESET
+			<< std::endl;
+
+		return 1;
+	}
+	catch (const std::logic_error& e) {
+		std::cout << GREEN
+			<< "[SUCCESS] Duplicate route insertion threw std::logic_error: "
+			<< e.what()
+			<< RESET
+			<< std::endl;
+	}
+	catch (...) {
+		std::cerr << RED
+			<< "[FAIL] Wrong exception type thrown"
+			<< RESET
+			<< std::endl;
+
+		return 1;
+	}
+
+	std::cout << GREEN << "[SUCCESS] Duplicate route tests passed!" << RESET << std::endl;
+
 	//t.debugDump();
 	//return 0;
 
