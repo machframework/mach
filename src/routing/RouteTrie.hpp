@@ -19,12 +19,15 @@ namespace mach::detail::routing
 		void addRoute(
 			std::vector<std::string>&& segments,
 			mach::http::Method method,
-			routing::Endpoint* endpoint);
+			routing::Endpoint* endpoint
+		);
 
 		routing::RouteMatch matchRoute(
 			mach::http::Method method,
 			const std::vector<std::string>& segments
 		);
+
+		void debugDump() const;
 
 	private:
 		struct RouteNode {
@@ -37,6 +40,6 @@ namespace mach::detail::routing
 			{ }
 		};
 
-		RouteNode root;
+		RouteNode m_root;
 	};
 }

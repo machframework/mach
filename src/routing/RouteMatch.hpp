@@ -10,6 +10,15 @@ namespace mach::detail::routing
 		MethodNotAllowed
 	};
 
+	constexpr std::string_view toString(RouteMatchStatus status) {
+		switch (status) {
+		case RouteMatchStatus::Found: return "Found";
+		case RouteMatchStatus::NotFound: return "Not Found";
+		case RouteMatchStatus::MethodNotAllowed: return "Method Not Allowed";
+		default: return "Unknown";
+		}
+	}
+
 	struct RouteMatch {
 		RouteMatchStatus status;
 		routing::Endpoint* endpoint = nullptr;

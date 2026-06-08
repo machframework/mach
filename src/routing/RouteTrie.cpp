@@ -1,6 +1,9 @@
-#include "RouteTrie.hpp"
+﻿#include "RouteTrie.hpp"
 
+#include <algorithm>
 #include <format>
+#include <functional>
+#include <iostream>
 #include <stdexcept>
 
 namespace mach::detail::routing
@@ -11,7 +14,7 @@ namespace mach::detail::routing
 		routing::Endpoint* endpoint
 	) 
 	{
-		RouteNode* curr = &root;
+		RouteNode* curr = &m_root;
 
 		for (auto it = segments.begin(); it != segments.end(); ++it) {
 			const auto& currSegmentKey = *it;
@@ -60,7 +63,7 @@ namespace mach::detail::routing
 		const std::vector<std::string>& segments
 	) 
 	{
-		RouteNode* curr = &root;
+		RouteNode* curr = &m_root;
 
 		for (auto it = segments.begin(); it != segments.end(); ++it) {
 			if (!curr) {
@@ -82,5 +85,46 @@ namespace mach::detail::routing
 
 			curr = nextSegment->second.get();
 		}
+	}
+
+	void RouteTrie::debugDump() const {
+		std::function<void(const RouteNode&, const std::string&, bool)> print =
+			[&](const RouteNode& node, const std::string& prefix, bool isLast) {
+				// Print current node
+				std::string connector = isLast ? "\\-- " : "|-- ";
+				std::string label = node.segmentKey.empty() ? "[root]" : node.segmentKey;
+
+				// Collect methods if any endpoints are registered
+				if (!node.endpointsByMethod.empty()) {
+					std::string methods = " [";
+					bool first = true;
+					for (const auto& [method, _] : node.endpointsByMethod) {
+						if (!first) methods += ", ";
+						methods += toString(method); // adjust to your actual method→string utility
+						first = false;
+					}
+					methods += "]";
+					label += methods;
+				}
+
+				std::cout << prefix << connector << label << "\n";
+
+				// Prepare prefix for children
+				std::string childPrefix = prefix + (isLast ? "    " : "|   ");
+
+				// Collect and sort children keys for stable output
+				std::vector<std::string> keys;
+				keys.reserve(node.childrenBySegment.size());
+				for (const auto& [key, _] : node.childrenBySegment)
+					keys.push_back(key);
+				std::sort(keys.begin(), keys.end());
+
+				for (size_t i = 0; i < keys.size(); ++i) {
+					const auto& child = *node.childrenBySegment.at(keys[i]);
+					print(child, childPrefix, i == keys.size() - 1);
+				}
+			};
+
+		print(m_root, "", true);
 	}
 }
