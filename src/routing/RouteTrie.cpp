@@ -70,17 +70,18 @@ namespace mach::detail::routing
 				return routing::RouteMatch(RouteMatchStatus::NotFound);
 			}
 
-			if (std::next(it) == segments.end()) {
-				if (curr->endpointsByMethod.contains(method)) {
-					return routing::RouteMatch(curr->endpointsByMethod.find(method)->second);
-				}
-
-				return routing::RouteMatch(RouteMatchStatus::MethodNotAllowed);
-			}
-
 			auto nextSegment = curr->childrenBySegment.find(*it);
 			if (nextSegment == curr->childrenBySegment.end()) {
 				return routing::RouteMatch(RouteMatchStatus::NotFound);
+			}
+
+			if (std::next(it) == segments.end()) {
+				if (nextSegment->second->endpointsByMethod.contains(method)) {
+					std::cout << "found" << std::endl;
+					return routing::RouteMatch(nextSegment->second->endpointsByMethod.find(method)->second);
+				}
+
+				return routing::RouteMatch(RouteMatchStatus::MethodNotAllowed);
 			}
 
 			curr = nextSegment->second.get();
