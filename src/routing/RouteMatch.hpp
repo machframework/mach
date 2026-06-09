@@ -23,11 +23,11 @@ namespace mach::detail::routing
 		RouteMatchStatus status;
 		routing::Endpoint* endpoint = nullptr;
 
-		RouteMatch(RouteMatchStatus status)
+		explicit RouteMatch(RouteMatchStatus status)
 			: status(status)
 		{ }
 
-		RouteMatch(routing::Endpoint* endpoint)
+		explicit RouteMatch(routing::Endpoint* endpoint)
 			: status(RouteMatchStatus::Found),
 			endpoint(endpoint)
 		{ }
