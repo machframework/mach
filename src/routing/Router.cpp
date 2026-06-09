@@ -3,7 +3,7 @@
 namespace mach::detail::routing
 {
 	application::ExecutionPlan Router::route(const mach::Request& request) const {		
-        application::ExecutionPlan plan;
+        application::ExecutionPlan plan{};
         
         auto match = matchRoute(request);
 

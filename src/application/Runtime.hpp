@@ -2,6 +2,8 @@
 
 #include <mach/Context.hpp>
 
+#include "routing/Router.hpp"
+
 namespace mach::detail::application
 {
 	class Runtime {
@@ -10,6 +12,6 @@ namespace mach::detail::application
 		void handle(mach::Context& context);
 
 	private:
-
+		routing::Router m_router;
 	};
 }

@@ -1,20 +1,20 @@
 #pragma once
 
 #include "Endpoint.hpp"
-#include "RouteMatchStatus.hpp"
+#include "RoutingStatus.hpp"
 
 namespace mach::detail::routing
 {
 	struct RouteMatch {
-		routing::RouteMatchStatus status;
+		routing::RoutingStatus status;
 		routing::Endpoint* endpoint = nullptr;
 
-		explicit RouteMatch(routing::RouteMatchStatus status)
+		explicit RouteMatch(routing::RoutingStatus status)
 			: status(status)
 		{ }
 
 		explicit RouteMatch(routing::Endpoint* endpoint)
-			: status(routing::RouteMatchStatus::Found),
+			: status(routing::RoutingStatus::Found),
 			endpoint(endpoint)
 		{ }
 	};	

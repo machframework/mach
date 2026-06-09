@@ -1,9 +1,11 @@
 #pragma once
 
+#include <string>
+
 namespace mach::http
 {
 	enum class StatusCode {
-		OK = 200,
+		Ok = 200,
 		Created = 201,
 		Accepted = 202,
 		NonAuthoritativeInformation = 203,
@@ -25,4 +27,29 @@ namespace mach::http
 
 		InternalServerError = 500
 	};
+
+	constexpr std::string reasonPhrase(StatusCode status)
+	{
+		switch (status) {
+		case StatusCode::Ok:
+			return "OK";
+
+		case StatusCode::Created:
+			return "Created";
+
+		case StatusCode::BadRequest:
+			return "Bad Request";
+
+		case StatusCode::NotFound:
+			return "Not Found";
+
+		case StatusCode::MethodNotAllowed:
+			return "Method Not Allowed";
+
+		case StatusCode::InternalServerError:
+			return "Internal Server Error";
+		}
+
+		return "Unknown Status";
+	}
 }

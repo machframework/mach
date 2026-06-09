@@ -77,31 +77,31 @@ namespace mach::detail::routing
 
 		for (auto it = segments.begin(); it != segments.end(); ++it) {
 			if (!curr) {
-				return routing::RouteMatch(RouteMatchStatus::NotFound);
+				return routing::RouteMatch(RoutingStatus::NotFound);
 			}
 
 			auto nextSegment = curr->childrenBySegment.find(std::string(*it));
 			if (nextSegment == curr->childrenBySegment.end()) {
-				return routing::RouteMatch(RouteMatchStatus::NotFound);
+				return routing::RouteMatch(RoutingStatus::NotFound);
 			}
 
 			if (std::next(it) == segments.end()) {
 				if (nextSegment->second->endpointsByMethod.size() == 0) {
-					return routing::RouteMatch(RouteMatchStatus::NotFound);
+					return routing::RouteMatch(RoutingStatus::NotFound);
 				}
 
 				if (nextSegment->second->endpointsByMethod.contains(method)) {
 					return routing::RouteMatch(nextSegment->second->endpointsByMethod.find(method)->second);
 				}
 				
-				return routing::RouteMatch(RouteMatchStatus::MethodNotAllowed);
+				return routing::RouteMatch(RoutingStatus::MethodNotAllowed);
 			}
 
 			curr = nextSegment->second.get();
 		}
 
 		// reached the end of the segment list without finding a match
-		return routing::RouteMatch(routing::RouteMatchStatus::NotFound);
+		return routing::RouteMatch(routing::RoutingStatus::NotFound);
 	}
 
 	void RouteTrie::debugDump() const {

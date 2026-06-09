@@ -4,13 +4,17 @@
 #include <unordered_map>
 
 #include "routing/Endpoint.hpp"
-#include "routing/RouteMatchStatus.hpp"
+#include "routing/RoutingStatus.hpp"
 
 namespace mach::detail::application
 {
 	struct ExecutionPlan {
-		routing::RouteMatchStatus status;
+		routing::RoutingStatus status;
 		// middleware[]
 		routing::Endpoint* endpoint;
+
+		bool found() const noexcept {
+			return status == routing::RoutingStatus::Found;
+		}
 	};
 }

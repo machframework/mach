@@ -11,7 +11,6 @@
 #include "application/ExecutionPlan.hpp"
 #include "Endpoint.hpp"
 #include "RouteMatch.hpp"
-#include "RouteMatchStatus.hpp"
 #include "RouteTrie.hpp"
 
 namespace mach::detail::routing

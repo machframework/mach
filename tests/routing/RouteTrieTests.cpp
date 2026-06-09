@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include "routing/RouteTrie.hpp"
-#include "routing/RouteMatchStatus.hpp"
+#include "routing/RoutingStatus.hpp"
 
 constexpr const char* GREEN = "\033[32m";
 constexpr const char* RED = "\033[31m";
@@ -10,8 +10,8 @@ constexpr const char* RESET = "\033[0m";
 
 void fail(
 	std::string_view testName,
-	mach::detail::routing::RouteMatchStatus expected,
-	mach::detail::routing::RouteMatchStatus actual);
+	mach::detail::routing::RoutingStatus expected,
+	mach::detail::routing::RoutingStatus actual);
 
 int main() {
 
@@ -91,10 +91,10 @@ int main() {
 			mach::http::Method::Get,
 			{ "users" });
 
-		if (match.status != mach::detail::routing::RouteMatchStatus::Found) {
+		if (match.status != mach::detail::routing::RoutingStatus::Found) {
 			fail(
 				testName,
-				mach::detail::routing::RouteMatchStatus::Found,
+				mach::detail::routing::RoutingStatus::Found,
 				match.status);
 
 			return 1;
@@ -108,10 +108,10 @@ int main() {
 			mach::http::Method::Get,
 			{ "users", "names" });
 
-		if (match.status != mach::detail::routing::RouteMatchStatus::Found) {
+		if (match.status != mach::detail::routing::RoutingStatus::Found) {
 			fail(
 				testName,
-				mach::detail::routing::RouteMatchStatus::Found,
+				mach::detail::routing::RoutingStatus::Found,
 				match.status);
 
 			return 1;
@@ -125,10 +125,10 @@ int main() {
 			mach::http::Method::Get,
 			{ "users", "names", "desc" });
 
-		if (match.status != mach::detail::routing::RouteMatchStatus::Found) {
+		if (match.status != mach::detail::routing::RoutingStatus::Found) {
 			fail(
 				testName,
-				mach::detail::routing::RouteMatchStatus::Found,
+				mach::detail::routing::RoutingStatus::Found,
 				match.status);
 
 			return 1;
@@ -142,10 +142,10 @@ int main() {
 			mach::http::Method::Post,
 			{ "users" });
 
-		if (match.status != mach::detail::routing::RouteMatchStatus::Found) {
+		if (match.status != mach::detail::routing::RoutingStatus::Found) {
 			fail(
 				testName,
-				mach::detail::routing::RouteMatchStatus::Found,
+				mach::detail::routing::RoutingStatus::Found,
 				match.status);
 
 			return 1;
@@ -159,10 +159,10 @@ int main() {
 			mach::http::Method::Get,
 			{ "api", "v1", "users" });
 
-		if (match.status != mach::detail::routing::RouteMatchStatus::Found) {
+		if (match.status != mach::detail::routing::RoutingStatus::Found) {
 			fail(
 				testName,
-				mach::detail::routing::RouteMatchStatus::Found,
+				mach::detail::routing::RoutingStatus::Found,
 				match.status);
 
 			return 1;
@@ -176,10 +176,10 @@ int main() {
 			mach::http::Method::Delete,
 			{ "api", "v1", "users" });
 
-		if (match.status != mach::detail::routing::RouteMatchStatus::Found) {
+		if (match.status != mach::detail::routing::RoutingStatus::Found) {
 			fail(
 				testName,
-				mach::detail::routing::RouteMatchStatus::Found,
+				mach::detail::routing::RoutingStatus::Found,
 				match.status);
 
 			return 1;
@@ -193,10 +193,10 @@ int main() {
 			mach::http::Method::Get,
 			{ "health" });
 
-		if (match.status != mach::detail::routing::RouteMatchStatus::Found) {
+		if (match.status != mach::detail::routing::RoutingStatus::Found) {
 			fail(
 				testName,
-				mach::detail::routing::RouteMatchStatus::Found,
+				mach::detail::routing::RoutingStatus::Found,
 				match.status);
 
 			return 1;
@@ -216,10 +216,10 @@ int main() {
 			mach::http::Method::Get,
 			{ "orders" });
 
-		if (match.status != mach::detail::routing::RouteMatchStatus::NotFound) {
+		if (match.status != mach::detail::routing::RoutingStatus::NotFound) {
 			fail(
 				testName,
-				mach::detail::routing::RouteMatchStatus::NotFound,
+				mach::detail::routing::RoutingStatus::NotFound,
 				match.status);
 
 			return 1;
@@ -233,10 +233,10 @@ int main() {
 			mach::http::Method::Get,
 			{ "users", "emails" });
 
-		if (match.status != mach::detail::routing::RouteMatchStatus::NotFound) {
+		if (match.status != mach::detail::routing::RoutingStatus::NotFound) {
 			fail(
 				testName,
-				mach::detail::routing::RouteMatchStatus::NotFound,
+				mach::detail::routing::RoutingStatus::NotFound,
 				match.status);
 
 			return 1;
@@ -250,10 +250,10 @@ int main() {
 			mach::http::Method::Get,
 			{ "api", "v2", "users" });
 
-		if (match.status != mach::detail::routing::RouteMatchStatus::NotFound) {
+		if (match.status != mach::detail::routing::RoutingStatus::NotFound) {
 			fail(
 				testName,
-				mach::detail::routing::RouteMatchStatus::NotFound,
+				mach::detail::routing::RoutingStatus::NotFound,
 				match.status);
 
 			return 1;
@@ -267,10 +267,10 @@ int main() {
 			mach::http::Method::Get,
 			{ "users", "names", "asc" });
 
-		if (match.status != mach::detail::routing::RouteMatchStatus::NotFound) {
+		if (match.status != mach::detail::routing::RoutingStatus::NotFound) {
 			fail(
 				testName,
-				mach::detail::routing::RouteMatchStatus::NotFound,
+				mach::detail::routing::RoutingStatus::NotFound,
 				match.status);
 
 			return 1;
@@ -290,10 +290,10 @@ int main() {
 			mach::http::Method::Put,
 			{ "users" });
 
-		if (match.status != mach::detail::routing::RouteMatchStatus::MethodNotAllowed) {
+		if (match.status != mach::detail::routing::RoutingStatus::MethodNotAllowed) {
 			fail(
 				testName,
-				mach::detail::routing::RouteMatchStatus::MethodNotAllowed,
+				mach::detail::routing::RoutingStatus::MethodNotAllowed,
 				match.status);
 
 			return 1;
@@ -307,10 +307,10 @@ int main() {
 			mach::http::Method::Delete,
 			{ "users", "names" });
 
-		if (match.status != mach::detail::routing::RouteMatchStatus::MethodNotAllowed) {
+		if (match.status != mach::detail::routing::RoutingStatus::MethodNotAllowed) {
 			fail(
 				testName,
-				mach::detail::routing::RouteMatchStatus::MethodNotAllowed,
+				mach::detail::routing::RoutingStatus::MethodNotAllowed,
 				match.status);
 
 			return 1;
@@ -324,10 +324,10 @@ int main() {
 			mach::http::Method::Post,
 			{ "api", "v1", "posts" });
 
-		if (match.status != mach::detail::routing::RouteMatchStatus::MethodNotAllowed) {
+		if (match.status != mach::detail::routing::RoutingStatus::MethodNotAllowed) {
 			fail(
 				testName,
-				mach::detail::routing::RouteMatchStatus::MethodNotAllowed,
+				mach::detail::routing::RoutingStatus::MethodNotAllowed,
 				match.status);
 
 			return 1;
@@ -341,10 +341,10 @@ int main() {
 			mach::http::Method::Head,
 			{ "health" });
 
-		if (match.status != mach::detail::routing::RouteMatchStatus::MethodNotAllowed) {
+		if (match.status != mach::detail::routing::RoutingStatus::MethodNotAllowed) {
 			fail(
 				testName,
-				mach::detail::routing::RouteMatchStatus::MethodNotAllowed,
+				mach::detail::routing::RoutingStatus::MethodNotAllowed,
 				match.status);
 
 			return 1;
@@ -359,8 +359,8 @@ int main() {
 
 void fail(
 	std::string_view testName,
-	mach::detail::routing::RouteMatchStatus expected,
-	mach::detail::routing::RouteMatchStatus actual)
+	mach::detail::routing::RoutingStatus expected,
+	mach::detail::routing::RoutingStatus actual)
 {
 	std::cerr
 		<< RED
