@@ -1,27 +1,25 @@
 #pragma once
 
+#include <memory>
+#include <string>
 #include <string_view>
-
-#include "application/Runtime.hpp"
-#include "routing/Router.hpp"
-#include "server/Server.hpp"
 
 namespace mach
 {
-	namespace application = mach::detail::application;
-	namespace routing = mach::detail::routing;
-	namespace server = mach::detail::server;
-
 	class App {
 
 	public:
 		App(std::string_view host, std::uint16_t port, std::size_t threadCount = 1);
+		~App();
+
+		std::string host() const noexcept;
+		std::uint16_t port() const noexcept;
+		std::size_t threadCount() const noexcept;
 
 		void run();
 
 	private:
-		server::Server m_server;
-		application::Runtime m_runtime;
-		routing::Router m_router;
+		class Impl;
+		std::unique_ptr<Impl> m_impl;
 	};
 }
