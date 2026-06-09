@@ -5,11 +5,12 @@
 #include <functional>
 #include <iostream>
 #include <stdexcept>
+#include <string_view>
 
 namespace mach::detail::routing
 {
 	void RouteTrie::addRoute(
-		std::vector<std::string>&& segments,
+		std::vector<std::string_view>&& segments,
 		routing::Endpoint* endpoint
 	) 
 	{
@@ -18,7 +19,7 @@ namespace mach::detail::routing
 		for (auto it = segments.begin(); it != segments.end(); ++it) {
 			const auto& currSegmentKey = *it;
 			
-			auto nextSegment = curr->childrenBySegment.find(currSegmentKey);
+			auto nextSegment = curr->childrenBySegment.find(std::string(currSegmentKey));
 
 			// child does not exist yet
 			if (nextSegment == curr->childrenBySegment.end()) {
@@ -69,17 +70,17 @@ namespace mach::detail::routing
 
 	routing::RouteMatch RouteTrie::matchRoute(
 		mach::http::Method method,
-		const std::vector<std::string>& segments
-	) 
+		std::vector<std::string_view>&& segments
+	) const
 	{
-		RouteNode* curr = &m_root;
+		const RouteNode* curr = &m_root;
 
 		for (auto it = segments.begin(); it != segments.end(); ++it) {
 			if (!curr) {
 				return routing::RouteMatch(RouteMatchStatus::NotFound);
 			}
 
-			auto nextSegment = curr->childrenBySegment.find(*it);
+			auto nextSegment = curr->childrenBySegment.find(std::string(*it));
 			if (nextSegment == curr->childrenBySegment.end()) {
 				return routing::RouteMatch(RouteMatchStatus::NotFound);
 			}
@@ -145,7 +146,7 @@ namespace mach::detail::routing
 		std::cout << std::endl;
 	}
 
-	std::string RouteTrie::segmentsToPath(const std::vector<std::string>& segments) {
+	std::string RouteTrie::segmentsToPath(const std::vector<std::string_view>& segments) {
 		std::string path = "/";
 
 		for (std::size_t i = 0; i < segments.size(); ++i) {

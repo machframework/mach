@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 
@@ -17,14 +18,14 @@ namespace mach::detail::routing
 		RouteTrie() = default;
 
 		void addRoute(
-			std::vector<std::string>&& segments,
+			std::vector<std::string_view>&& segments,
 			routing::Endpoint* endpoint
 		);
 
 		routing::RouteMatch matchRoute(
 			mach::http::Method method,
-			const std::vector<std::string>& segments
-		);
+			std::vector<std::string_view>&& segments
+		) const;
 
 		void debugDump() const;
 
@@ -34,12 +35,12 @@ namespace mach::detail::routing
 			std::unordered_map<mach::http::Method, routing::Endpoint*> endpointsByMethod;
 			std::unordered_map<std::string, std::unique_ptr<RouteNode>> childrenBySegment;
 
-			RouteNode(std::string segmentKey = "")
+			explicit RouteNode(std::string_view segmentKey = "")
 				: segmentKey(std::move(segmentKey))
 			{ }
 		};
 
-		static std::string segmentsToPath(const std::vector<std::string>& segments);
+		static std::string segmentsToPath(const std::vector<std::string_view>& segments);
 
 		RouteNode m_root;
 	};

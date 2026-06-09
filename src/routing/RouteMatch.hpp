@@ -1,34 +1,20 @@
 #pragma once
 
-#include "routing/Endpoint.hpp"
+#include "Endpoint.hpp"
+#include "RouteMatchStatus.hpp"
 
 namespace mach::detail::routing
 {
-	enum class RouteMatchStatus {
-		Found,
-		NotFound,
-		MethodNotAllowed
-	};
-
-	constexpr std::string_view toString(RouteMatchStatus status) {
-		switch (status) {
-		case RouteMatchStatus::Found: return "Found";
-		case RouteMatchStatus::NotFound: return "Not Found";
-		case RouteMatchStatus::MethodNotAllowed: return "Method Not Allowed";
-		default: return "Unknown";
-		}
-	}
-
 	struct RouteMatch {
-		RouteMatchStatus status;
+		routing::RouteMatchStatus status;
 		routing::Endpoint* endpoint = nullptr;
 
-		explicit RouteMatch(RouteMatchStatus status)
+		explicit RouteMatch(routing::RouteMatchStatus status)
 			: status(status)
 		{ }
 
 		explicit RouteMatch(routing::Endpoint* endpoint)
-			: status(RouteMatchStatus::Found),
+			: status(routing::RouteMatchStatus::Found),
 			endpoint(endpoint)
 		{ }
 	};	

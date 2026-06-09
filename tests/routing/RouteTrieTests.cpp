@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "routing/RouteTrie.hpp"
+#include "routing/RouteMatchStatus.hpp"
 
 constexpr const char* GREEN = "\033[32m";
 constexpr const char* RED = "\033[31m";
