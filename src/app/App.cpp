@@ -3,6 +3,7 @@
 #include <string>
 
 #include "application/Runtime.hpp"
+#include "routing/Endpoint.hpp"
 #include "server/Server.hpp"
 
 namespace mach
@@ -17,6 +18,8 @@ namespace mach
 		std::uint16_t port() const noexcept;
 		std::size_t threadCount() const noexcept;
 
+		void addRoute(mach::http::Method method, std::string&& pattern, Handler handler);
+
 		void run();
 
 	private:
@@ -30,6 +33,14 @@ namespace mach
 
 	App::~App() = default;
 
+	void App::run() {
+		m_impl->run();
+	}
+
+	void App::addRoute(mach::http::Method method, std::string pattern, Handler handler) {
+		m_impl->addRoute(method, std::move(pattern), handler);
+	}
+
 	std::string App::host() const noexcept {
 		return m_impl->host();
 	}
@@ -42,10 +53,6 @@ namespace mach
 		return m_impl->threadCount();
 	}
 
-	void App::run() {
-		m_impl->run();
-	}
-
 	App::Impl::Impl(std::string_view host, std::uint16_t port, std::size_t threadCount) 
 		: m_server(host, port, threadCount, m_runtime)
 	{ }
@@ -53,6 +60,17 @@ namespace mach
 	void App::Impl::run() {
 		m_server.run();
 	}
+
+	void App::Impl::addRoute(mach::http::Method method, std::string&& pattern, Handler handler) {
+		mach::detail::routing::Endpoint endpoint{
+			.method = method,
+			.pattern = std::move(pattern),
+			.handler = handler
+		};
+
+		m_runtime.addRoute(std::move(endpoint));
+	}
+
 
 	std::string App::Impl::host() const noexcept {
 		return m_server.host();

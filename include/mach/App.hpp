@@ -4,8 +4,13 @@
 #include <string>
 #include <string_view>
 
+#include <mach/http/Method.hpp>
+#include <mach/Context.hpp>
+
 namespace mach
 {
+	using Handler = void(*)(mach::Context&);
+
 	class App {
 
 	public:
@@ -15,6 +20,8 @@ namespace mach
 		std::string host() const noexcept;
 		std::uint16_t port() const noexcept;
 		std::size_t threadCount() const noexcept;
+
+		void addRoute(mach::http::Method method, std::string pattern, Handler handler);
 
 		void run();
 
