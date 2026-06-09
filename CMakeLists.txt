@@ -24,6 +24,7 @@ add_library(mach
     src/application/Runtime.cpp
     src/routing/Router.cpp
     src/routing/RouteTrie.cpp
+    src/app/App.cpp
 )
 
 target_include_directories(mach

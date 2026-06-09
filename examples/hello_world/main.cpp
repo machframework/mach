@@ -1,12 +1,12 @@
 #include <thread>
 
-#include <mach/server/Server.hpp>
+#include <mach/App.hpp>
 
 int main() {
 	int threads = std::thread::hardware_concurrency();
 
-	auto server = mach::detail::server::Server("127.0.0.1", 3143, threads);
-	server.run();
+	auto app = mach::App("127.0.0.1", 3143, threads);
+	app.run();
 
 	return 0;
 }
