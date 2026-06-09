@@ -1,5 +1,6 @@
 add_executable(mach_tests
     routing/RouteTrieTests.cpp
+    
 )
 
 target_link_libraries(mach_tests
@@ -13,3 +14,8 @@ target_include_directories(mach_tests
 )
 
 add_test(NAME mach_tests COMMAND mach_tests)
+
+target_include_directories(mach_tests
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
