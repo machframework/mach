@@ -16,40 +16,39 @@ int main() {
 
 	mach::detail::routing::RouteTrie t;
 
-	auto endpoint1 = mach::detail::routing::Endpoint();
-	t.addRoute({ "users" }, mach::http::Method::Get, &endpoint1);
+	auto endpoint1 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Get };
+	t.addRoute({ "users" }, &endpoint1);
 
-	auto endpoint2 = mach::detail::routing::Endpoint();
-	t.addRoute({ "users", "names" }, mach::http::Method::Get, &endpoint2);
+	auto endpoint2 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Get };
+	t.addRoute({ "users", "names" }, &endpoint2);
 
-	auto endpoint3 = mach::detail::routing::Endpoint();
-	t.addRoute({ "users", "names", "desc" }, mach::http::Method::Get, &endpoint3);
+	auto endpoint3 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Get };
+	t.addRoute({ "users", "names", "desc" }, &endpoint3);
 
-	auto endpoint4 = mach::detail::routing::Endpoint();
-	t.addRoute({ "users" }, mach::http::Method::Post, &endpoint4);
+	auto endpoint4 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Post };
+	t.addRoute({ "users" }, &endpoint4);
 
-	auto endpoint5 = mach::detail::routing::Endpoint();
-	t.addRoute({ "api", "v1", "users" }, mach::http::Method::Get, &endpoint5);
+	auto endpoint5 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Get };
+	t.addRoute({ "api", "v1", "users" }, &endpoint5);
 
-	auto endpoint6 = mach::detail::routing::Endpoint();
-	t.addRoute({ "api", "v1", "posts" }, mach::http::Method::Get, &endpoint6);
+	auto endpoint6 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Get };
+	t.addRoute({ "api", "v1", "posts" }, &endpoint6);
 
-	auto endpoint7 = mach::detail::routing::Endpoint();
-	t.addRoute({ "health" }, mach::http::Method::Get, &endpoint7);
+	auto endpoint7 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Get };
+	t.addRoute({ "health" }, &endpoint7);
 
-	auto endpoint8 = mach::detail::routing::Endpoint();
-	t.addRoute({ "api", "v1", "users" }, mach::http::Method::Delete, &endpoint8);
+	auto endpoint8 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Delete };
+	t.addRoute({ "api", "v1", "users" }, &endpoint8);
 
 	// -------------------------
 	// Double route definition tests
 	// -------------------------
 
 	try {
-		auto endpoint9 = mach::detail::routing::Endpoint();
+		auto endpoint9 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Delete };
 
 		t.addRoute(
 			{ "api", "v1", "users" },
-			mach::http::Method::Delete,
 			&endpoint9);
 
 		std::cerr << RED
@@ -135,7 +134,7 @@ int main() {
 		}
 	}
 
-	{ // Method not allowed instead of Found
+	{
 		constexpr auto testName = "Match POST /users";
 
 		auto match = t.matchRoute(

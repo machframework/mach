@@ -18,7 +18,6 @@ namespace mach::detail::routing
 
 		void addRoute(
 			std::vector<std::string>&& segments,
-			mach::http::Method method,
 			routing::Endpoint* endpoint
 		);
 

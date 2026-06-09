@@ -10,7 +10,6 @@ namespace mach::detail::routing
 {
 	void RouteTrie::addRoute(
 		std::vector<std::string>&& segments,
-		mach::http::Method method,
 		routing::Endpoint* endpoint
 	) 
 	{
@@ -26,7 +25,7 @@ namespace mach::detail::routing
 				auto newNode = std::make_unique<RouteNode>(currSegmentKey);
 
 				if (std::next(it) == segments.end()) {
-					newNode->endpointsByMethod.emplace(method, endpoint);
+					newNode->endpointsByMethod.emplace(endpoint->method, endpoint);
 					curr->childrenBySegment.emplace(currSegmentKey, std::move(newNode));
 					
 					return;
@@ -42,11 +41,11 @@ namespace mach::detail::routing
 			}
 			else {
 				if (std::next(it) == segments.end()) {
-					if (nextSegment->second->endpointsByMethod.contains(method)) {
+					if (nextSegment->second->endpointsByMethod.contains(endpoint->method)) {
 						throw std::logic_error(
 							std::format(
 								"Duplicate route registered: {} {}",
-								mach::http::toString(method),
+								mach::http::toString(endpoint->method),
 								segmentsToPath(segments)
 							)
 						);
@@ -55,7 +54,7 @@ namespace mach::detail::routing
 					// same route, different method
 					else {
 						nextSegment->second->endpointsByMethod.emplace(
-							method,
+							endpoint->method,
 							endpoint
 						);
 
