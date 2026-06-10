@@ -89,17 +89,29 @@ namespace mach::detail::routing
 			auto nextSegment = curr->childrenByStaticSegment.find(std::string(*it));
 			if (nextSegment == curr->childrenByStaticSegment.end()) {
 				// check for parameters
-				     
+				if (curr->parameterizedChild) {
+					const auto childNode = curr->parameterizedChild.get();
+
+					if (std::next(it) == segments.end()) {
+						if (!childNode->endpointsByMethod.contains(method)) {
+							return routing::RouteMatch(RoutingStatus::MethodNotAllowed);
+						}
+
+						return routing::RouteMatch(childNode->endpointsByMethod.find(method)->second);
+					}
+
+					curr = curr->parameterizedChild.get();
+					continue;
+				}
+
 				return routing::RouteMatch(RoutingStatus::NotFound);
 			}
 
 			if (std::next(it) == segments.end()) {
-				if (nextSegment->second->endpointsByMethod.size() == 0) {
-					return routing::RouteMatch(RoutingStatus::NotFound);
-				}
+				const auto& endpointsByMethod = nextSegment->second->endpointsByMethod;
 
-				if (nextSegment->second->endpointsByMethod.contains(method)) {
-					return routing::RouteMatch(nextSegment->second->endpointsByMethod.find(method)->second);
+				if (endpointsByMethod.contains(method)) {
+					return routing::RouteMatch(endpointsByMethod.find(method)->second);
 				}
 				
 				return routing::RouteMatch(RoutingStatus::MethodNotAllowed);
