@@ -18,7 +18,7 @@ namespace mach
 		std::uint16_t port() const noexcept;
 		std::size_t threadCount() const noexcept;
 
-		void addRoute(mach::http::Method method, std::string&& pattern, Handler handler);
+		void addRoute(mach::http::Method method, std::string&& pattern, detail::Handler handler);
 
 		void run();
 
@@ -37,7 +37,7 @@ namespace mach
 		m_impl->run();
 	}
 
-	void App::addRoute(mach::http::Method method, std::string pattern, Handler handler) {
+	void App::addRoute(mach::http::Method method, std::string pattern, detail::Handler handler) {
 		m_impl->addRoute(method, std::move(pattern), handler);
 	}
 
@@ -61,7 +61,7 @@ namespace mach
 		m_server.run();
 	}
 
-	void App::Impl::addRoute(mach::http::Method method, std::string&& pattern, Handler handler) {
+	void App::Impl::addRoute(mach::http::Method method, std::string&& pattern, detail::Handler handler) {
 		mach::detail::routing::Endpoint endpoint{
 			.method = method,
 			.pattern = std::move(pattern),

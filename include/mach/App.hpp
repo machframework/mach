@@ -7,10 +7,11 @@
 #include <mach/http/Method.hpp>
 #include <mach/Context.hpp>
 
+// TODO: change registration method to a template
+#include "../src/core/Handler.hpp"
+
 namespace mach
 {
-	using Handler = void(*)(mach::Context&);
-
 	class App {
 
 	public:
@@ -21,7 +22,7 @@ namespace mach
 		std::uint16_t port() const noexcept;
 		std::size_t threadCount() const noexcept;
 
-		void addRoute(mach::http::Method method, std::string pattern, Handler handler);
+		void addRoute(mach::http::Method method, std::string pattern, detail::Handler handler);
 
 		void run();
 
