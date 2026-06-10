@@ -33,7 +33,7 @@ namespace mach::detail::routing
 		struct RouteNode {
 			std::string segmentKey;
 			std::unordered_map<mach::http::Method, routing::Endpoint*> endpointsByMethod;
-			std::unordered_map<std::string, std::unique_ptr<RouteNode>> childrenBySegment;
+			std::unordered_map<std::string, std::unique_ptr<RouteNode>> childrenByStaticSegment;
 
 			explicit RouteNode(std::string_view segmentKey = "")
 				: segmentKey(std::move(segmentKey))

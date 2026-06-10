@@ -19,53 +19,33 @@ namespace mach::detail::routing
 		for (auto it = segments.begin(); it != segments.end(); ++it) {
 			const auto& currSegmentKey = *it;
 			
-			auto nextSegment = curr->childrenBySegment.find(std::string(currSegmentKey));
+			auto nextSegment = curr->childrenByStaticSegment.find(std::string(currSegmentKey));
 
 			// child does not exist yet
-			if (nextSegment == curr->childrenBySegment.end()) {
-				auto newNode = std::make_unique<RouteNode>(currSegmentKey);
-
-				if (std::next(it) == segments.end()) {
-					newNode->endpointsByMethod.emplace(endpoint->method, endpoint);
-					curr->childrenBySegment.emplace(currSegmentKey, std::move(newNode));
-					
-					return;
-				}
-
-				auto [pos, inserted] = curr->childrenBySegment.emplace(
+			if (nextSegment == curr->childrenByStaticSegment.end()) {
+				auto [pos, inserted] = curr->childrenByStaticSegment.emplace(
 					currSegmentKey,
 					std::make_unique<RouteNode>(currSegmentKey)
 				);
 
-				// move to child
 				curr = pos->second.get();
 			}
 			else {
-				if (std::next(it) == segments.end()) {
-					if (nextSegment->second->endpointsByMethod.contains(endpoint->method)) {
-						throw std::logic_error(
-							std::format(
-								"Duplicate route registered: {} {}",
-								mach::http::toString(endpoint->method),
-								segmentsToPath(segments)
-							)
-						);
-					}
-
-					// same route, different method
-					else {
-						nextSegment->second->endpointsByMethod.emplace(
-							endpoint->method,
-							endpoint
-						);
-
-						return;
-					}
-				}
-
 				curr = nextSegment->second.get();
 			}
 		}
+
+		if (curr->endpointsByMethod.contains(endpoint->method)) {
+			throw std::logic_error(
+				std::format(
+					"Duplicate route registered: {} {}",
+					mach::http::toString(endpoint->method),
+					segmentsToPath(segments)
+				)
+			);
+		}
+
+		curr->endpointsByMethod.emplace(endpoint->method, endpoint);
 	}
 
 	routing::RouteMatch RouteTrie::matchRoute(
@@ -80,8 +60,10 @@ namespace mach::detail::routing
 				return routing::RouteMatch(RoutingStatus::NotFound);
 			}
 
-			auto nextSegment = curr->childrenBySegment.find(std::string(*it));
-			if (nextSegment == curr->childrenBySegment.end()) {
+			auto nextSegment = curr->childrenByStaticSegment.find(std::string(*it));
+			if (nextSegment == curr->childrenByStaticSegment.end()) {
+				// check for parameters
+				     
 				return routing::RouteMatch(RoutingStatus::NotFound);
 			}
 
@@ -131,13 +113,13 @@ namespace mach::detail::routing
 
 				// Collect and sort children keys for stable output
 				std::vector<std::string> keys;
-				keys.reserve(node.childrenBySegment.size());
-				for (const auto& [key, _] : node.childrenBySegment)
+				keys.reserve(node.childrenByStaticSegment.size());
+				for (const auto& [key, _] : node.childrenByStaticSegment)
 					keys.push_back(key);
 				std::sort(keys.begin(), keys.end());
 
 				for (size_t i = 0; i < keys.size(); ++i) {
-					const auto& child = *node.childrenBySegment.at(keys[i]);
+					const auto& child = *node.childrenByStaticSegment.at(keys[i]);
 					print(child, childPrefix, i == keys.size() - 1);
 				}
 			};
