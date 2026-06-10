@@ -23,7 +23,6 @@ namespace mach::detail::routing
 
 	private:
 		routing::RouteMatch matchRoute(const mach::Request& request) const;
-		static std::vector<std::string_view> splitToSegments(std::string_view pattern);
 
 		std::deque<routing::Endpoint> m_endpoints;
 		routing::RouteTrie m_routes;

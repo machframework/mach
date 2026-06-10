@@ -80,6 +80,7 @@ namespace mach::detail::routing
 	) const
 	{
 		const RouteNode* curr = &m_root;
+		std::unordered_map<std::string, std::string> params;
 
 		for (auto it = segments.begin(); it != segments.end(); ++it) {
 			if (!curr) {
@@ -91,6 +92,7 @@ namespace mach::detail::routing
 				// check for parameters
 				if (curr->parameterizedChild) {
 					const auto childNode = curr->parameterizedChild.get();
+					params.emplace(childNode->segmentKey, *it);
 
 					if (std::next(it) == segments.end()) {
 						if (childNode->endpointsByMethod.empty()) {
@@ -100,7 +102,7 @@ namespace mach::detail::routing
 							return routing::RouteMatch(RoutingStatus::MethodNotAllowed);
 						}
 
-						return routing::RouteMatch(childNode->endpointsByMethod.find(method)->second);
+						return routing::RouteMatch(childNode->endpointsByMethod.find(method)->second, std::move(params));
 					}
 
 					curr = curr->parameterizedChild.get();
@@ -114,7 +116,7 @@ namespace mach::detail::routing
 				const auto& endpointsByMethod = nextSegment->second->endpointsByMethod;
 
 				if (endpointsByMethod.contains(method)) {
-					return routing::RouteMatch(endpointsByMethod.find(method)->second);
+					return routing::RouteMatch(endpointsByMethod.find(method)->second, std::move(params));
 				}
 				
 				return routing::RouteMatch(RoutingStatus::MethodNotAllowed);

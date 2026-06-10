@@ -1,33 +1,13 @@
 #include "Router.hpp"
 
-namespace mach::detail::routing
+#include <format>
+#include <iostream>
+#include <stdexcept>
+#include <unordered_set>
+
+namespace
 {
-	application::ExecutionPlan Router::route(const mach::Request& request) const {		
-        application::ExecutionPlan plan{};
-        
-        auto match = matchRoute(request);
-
-        plan.status = match.status;
-        plan.endpoint = match.endpoint;
-
-        return plan;
-    }
-
-	void Router::addRoute(Endpoint&& route) {
-        auto segments = splitToSegments(route.pattern); 
-
-        m_endpoints.push_back(std::move(route));
-        Endpoint* stored = &m_endpoints.back();
-
-        m_routes.addRoute(std::move(segments), stored);
-    }
-
-	routing::RouteMatch Router::matchRoute(const mach::Request& request) const {
-        auto segments = splitToSegments(request.target());
-        return m_routes.matchRoute(request.method(), std::move(segments));
-	}
-
-	std::vector<std::string_view> Router::splitToSegments(std::string_view pattern) {
+    std::vector<std::string_view> splitToSegments(std::string_view pattern) {
         std::vector<std::string_view> segments;
 
         const char delimiter = '/';
@@ -54,5 +34,86 @@ namespace mach::detail::routing
         }
 
         return segments;
+    }
+
+    bool isParameter(std::string_view segment) {
+        return segment.front() == '{'
+            && segment.back() == '}';
+    }
+
+    std::vector<std::string_view> extractParameterSegments(const std::vector<std::string_view>& segments) {
+        std::vector<std::string_view> parameters;
+
+        for (const auto& segment : segments) {
+            if (isParameter(segment)) {
+                parameters.push_back(segment);
+            }
+        }
+
+        return parameters;
+    }
+
+    bool containsDuplicateParameters(const std::vector<std::string_view>& parameters, std::string& duplicate) {
+        std::unordered_set<std::string_view> seen;
+
+        for (const auto& param : parameters) {
+            if (!seen.insert(param).second) {
+                duplicate = param;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    std::string extractParameter(std::string_view segment) {
+        segment.remove_prefix(1);
+        segment.remove_suffix(1);
+
+        return std::string(segment);
+    }
+}
+
+namespace mach::detail::routing
+{
+	application::ExecutionPlan Router::route(const mach::Request& request) const {		
+        application::ExecutionPlan plan{};
+        
+        auto match = matchRoute(request);
+
+        plan.status = match.status;
+        plan.endpoint = match.endpoint;
+
+        std::cout << "Printing prarms:" << std::endl;
+        for (const auto& [key, value] : match.params) {
+            std::cout << key << " -> " << value << std::endl;
+        }
+
+        return plan;
+    }
+
+	void Router::addRoute(Endpoint&& route) {
+        auto segments = splitToSegments(route.pattern); 
+
+        std::string duplicate;
+        if (containsDuplicateParameters(extractParameterSegments(segments), duplicate)) {
+            throw std::invalid_argument(
+                std::format(
+                    "Duplicate route parameter '{}' in route '{}'",
+                    extractParameter(duplicate),
+                    route.pattern
+                )
+            );
+        }
+
+        m_endpoints.push_back(std::move(route));
+        Endpoint* stored = &m_endpoints.back();
+
+        m_routes.addRoute(std::move(segments), stored);
+    }
+
+	routing::RouteMatch Router::matchRoute(const mach::Request& request) const {
+        auto segments = splitToSegments(request.target());
+        return m_routes.matchRoute(request.method(), std::move(segments));
 	}
 }
