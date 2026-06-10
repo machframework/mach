@@ -12,11 +12,12 @@ int main() {
 
 		app.addRoute(mach::http::Method::Get, "/users", [](mach::Context& context) {
 			std::cout << "Request Body: " << context.request.body() << std::endl;
-			});
+		});
 
-		app.addRoute(mach::http::Method::Get, "/users/{age}/{age}", [](mach::Context& context) {
-			std::cout << "Target: " << context.request.target() << std::endl;
-			});
+		app.addRoute(mach::http::Method::Get, "/users/{name}/{age}", [](mach::Context& context) {
+			std::cout << "My name is: " << context.request.routeParam("name")
+				<< " and my age is: " << context.request.routeParam("age") << std::endl;
+		});
 
 		app.run();
 	}

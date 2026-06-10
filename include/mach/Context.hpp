@@ -37,6 +37,5 @@ namespace mach
 
 		Request request;
 		Response response;
-		std::unordered_map<std::string, std::string> params;
 	};
 }

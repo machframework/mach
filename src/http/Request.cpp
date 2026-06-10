@@ -2,7 +2,9 @@
 
 #include "HttpUtils.hpp"
 
+#include <format>
 #include <optional>
+#include <stdexcept>
 
 namespace mach
 {
@@ -59,5 +61,23 @@ namespace mach
 		detail::http::toLowercaseInPlace(normalizedName);
 
 		return m_headers.find(normalizedName) != m_headers.end();
+	}
+
+	std::string_view Request::routeParam(std::string_view name) const {
+		std::string normalizedName = std::string(name);
+		detail::http::toLowercaseInPlace(normalizedName);
+
+		auto it = m_routeParams.find(normalizedName);
+		if (it != m_routeParams.end()) {
+			return it->second;
+		}
+
+		throw std::out_of_range(
+			std::format("Route parameter '{}' does not exist", name)
+		);
+	}
+
+	void Request::setRouteParams(std::unordered_map<std::string, std::string>&& params) {
+		m_routeParams = std::move(params);
 	}
 }

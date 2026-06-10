@@ -83,11 +83,7 @@ namespace mach::detail::routing
 
         plan.status = match.status;
         plan.endpoint = match.endpoint;
-
-        std::cout << "Printing prarms:" << std::endl;
-        for (const auto& [key, value] : match.params) {
-            std::cout << key << " -> " << value << std::endl;
-        }
+        plan.params = std::move(match.params);
 
         return plan;
     }

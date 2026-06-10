@@ -18,6 +18,9 @@ namespace mach::detail::application {
 			return; 
 		}
 		
+		// add params to request object
+		context.request.setRouteParams(std::move(plan.params));
+
 		// dispatcher
 		m_dispatcher.execute(context, std::move(plan));
 
