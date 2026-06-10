@@ -5,10 +5,10 @@
 #include <mach/Context.hpp>
 #include <mach/http/Method.hpp>
 
+#include "core/Handler.hpp"
+
 namespace mach::detail::routing
 {
-	using Handler = void(*)(mach::Context&);
-
 	struct Endpoint {
 		mach::http::Method method;
 		std::string pattern;

@@ -2,6 +2,7 @@
 
 #include <mach/Context.hpp>
 
+#include "dispatching/Dispatcher.hpp"
 #include "routing/Endpoint.hpp"
 #include "routing/Router.hpp"
 
@@ -15,5 +16,6 @@ namespace mach::detail::application
 
 	private:
 		routing::Router m_router;
+		dispatching::Dispatcher m_dispatcher;
 	};
 }

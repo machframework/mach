@@ -7,22 +7,91 @@
 #include <mach/http/Method.hpp>
 #include <mach/Context.hpp>
 
+// TODO: change registration method to a template
+#include "../src/core/Handler.hpp"
+
 namespace mach
 {
-	using Handler = void(*)(mach::Context&);
-
+	/**
+	 * Represents the main entry point for configuring and running a Mach application.
+	 *
+	 * Used to register routes and start the underlying HTTP server.
+	 *
+	 * Ownership:
+	 * - Owns the application's runtime state.
+	 * - Should be treated as the root object of a Mach application.
+	 * 
+	 * Thread safety:
+	 * - Not thread-safe. Application configuration should be performed from one thread.
+	 * 
+	 * Stability:
+	 * - This API is still experimental and may change before Mach's first stable release.
+	 */
 	class App {
 
 	public:
+		/**
+		 * Creates a new application instance.
+		 *
+		 * @param host The network interface to bind to.
+		 * @param port The port to listen on.
+		 * @param threadCount The number of worker threads used to process requests.
+		 *
+		 * @throws std::invalid_argument If the supplied configuration is invalid.
+		 */
 		App(std::string_view host, std::uint16_t port, std::size_t threadCount = 1);
+
 		~App();
 
+		/**
+		 * Returns the host the application is configured to listen on (e.g. "127.0.0.1").
+		 *
+		 * @return The configured host.
+		 *
+		 * @thread_safety This function is thread-safe.
+		 */
 		std::string host() const noexcept;
+
+		/**
+		 * Returns the port the application is configured to listen on (e.g. 3143, 8080).
+		 *
+		 * @return The configured port.
+		 *
+		 * @thread_safety This function is thread-safe.
+		 */
 		std::uint16_t port() const noexcept;
+
+		/**
+		 * Returns the number of worker threads the application is configured to use.
+		 *
+		 * @return The configured thread count.
+		 *
+		 * @thread_safety This function is thread-safe.
+		 */
 		std::size_t threadCount() const noexcept;
 
-		void addRoute(mach::http::Method method, std::string pattern, Handler handler);
+		/**
+		 * Registers a route handler.
+		 *
+		 * @param method The HTTP method to match (e.g. GET, POST).
+		 * @param pattern The route pattern to match (e.g. "/api/users").
+		 * @param handler The function invoked when the route is matched.
+		 *
+		 * @throws std::invalid_argument If the supplied handler is invalid.
+		 * @throws std::logic_error If a route with the same method and pattern
+		 *         has already been registered.
+		 * 
+		 * @thread_safety This function is not thread-safe.
+		 */
+		void addRoute(mach::http::Method method, std::string pattern, detail::Handler handler);
 
+		/**
+		 * Starts the application and begins accepting incoming HTTP requests.
+		 *
+		 * This function blocks the calling thread until the application stops.
+		 *
+		 * @thread_safety This function is not thread-safe.
+		 */
 		void run();
 
 	private:
