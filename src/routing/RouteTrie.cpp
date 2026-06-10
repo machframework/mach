@@ -93,6 +93,9 @@ namespace mach::detail::routing
 					const auto childNode = curr->parameterizedChild.get();
 
 					if (std::next(it) == segments.end()) {
+						if (childNode->endpointsByMethod.empty()) {
+							return routing::RouteMatch(RoutingStatus::NotFound);
+						}
 						if (!childNode->endpointsByMethod.contains(method)) {
 							return routing::RouteMatch(RoutingStatus::MethodNotAllowed);
 						}
