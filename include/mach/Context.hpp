@@ -9,21 +9,27 @@
 namespace mach
 {
 	/**
-	 * Represents an HTTP context used by the server during the request-handling process.
+	 * Represents the per-request HTTP context used during request handling.
 	 *
-	 * This object provides access to HTTP request, response and request parameters
+	 * Provides access to the current HTTP request, response, and route parameters.
 	 *
 	 * Lifetime:
-	 * - The Context object is valid only during the request handling scope.
-	 *
-	 * Thread safety:
-	 * - This class is not thread-safe. Concurrent access must be synchronized externally.
+	 * - Valid only for the duration of the request handling scope.
 	 *
 	 * Ownership:
-	 * - The Context object is owned by the framework and should not be stored
-	 *   beyond the request handling lifetime.
+	 * - Owned by the framework.
+	 * - Must not be copied, moved, or stored beyond the request handling lifetime.
+	 *
+	 * Thread safety:
+	 * - Not thread-safe. Concurrent access must be synchronized externally.
 	 */
 	struct Context {
+		Context(const Context&) = delete;
+		Context& operator=(const Context&) = delete;
+
+		Context(Context&&) = delete;
+		Context& operator=(Context&&) = delete;
+
 		Request request;
 		Response response;
 		std::unordered_map<std::string, std::string> params;
