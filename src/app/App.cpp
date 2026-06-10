@@ -1,6 +1,7 @@
 #include <mach/App.hpp>
 
 #include <string>
+#include <stdexcept>
 
 #include "application/Runtime.hpp"
 #include "routing/Endpoint.hpp"
@@ -62,6 +63,10 @@ namespace mach
 	}
 
 	void App::Impl::addRoute(mach::http::Method method, std::string&& pattern, detail::Handler handler) {
+		if (!handler) {
+			throw std::invalid_argument("Route handler cannot be empty");
+		}
+		
 		mach::detail::routing::Endpoint endpoint{
 			.method = method,
 			.pattern = std::move(pattern),

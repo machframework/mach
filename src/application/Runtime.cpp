@@ -19,6 +19,7 @@ namespace mach::detail::application {
 		}
 		
 		// dispatcher
+		m_dispatcher.execute(context, std::move(plan));
 
 		// echo request body
 		context.response.body(context.request.body());
