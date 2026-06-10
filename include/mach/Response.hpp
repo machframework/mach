@@ -119,7 +119,7 @@ namespace mach
 	private:
 		Response(
 			http::Version version,
-			http::StatusCode status = http::StatusCode::OK
+			http::StatusCode status = http::StatusCode::Ok
 		);
 
 		http::Version m_version;

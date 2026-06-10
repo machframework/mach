@@ -2,13 +2,16 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
+
+#include "application/Runtime.hpp"
 
 namespace mach::detail::server
 {
 	class Server {
 
 	public:
-		Server(const std::string& host, std::uint16_t port, std::size_t thread_count = 1);
+		Server(const std::string_view& host, std::uint16_t port, std::size_t thread_count, application::Runtime& runtime);
 		~Server();
 		
 		std::string host() const noexcept;

@@ -1,4 +1,4 @@
-#include <mach/server/Server.hpp>
+#include "Server.hpp"
 
 #include <format>
 #include <thread>
@@ -24,7 +24,7 @@ namespace mach::detail::server
 	class Server::Impl {
 	
 	public:
-		Impl(const boost::asio::ip::address& address, std::uint16_t port, std::size_t threadCount);
+		Impl(const boost::asio::ip::address& address, std::uint16_t port, std::size_t threadCount, detail::application::Runtime& runtime);
 		~Impl() = default;
 
 		std::string host() const noexcept;
@@ -39,13 +39,13 @@ namespace mach::detail::server
 		boost::asio::io_context m_ioc;
 		std::shared_ptr<BeastListener> m_listener;
 
-		detail::application::Runtime m_runtime;
+		detail::application::Runtime& m_runtime;
 		detail::http::adapter::BeastRequestAdapter m_requestAdapter;
 		detail::http::adapter::BeastResponseAdapter m_responseAdapter;
 	};
 
-	Server::Server(const std::string& host, std::uint16_t port, std::size_t threadCount)
-		: m_impl(std::make_unique<Impl>(boost::asio::ip::make_address(host), port, threadCount))
+	Server::Server(const std::string_view& host, std::uint16_t port, std::size_t thread_count, application::Runtime& runtime)
+		: m_impl(std::make_unique<Impl>(boost::asio::ip::make_address(host), port, thread_count, runtime))
 	{}
 
 	Server::~Server() = default;
@@ -66,10 +66,11 @@ namespace mach::detail::server
 		m_impl->run();
 	}
 
-	Server::Impl::Impl(const boost::asio::ip::address& address, std::uint16_t port, std::size_t threadCount)
+	Server::Impl::Impl(const boost::asio::ip::address& address, std::uint16_t port, std::size_t threadCount, detail::application::Runtime& runtime)
 		: m_thread_count(threadCount), 
 		m_endpoint(address, port), 
-		m_ioc(static_cast<int>(threadCount))
+		m_ioc(static_cast<int>(threadCount)),
+		m_runtime(runtime)
 	{}
 
 	std::string Server::Impl::host() const noexcept {

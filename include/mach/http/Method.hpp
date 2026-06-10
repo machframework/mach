@@ -16,7 +16,7 @@ namespace mach::http
 		Unknown
 	};
 
-	constexpr std::string_view to_string(Method method) {
+	constexpr std::string_view toString(Method method) {
 		switch (method) {
 		case Method::Get: return "GET";
 		case Method::Post: return "POST";
