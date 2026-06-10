@@ -24,10 +24,7 @@ namespace mach::detail::http::adapter
 		// create an empty response
 		mach::Response res(version);
 
-		return mach::Context{
-			.request = std::move(req),
-			.response = std::move(res)
-		};
+		return mach::Context(std::move(req), std::move(res));
 	}
 
 	mach::http::Method BeastRequestAdapter::fromBeastVerb(beast::http::verb verb) {

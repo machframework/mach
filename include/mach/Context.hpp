@@ -24,6 +24,11 @@ namespace mach
 	 * - Not thread-safe. Concurrent access must be synchronized externally.
 	 */
 	struct Context {
+		Context(Request&& requst, Response&& response) 
+			: request(std::move(requst)),
+			response(std::move(response))
+		{ }
+
 		Context(const Context&) = delete;
 		Context& operator=(const Context&) = delete;
 
