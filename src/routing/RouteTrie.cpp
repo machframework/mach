@@ -5,7 +5,21 @@
 #include <functional>
 #include <iostream>
 #include <stdexcept>
-#include <string_view>
+
+namespace
+{
+	bool isParameter(std::string_view segment) {
+		return segment.front() == '{'
+			&& segment.back() == '}';
+	}
+
+	std::string extractParameter(std::string_view segment) {
+		segment.remove_prefix(1);
+		segment.remove_suffix(1);
+
+		return std::string(segment);
+	}
+}
 
 namespace mach::detail::routing
 {
@@ -23,18 +37,29 @@ namespace mach::detail::routing
 
 			// child does not exist yet
 			if (nextSegment == curr->childrenByStaticSegment.end()) {
-				auto [pos, inserted] = curr->childrenByStaticSegment.emplace(
-					currSegmentKey,
-					std::make_unique<RouteNode>(currSegmentKey)
-				);
+				RouteNode* next = nullptr;
+				
+				if (isParameter(currSegmentKey)) {
+					curr->parameterizedChild = std::make_unique<RouteNode>(extractParameter(currSegmentKey));
+					next = curr->parameterizedChild.get();
+				}
+				else {
+					auto [pos, inserted] = curr->childrenByStaticSegment.emplace(
+						currSegmentKey,
+						std::make_unique<RouteNode>(currSegmentKey)
+					);
 
-				curr = pos->second.get();
+					next = pos->second.get();
+				}
+				
+				curr = next;
 			}
 			else {
 				curr = nextSegment->second.get();
 			}
 		}
 
+		// same route and method, reject
 		if (curr->endpointsByMethod.contains(endpoint->method)) {
 			throw std::logic_error(
 				std::format(
@@ -45,6 +70,7 @@ namespace mach::detail::routing
 			);
 		}
 
+		// same route, different method
 		curr->endpointsByMethod.emplace(endpoint->method, endpoint);
 	}
 

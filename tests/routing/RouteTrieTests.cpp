@@ -37,6 +37,12 @@ int main() {
 	auto endpoint8 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Delete };
 	t.addRoute({ "api", "v1", "users" }, &endpoint8);
 
+	auto endpoint9 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Get };
+	t.addRoute({ "users", "{age}" }, &endpoint9);
+
+	t.debugDump();
+	return 0;
+
 	// -------------------------
 	// Double route definition tests
 	// -------------------------
