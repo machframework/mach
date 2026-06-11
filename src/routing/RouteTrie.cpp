@@ -31,22 +31,25 @@ namespace mach::detail::routing
 		RouteNode* curr = &m_root;
 
 		for (auto it = segments.begin(); it != segments.end(); ++it) {
-			const auto& currSegmentKey = *it;
+			const auto& nextSegmentKey = *it;
 			
-			auto nextSegment = curr->childrenByStaticSegment.find(std::string(currSegmentKey));
+			auto nextSegment = curr->childrenByStaticSegment.find(std::string(nextSegmentKey));
 
 			// child does not exist yet
 			if (nextSegment == curr->childrenByStaticSegment.end()) {
 				RouteNode* next = nullptr;
 				
-				if (isParameter(currSegmentKey)) {
-					curr->parameterizedChild = std::make_unique<RouteNode>(extractParameter(currSegmentKey));
+				if (isParameter(nextSegmentKey)) {
+					if (!curr->parameterizedChild) {
+						curr->parameterizedChild = std::make_unique<RouteNode>(extractParameter(nextSegmentKey));
+					}
+
 					next = curr->parameterizedChild.get();
 				}
 				else {
 					auto [pos, inserted] = curr->childrenByStaticSegment.emplace(
-						currSegmentKey,
-						std::make_unique<RouteNode>(currSegmentKey)
+						nextSegmentKey,
+						std::make_unique<RouteNode>(nextSegmentKey)
 					);
 
 					next = pos->second.get();
@@ -72,6 +75,8 @@ namespace mach::detail::routing
 
 		// same route, different method
 		curr->endpointsByMethod.emplace(endpoint->method, endpoint);
+
+		debugDump();
 	}
 
 	routing::RouteMatch RouteTrie::matchRoute(
@@ -130,45 +135,50 @@ namespace mach::detail::routing
 	}
 
 	void RouteTrie::debugDump() const {
-		std::function<void(const RouteNode&, const std::string&, bool)> print =
-			[&](const RouteNode& node, const std::string& prefix, bool isLast) {
-				// Print current node
-				std::string connector = isLast ? "\\-- " : "|-- ";
-				std::string label = node.segmentKey.empty() ? "[root]" : node.segmentKey;
+		std::function<void(const RouteNode&, const std::string&, bool, bool)> print =
+			[&](const RouteNode& node, const std::string& prefix, bool isLast, bool isParam) {
 
-				// Collect methods if any endpoints are registered
-				if (!node.endpointsByMethod.empty()) {
-					std::string methods = " [";
-					bool first = true;
-					for (const auto& [method, _] : node.endpointsByMethod) {
-						if (!first) methods += ", ";
-						methods += toString(method); // adjust to your actual method→string utility
-						first = false;
-					}
-					methods += "]";
-					label += methods;
+			const std::string connector = isLast ? "\\-- " : "|-- ";
+
+			// Build label
+			std::string label = node.segmentKey.empty()
+				? "[root]"
+				: (isParam ? "{" + node.segmentKey + "}" : node.segmentKey);
+
+			if (!node.endpointsByMethod.empty()) {
+				label += " [";
+				bool first = true;
+				for (const auto& [method, _] : node.endpointsByMethod) {
+					if (!first) label += ", ";
+					label += toString(method);
+					first = false;
 				}
+				label += "]";
+			}
 
-				std::cout << prefix << connector << label << "\n";
+			std::cout << prefix << connector << label << "\n";
 
-				// Prepare prefix for children
-				std::string childPrefix = prefix + (isLast ? "    " : "|   ");
+			const std::string childPrefix = prefix + (isLast ? "    " : "|   ");
+			const bool hasParamChild = node.parameterizedChild != nullptr;
 
-				// Collect and sort children keys for stable output
-				std::vector<std::string> keys;
-				keys.reserve(node.childrenByStaticSegment.size());
-				for (const auto& [key, _] : node.childrenByStaticSegment)
-					keys.push_back(key);
-				std::sort(keys.begin(), keys.end());
+			// Collect and sort static children
+			std::vector<std::string> keys;
+			keys.reserve(node.childrenByStaticSegment.size());
+			for (const auto& [key, _] : node.childrenByStaticSegment)
+				keys.push_back(key);
+			std::sort(keys.begin(), keys.end());
 
-				for (size_t i = 0; i < keys.size(); ++i) {
-					const auto& child = *node.childrenByStaticSegment.at(keys[i]);
-					print(child, childPrefix, i == keys.size() - 1);
-				}
+			for (size_t i = 0; i < keys.size(); ++i) {
+				const bool lastChild = !hasParamChild && (i == keys.size() - 1);
+				print(*node.childrenByStaticSegment.at(keys[i]), childPrefix, lastChild, false);
+			}
+
+			if (hasParamChild)
+				print(*node.parameterizedChild, childPrefix, true, true);
 			};
 
-		print(m_root, "", true);
-		std::cout << std::endl;
+		print(m_root, "", true, false);
+		std::cout << '\n';
 	}
 
 	std::string RouteTrie::segmentsToPath(const std::vector<std::string_view>& segments) {
