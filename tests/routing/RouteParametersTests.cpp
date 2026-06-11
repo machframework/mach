@@ -161,6 +161,18 @@ int main()
 		}
 	);
 
+	app.addRoute(
+		mach::http::Method::Get,
+		"/users/me",
+		[](mach::Context&) {
+			std::cout
+				<< test::GREEN
+				<< "[SUCCESS] Static route precedence: /users/me hit static route"
+				<< test::RESET
+				<< std::endl;
+		}
+	);
+
 	std::cout
 		<< test::GREEN
 		<< "[SUCCESS] Route parameter registration tests passed!"
@@ -170,9 +182,9 @@ int main()
 	std::cout
 		<< "Manual Postman checks:\n"
 		<< "  GET http://127.0.0.1:3143/users/Asaf\n"
-		<< "  GET http://127.0.0.1:3143/users/Asaf/16\n";
+		<< "  GET http://127.0.0.1:3143/users/Asaf/16\n"
+		<< "  GET http://127.0.0.1:3143/users/me\n";
 		
-
 	app.run();
 
 	return 0;
