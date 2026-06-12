@@ -40,6 +40,9 @@ namespace mach::detail::routing
 				RouteNode* next = nullptr;
 				
 				if (isParameter(nextSegmentKey)) {
+					// get constraint
+
+					// check for specific constraints
 					if (!curr->parameterizedChild) {
 						curr->parameterizedChild = std::make_unique<RouteNode>(extractParameter(nextSegmentKey));
 					}

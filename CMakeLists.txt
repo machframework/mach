@@ -25,7 +25,9 @@ add_library(mach
     src/routing/Router.cpp
     src/routing/RouteTrie.cpp
     src/app/App.cpp
-    src/dispatching/Dispatcher.cpp)
+    src/dispatching/Dispatcher.cpp 
+    src/routing/RouteConstraint.cpp
+)
 
 target_include_directories(mach
     PUBLIC

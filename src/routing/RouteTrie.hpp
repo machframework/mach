@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -8,6 +9,7 @@
 
 #include <mach/http/Method.hpp>
 
+#include "RouteConstraint.hpp"
 #include "routing/RouteMatch.hpp"
 
 namespace mach::detail::routing
