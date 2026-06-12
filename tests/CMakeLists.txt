@@ -28,3 +28,8 @@ add_mach_test(
     RouteParametersTests
     routing/RouteParametersTests.cpp
 )
+
+add_mach_test(
+    ConstrainedRoutesTests
+    routing/ConstrainedRoutesTests.cpp
+)

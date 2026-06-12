@@ -7,7 +7,8 @@ namespace mach::detail::routing
 	enum class RoutingStatus {
 		Found,
 		NotFound,
-		MethodNotAllowed
+		MethodNotAllowed,
+		BadRequest
 	};
 
 	constexpr std::string_view toString(RoutingStatus status) {

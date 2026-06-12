@@ -72,7 +72,7 @@ namespace mach::detail::routing
 					if (!curr->constrainedParameterChildren.contains(constraint)) {
 						curr->constrainedParameterChildren.emplace(
 							constraint,
-							std::make_unique<RouteNode>(nextSegmentKey)
+							std::make_unique<RouteNode>(parameter)
 						);
 
 						//add constrained parameter to parameter map
@@ -110,6 +110,8 @@ namespace mach::detail::routing
 
 		// same route, different method
 		curr->endpointsByMethod.emplace(endpoint->method, endpoint);
+
+		debugDump();
 	}
 
 	routing::RouteMatch RouteTrie::matchRoute(
@@ -143,6 +145,9 @@ namespace mach::detail::routing
 					}
 					else if (curr->constrainedParameterChildren.contains(RouteConstraint::String)) {
 						childNode = curr->constrainedParameterChildren.find(RouteConstraint::String)->second.get();
+					}
+					else {
+						return RouteMatch(RoutingStatus::BadRequest);
 					}
 
 					params.emplace(childNode->segmentKey, *it);
@@ -220,17 +225,20 @@ namespace mach::detail::routing
 			constraints.reserve(node.constrainedParameterChildren.size());
 			for (const auto& [constraintKey, _] : node.constrainedParameterChildren)
 				constraints.push_back(constraintKey);
+
 			std::sort(constraints.begin(), constraints.end(),
 				[](const auto& a, const auto& b) {
 					const std::string_view sa = a ? toString(*a) : "";
 					const std::string_view sb = b ? toString(*b) : "";
 					return sa < sb;
 				});
+
 			for (size_t i = 0; i < constraints.size(); ++i) {
 				const bool lastChild = (i == constraints.size() - 1);
 				print(*node.constrainedParameterChildren.at(constraints[i]), childPrefix, lastChild, true, constraints[i]);
 			}
-			};
+		};
+
 		print(m_root, "", true, false, std::nullopt);
 		std::cout << '\n';
 	}
