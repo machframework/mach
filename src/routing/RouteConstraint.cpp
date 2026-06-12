@@ -25,10 +25,23 @@ namespace
 
 namespace mach::detail::routing
 {
+    std::string_view toString(RouteConstraint constraint) {
+        switch (constraint) {
+        case RouteConstraint::Int:
+            return "int";
+        }
+
+        return "string";
+    }
+
 	std::optional<RouteConstraint> toRouteConstraint(std::string_view value) {
 		if (value == "int") {
 			return RouteConstraint::Int;
 		}
+
+        if (value == "string") {
+            return RouteConstraint::String;
+        }
 
 		return std::nullopt;
 	}
