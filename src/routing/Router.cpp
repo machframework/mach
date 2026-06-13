@@ -88,8 +88,8 @@ namespace mach::detail::routing
         return plan;
     }
 
-	void Router::addRoute(Endpoint&& route) {
-        auto segments = splitToSegments(route.pattern); 
+	void Router::addRoute(Endpoint&& endpoint) {
+        auto segments = splitToSegments(endpoint.pattern); 
 
         std::string duplicate;
         if (containsDuplicateParameters(extractParameterSegments(segments), duplicate)) {
@@ -97,12 +97,12 @@ namespace mach::detail::routing
                 std::format(
                     "Duplicate route parameter '{}' in route '{}'",
                     extractParameter(duplicate),
-                    route.pattern
+                    endpoint.pattern
                 )
             );
         }
 
-        m_endpoints.push_back(std::move(route));
+        m_endpoints.push_back(std::move(endpoint));
         Endpoint* stored = &m_endpoints.back();
 
         m_routes.addRoute(std::move(segments), stored);

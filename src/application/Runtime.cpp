@@ -28,7 +28,7 @@ namespace mach::detail::application {
 		context.response.body(context.request.body());
 	}
 
-	void Runtime::addRoute(routing::Endpoint&& route) {
-		m_router.addRoute(std::move(route));
+	void Runtime::addRoute(routing::Endpoint&& endpoint) {
+		m_router.addRoute(std::move(endpoint));
 	}
 }

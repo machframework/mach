@@ -12,7 +12,7 @@ namespace mach::detail::application
 
 	public:
 		void handle(mach::Context& context);
-		void addRoute(routing::Endpoint&& route);
+		void addRoute(routing::Endpoint&& endpoint);
 
 	private:
 		routing::Router m_router;
