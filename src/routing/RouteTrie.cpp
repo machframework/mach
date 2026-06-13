@@ -147,7 +147,8 @@ namespace mach::detail::routing
 						childNode = curr->constrainedParameterChildren.find(RouteConstraint::String)->second.get();
 					}
 					else {
-						return RouteMatch(RoutingStatus::BadRequest);
+						// not found for the given param types
+						return RouteMatch(RoutingStatus::NotFound);
 					}
 
 					params.emplace(childNode->segmentKey, *it);
