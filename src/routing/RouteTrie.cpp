@@ -110,8 +110,6 @@ namespace mach::detail::routing
 
 		// same route, different method
 		curr->endpointsByMethod.emplace(endpoint->method, endpoint);
-
-		debugDump();
 	}
 
 	routing::RouteMatch RouteTrie::matchRoute(

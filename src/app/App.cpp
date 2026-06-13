@@ -19,7 +19,7 @@ namespace mach
 		std::uint16_t port() const noexcept;
 		std::size_t threadCount() const noexcept;
 
-		void addRoute(mach::http::Method method, std::string&& pattern, detail::Handler handler);
+		void addRoute(mach::http::Method method, std::string_view pattern, detail::Handler handler);
 
 		void run();
 
@@ -38,10 +38,6 @@ namespace mach
 		m_impl->run();
 	}
 
-	void App::addRoute(mach::http::Method method, std::string pattern, detail::Handler handler) {
-		m_impl->addRoute(method, std::move(pattern), handler);
-	}
-
 	std::string App::host() const noexcept {
 		return m_impl->host();
 	}
@@ -54,6 +50,10 @@ namespace mach
 		return m_impl->threadCount();
 	}
 
+	void App::addRouteImpl(http::Method method, std::string_view pattern, detail::Handler handler) {
+		m_impl->addRoute(method, pattern, handler);
+	}
+
 	App::Impl::Impl(std::string_view host, std::uint16_t port, std::size_t threadCount) 
 		: m_server(host, port, threadCount, m_runtime)
 	{ }
@@ -62,14 +62,14 @@ namespace mach
 		m_server.run();
 	}
 
-	void App::Impl::addRoute(mach::http::Method method, std::string&& pattern, detail::Handler handler) {
+	void App::Impl::addRoute(mach::http::Method method, std::string_view pattern, detail::Handler handler) {
 		if (!handler) {
 			throw std::invalid_argument("Route handler cannot be empty");
 		}
 		
 		mach::detail::routing::Endpoint endpoint{
 			.method = method,
-			.pattern = std::move(pattern),
+			.pattern = std::string(pattern),
 			.handler = handler
 		};
 
