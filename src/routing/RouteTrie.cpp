@@ -39,6 +39,10 @@ namespace
 		if (!constraintType) {
 			throw std::invalid_argument("Invalid constraint type");
 		}
+
+		if (param.empty()) {
+			throw std::invalid_argument("Parameter name cannot be empty");
+		}
 		
 		return {
 			std::string(param),
@@ -83,8 +87,8 @@ namespace mach::detail::routing
 				}
 				else {
 					auto [pos, inserted] = curr->childrenByStaticSegment.emplace(
-						nextSegmentKey,
-						std::make_unique<RouteNode>(nextSegmentKey)
+						std::string(nextSegmentKey),
+						std::make_unique<RouteNode>(std::string(nextSegmentKey))
 					);
 
 					next = pos->second.get();

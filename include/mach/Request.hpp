@@ -68,7 +68,7 @@ namespace mach
 		 *
 		 * @thread_safety This function is thread-safe.
 		 */
-		std::string target() const noexcept;
+		std::string_view target() const noexcept;
 
 		/**
 		 * Returns the body of the HTTP request.

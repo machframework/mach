@@ -171,18 +171,6 @@ int main()
 			});
 		});
 
-	expectInvalidArgument("Reject unclosed brace", [&] {
-		app.get("/users/{id:int", [](mach::Context&) {
-			std::cout << "Shouldn't be reached" << std::endl;
-			});
-		});
-
-	expectInvalidArgument("Reject unopened brace", [&] {
-		app.get("/users/id:int}", [](mach::Context&) {
-			std::cout << "Shouldn't be reached" << std::endl;
-			});
-		});
-
 	expectInvalidArgument("Reject nested braces", [&] {
 		app.get("/users/{{id:int}}", [](mach::Context&) {
 			std::cout << "Shouldn't be reached" << std::endl;

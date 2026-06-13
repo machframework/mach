@@ -10,7 +10,7 @@ int main() {
 		int threads = std::thread::hardware_concurrency();
 		auto app = mach::App("127.0.0.1", 3143, threads);
 
-		app.get("/users/{name}", [](mach::Context& context) {
+		app.get("/users/{name:string}", [](mach::Context& context) {
 			std::cout << "My name is " << context.request.routeParam("name") << std::endl;
 		});
 
