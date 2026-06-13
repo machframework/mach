@@ -64,10 +64,7 @@ namespace mach
 	}
 
 	std::string_view Request::routeParam(std::string_view name) const {
-		std::string normalizedName = std::string(name);
-		detail::http::toLowercaseInPlace(normalizedName);
-
-		auto it = m_routeParams.find(normalizedName);
+		auto it = m_routeParams.find(std::string(name));
 		if (it != m_routeParams.end()) {
 			return it->second;
 		}

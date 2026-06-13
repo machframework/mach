@@ -43,7 +43,8 @@ namespace
 		if (param.empty()) {
 			throw std::invalid_argument("Parameter name cannot be empty");
 		}
-		
+	
+
 		return {
 			std::string(param),
 			*constraintType
@@ -114,6 +115,8 @@ namespace mach::detail::routing
 
 		// same route, different method
 		curr->endpointsByMethod.emplace(endpoint->method, endpoint);
+
+		//debugDump();
 	}
 
 	routing::RouteMatch RouteTrie::matchRoute(

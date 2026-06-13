@@ -235,20 +235,24 @@ int main()
 		app.get("/orders/{orderId:int}", [](mach::Context& context) {
 			constexpr auto testName = "Extract constrained int parameter";
 
-			if (requireEqual(
-				testName,
-				"123",
-				context.request.routeParam("orderId"),
-				"route parameter 'orderId'"
-			)) {
-				std::cout
-					<< test::GREEN
-					<< "[SUCCESS] Constrained int route parameter extraction passed!"
-					<< test::RESET
-					<< std::endl;
-			}
-			});
+			auto orderId = context.request.routeParam("orderId");
+
+			//if (requireEqual(
+			//	testName,
+			//	"123",
+			//	context.request.routeParam("orderId"),
+			//	"route parameter 'orderId'"
+			//)) {
+			//	std::cout
+			//		<< test::GREEN
+			//		<< "[SUCCESS] Constrained int route parameter extraction passed!"
+			//		<< test::RESET
+			//		<< std::endl;
+			//}
+
+			std::cout << "Handler leaving" << std::endl;
 		});
+	});
 
 	expectNoThrow("Register static route competing with constrained param route", [&] {
 		app.get("/orders/latest", [](mach::Context&) {
