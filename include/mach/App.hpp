@@ -70,6 +70,18 @@ namespace mach
 		 */
 		std::size_t threadCount() const noexcept;
 
+		/**
+		 * Registers a GET request handler.
+		 *
+		 * @param pattern The route pattern to match (e.g. "/api/users").
+		 * @param handler The function invoked when the route is matched.
+		 *
+		 * @throws std::invalid_argument If the supplied handler is invalid.
+		 * @throws std::logic_error If a route with the same method and pattern
+		 *         has already been registered.
+		 *
+		 * @thread_safety This function is not thread-safe.
+		 */
 		template <typename THandler>
 		requires std::is_invocable_r_v<void, THandler, mach::Context&>
 		void get(std::string_view pattern, THandler&& handler) {
@@ -80,6 +92,18 @@ namespace mach
 			);
 		}
 
+		/**
+		 * Registers a POST request handler.
+		 *
+		 * @param pattern The route pattern to match (e.g. "/api/users").
+		 * @param handler The function invoked when the route is matched.
+		 *
+		 * @throws std::invalid_argument If the supplied handler is invalid.
+		 * @throws std::logic_error If a route with the same method and pattern
+		 *         has already been registered.
+		 *
+		 * @thread_safety This function is not thread-safe.
+		 */
 		template <typename THandler>
 		requires std::is_invocable_r_v<void, THandler, mach::Context&>
 		void post(std::string_view pattern, THandler&& handler) {
@@ -90,6 +114,18 @@ namespace mach
 			);
 		}
 
+		/**
+		 * Registers a PUT request handler.
+		 *
+		 * @param pattern The route pattern to match (e.g. "/api/users").
+		 * @param handler The function invoked when the route is matched.
+		 *
+		 * @throws std::invalid_argument If the supplied handler is invalid.
+		 * @throws std::logic_error If a route with the same method and pattern
+		 *         has already been registered.
+		 *
+		 * @thread_safety This function is not thread-safe.
+		 */
 		template <typename THandler>
 		requires std::is_invocable_r_v<void, THandler, mach::Context&>
 		void put(std::string_view pattern, THandler&& handler) {
@@ -100,6 +136,18 @@ namespace mach
 			);
 		}
 
+		/**
+		 * Registers a PATCH request handler.
+		 *
+		 * @param pattern The route pattern to match (e.g. "/api/users").
+		 * @param handler The function invoked when the route is matched.
+		 *
+		 * @throws std::invalid_argument If the supplied handler is invalid.
+		 * @throws std::logic_error If a route with the same method and pattern
+		 *         has already been registered.
+		 *
+		 * @thread_safety This function is not thread-safe.
+		 */
 		template <typename THandler>
 		requires std::is_invocable_r_v<void, THandler, mach::Context&>
 		void patch(std::string_view pattern, THandler&& handler) {
@@ -110,6 +158,18 @@ namespace mach
 			);
 		}
 
+		/**
+		 * Registers a DELETE request handler.
+		 *
+		 * @param pattern The route pattern to match (e.g. "/api/users").
+		 * @param handler The function invoked when the route is matched.
+		 *
+		 * @throws std::invalid_argument If the supplied handler is invalid.
+		 * @throws std::logic_error If a route with the same method and pattern
+		 *         has already been registered.
+		 *
+		 * @thread_safety This function is not thread-safe.
+		 */
 		template <typename THandler>
 		requires std::is_invocable_r_v<void, THandler, mach::Context&>
 		void del(std::string_view pattern, THandler&& handler) {

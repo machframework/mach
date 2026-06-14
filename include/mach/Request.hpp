@@ -105,6 +105,18 @@ namespace mach
 		 */
 		bool containsHeader(std::string_view name) const noexcept;
 
+		/**
+		 * Returns the value of an HTTP header.
+		 *
+		 * @param name Header name (case-sensitive).
+		 *
+		 * @return A view into the stored header value.
+		 *
+		 * @throws std::bad_alloc If memory allocation fails while returning the string.
+		 * @throws std::out_of_range If the parameter does not exist.
+		 *
+		 * @thread_safety This function is thread-safe.
+		 */
 		std::string_view routeParam(std::string_view name) const;
 
 	private:
