@@ -53,12 +53,22 @@ namespace
         return parameters;
     }
 
-    bool containsDuplicateParameters(const std::vector<std::string_view>& parameters, std::string& duplicate) {
+    bool containsDuplicateParameters(const std::vector<std::string_view>& parameters, std::string_view& duplicate) {
         std::unordered_set<std::string_view> seen;
 
         for (const auto& param : parameters) {
             if (!seen.insert(param).second) {
                 duplicate = param;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool containsSpaces(const std::vector<std::string_view>& segments, std::string_view invalidSegment) {
+        for (const auto& segment : segments) {
+            if (segment.find(' ') != std::string_view::npos) {
                 return true;
             }
         }
@@ -101,6 +111,30 @@ namespace
 
         return true;
     }
+
+    bool emptyParameter(const std::vector<std::string_view>& parameters, std::string_view& empty) {
+        for (const auto& param : parameters) {
+            if (param.length() == 2) {
+                empty = param;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool containsRepeatedSlash(std::string_view pattern) {
+        char prev{};
+        for (const auto ch : pattern) {
+            if (prev == '/' && ch == '/') {
+                return true;
+            }
+
+            prev = ch;
+        }
+
+        return false;
+    }
 }
 
 namespace mach::detail::routing
@@ -121,9 +155,24 @@ namespace mach::detail::routing
         // enforce syntax
         const auto& pattern = endpoint.pattern;
 
+        if (pattern.empty()) {
+            throw std::invalid_argument(
+                std::format("Invalid route definition '{}': Route cannot be empty", pattern)
+            );
+        }
         if (pattern.front() != '/') {
             throw std::invalid_argument(
                 std::format("Invalid route definition '{}': Route must begin with '/'", pattern)
+            );
+        }
+        if (pattern.length() != 1 && pattern.back() == '/') {
+            throw std::invalid_argument(
+                std::format("Invalid route definition '{}': Route cannot end with '/'", pattern)
+            );
+        }
+        if (containsRepeatedSlash(pattern)) {
+            throw std::invalid_argument(
+                std::format("Invalid route definition '{}': Route cannot contain repeated '/'", pattern)
             );
         }
         if (pattern.find('#') != std::string::npos || pattern.find('?') != std::string::npos) {
@@ -134,14 +183,34 @@ namespace mach::detail::routing
 
         auto segments = splitToSegments(pattern); 
 
+        std::string_view segmentWithSpaces;
+        if (containsSpaces(segments, segmentWithSpaces)) {
+            throw std::invalid_argument(
+                std::format("Invalid route definition '{}': Route cannot contain white spaces", pattern)
+            );
+        }
+
         if (!validBraces(segments)) {
             throw std::invalid_argument(
                 std::format("Invalid route definition '{}': Route must contain balanced braces", pattern)
             );
         }
 
-        std::string duplicate;
-        if (containsDuplicateParameters(extractParameterSegments(segments), duplicate)) {
+        const auto parameters = extractParameterSegments(segments);
+
+        std::string_view emptyParam;
+        if (emptyParameter(parameters, emptyParam)) {
+            throw std::invalid_argument(
+                std::format(
+                    "Duplicate route parameter '{}' in route '{}'",
+                    extractParameter(emptyParam),
+                    endpoint.pattern
+                )
+            );
+        }
+
+        std::string_view duplicate;
+        if (containsDuplicateParameters(parameters, duplicate)) {
             throw std::invalid_argument(
                 std::format(
                     "Duplicate route parameter '{}' in route '{}'",
