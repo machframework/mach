@@ -72,6 +72,35 @@ namespace
 
         return std::string(segment);
     }
+
+    bool validBraces(const std::vector<std::string_view>& segments) {
+        for (const auto& seg : segments) {
+            if (!isParameter(seg)) {
+                if ((seg.find('{') != std::string_view::npos || seg.find('}') != std::string_view::npos)) {
+                    return false;
+                }
+            }
+            else {
+                auto opens = std::count(
+                    seg.begin(),
+                    seg.end(),
+                    '{'
+                );
+
+                auto closes = std::count(
+                    seg.begin(),
+                    seg.end(),
+                    '}'
+                );
+
+                if (opens != 1 || closes != 1) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 }
 
 namespace mach::detail::routing
@@ -89,7 +118,27 @@ namespace mach::detail::routing
     }
 
 	void Router::addRoute(Endpoint&& endpoint) {
+        // enforce syntax
+        const auto& pattern = endpoint.pattern;
+
+        if (pattern.front() != '/') {
+            throw std::invalid_argument(
+                std::format("Invalid route definition '{}': Route must begin with '/'", pattern)
+            );
+        }
+        if (pattern.find('#') != std::string::npos || pattern.find('?') != std::string::npos) {
+            throw std::invalid_argument(
+                std::format("Invalid route definition '{}': Route must not contain '?' or '#'", pattern)
+            );
+        }
+
         auto segments = splitToSegments(endpoint.pattern); 
+
+        if (!validBraces(segments)) {
+            throw std::invalid_argument(
+                std::format("Invalid route definition '{}': Route must contain balanced braces")
+            );
+        }
 
         std::string duplicate;
         if (containsDuplicateParameters(extractParameterSegments(segments), duplicate)) {
