@@ -11,18 +11,6 @@
 
 const int threads = static_cast<int>(std::thread::hardware_concurrency());
 
-void fail(std::string_view testName, std::string_view message)
-{
-	std::cerr
-		<< test::RED
-		<< "[FAIL] "
-		<< testName
-		<< ": "
-		<< message
-		<< test::RESET
-		<< std::endl;
-}
-
 bool requireEqual(
 	std::string_view testName,
 	std::string_view expected,

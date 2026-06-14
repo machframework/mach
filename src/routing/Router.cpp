@@ -132,11 +132,11 @@ namespace mach::detail::routing
             );
         }
 
-        auto segments = splitToSegments(endpoint.pattern); 
+        auto segments = splitToSegments(pattern); 
 
         if (!validBraces(segments)) {
             throw std::invalid_argument(
-                std::format("Invalid route definition '{}': Route must contain balanced braces")
+                std::format("Invalid route definition '{}': Route must contain balanced braces", pattern)
             );
         }
 

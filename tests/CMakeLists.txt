@@ -33,3 +33,8 @@ add_mach_test(
     ConstrainedRoutesTests
     routing/ConstrainedRoutesTests.cpp
 )
+
+add_mach_test(
+    RouteSyntaxTests
+    routing/RouteSyntaxTests.cpp
+)
