@@ -16,7 +16,7 @@ int main() {
 
 		app.get("/users/{name}/{age:int}", [](mach::Context& context) {
 			std::cout << "My name is: " << context.request.routeParam("name")
-				<< " and my age is: " << context.request.routeParam("age") << std::endl;
+				<< " and my age is: " << context.request.routeParam("Age") << std::endl;
 		});
 
 		app.run();

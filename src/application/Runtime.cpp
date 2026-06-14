@@ -1,5 +1,8 @@
 #include "Runtime.hpp"
 
+#include <exception>
+#include <iostream>
+
 #include <mach/http/StatusCode.hpp>
 
 #include "routing/RoutingStatus.hpp"
@@ -21,11 +24,17 @@ namespace mach::detail::application {
 		// add params to request object
 		context.request.setRouteParams(std::move(plan.params));
 
-		// dispatcher
-		m_dispatcher.execute(context, std::move(plan));
+		try {
+			// dispatcher
+			m_dispatcher.execute(context, std::move(plan));
+		}
+		catch (const std::exception& ex) {
+			std::cout << "Error: " << ex.what() << std::endl;
 
-		// echo request body
-		context.response.body(context.request.body());
+			// error
+			context.response.status(mach::http::StatusCode::InternalServerError);
+			context.response.body(std::move(ex.what()));
+		}
 	}
 
 	void Runtime::addRoute(routing::Endpoint&& endpoint) {
