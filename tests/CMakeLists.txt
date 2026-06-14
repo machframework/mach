@@ -38,3 +38,8 @@ add_mach_test(
     RouteSyntaxTests
     routing/RouteSyntaxTests.cpp
 )
+
+add_mach_test(
+    RoutingTests
+    routing/RoutingTests.cpp
+)
