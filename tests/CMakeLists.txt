@@ -43,3 +43,8 @@ add_mach_test(
     RoutingTests
     routing/RoutingTests.cpp
 )
+
+add_mach_test(
+    RoutingRuntimeTests
+    routing/RoutingRuntimeTests.cpp
+)
