@@ -15,9 +15,9 @@ ROOT = Path(__file__).resolve().parents[2]
 BASE_URL = "http://127.0.0.1:3143"
 DURATION = 30
 
-SERVER_BIN = ROOT / "build" / "mach_hello_world"
+SERVER_BIN = ROOT / "build" / "benchmarks" / "RoutingBenchmarks"
 
-CSV_PATH = ROOT / "benchmarks" / "results" / "wrk_results.csv"
+CSV_PATH = ROOT / "benchmarks" / "results" / "routing_wrk_results.csv"
 
 ROUTES = [
     ("baseline", "/"),

@@ -55,7 +55,7 @@ namespace
 		std::unordered_map<std::string, std::string> params;
 
 		if (names.size() != values.size()) {
-			throw std::exception("Invalid route matched");
+			throw std::runtime_error("Invalid route matched");
 		}
 
 		params.reserve(names.size());
