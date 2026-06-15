@@ -12,12 +12,21 @@ from datetime import date
 
 ROOT = Path(__file__).resolve().parents[2]
 
-URL = "http://127.0.0.1:3143"
+BASE_URL = "http://127.0.0.1:3143"
 DURATION = 30
 
 SERVER_BIN = ROOT / "build" / "mach_hello_world"
 
 CSV_PATH = ROOT / "benchmarks" / "results" / "wrk_results.csv"
+
+ROUTES = [
+    ("baseline", "/"),
+    ("static_lookup", "/runtime/static"),
+    ("single_param", "/runtime/users/123"),
+    ("multiple_params", "/runtime/users/asaf/posts/42"),
+    ("precedence_static", "/runtime/precedence/me"),
+    ("precedence_param", "/runtime/precedence/asaf"),
+]
 
 TEST_SETS = [
     {
@@ -42,6 +51,7 @@ TEST_SETS = [
 
 def start_server():
     print("[INFO] Starting server...")
+
     return subprocess.Popen(
         [str(SERVER_BIN)],
         stdout=subprocess.DEVNULL,
@@ -56,7 +66,7 @@ def wait_for_server():
         try:
             with socket.create_connection(("127.0.0.1", 3143), timeout=0.1):
                 return
-        except:
+        except OSError:
             time.sleep(0.1)
 
     raise RuntimeError("Server did not become ready")
@@ -64,24 +74,27 @@ def wait_for_server():
 
 def stop_server(proc):
     print("[INFO] Stopping server...")
+
     try:
         os.kill(proc.pid, signal.SIGTERM)
         proc.wait(timeout=3)
-    except:
+    except Exception:
         proc.kill()
 
 
 # ---------------- WRK ----------------
 
-def run_wrk(threads, connections):
-    print(f"[INFO] Running wrk: t={threads}, c={connections}")
+def run_wrk(threads, connections, path):
+    url = BASE_URL + path
+
+    print(f"[INFO] Running wrk: t={threads}, c={connections}, path={path}")
 
     cmd = [
         "wrk",
         "-t", str(threads),
         "-c", str(connections),
         "-d", str(DURATION),
-        URL
+        url
     ]
 
     result = subprocess.run(
@@ -98,6 +111,7 @@ def run_wrk(threads, connections):
 
 def to_us(value_with_unit):
     match = re.match(r"([0-9.]+)([a-z]+)", value_with_unit)
+
     if not match:
         raise ValueError(f"Bad latency format: {value_with_unit}")
 
@@ -106,8 +120,13 @@ def to_us(value_with_unit):
 
     if unit == "ms":
         return val * 1000
+
     if unit == "us":
         return val
+
+    if unit == "s":
+        return val * 1_000_000
+
     return val
 
 
@@ -121,12 +140,9 @@ def parse_wrk(output):
     for line in output.splitlines():
         line = line.strip()
 
-        # Requests/sec
         if "Requests/sec:" in line:
             rps = float(line.split()[-1])
 
-        # Latency line:
-        # Latency   413.44us  113.90us  16.23ms
         elif line.startswith("Latency"):
             parts = line.split()
             avg = parts[1]
@@ -150,24 +166,23 @@ def get_git_commit():
             ["git", "rev-parse", "--short", "HEAD"],
             text=True
         ).strip()
-    except:
+    except Exception:
         return "unknown"
+
 
 def write_session_header():
     CSV_PATH.parent.mkdir(parents=True, exist_ok=True)
 
-    today = date.today()
     file_exists = CSV_PATH.exists()
 
     with open(CSV_PATH, "a", newline="") as f:
         writer = csv.writer(f)
 
-        # blank visual separator (optional but fine in CSV viewers)
         writer.writerow([])
 
         writer.writerow([
             "SESSION START",
-            today,
+            date.today(),
             get_git_commit()
         ])
 
@@ -175,6 +190,8 @@ def write_session_header():
             writer.writerow([
                 "date",
                 "test_set",
+                "route_name",
+                "path",
                 "threads",
                 "connections",
                 "rps",
@@ -182,58 +199,57 @@ def write_session_header():
                 "max_latency_us"
             ])
 
-def write_row(test_set, row):
-    CSV_PATH.parent.mkdir(parents=True, exist_ok=True)
 
-    file_exists = CSV_PATH.exists()
+def write_row(row):
+    CSV_PATH.parent.mkdir(parents=True, exist_ok=True)
 
     with open(CSV_PATH, "a", newline="") as f:
         writer = csv.writer(f)
-
-        if not file_exists:
-            writer.writerow([
-                "date",
-                "test_set",
-                "threads",
-                "connections",
-                "rps",
-                "avg_latency_us",
-                "max_latency_us"
-            ])
-
-        writer.writerow([test_set] + row)
+        writer.writerow(row)
 
 
 # ---------------- MAIN ----------------
 
 def main():
     write_session_header()
-    
-    for test in TEST_SETS:
-        print(f"\n=== Running test set: {test['name']} ===")
 
-        for threads, conns in test["runs"]:
-            server = start_server()
+    for route_name, path in ROUTES:
+        for test in TEST_SETS:
+            print(
+                f"\n=== Running route: {route_name} {path}, "
+                f"test set: {test['name']} ==="
+            )
 
-            try:
-                wait_for_server()
+            for threads, conns in test["runs"]:
+                server = start_server()
 
-                output = run_wrk(threads, conns)
+                try:
+                    wait_for_server()
 
-                rps, avg_us, max_us = parse_wrk(output)
+                    output = run_wrk(threads, conns, path)
 
-                today = date.today()
+                    rps, avg_us, max_us = parse_wrk(output)
 
-                write_row(
-                    test["name"],
-                    [today, threads, conns, rps, avg_us, max_us]
-                )
+                    write_row([
+                        date.today(),
+                        test["name"],
+                        route_name,
+                        path,
+                        threads,
+                        conns,
+                        rps,
+                        avg_us,
+                        max_us
+                    ])
 
-                print(f"[RESULT] {test['name']} t={threads}, c={conns}, rps={rps}")
+                    print(
+                        f"[RESULT] {route_name} {test['name']} "
+                        f"t={threads}, c={conns}, rps={rps}"
+                    )
 
-            finally:
-                stop_server(server)
-                time.sleep(2)
+                finally:
+                    stop_server(server)
+                    time.sleep(2)
 
 
 if __name__ == "__main__":
