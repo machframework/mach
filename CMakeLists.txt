@@ -41,8 +41,9 @@ target_link_libraries(mach
         Boost::headers
 )
 
-option(MACH_BUILD_EXAMPLES "Build Mach examples" ON)
-option(MACH_BUILD_TESTS "Build Mach tests" ON)
+option(MACH_BUILD_EXAMPLES "Build Mach examples" OFF)
+option(MACH_BUILD_TESTS "Build Mach tests" OFF)
+option(MACH_BUILD_BENCHMARKS "Build Mach benchmarks" ON)
 
 if(MACH_BUILD_EXAMPLES)
     add_subdirectory(examples)
@@ -51,4 +52,8 @@ endif()
 if(MACH_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
+endif()
+
+if(MACH_BUILD_BENCHMARKS)
+    add_subdirectory(benchmarks)
 endif()

@@ -1,21 +1,21 @@
-function(add_mach_test test_name)
-    add_executable("${test_name}"
+function(add_mach_test bench_name)
+    add_executable("${bench_name}"
         ${ARGN}
     )
 
-    target_link_libraries("${test_name}"
+    target_link_libraries("${bench_name}"
         PRIVATE mach
     )
 
-    target_include_directories("${test_name}"
+    target_include_directories("${bench_name}"
         PRIVATE
             ${CMAKE_SOURCE_DIR}/src
             ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
     add_test(
-        NAME "${test_name}"
-        COMMAND "${test_name}"
+        NAME "${bench_name}"
+        COMMAND "${bench_name}"
     )
 endfunction()
 
