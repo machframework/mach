@@ -50,6 +50,22 @@ namespace
 			*constraintType
 		};
 	}
+
+	std::unordered_map<std::string, std::string> makeRouteParameters(const std::vector<std::string>& names, std::vector<std::string>&& values) {
+		std::unordered_map<std::string, std::string> params;
+
+		if (names.size() != values.size()) {
+			throw std::exception("Invalid route matched");
+		}
+
+		params.reserve(names.size());
+
+		for (size_t i = 0; i < names.size(); i++) {
+			params.emplace(names[i], values[i]);
+		}
+
+		return params;
+	}
 }
 
 namespace mach::detail::routing
@@ -79,10 +95,10 @@ namespace mach::detail::routing
 							constraint,
 							std::make_unique<RouteNode>(parameter)
 						);
-
-						//add constrained parameter to parameter map
-						endpoint->parameters.emplace(parameter, constraint);
 					}
+
+					//add constrained parameter to parameter list
+					endpoint->parameterNames.push_back(parameter);
 
 					next = curr->constrainedParameterChildren.find(constraint)->second.get();
 				}
@@ -125,7 +141,8 @@ namespace mach::detail::routing
 	) const
 	{
 		const RouteNode* curr = &m_root;
-		std::unordered_map<std::string, std::string> params;
+
+		std::vector<std::string> capturedValues;
 
 		for (auto it = segments.begin(); it != segments.end(); ++it) {
 			if (!curr) {
@@ -156,7 +173,7 @@ namespace mach::detail::routing
 						return RouteMatch(RoutingStatus::NotFound);
 					}
 
-					params.emplace(childNode->segmentKey, *it);
+					capturedValues.push_back(std::string(*it));
 
 					if (std::next(it) == segments.end()) {
 						if (childNode->endpointsByMethod.empty()) {
@@ -166,7 +183,14 @@ namespace mach::detail::routing
 							return routing::RouteMatch(RoutingStatus::MethodNotAllowed);
 						}
 
-						return routing::RouteMatch(childNode->endpointsByMethod.find(method)->second, std::move(params));
+						auto endpoint = childNode->endpointsByMethod.find(method)->second;
+
+						return routing::RouteMatch(
+							endpoint,
+							std::move(
+								makeRouteParameters(endpoint->parameterNames, std::move(capturedValues))
+							)
+						);
 					}
 
 					curr = childNode;
@@ -180,7 +204,14 @@ namespace mach::detail::routing
 				const auto& endpointsByMethod = nextSegment->second->endpointsByMethod;
 
 				if (endpointsByMethod.contains(method)) {
-					return routing::RouteMatch(endpointsByMethod.find(method)->second, std::move(params));
+					auto endpoint = endpointsByMethod.find(method)->second;
+
+					return routing::RouteMatch(
+						endpoint,
+						std::move(
+							makeRouteParameters(endpoint->parameterNames, std::move(capturedValues))
+						)
+					);
 				}
 				
 				return routing::RouteMatch(RoutingStatus::MethodNotAllowed);
