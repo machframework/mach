@@ -2,7 +2,9 @@
 
 #include "HttpUtils.hpp"
 
+#include <format>
 #include <optional>
+#include <stdexcept>
 
 namespace mach
 {
@@ -30,7 +32,7 @@ namespace mach
 		return m_method;
 	}
 
-	std::string Request::target() const noexcept
+	std::string_view Request::target() const noexcept
 	{
 		return m_target;
 	}
@@ -59,5 +61,20 @@ namespace mach
 		detail::http::toLowercaseInPlace(normalizedName);
 
 		return m_headers.find(normalizedName) != m_headers.end();
+	}
+
+	std::string_view Request::routeParam(std::string_view name) const {
+		auto it = m_routeParams.find(std::string(name));
+		if (it != m_routeParams.end()) {
+			return it->second;
+		}
+
+		throw std::out_of_range(
+			std::format("Route parameter '{}' does not exist", name)
+		);
+	}
+
+	void Request::setRouteParams(std::unordered_map<std::string, std::string>&& params) {
+		m_routeParams = std::move(params);
 	}
 }

@@ -12,6 +12,7 @@ namespace mach::detail::application
 		routing::RoutingStatus status;
 		// middleware[]
 		routing::Endpoint* endpoint;
+		std::unordered_map<std::string, std::string> params;
 
 		bool found() const noexcept {
 			return status == routing::RoutingStatus::Found;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -8,6 +9,7 @@
 
 #include <mach/http/Method.hpp>
 
+#include "RouteConstraint.hpp"
 #include "routing/RouteMatch.hpp"
 
 namespace mach::detail::routing
@@ -33,7 +35,9 @@ namespace mach::detail::routing
 		struct RouteNode {
 			std::string segmentKey;
 			std::unordered_map<mach::http::Method, routing::Endpoint*> endpointsByMethod;
-			std::unordered_map<std::string, std::unique_ptr<RouteNode>> childrenBySegment;
+
+			std::unordered_map<std::string, std::unique_ptr<RouteNode>> childrenByStaticSegment;
+			std::unordered_map<std::optional<routing::RouteConstraint>, std::unique_ptr<RouteNode>> constrainedParameterChildren;
 
 			explicit RouteNode(std::string_view segmentKey = "")
 				: segmentKey(std::move(segmentKey))

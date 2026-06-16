@@ -1,20 +1,50 @@
-add_executable(mach_tests
+function(add_mach_test bench_name)
+    add_executable("${bench_name}"
+        ${ARGN}
+    )
+
+    target_link_libraries("${bench_name}"
+        PRIVATE mach
+    )
+
+    target_include_directories("${bench_name}"
+        PRIVATE
+            ${CMAKE_SOURCE_DIR}/src
+            ${CMAKE_CURRENT_SOURCE_DIR}
+    )
+
+    add_test(
+        NAME "${bench_name}"
+        COMMAND "${bench_name}"
+    )
+endfunction()
+
+add_mach_test(
+    RouteTrieTests
     routing/RouteTrieTests.cpp
 )
 
-target_link_libraries(mach_tests
-    PRIVATE
-        mach
+add_mach_test(
+    RouteParametersTests
+    routing/RouteParametersTests.cpp
 )
 
-target_include_directories(mach_tests
-    PRIVATE
-        ${CMAKE_SOURCE_DIR}/src
+add_mach_test(
+    ConstrainedRoutesTests
+    routing/ConstrainedRoutesTests.cpp
 )
 
-add_test(NAME mach_tests COMMAND mach_tests)
+add_mach_test(
+    RouteSyntaxTests
+    routing/RouteSyntaxTests.cpp
+)
 
-target_include_directories(mach_tests
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
+add_mach_test(
+    RoutingTests
+    routing/RoutingTests.cpp
+)
+
+add_mach_test(
+    RoutingRuntimeTests
+    routing/RoutingRuntimeTests.cpp
 )

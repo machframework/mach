@@ -1,11 +1,15 @@
 #pragma once
 
+#include <optional>
 #include <string>
+#include <unordered_map>
+#include <vector>
 
 #include <mach/Context.hpp>
 #include <mach/http/Method.hpp>
 
 #include "core/Handler.hpp"
+#include "routing/RouteConstraint.hpp"
 
 namespace mach::detail::routing
 {
@@ -13,6 +17,7 @@ namespace mach::detail::routing
 		mach::http::Method method;
 		std::string pattern;
 		Handler handler;
+		std::vector<std::string> parameterNames;
 
 		bool operator==(const Endpoint& other) const {
 			return method == other.method

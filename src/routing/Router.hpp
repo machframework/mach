@@ -19,11 +19,10 @@ namespace mach::detail::routing
 
 	public:
 		application::ExecutionPlan route(const mach::Request& request) const;
-		void addRoute(Endpoint&& route);
+		void addRoute(Endpoint&& endpoint);
 
 	private:
 		routing::RouteMatch matchRoute(const mach::Request& request) const;
-		static std::vector<std::string_view> splitToSegments(std::string_view pattern);
 
 		std::deque<routing::Endpoint> m_endpoints;
 		routing::RouteTrie m_routes;

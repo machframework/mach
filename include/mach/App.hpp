@@ -71,6 +71,116 @@ namespace mach
 		std::size_t threadCount() const noexcept;
 
 		/**
+		 * Registers a GET request handler.
+		 *
+		 * @param pattern The route pattern to match (e.g. "/api/users").
+		 * @param handler The function invoked when the route is matched.
+		 *
+		 * @throws std::invalid_argument If the supplied handler is invalid.
+		 * @throws std::logic_error If a route with the same method and pattern
+		 *         has already been registered.
+		 *
+		 * @thread_safety This function is not thread-safe.
+		 */
+		template <typename THandler>
+		requires std::is_invocable_r_v<void, THandler, mach::Context&>
+		void get(std::string_view pattern, THandler&& handler) {
+			addRoute(
+				http::Method::Get,
+				pattern,
+				std::forward<THandler>(handler)
+			);
+		}
+
+		/**
+		 * Registers a POST request handler.
+		 *
+		 * @param pattern The route pattern to match (e.g. "/api/users").
+		 * @param handler The function invoked when the route is matched.
+		 *
+		 * @throws std::invalid_argument If the supplied handler is invalid.
+		 * @throws std::logic_error If a route with the same method and pattern
+		 *         has already been registered.
+		 *
+		 * @thread_safety This function is not thread-safe.
+		 */
+		template <typename THandler>
+		requires std::is_invocable_r_v<void, THandler, mach::Context&>
+		void post(std::string_view pattern, THandler&& handler) {
+			addRoute(
+				http::Method::Post,
+				pattern,
+				std::forward<THandler>(handler)
+			);
+		}
+
+		/**
+		 * Registers a PUT request handler.
+		 *
+		 * @param pattern The route pattern to match (e.g. "/api/users").
+		 * @param handler The function invoked when the route is matched.
+		 *
+		 * @throws std::invalid_argument If the supplied handler is invalid.
+		 * @throws std::logic_error If a route with the same method and pattern
+		 *         has already been registered.
+		 *
+		 * @thread_safety This function is not thread-safe.
+		 */
+		template <typename THandler>
+		requires std::is_invocable_r_v<void, THandler, mach::Context&>
+		void put(std::string_view pattern, THandler&& handler) {
+			addRoute(
+				http::Method::Put,
+				pattern,
+				std::forward<THandler>(handler)
+			);
+		}
+
+		/**
+		 * Registers a PATCH request handler.
+		 *
+		 * @param pattern The route pattern to match (e.g. "/api/users").
+		 * @param handler The function invoked when the route is matched.
+		 *
+		 * @throws std::invalid_argument If the supplied handler is invalid.
+		 * @throws std::logic_error If a route with the same method and pattern
+		 *         has already been registered.
+		 *
+		 * @thread_safety This function is not thread-safe.
+		 */
+		template <typename THandler>
+		requires std::is_invocable_r_v<void, THandler, mach::Context&>
+		void patch(std::string_view pattern, THandler&& handler) {
+			addRoute(
+				http::Method::Patch,
+				pattern,
+				std::forward<THandler>(handler)
+			);
+		}
+
+		/**
+		 * Registers a DELETE request handler.
+		 *
+		 * @param pattern The route pattern to match (e.g. "/api/users").
+		 * @param handler The function invoked when the route is matched.
+		 *
+		 * @throws std::invalid_argument If the supplied handler is invalid.
+		 * @throws std::logic_error If a route with the same method and pattern
+		 *         has already been registered.
+		 *
+		 * @thread_safety This function is not thread-safe.
+		 */
+		template <typename THandler>
+		requires std::is_invocable_r_v<void, THandler, mach::Context&>
+		void del(std::string_view pattern, THandler&& handler) {
+			addRoute(
+				http::Method::Delete,
+				pattern,
+				std::forward<THandler>(handler)
+			);
+		}
+
+		/**
 		 * Registers a route handler.
 		 *
 		 * @param method The HTTP method to match (e.g. GET, POST).
@@ -80,10 +190,18 @@ namespace mach
 		 * @throws std::invalid_argument If the supplied handler is invalid.
 		 * @throws std::logic_error If a route with the same method and pattern
 		 *         has already been registered.
-		 * 
+		 *
 		 * @thread_safety This function is not thread-safe.
 		 */
-		void addRoute(mach::http::Method method, std::string pattern, detail::Handler handler);
+		template <typename THandler>
+		requires std::is_invocable_r_v<void, THandler, mach::Context&>
+		void addRoute(http::Method method, std::string_view pattern, THandler&& handler) {
+			addRouteImpl(
+				method,
+				pattern,
+				detail::Handler{ std::forward<THandler>(handler) }
+			);
+		}
 
 		/**
 		 * Starts the application and begins accepting incoming HTTP requests.
@@ -95,6 +213,8 @@ namespace mach
 		void run();
 
 	private:
+		void addRouteImpl(http::Method method, std::string_view pattern, detail::Handler handler);
+
 		class Impl;
 		std::unique_ptr<Impl> m_impl;
 	};

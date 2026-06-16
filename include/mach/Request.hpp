@@ -8,8 +8,16 @@
 #include <mach/http/Method.hpp>
 #include <mach/http/Version.hpp>
 
-namespace mach::detail::http::adapter {
-	class BeastRequestAdapter;
+namespace mach::detail
+{
+	namespace http::adapter
+	{
+		class BeastRequestAdapter;
+	}
+	namespace application
+	{
+		class Runtime;
+	}
 }
 
 namespace mach
@@ -60,7 +68,7 @@ namespace mach
 		 *
 		 * @thread_safety This function is thread-safe.
 		 */
-		std::string target() const noexcept;
+		std::string_view target() const noexcept;
 
 		/**
 		 * Returns the body of the HTTP request.
@@ -97,6 +105,20 @@ namespace mach
 		 */
 		bool containsHeader(std::string_view name) const noexcept;
 
+		/**
+		 * Returns the value of an HTTP header.
+		 *
+		 * @param name Header name (case-sensitive).
+		 *
+		 * @return A view into the stored header value.
+		 *
+		 * @throws std::bad_alloc If memory allocation fails while returning the string.
+		 * @throws std::out_of_range If the parameter does not exist.
+		 *
+		 * @thread_safety This function is thread-safe.
+		 */
+		std::string_view routeParam(std::string_view name) const;
+
 	private:
 
 		Request(
@@ -107,12 +129,16 @@ namespace mach
 			std::unordered_map<std::string, std::string> headers
 		);
 
+		void setRouteParams(std::unordered_map<std::string, std::string>&& params);
+
 		http::Version m_version;
 		http::Method m_method;
 		std::string m_target;
 		std::string m_body;
 		std::unordered_map<std::string, std::string> m_headers;
+		std::unordered_map<std::string, std::string> m_routeParams;
 
 		friend class detail::http::adapter::BeastRequestAdapter;
+		friend class detail::application::Runtime;
 	};
 }

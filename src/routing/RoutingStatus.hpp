@@ -4,6 +4,8 @@
 
 namespace mach::detail::routing
 {
+	using mach::http::StatusCode;
+
 	enum class RoutingStatus {
 		Found,
 		NotFound,
@@ -20,14 +22,14 @@ namespace mach::detail::routing
 		return "Unknown";
 	}
 
-	constexpr mach::http::StatusCode toStatusCode(RoutingStatus status) {
+	constexpr StatusCode toStatusCode(RoutingStatus status) {
 		switch (status) {
 		case RoutingStatus::Found:
-			return mach::http::StatusCode::Ok;
+			return StatusCode::Ok;
 		case RoutingStatus::NotFound:
-			return mach::http::StatusCode::NotFound;
+			return StatusCode::NotFound;
 		case RoutingStatus::MethodNotAllowed:
-			return mach::http::StatusCode::MethodNotAllowed;
+			return StatusCode::MethodNotAllowed;
 		}
 
 		return mach::http::StatusCode::InternalServerError; // fallback for safety
