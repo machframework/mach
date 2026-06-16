@@ -77,6 +77,12 @@ namespace mach::detail::routing
 	{
 		RouteNode* curr = &m_root;
 
+		// registering root 
+		if (segments.empty()) {
+			curr->endpointsByMethod.emplace(endpoint->method, endpoint);
+			return;
+		}
+
 		for (auto it = segments.begin(); it != segments.end(); ++it) {
 			const auto& nextSegmentKey = *it;
 			
@@ -143,6 +149,14 @@ namespace mach::detail::routing
 		const RouteNode* curr = &m_root;
 
 		std::vector<std::string> capturedValues;
+
+		// check for root
+		if (segments.empty()) {
+			if (curr->endpointsByMethod.contains(method)) {
+				auto endpoint = curr->endpointsByMethod.find(method)->second;
+				return RouteMatch(endpoint);
+			}
+		}
 
 		for (auto it = segments.begin(); it != segments.end(); ++it) {
 			if (!curr) {
