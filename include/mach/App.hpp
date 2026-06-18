@@ -4,14 +4,17 @@
 #include <string>
 #include <string_view>
 
-#include <mach/http/Method.hpp>
 #include <mach/Context.hpp>
+#include <mach/http/Method.hpp>
 
-// TODO: change registration method to a template
-#include "../src/core/Handler.hpp"
+#include <mach/detail/app/ServerOptions.hpp>
+#include <mach/detail/di/Container.hpp>
+#include <mach/detail/core/Handler.hpp>
 
 namespace mach
 {
+	class AppBuilder;
+
 	/**
 	 * Represents the main entry point for configuring and running a Mach application.
 	 *
@@ -30,17 +33,6 @@ namespace mach
 	class App {
 
 	public:
-		/**
-		 * Creates a new application instance.
-		 *
-		 * @param host The network interface to bind to.
-		 * @param port The port to listen on.
-		 * @param threadCount The number of worker threads used to process requests.
-		 *
-		 * @throws std::invalid_argument If the supplied configuration is invalid.
-		 */
-		App(std::string_view host, std::uint16_t port, std::size_t threadCount = 1);
-
 		~App();
 
 		/**
@@ -213,9 +205,13 @@ namespace mach
 		void run();
 
 	private:
+	
+		App(detail::app::ServerOptions serverOptions, detail::di::Container container);
 		void addRouteImpl(http::Method method, std::string_view pattern, detail::Handler handler);
 
 		class Impl;
 		std::unique_ptr<Impl> m_impl;
+
+		friend class AppBuilder;
 	};
 }

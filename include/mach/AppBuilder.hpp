@@ -4,10 +4,8 @@
 
 #include <mach/App.hpp>
 
-#include "app/ServerOptions.hpp"
-#include "di/Container.hpp"
-#include "di/ServiceLifetime.hpp"
-
+#include <mach/detail/app/ServerOptions.hpp>
+#include <mach/detail/di/Container.hpp>
 
 namespace mach
 {
@@ -24,6 +22,8 @@ namespace mach
 
 		template <typename T, typename... Deps>
 		AppBuilder& addTransient();
+
+		App build();
 
 	private:
 		detail::app::ServerOptions m_serverOptions;

@@ -28,8 +28,8 @@ namespace mach
 		detail::application::Runtime m_runtime;
 	};
 
-	App::App(std::string_view host, std::uint16_t port, std::size_t threadCount)
-		: m_impl(std::make_unique<Impl>(host, port, threadCount))
+	App::App(detail::app::ServerOptions serverOptions, detail::di::Container container)
+		: m_impl(std::make_unique<Impl>(serverOptions.host, serverOptions.port, serverOptions.threads))
 	{ }
 
 	App::~App() = default;

@@ -7,7 +7,7 @@
 #include <typeindex>
 
 #include "Scope.hpp"
-#include "ServiceDescriptor.hpp"
+#include <mach/detail/di/ServiceLifetime.hpp>
 
 namespace mach::detail::di
 {

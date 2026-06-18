@@ -1,9 +1,9 @@
-#include "Scope.hpp"
+#include <mach/detail/di/Scope.hpp>
 
 #include <format>
 #include <stdexcept>
 
-#include "Container.hpp"
+#include <mach/detail/di/Container.hpp>
 
 namespace mach::detail::di
 {
