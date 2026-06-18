@@ -5,13 +5,14 @@
 #include <typeindex>
 
 #include "ServiceLifetime.hpp"
-#include "Scope.hpp"
 
 namespace mach::detail::di
 {
+	class Scope;
+
 	struct ServiceDescriptor {
 		std::type_index type;
 		ServiceLifetime lifetime;
-		std::function<std::shared_ptr<void>(Scope&)> factory;
+		std::function<std::shared_ptr<void>(const Scope&)> factory;
 	};
 }

@@ -27,6 +27,8 @@ add_library(mach
     src/app/App.cpp
     src/dispatching/Dispatcher.cpp 
     src/routing/RouteConstraint.cpp
+    src/di/Scope.cpp
+    src/di/Container.cpp
 )
 
 target_include_directories(mach
