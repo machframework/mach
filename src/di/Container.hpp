@@ -1,7 +1,9 @@
 #pragma once
 
+#include <format>
 #include <functional>
 #include <memory>
+#include <stdexcept>
 #include <typeindex>
 
 #include "Scope.hpp"
@@ -37,9 +39,15 @@ namespace mach::detail::di
             }
         };
 
-        m_serviceRegistry.emplace(
+        auto [_, inserted] = m_serviceRegistry.emplace(
             descriptor.type,
             std::move(descriptor)
         );
+
+        if (!inserted) {
+            throw std::logic_error(
+                std::format("Duplicate dependency registration: {}", descriptor.type.name())
+            );
+        }
     }
 }

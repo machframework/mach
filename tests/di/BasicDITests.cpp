@@ -47,6 +47,13 @@ int main() {
 	//container.addService<Db, Logger>(di::ServiceLifetime::Scoped);
 	container.addService<UserService, Db>(di::ServiceLifetime::Scoped);
 
+	try {
+		container.addService<Logger>(di::ServiceLifetime::Scoped);
+	}
+	catch (const std::logic_error& ex) {
+		std::cout << "Error: " << ex.what() << std::endl;
+	}
+
 	auto scope = container.createScope();
 
 	auto logger = scope.resolve<Logger>();
