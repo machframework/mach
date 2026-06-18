@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <typeindex>
 
@@ -11,12 +12,34 @@ namespace mach::detail::di
 	class Container {
 		
 	public:
-		void addService(ServiceDescriptor descriptor);
+		template <typename T, typename... Deps>
+		void addService(ServiceLifetime lifetime);
 
-		std::shared_ptr<void> resolve(std::type_index type) const;
-		Scope createScope() const;
+		const ServiceDescriptor& getDescriptor(std::type_index type) const;
+        std::shared_ptr<void> getOrCreateSingleton(std::type_index type, Scope& container);
+
+		Scope createScope();
 
 	private:
 		std::unordered_map<std::type_index, ServiceDescriptor> m_serviceRegistry;
+        std::unordered_map<std::type_index, std::shared_ptr<void>> m_singletonInstances;
 	};
+
+    template <typename T, typename... Deps>
+    void Container::addService(ServiceLifetime lifetime) {
+        ServiceDescriptor descriptor{
+            .type = typeid(T),
+            .lifetime = lifetime,
+            .factory = [](Scope& scope) {
+                return std::make_shared<T>(
+                    *scope.resolve<Deps>()...
+                );
+            }
+        };
+
+        m_serviceRegistry.emplace(
+            descriptor.type,
+            std::move(descriptor)
+        );
+    }
 }

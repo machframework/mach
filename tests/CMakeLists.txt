@@ -48,3 +48,8 @@ add_mach_test(
     RoutingRuntimeTests
     routing/RoutingRuntimeTests.cpp
 )
+
+add_mach_test(
+    BasicDITests
+    di/BasicDITests.cpp
+)

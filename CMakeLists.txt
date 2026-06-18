@@ -27,6 +27,8 @@ add_library(mach
     src/app/App.cpp
     src/dispatching/Dispatcher.cpp 
     src/routing/RouteConstraint.cpp
+    src/di/Scope.cpp
+    src/di/Container.cpp
 )
 
 target_include_directories(mach
@@ -42,7 +44,7 @@ target_link_libraries(mach
 )
 
 option(MACH_BUILD_EXAMPLES "Build Mach examples" ON)
-option(MACH_BUILD_TESTS "Build Mach tests" OFF)
+option(MACH_BUILD_TESTS "Build Mach tests" ON)
 option(MACH_BUILD_BENCHMARKS "Build Mach benchmarks" OFF)
 
 if(MACH_BUILD_EXAMPLES)

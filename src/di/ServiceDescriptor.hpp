@@ -5,10 +5,11 @@
 #include <typeindex>
 
 #include "ServiceLifetime.hpp"
-#include "Scope.hpp"
 
 namespace mach::detail::di
 {
+	class Scope;
+
 	struct ServiceDescriptor {
 		std::type_index type;
 		ServiceLifetime lifetime;
