@@ -1,8 +1,17 @@
 #include "Container.hpp"
 
+#include <format>
+#include <stdexcept>
+
 namespace mach::detail::di
 {
 	const ServiceDescriptor& Container::getDescriptor(std::type_index type) const {
+		if (!m_serviceRegistry.contains(type)) {
+			throw std::runtime_error(
+				std::format("Dependency missing: {}", type.name())
+			);
+		}
+
 		return m_serviceRegistry.find(type)->second;
 	}
 

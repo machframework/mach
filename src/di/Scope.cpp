@@ -1,5 +1,8 @@
 #include "Scope.hpp"
 
+#include <format>
+#include <stdexcept>
+
 #include "Container.hpp"
 
 namespace mach::detail::di
