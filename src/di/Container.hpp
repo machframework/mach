@@ -22,19 +22,21 @@ namespace mach::detail::di
 		std::unordered_map<std::type_index, ServiceDescriptor> m_serviceRegistry;
 	};
 
-	template <typename T, typename... Deps>
-	void Container::addService(ServiceLifetime lifetime) {
-		ServiceDescriptor descriptor;
+    template <typename T, typename... Deps>
+    void Container::addService(ServiceLifetime lifetime) {
+        ServiceDescriptor descriptor{
+            .type = typeid(T),
+            .lifetime = lifetime,
+            .factory = [](const Scope& scope) {
+                return std::make_shared<T>(
+                    *scope.resolve<Deps>()...
+                );
+            }
+        };
 
-		descriptor.type = typeid(T);
-		descriptor.lifetime = lifetime;
-
-		descriptor.factory = [](const Scope& scope) {
-			return std::shared_ptr<T>(
-				*scope.resolve<Deps>()...
-			);
-		};
-
-		m_serviceRegistry.emplace(descriptor.type, descriptor);
-	}
+        m_serviceRegistry.emplace(
+            descriptor.type,
+            std::move(descriptor)
+        );
+    }
 }

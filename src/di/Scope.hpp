@@ -29,6 +29,6 @@ namespace mach::detail::di
 
 	template <typename T>
 	std::shared_ptr<T> Scope::resolve() const {		
-		return resolve(std::type_index(typeid(T)));
+		return std::static_pointer_cast<T>(resolve(std::type_index(typeid(T))));
 	}
 }
