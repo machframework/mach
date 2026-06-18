@@ -53,3 +53,8 @@ add_mach_test(
     BasicDITests
     di/BasicDITests.cpp
 )
+
+add_mach_test(
+    DILifetimeTests
+    di/DILifetimeTests.cpp
+)

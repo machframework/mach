@@ -44,16 +44,26 @@ int main() {
 	di::Container container;
 
 	container.addService<Logger>(di::ServiceLifetime::Scoped);
-	container.addService<Db, Logger>(di::ServiceLifetime::Scoped);
+	//container.addService<Db, Logger>(di::ServiceLifetime::Scoped);
 	container.addService<UserService, Db>(di::ServiceLifetime::Scoped);
+
+	try {
+		container.addService<Logger>(di::ServiceLifetime::Scoped);
+	}
+	catch (const std::logic_error& ex) {
+		std::cout << "Error: " << ex.what() << std::endl;
+	}
 
 	auto scope = container.createScope();
 
 	auto logger = scope.resolve<Logger>();
 	logger->Log("Logging from a dynamically resolved logger!");
 
-	auto db = scope.resolve<Db>();
-	int result = db->query();
-	
-	logger->Log("Got dynamic query result " + std::to_string(result));
+	// missing dependency
+	try {
+		auto userService = scope.resolve<UserService>();
+	}
+	catch (const std::runtime_error& ex) {
+		std::cout << "Error: " << ex.what() << std::endl;
+	}
 }
