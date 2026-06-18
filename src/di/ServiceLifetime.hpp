@@ -1,6 +1,6 @@
 #pragma once
 
-namespace mach
+namespace mach::detail::di
 {
 	enum class ServiceLifetime {
 		Scoped,
