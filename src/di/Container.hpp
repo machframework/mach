@@ -16,10 +16,13 @@ namespace mach::detail::di
 		void addService(ServiceLifetime lifetime);
 
 		const ServiceDescriptor& getDescriptor(std::type_index type) const;
-		Scope createScope() const;
+        std::shared_ptr<void> getOrCreateSingleton(std::type_index type, Scope& container);
+
+		Scope createScope();
 
 	private:
 		std::unordered_map<std::type_index, ServiceDescriptor> m_serviceRegistry;
+        std::unordered_map<std::type_index, std::shared_ptr<void>> m_singletonInstances;
 	};
 
     template <typename T, typename... Deps>
@@ -27,7 +30,7 @@ namespace mach::detail::di
         ServiceDescriptor descriptor{
             .type = typeid(T),
             .lifetime = lifetime,
-            .factory = [](const Scope& scope) {
+            .factory = [](Scope& scope) {
                 return std::make_shared<T>(
                     *scope.resolve<Deps>()...
                 );

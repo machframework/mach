@@ -13,6 +13,6 @@ namespace mach::detail::di
 	struct ServiceDescriptor {
 		std::type_index type;
 		ServiceLifetime lifetime;
-		std::function<std::shared_ptr<void>(const Scope&)> factory;
+		std::function<std::shared_ptr<void>(Scope&)> factory;
 	};
 }

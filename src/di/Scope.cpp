@@ -4,16 +4,27 @@
 
 namespace mach::detail::di
 {
-	std::shared_ptr<void> Scope::resolve(std::type_index type) const {
+	std::shared_ptr<void> Scope::resolve(std::type_index type) {
 		if (m_scopedInstances.contains(type)) {
 			return m_scopedInstances.find(type)->second;
 		}
 
 		const auto& descriptor = m_container.getDescriptor(type);
-		return descriptor.factory(*this);
+
+		if (descriptor.lifetime == ServiceLifetime::Singleton) {
+			return m_container.getOrCreateSingleton(descriptor.type, *this);
+		}
+
+		auto instance = descriptor.factory(*this);
+
+		if (descriptor.lifetime == ServiceLifetime::Scoped) {
+			m_scopedInstances.emplace(descriptor.type, instance);
+		}
+
+		return instance;
 	}
 
-	Scope::Scope(const Container& container) 
+	Scope::Scope(Container& container) 
 		: m_container(container)
 	{ }
 }
