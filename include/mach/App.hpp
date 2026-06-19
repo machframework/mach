@@ -16,17 +16,18 @@ namespace mach
 	class AppBuilder;
 
 	/**
-	 * Represents the main entry point for configuring and running a Mach application.
+	 * Represents a built Mach application.
 	 *
-	 * Used to register routes and start the underlying HTTP server.
+	 * Used to register routes and start the underlying HTTP server after 
+	 * application configuration has been finalized by AppBuilder.
 	 *
 	 * Ownership:
 	 * - Owns the application's runtime state.
-	 * - Should be treated as the root object of a Mach application.
-	 * 
+	 * - Should be treated as the root runtime object of a Mach application.
+	 *
 	 * Thread safety:
-	 * - Not thread-safe. Application configuration should be performed from one thread.
-	 * 
+	 * - Not thread-safe.
+	 *
 	 * Stability:
 	 * - This API is still experimental and may change before Mach's first stable release.
 	 */
