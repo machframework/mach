@@ -60,6 +60,11 @@ add_mach_test(
 )
 
 add_mach_test(
-    ContainerTests.cpp
+    ContainerTests
     di/ContainerTests.cpp
+)
+
+add_mach_test(
+    CompileDITests.cpp
+    di/CompileDITests.cpp
 )
