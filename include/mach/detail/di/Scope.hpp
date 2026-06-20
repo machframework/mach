@@ -4,7 +4,7 @@
 #include <typeindex>
 #include <unordered_map>
 
-#include "ServiceDescriptor.hpp"
+#include <mach/detail/di/ServiceDescriptor.hpp>
 
 namespace mach::detail::di
 {

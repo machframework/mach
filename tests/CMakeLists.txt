@@ -58,3 +58,13 @@ add_mach_test(
     DILifetimeTests
     di/DILifetimeTests.cpp
 )
+
+add_mach_test(
+    ContainerTests
+    di/ContainerTests.cpp
+)
+
+add_mach_test(
+    CompileDITests.cpp
+    di/CompileDITests.cpp
+)

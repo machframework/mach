@@ -11,14 +11,21 @@ namespace test
 
     inline unsigned int THREADS = std::thread::hardware_concurrency();
 
-	inline void fail(std::string_view testName, std::string_view message)
-	{
+	inline void fail(std::string_view testName, std::string_view message) {
 		std::cerr
 			<< test::RED
 			<< "[FAIL] "
 			<< testName
 			<< ": "
 			<< message
+			<< test::RESET
+			<< std::endl;
+	}
+
+	inline void success(std::string_view testName) {
+		std::cout
+			<< test::GREEN
+			<< "[SUCCESS] " << testName << " passed!"
 			<< test::RESET
 			<< std::endl;
 	}

@@ -4,7 +4,7 @@
 #include <memory>
 #include <typeindex>
 
-#include "ServiceLifetime.hpp"
+#include <mach/detail/di/ServiceLifetime.hpp>
 
 namespace mach::detail::di
 {

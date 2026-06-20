@@ -4,43 +4,36 @@
 #include <string>
 #include <string_view>
 
-#include <mach/http/Method.hpp>
 #include <mach/Context.hpp>
+#include <mach/http/Method.hpp>
 
-// TODO: change registration method to a template
-#include "../src/core/Handler.hpp"
+#include <mach/detail/app/ServerOptions.hpp>
+#include <mach/detail/di/Container.hpp>
+#include <mach/detail/core/Handler.hpp>
 
 namespace mach
 {
+	class AppBuilder;
+
 	/**
-	 * Represents the main entry point for configuring and running a Mach application.
+	 * Represents a built Mach application.
 	 *
-	 * Used to register routes and start the underlying HTTP server.
+	 * Used to register routes and start the underlying HTTP server after 
+	 * application configuration has been finalized by AppBuilder.
 	 *
 	 * Ownership:
 	 * - Owns the application's runtime state.
-	 * - Should be treated as the root object of a Mach application.
-	 * 
+	 * - Should be treated as the root runtime object of a Mach application.
+	 *
 	 * Thread safety:
-	 * - Not thread-safe. Application configuration should be performed from one thread.
-	 * 
+	 * - Not thread-safe.
+	 *
 	 * Stability:
 	 * - This API is still experimental and may change before Mach's first stable release.
 	 */
 	class App {
 
 	public:
-		/**
-		 * Creates a new application instance.
-		 *
-		 * @param host The network interface to bind to.
-		 * @param port The port to listen on.
-		 * @param threadCount The number of worker threads used to process requests.
-		 *
-		 * @throws std::invalid_argument If the supplied configuration is invalid.
-		 */
-		App(std::string_view host, std::uint16_t port, std::size_t threadCount = 1);
-
 		~App();
 
 		/**
@@ -213,9 +206,13 @@ namespace mach
 		void run();
 
 	private:
+	
+		App(detail::app::ServerOptions serverOptions, detail::di::Container container);
 		void addRouteImpl(http::Method method, std::string_view pattern, detail::Handler handler);
 
 		class Impl;
 		std::unique_ptr<Impl> m_impl;
+
+		friend class AppBuilder;
 	};
 }

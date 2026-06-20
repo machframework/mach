@@ -2,13 +2,16 @@
 #include <thread>
 
 #include <mach/App.hpp>
+#include <mach/AppBuilder.hpp>
 #include <mach/Context.hpp>
 
 int main() {
 
 	try {
 		int threads = std::thread::hardware_concurrency();
-		auto app = mach::App("127.0.0.1", 3143, threads);
+
+		auto builder = mach::AppBuilder("127.0.0.1", 3143, threads);
+		auto app = builder.build();
 
 		app.get("/users/{name:string}", [](mach::Context& context) {
 			std::cout << "My name is " << context.request.routeParam("name") << std::endl;

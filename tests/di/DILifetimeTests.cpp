@@ -3,9 +3,10 @@
 
 #include "Testing.hpp"
 
-#include "di/Container.hpp"
-#include "di/Scope.hpp"
-#include "di/ServiceLifetime.hpp"
+#include <mach/detail/di/Container.hpp>
+#include <mach/detail/di/Scope.hpp>
+#include <mach/detail/di/ServiceLifetime.hpp>
+
 
 class Logger {
 public:
