@@ -38,31 +38,40 @@ namespace mach::detail::di
 
     template <typename T, typename... Deps>
     void Container::addService(ServiceLifetime lifetime) {
-        static_assert(isValidServiceType<T>,
-            "Service type must be a non-const, non-reference, non-pointer class type.");
+        constexpr bool validService = isValidServiceType<T>;
+        constexpr bool validDeps = (isValidServiceType<Deps> && ...);
+        
+        static_assert(
+            validService,
+            "Service type must be a non-const, non-reference, non-pointer class type."
+            );
 
-        static_assert((isValidServiceType<Deps> && ...),
-            "Dependency types must be non-const, non-reference, non-pointer class types.");
+        static_assert(
+            validDeps,
+            "Dependency types must be non-const, non-reference, non-pointer class types."
+            );
 
-        ServiceDescriptor descriptor{
-            .type = typeid(T),
-            .lifetime = lifetime,
-            .factory = [](Scope& scope) {
-                return std::make_shared<T>(
-                    *scope.resolve<Deps>()...
+        if constexpr (validService && validDeps) {
+            ServiceDescriptor descriptor{
+                .type = typeid(T),
+                .lifetime = lifetime,
+                .factory = [](Scope& scope) {
+                    return std::make_shared<T>(
+                        *scope.resolve<Deps>()...
+                    );
+                }
+            };
+
+            auto [_, inserted] = m_serviceRegistry.emplace(
+                descriptor.type,
+                std::move(descriptor)
+            );
+
+            if (!inserted) {
+                throw std::logic_error(
+                    std::format("Duplicate dependency registration: {}", descriptor.type.name())
                 );
             }
-        };
-
-        auto [_, inserted] = m_serviceRegistry.emplace(
-            descriptor.type,
-            std::move(descriptor)
-        );
-
-        if (!inserted) {
-            throw std::logic_error(
-                std::format("Duplicate dependency registration: {}", descriptor.type.name())
-            );
         }
     }
 }
