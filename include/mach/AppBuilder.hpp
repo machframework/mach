@@ -1,6 +1,8 @@
 #pragma once
 
+#include <string>
 #include <string_view>
+#include <type_traits>
 
 #include <mach/App.hpp>
 
@@ -118,22 +120,49 @@ namespace mach
 	private:
 		detail::app::ServerOptions m_serverOptions;
 		detail::di::Container m_container;
+
+		template <typename T>
+		static constexpr bool isValidServiceType =
+			std::is_class_v<T> &&
+			!std::is_const_v<T> &&
+			!std::is_reference_v<T> &&
+			!std::is_pointer_v<T> &&
+			!std::is_same_v<T, std::string> &&
+			!std::is_same_v<T, std::string_view>;
 	};
 
 	template <typename T, typename... Deps>
 	AppBuilder& AppBuilder::addScoped() {
+		static_assert(isValidServiceType<T>,
+			"Service type must be a non-const, non-reference, non-pointer class type.");
+
+		static_assert((isValidServiceType<Deps> && ...),
+			"Dependency types must be non-const, non-reference, non-pointer class types.");
+
 		m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Scoped);
 		return *this;
 	}
 
 	template <typename T, typename... Deps>
 	AppBuilder& AppBuilder::addSingleton() {
+		static_assert(isValidServiceType<T>,
+			"Service type must be a non-const, non-reference, non-pointer class type.");
+
+		static_assert((isValidServiceType<Deps> && ...),
+			"Dependency types must be non-const, non-reference, non-pointer class types.");
+
 		m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Singleton);
 		return *this;
 	}
 
 	template <typename T, typename... Deps>
 	AppBuilder& AppBuilder::addTransient() {
+		static_assert(isValidServiceType<T>,
+			"Service type must be a non-const, non-reference, non-pointer class type.");
+
+		static_assert((isValidServiceType<Deps> && ...),
+			"Dependency types must be non-const, non-reference, non-pointer class types.");
+
 		m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Transient);
 		return *this;
 	}

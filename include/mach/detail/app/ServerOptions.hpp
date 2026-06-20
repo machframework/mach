@@ -7,7 +7,7 @@ namespace mach::detail::app
 {
 	struct ServerOptions {
 		std::string host;
-		uint16_t port;
-		std::size_t threads;
+		uint16_t port = 3143;
+		std::size_t threads = 1;
 	};
 }
