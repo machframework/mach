@@ -24,9 +24,4 @@ namespace mach::detail::dispatching
     private:
         Action m_action;
     };
-
-    struct ControllerActionEndpoint {
-        std::type_index controllerType;
-        std::unique_ptr<IControllerActionInvoker> invoker;
-    };
 }

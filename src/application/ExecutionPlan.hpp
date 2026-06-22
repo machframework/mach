@@ -3,7 +3,7 @@
 #include <string>
 #include <unordered_map>
 
-#include <mach/detail/routing/Endpoint.hpp>
+#include <mach/detail/routing/RouteEndpoint.hpp>
 #include "routing/RoutingStatus.hpp"
 
 namespace mach::detail::application
@@ -11,7 +11,7 @@ namespace mach::detail::application
 	struct ExecutionPlan {
 		routing::RoutingStatus status;
 		// middleware[]
-		routing::Endpoint* endpoint;
+		routing::RouteEndpoint* endpoint;
 		std::unordered_map<std::string, std::string> params;
 
 		bool found() const noexcept {

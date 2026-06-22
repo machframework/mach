@@ -9,7 +9,7 @@
 #include <mach/Request.hpp>
 
 #include "application/ExecutionPlan.hpp"
-#include <mach/detail/routing/Endpoint.hpp>
+#include <mach/detail/routing/RouteEndpoint.hpp>
 #include "RouteMatch.hpp"
 #include "RouteTrie.hpp"
 
@@ -19,12 +19,12 @@ namespace mach::detail::routing
 
 	public:
 		application::ExecutionPlan route(const mach::Request& request) const;
-		void addRoute(Endpoint&& endpoint);
+		void addRoute(RouteEndpoint&& endpoint);
 
 	private:
 		routing::RouteMatch matchRoute(const mach::Request& request) const;
 
-		std::deque<routing::Endpoint> m_endpoints;
+		std::deque<routing::RouteEndpoint> m_endpoints;
 		routing::RouteTrie m_routes;
 	};
 }

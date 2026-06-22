@@ -9,7 +9,7 @@
 
 #include <mach/detail/app/ServerOptions.hpp>
 #include <mach/detail/di/Container.hpp>
-#include <mach/detail/core/MinimalApiEndpoint.hpp>
+#include <mach/detail/core/MinimalApiHandler.hpp>
 
 namespace mach
 {

@@ -3,8 +3,9 @@
 #include <string>
 #include <stdexcept>
 
+#include <mach/detail/routing/RouteEndpoint.hpp>
+
 #include "application/Runtime.hpp"
-#include <mach/detail/routing/Endpoint.hpp>
 #include "server/Server.hpp"
 
 namespace mach
@@ -85,7 +86,7 @@ namespace mach
 			throw std::invalid_argument("Route handler cannot be empty");
 		}
 		
-		mach::detail::routing::Endpoint endpoint{
+		mach::detail::routing::RouteEndpoint endpoint{
 			.method = method,
 			.pattern = std::string(pattern),
 			.handler = handler

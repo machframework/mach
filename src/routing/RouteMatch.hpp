@@ -3,27 +3,27 @@
 #include <string>
 #include <unordered_map>
 
-#include <mach/detail/routing/Endpoint.hpp>
+#include <mach/detail/routing/RouteEndpoint.hpp>
 #include "RoutingStatus.hpp"
 
 namespace mach::detail::routing
 {
 	struct RouteMatch {
 		routing::RoutingStatus status = RoutingStatus::Found;
-		routing::Endpoint* endpoint = nullptr;
+		routing::RouteEndpoint* endpoint = nullptr;
 		std::unordered_map<std::string, std::string> params;
 
 		explicit RouteMatch(routing::RoutingStatus status)
 			: status(status)
 		{ }
 
-		explicit RouteMatch(routing::Endpoint* endpoint)
+		explicit RouteMatch(routing::RouteEndpoint* endpoint)
 			: status(routing::RoutingStatus::Found),
 			endpoint(endpoint)
 		{ }
 
 		RouteMatch(
-			routing::Endpoint* endpoint, std::unordered_map<std::string, std::string>&& params
+			routing::RouteEndpoint* endpoint, std::unordered_map<std::string, std::string>&& params
 		) : endpoint(endpoint), 
 			params(std::move(params))
 		{ }

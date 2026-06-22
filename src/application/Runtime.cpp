@@ -43,7 +43,7 @@ namespace mach::detail::application
 		}
 	}
 
-	void Runtime::addRoute(routing::Endpoint&& endpoint) {
+	void Runtime::addRoute(routing::RouteEndpoint&& endpoint) {
 		m_router.addRoute(std::move(endpoint));
 	}
 }

@@ -151,7 +151,7 @@ namespace mach::detail::routing
         return plan;
     }
 
-	void Router::addRoute(Endpoint&& endpoint) {
+	void Router::addRoute(RouteEndpoint&& endpoint) {
         // enforce syntax
         const auto& pattern = endpoint.pattern;
 
@@ -221,7 +221,7 @@ namespace mach::detail::routing
         }
 
         m_endpoints.push_back(std::move(endpoint));
-        Endpoint* stored = &m_endpoints.back();
+        RouteEndpoint* stored = &m_endpoints.back();
 
         m_routes.addRoute(std::move(segments), stored);
     }
