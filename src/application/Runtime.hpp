@@ -4,9 +4,9 @@
 
 #include <mach/detail/di/Container.hpp>
 #include <mach/detail/routing/RouteEndpoint.hpp>
+#include <mach/detail/routing/Router.hpp>
 
 #include "dispatching/Dispatcher.hpp"
-#include "routing/Router.hpp"
 
 namespace mach::detail::application
 {

@@ -3,11 +3,12 @@
 #include <string_view>
 #include <vector>
 
+#include <mach/detail/core/FunctionTraits.hpp>
+#include <mach/detail/dispatching/ControllerActionDescriptor.hpp>
+#include <mach/detail/routing/RouteEndpoint.hpp>
 #include <mach/http/Method.hpp>
 
-#include <mach/detail/routing/RouteEndpoint.hpp>
-#include <mach/detail/dispatching/ControllerActionDescriptor.hpp>
-#include <mach/detail/core/FunctionTraits.hpp>
+#include <mach/detail/routing/Router.hpp>
 
 namespace mach
 {
@@ -63,11 +64,13 @@ namespace mach
 			"Mach error: route handler must belong to the controller being registered."
 		);
 
-		detail::routing::RouteEndpoint{
+		detail::routing::RouteEndpoint endpoint{
 			.method = method,
 			.pattern = std::string(pattern),
 			.kind = EndpointKind::ControllerAction,
 			.controllerAction = std::make_unique<ControllerActionInvoker<UserController>>(&handler)
 		};
+
+		m_controllerEndpoints.emplace(std::move(endpoint));
 	}
 }

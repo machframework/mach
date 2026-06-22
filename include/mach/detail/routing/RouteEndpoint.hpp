@@ -10,8 +10,7 @@
 
 #include <mach/detail/core/MinimalApiHandler.hpp>
 #include <mach/detail/dispatching/IControllerActionDescriptor.hpp>
-
-#include "routing/RouteConstraint.hpp"
+#include <mach/detail/routing/RouteConstraint.hpp>
 
 namespace mach::detail::routing
 {
