@@ -8,6 +8,7 @@
 
 #include <mach/detail/app/ServerOptions.hpp>
 #include <mach/detail/di/Container.hpp>
+#include <mach/detail/controllers/ControllerTraits.hpp>
 
 namespace mach
 {
@@ -99,6 +100,24 @@ namespace mach
 		AppBuilder& addTransient();
 
 		/**
+		 * Registers a HTTP controller in the dependency injection container.
+		 *
+		 * Controllers will be registered as transient dependencies.
+		 *
+		 * @tparam T The service type being registered.
+		 * @tparam Deps The constructor dependency types required to create T.
+		 *
+		 * @return A reference to the current AppBuilder instance, allowing
+		 *         method chaining.
+		 *
+		 * @throws std::logic_error If the service type has already been registered.
+		 *
+		 * @thread_safety This function is not thread-safe.
+		 */
+		template <typename T, typename... Deps>
+		AppBuilder& addController();
+
+		/**
 		 * Builds and returns the application instance.
 		 *
 		 * Finalizes the application configuration, including all registered
@@ -124,19 +143,61 @@ namespace mach
 
 	template <typename T, typename... Deps>
 	AppBuilder& AppBuilder::addScoped() {
+		static_assert(
+			!mach::detail::controllers::ValidController<T>,
+			"Mach error: Controllers must be registered using addController<T>(), not addScoped<T>()."
+		);
+
+		static_assert(
+			(!mach::detail::controllers::ValidController<Deps> && ...),
+			"Mach error: services must not depend on controllers."
+		);
+
 		m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Scoped);
 		return *this;
 	}
 
 	template <typename T, typename... Deps>
 	AppBuilder& AppBuilder::addSingleton() {
+		static_assert(
+			!mach::detail::controllers::ValidController<T>,
+			"Mach error: Controllers must be registered using addController<T>(), not addSingleton<T>()."
+		);
+
 		m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Singleton);
 		return *this;
 	}
 
 	template <typename T, typename... Deps>
 	AppBuilder& AppBuilder::addTransient() {
+		static_assert(
+			!mach::detail::controllers::ValidController<T>,
+			"Mach error: Controllers must be registered using addController<T>(), not addTransient<T>()."
+		);
+
 		m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Transient);
+		return *this;
+	}
+
+	template <typename T, typename... Deps>
+	AppBuilder& AppBuilder::addController() {
+		constexpr bool isControllerType = mach::detail::controllers::ControllerType<T>;
+		constexpr bool hasRouteField = mach::detail::controllers::HasPublicStaticRouteField<T>;
+		
+		static_assert(
+			isControllerType,
+			"Controller must be derived from ControllerBase"
+		);
+
+		static_assert(
+			hasRouteField,
+			"Controller must expose a public std::string route field"
+		);
+
+		if constexpr (isControllerType && hasRouteField) {
+			m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Transient);
+		}
+
 		return *this;
 	}
 }

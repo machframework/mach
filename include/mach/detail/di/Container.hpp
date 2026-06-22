@@ -6,8 +6,10 @@
 #include <stdexcept>
 #include <typeindex>
 
-#include "Scope.hpp"
 #include <mach/detail/di/ServiceLifetime.hpp>
+#include <mach/detail/di/ServiceTraits.hpp>
+
+#include "Scope.hpp"
 
 namespace mach::detail::di
 {
@@ -25,15 +27,6 @@ namespace mach::detail::di
 	private:
 		std::unordered_map<std::type_index, ServiceDescriptor> m_serviceRegistry;
         std::unordered_map<std::type_index, std::shared_ptr<void>> m_singletonInstances;
-
-        template <typename T>
-        static constexpr bool isValidServiceType =
-            std::is_class_v<T> &&
-            !std::is_const_v<T> &&
-            !std::is_reference_v<T> &&
-            !std::is_pointer_v<T> &&
-            !std::is_same_v<T, std::string> &&
-            !std::is_same_v<T, std::string_view>;
 	};
 
     template <typename T, typename... Deps>
@@ -44,12 +37,12 @@ namespace mach::detail::di
         static_assert(
             validService,
             "Service type must be a non-const, non-reference, non-pointer class type."
-            );
+        );
 
         static_assert(
             validDeps,
             "Dependency types must be non-const, non-reference, non-pointer class types."
-            );
+        );
 
         if constexpr (validService && validDeps) {
             ServiceDescriptor descriptor{
