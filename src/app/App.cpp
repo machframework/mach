@@ -12,7 +12,8 @@ namespace mach
 	class App::Impl {
 	
 	public: 
-		Impl(std::string_view host, std::uint16_t port, std::size_t threadCount);
+		Impl(detail::app::ServerOptions serverOptions);
+
 		~Impl() = default;
 
 		std::string host() const noexcept;
@@ -24,12 +25,16 @@ namespace mach
 		void run();
 
 	private:
-		detail::server::Server m_server;
+		detail::app::ServerOptions m_serverOptions;
+		//detail::server::Server m_server;
 		detail::application::Runtime m_runtime;
 	};
 
-	App::App(detail::app::ServerOptions serverOptions, detail::di::Container container)
-		: m_impl(std::make_unique<Impl>(serverOptions.host, serverOptions.port, serverOptions.threads))
+	App::App(
+		detail::app::ServerOptions serverOptions,
+		detail::di::Container container
+	)
+		: m_impl(std::make_unique<Impl>(serverOptions))
 	{ }
 
 	App::~App() = default;
@@ -54,12 +59,18 @@ namespace mach
 		m_impl->addRoute(method, pattern, handler);
 	}
 
-	App::Impl::Impl(std::string_view host, std::uint16_t port, std::size_t threadCount) 
-		: m_server(host, port, threadCount, m_runtime)
+	App::Impl::Impl(detail::app::ServerOptions serverOptions)
+		: m_serverOptions(std::move(serverOptions))
+		//: m_server(std::move(serverOptions), std::move(m_runtime))
 	{ }
 
 	void App::Impl::run() {
-		m_server.run();
+		auto server = std::make_unique<detail::server::Server>(
+			std::move(m_serverOptions),
+			std::move(m_runtime)
+		);
+
+		server->run();
 	}
 
 	void App::Impl::addRoute(mach::http::Method method, std::string_view pattern, detail::Handler handler) {
@@ -78,14 +89,14 @@ namespace mach
 
 
 	std::string App::Impl::host() const noexcept {
-		return m_server.host();
+		return m_serverOptions.host;
 	}
 
 	std::uint16_t App::Impl::port() const noexcept {
-		return m_server.port();
+		return m_serverOptions.port;
 	}
 
 	std::size_t App::Impl::threadCount() const noexcept {
-		return m_server.threadCount();
+		return m_serverOptions.threads;
 	}
 }

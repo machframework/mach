@@ -40,8 +40,14 @@ namespace mach::detail::routing
 			std::unordered_map<std::optional<routing::RouteConstraint>, std::unique_ptr<RouteNode>> constrainedParameterChildren;
 
 			explicit RouteNode(std::string_view segmentKey = "")
-				: segmentKey(std::move(segmentKey))
+				: segmentKey(segmentKey)
 			{ }
+
+			RouteNode(const RouteNode&) = delete;
+			RouteNode& operator=(const RouteNode&) = delete;
+
+			RouteNode(RouteNode&&) noexcept = default;
+			RouteNode& operator=(RouteNode&&) noexcept = default;
 		};
 
 		static std::string segmentsToPath(const std::vector<std::string_view>& segments);
