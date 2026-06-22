@@ -3,7 +3,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "routing/Endpoint.hpp"
+#include <mach/detail/routing/Endpoint.hpp>
 #include "routing/RoutingStatus.hpp"
 
 namespace mach::detail::application

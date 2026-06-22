@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 #include "application/Runtime.hpp"
-#include "routing/Endpoint.hpp"
+#include <mach/detail/routing/Endpoint.hpp>
 #include "server/Server.hpp"
 
 namespace mach

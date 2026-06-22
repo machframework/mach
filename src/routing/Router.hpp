@@ -9,7 +9,7 @@
 #include <mach/Request.hpp>
 
 #include "application/ExecutionPlan.hpp"
-#include "Endpoint.hpp"
+#include <mach/detail/routing/Endpoint.hpp>
 #include "RouteMatch.hpp"
 #include "RouteTrie.hpp"
 

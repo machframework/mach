@@ -3,7 +3,7 @@
 #include <mach/Context.hpp>
 
 #include "dispatching/Dispatcher.hpp"
-#include "routing/Endpoint.hpp"
+#include <mach/detail/routing/Endpoint.hpp>
 #include "routing/Router.hpp"
 
 namespace mach::detail::application
