@@ -8,7 +8,13 @@
 #include "routing/RoutingStatus.hpp"
 #include "ExecutionPlan.hpp"
 
-namespace mach::detail::application {
+namespace mach::detail::application 
+{
+	Runtime::Runtime(routing::Router router, di::Container container) 
+		: m_router(std::move(router)),
+		m_container(std::move(container))
+	{ }
+
 	void Runtime::handle(mach::Context& context) {
 		auto plan = m_router.route(context.request);
 		if (!plan.found()) {

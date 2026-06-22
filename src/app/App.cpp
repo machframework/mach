@@ -26,8 +26,10 @@ namespace mach
 
 	private:
 		detail::app::ServerOptions m_serverOptions;
-		//detail::server::Server m_server;
-		detail::application::Runtime m_runtime;
+
+		//detail::application::Runtime m_runtime;
+		detail::routing::Router m_router;
+		detail::di::Container m_container;
 	};
 
 	App::App(
@@ -65,9 +67,14 @@ namespace mach
 	{ }
 
 	void App::Impl::run() {
+		auto runtime = detail::application::Runtime(
+			std::move(m_router),
+			std::move(m_container)
+		);
+
 		auto server = std::make_unique<detail::server::Server>(
 			std::move(m_serverOptions),
-			std::move(m_runtime)
+			std::move(runtime)
 		);
 
 		server->run();
@@ -84,9 +91,8 @@ namespace mach
 			.handler = handler
 		};
 
-		m_runtime.addRoute(std::move(endpoint));
+		m_router.addRoute(std::move(endpoint));
 	}
-
 
 	std::string App::Impl::host() const noexcept {
 		return m_serverOptions.host;
