@@ -9,7 +9,7 @@
 
 #include <mach/detail/app/ServerOptions.hpp>
 #include <mach/detail/di/Container.hpp>
-#include <mach/detail/core/Handler.hpp>
+#include <mach/detail/core/MinimalApiEndpoint.hpp>
 
 namespace mach
 {
@@ -192,7 +192,7 @@ namespace mach
 			addRouteImpl(
 				method,
 				pattern,
-				detail::Handler{ std::forward<THandler>(handler) }
+				detail::MinimalApiHandler{ std::forward<THandler>(handler) }
 			);
 		}
 
@@ -208,7 +208,7 @@ namespace mach
 	private:
 	
 		App(detail::app::ServerOptions serverOptions, detail::di::Container container);
-		void addRouteImpl(http::Method method, std::string_view pattern, detail::Handler handler);
+		void addRouteImpl(http::Method method, std::string_view pattern, detail::MinimalApiHandler handler);
 
 		class Impl;
 		std::unique_ptr<Impl> m_impl;

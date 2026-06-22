@@ -1,16 +1,32 @@
 #pragma once
 
-template <typename TController, typename THandler>
-class ControllerActionDescriptor final : public IControllerActionDescriptor {
-public:
-    explicit ControllerActionDescriptor(THandler handler)
-        : m_handler(handler) {
-    }
+#include "IControllerActionDescriptor.hpp"
 
-    THandler handler() const {
-        return m_handler;
-    }
+#include <memory>
+#include <typeindex>
 
-private:
-    THandler m_handler;
-};
+namespace mach::detail::dispatching
+{
+    template <typename TController>
+    class ControllerActionInvoker final : public IControllerActionInvoker {
+    public:
+        using Action = void (TController::*)(Context&);
+
+        explicit ControllerActionInvoker(Action action)
+            : m_action(action) {
+        }
+
+        void invoke(Context& ctx, di::Scope& scope) const override {
+            auto controller = scope.resolve<TController>();
+            (controller.get()->*m_action)(ctx);
+        }
+
+    private:
+        Action m_action;
+    };
+
+    struct ControllerActionEndpoint {
+        std::type_index controllerType;
+        std::unique_ptr<IControllerActionInvoker> invoker;
+    };
+}

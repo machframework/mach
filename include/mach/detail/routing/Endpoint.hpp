@@ -8,7 +8,7 @@
 #include <mach/Context.hpp>
 #include <mach/http/Method.hpp>
 
-#include <mach/detail/core/Handler.hpp>
+#include <mach/detail/core/MinimalApiEndpoint.hpp>
 #include "routing/RouteConstraint.hpp"
 
 namespace mach::detail::routing
@@ -16,7 +16,7 @@ namespace mach::detail::routing
 	struct Endpoint {
 		mach::http::Method method;
 		std::string pattern;
-		Handler handler;
+		MinimalApiHandler handler;
 		std::vector<std::string> parameterNames;
 
 		bool operator==(const Endpoint& other) const {

@@ -20,7 +20,7 @@ namespace mach
 		std::uint16_t port() const noexcept;
 		std::size_t threadCount() const noexcept;
 
-		void addRoute(mach::http::Method method, std::string_view pattern, detail::Handler handler);
+		void addRoute(mach::http::Method method, std::string_view pattern, detail::MinimalApiHandler handler);
 
 		void run();
 
@@ -57,7 +57,7 @@ namespace mach
 		return m_impl->threadCount();
 	}
 
-	void App::addRouteImpl(http::Method method, std::string_view pattern, detail::Handler handler) {
+	void App::addRouteImpl(http::Method method, std::string_view pattern, detail::MinimalApiHandler handler) {
 		m_impl->addRoute(method, pattern, handler);
 	}
 
@@ -80,7 +80,7 @@ namespace mach
 		server->run();
 	}
 
-	void App::Impl::addRoute(mach::http::Method method, std::string_view pattern, detail::Handler handler) {
+	void App::Impl::addRoute(mach::http::Method method, std::string_view pattern, detail::MinimalApiHandler handler) {
 		if (!handler) {
 			throw std::invalid_argument("Route handler cannot be empty");
 		}
