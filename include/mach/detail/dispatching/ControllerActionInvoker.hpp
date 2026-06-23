@@ -5,6 +5,7 @@
 
 #include <mach/detail/controllers/ControllerTraits.hpp>
 #include <mach/detail/results/ResultTraits.hpp>
+#include <mach/detail/serailization/Serializer.hpp>
 
 #include "IControllerActionInvoker.hpp"
 
@@ -30,7 +31,7 @@ namespace mach::detail::dispatching
 
             ctx.response.status(res.statusCode());
             if (res.hasValue()) {
-                ctx.response.body(std::move(std::to_string(res.value())));
+                ctx.response.body(std::move(serialization::Serializer::serialize(res.value())));
             }
         }
 
