@@ -13,6 +13,11 @@ namespace mach::detail::application
 	class Runtime {
 
 	public:
+		Runtime(const Runtime&) = delete;
+		Runtime& operator=(const Runtime&) = delete;
+		Runtime(Runtime&&) = delete;
+		Runtime& operator=(Runtime&&) = delete;
+
 		Runtime(routing::Router router, di::Container container);
 
 		void handle(mach::Context& context);

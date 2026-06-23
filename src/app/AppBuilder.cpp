@@ -1,5 +1,7 @@
 #include <mach/AppBuilder.hpp>
 
+#include <iostream>
+
 namespace mach
 {
 	AppBuilder::AppBuilder(std::string_view host, std::uint16_t port, std::size_t threadCount) {
@@ -9,7 +11,7 @@ namespace mach
 		};
 	}
 
-	App AppBuilder::build() {
+	App AppBuilder::build() const {
 		return mach::App(std::move(m_serverOptions), std::move(m_container));
 	}
 }

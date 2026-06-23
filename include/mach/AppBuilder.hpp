@@ -134,7 +134,7 @@ namespace mach
 		 *
 		 * @thread_safety This function is not thread-safe.
 		 */
-		App build();
+		App build() const;
 
 	private:
 		detail::app::ServerOptions m_serverOptions;

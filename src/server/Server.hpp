@@ -6,13 +6,15 @@
 
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/address.hpp>
+
 #include <mach/detail/app/ServerOptions.hpp>
+#include <mach/detail/routing/Router.hpp>
+#include <mach/detail/di/Container.hpp>
 
 #include "adapter/inbound/BeastRequestAdapter.hpp"
 #include "adapter/outbound/BeastResponseAdapter.hpp"
 #include "BeastListener.hpp"
 #include "BeastSession.hpp"
-#include "application/Runtime.hpp"
 
 namespace mach::detail::server
 {
@@ -23,7 +25,8 @@ namespace mach::detail::server
 	public:
 		Server(
 			app::ServerOptions serverOptions,
-			application::Runtime runtime
+			routing::Router router,
+			di::Container container
 		);
 
 		~Server() = default;

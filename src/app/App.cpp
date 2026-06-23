@@ -5,7 +5,6 @@
 
 #include <mach/detail/routing/RouteEndpoint.hpp>
 
-#include "application/Runtime.hpp"
 #include "server/Server.hpp"
 
 namespace mach
@@ -13,7 +12,10 @@ namespace mach
 	class App::Impl {
 	
 	public: 
-		Impl(detail::app::ServerOptions serverOptions);
+		Impl(
+			detail::app::ServerOptions serverOptions,
+			detail::di::Container container
+		);
 
 		~Impl() = default;
 
@@ -29,7 +31,6 @@ namespace mach
 	private:
 		detail::app::ServerOptions m_serverOptions;
 
-		//detail::application::Runtime m_runtime;
 		detail::routing::Router m_router;
 		detail::di::Container m_container;
 	};
@@ -38,7 +39,7 @@ namespace mach
 		detail::app::ServerOptions serverOptions,
 		detail::di::Container container
 	)
-		: m_impl(std::make_unique<Impl>(serverOptions))
+		: m_impl(std::make_unique<Impl>(std::move(serverOptions), std::move(container)))
 	{ }
 
 	App::~App() = default;
@@ -67,20 +68,19 @@ namespace mach
 		m_impl->addControllerRoutes(std::move(routes));
 	}
 
-	App::Impl::Impl(detail::app::ServerOptions serverOptions)
-		: m_serverOptions(std::move(serverOptions))
-		//: m_server(std::move(serverOptions), std::move(m_runtime))
+	App::Impl::Impl(
+		detail::app::ServerOptions serverOptions,
+		detail::di::Container container
+	)
+		: m_serverOptions(std::move(serverOptions)),
+		m_container(std::move(container))
 	{ }
 
 	void App::Impl::run() {
-		auto runtime = detail::application::Runtime(
-			std::move(m_router),
-			std::move(m_container)
-		);
-
 		auto server = std::make_unique<detail::server::Server>(
 			std::move(m_serverOptions),
-			std::move(runtime)
+			std::move(m_router),
+			std::move(m_container)
 		);
 
 		server->run();
