@@ -7,7 +7,7 @@
 
 #include <mach/detail/controllers/ControllerTraits.hpp>
 #include <mach/detail/core/FunctionTraits.hpp>
-#include <mach/detail/dispatching/ControllerActionDescriptor.hpp>
+#include <mach/detail/dispatching/ControllerActionInvoker.hpp>
 #include <mach/detail/routing/RouteEndpoint.hpp>
 #include <mach/http/Method.hpp>
 
@@ -90,7 +90,7 @@ namespace mach
             .pattern = m_route + std::string(pattern),
             .kind = detail::routing::EndpointKind::ControllerAction,
             .controllerAction =
-                std::make_unique<detail::dispatching::ControllerActionInvoker<TController>>(
+                std::make_unique<detail::dispatching::ControllerActionInvoker<TController, ReturnType>>(
                     std::forward<THandler>(handler))
         };
 

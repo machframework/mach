@@ -9,7 +9,7 @@
 #include <mach/http/Method.hpp>
 
 #include <mach/detail/core/MinimalApiHandler.hpp>
-#include <mach/detail/dispatching/IControllerActionDescriptor.hpp>
+#include <mach/detail/dispatching/IControllerActionInvoker.hpp>
 #include <mach/detail/routing/RouteConstraint.hpp>
 
 namespace mach::detail::routing

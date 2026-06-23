@@ -8,6 +8,8 @@
 namespace mach::results
 {
 	class Results {
+
+	public:
 		template <typename T>
 		static mach::Reply<T> ok(T value);
 

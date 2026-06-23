@@ -3,16 +3,16 @@
 #include <mach/Context.hpp>
 #include <mach/results/Results.hpp>
 #include <mach/results/Reply.hpp>
+#include <mach/controllers/ControllerBuilder.hpp>
 
 namespace mach
 {
 	class ControllerBase {
-	
+
 	public:
-		virtual void configure(void) = 0;
+		mach::Context* context = nullptr;
 
 	protected:
-		mach::Context& context;
 
 		template <typename T>
 		mach::Reply<T> ok(T value);
