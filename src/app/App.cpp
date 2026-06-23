@@ -22,6 +22,7 @@ namespace mach
 		std::size_t threadCount() const noexcept;
 
 		void addRoute(mach::http::Method method, std::string_view pattern, detail::MinimalApiHandler handler);
+		void addControllerRoutes(std::vector<detail::routing::RouteEndpoint> routes);
 
 		void run();
 
@@ -62,6 +63,10 @@ namespace mach
 		m_impl->addRoute(method, pattern, handler);
 	}
 
+	void App::addControllerRoutesImpl(std::vector<detail::routing::RouteEndpoint> routes) {
+		m_impl->addControllerRoutes(std::move(routes));
+	}
+
 	App::Impl::Impl(detail::app::ServerOptions serverOptions)
 		: m_serverOptions(std::move(serverOptions))
 		//: m_server(std::move(serverOptions), std::move(m_runtime))
@@ -93,6 +98,12 @@ namespace mach
 		};
 
 		m_router.addRoute(std::move(endpoint));
+	}
+
+	void App::Impl::addControllerRoutes(std::vector<detail::routing::RouteEndpoint> routes) {
+		for (auto& route : routes) {
+			m_router.addRoute(std::move(route));
+		}
 	}
 
 	std::string App::Impl::host() const noexcept {

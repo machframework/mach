@@ -1,8 +1,11 @@
 #pragma once
 
+#include <string>
 #include <string_view>
 #include <vector>
+#include <utility>
 
+#include <mach/detail/controllers/ControllerTraits.hpp>
 #include <mach/detail/core/FunctionTraits.hpp>
 #include <mach/detail/dispatching/ControllerActionDescriptor.hpp>
 #include <mach/detail/routing/RouteEndpoint.hpp>
@@ -12,65 +15,85 @@
 
 namespace mach
 {
-	template <typename TController>
-	class ControllerBuilder {
-		
-	public:
-		ControllerBuilder(const ControllerBuilder&) = delete;
-		ControllerBuilder& operator=(const ControllerBuilder&) = delete;
+    template <typename TController>
+    class ControllerBuilder {
 
-		ControllerBuilder(ControllerBuilder&&) = delete;
-		ControllerBuilder& operator=(ControllerBuilder&&) = delete;
+    public:
+        ControllerBuilder(const ControllerBuilder&) = delete;
+        ControllerBuilder& operator=(const ControllerBuilder&) = delete;
 
-		template <typename THandler>
-		ControllerBuilder& get(std::string_view pattern, THandler handler);
+        ControllerBuilder(ControllerBuilder&&) = delete;
+        ControllerBuilder& operator=(ControllerBuilder&&) = delete;
 
-	private:
-		explicit ControllerBuilder();
+        template <typename THandler>
+        ControllerBuilder<TController>& get(std::string_view pattern, THandler&& handler);
 
-		template <typename THandler>
-		void addControllerMethod(http::Method method, std::string_view pattern, THandler handler);
+    private:
+        explicit ControllerBuilder();
 
-		std::vector<detail::routing::Endpoint> m_controllerEndpoints;
+        template <typename THandler>
+        void addControllerMethod(http::Method method, std::string_view pattern, THandler&& handler);
 
-		friend class AppBuilder;
-	};
+        std::string m_route;
+        std::vector<detail::routing::RouteEndpoint> m_controllerEndpoints;
 
-	template <typename TController>
-	template <typename THandler>
-	ControllerBuilder<TController>& ControllerBuilder<TController>::get(
-		std::string_view pattern,
-		THandler handler
-	) {
-		addControllerMethod(http::Method::Get, path, std::forward(handler));
-		return *this;
-	}
+        friend class App;
+        friend class AppBuilder;
+    };
 
-	template <typename TController>
-	template <typename THandler>
-	void ControllerBuilder<TController>::addControllerMethod(
-		http::Method method,
-		std::string_view pattern,
-		THandler handler
-	) {
-		using Traits = detail::FunctionTraits<Handler>;
+    template <typename TController>
+    ControllerBuilder<TController>::ControllerBuilder()
+    {
+        static_assert(
+            detail::controllers::MachController<TController>,
+            "Mach error: TController must be a valid Mach controller."
+        );
 
-		using HandlerControllerType = typename Traits::ClassType;
-		using ReturnType = typename Traits::ReturnType;
-		using ArgsTuple = typename Traits::ArgsTuple;
+        m_route = TController::route;
+    }
 
-		static_assert(
-			std::same_as<HandlerControllerType, TController>,
-			"Mach error: route handler must belong to the controller being registered."
-		);
+    template <typename TController>
+    template <typename THandler>
+    ControllerBuilder<TController>& ControllerBuilder<TController>::get(
+        std::string_view pattern,
+        THandler&& handler)
+    {
+        addControllerMethod(
+            http::Method::Get,
+            pattern,
+            std::forward<THandler>(handler));
 
-		detail::routing::RouteEndpoint endpoint{
-			.method = method,
-			.pattern = std::string(pattern),
-			.kind = EndpointKind::ControllerAction,
-			.controllerAction = std::make_unique<ControllerActionInvoker<UserController>>(&handler)
-		};
+        return *this;
+    }
 
-		m_controllerEndpoints.emplace(std::move(endpoint));
-	}
+    template <typename TController>
+    template <typename THandler>
+    void ControllerBuilder<TController>::addControllerMethod(
+        http::Method method,
+        std::string_view pattern,
+        THandler&& handler)
+    {
+        using HandlerType = std::remove_cvref_t<THandler>;
+        using Traits = detail::FunctionTraits<HandlerType>;
+
+        using HandlerControllerType = typename Traits::ClassType;
+        using ReturnType = typename Traits::ReturnType;
+        using ArgsTuple = typename Traits::ArgsTuple;
+
+        static_assert(
+            std::same_as<HandlerControllerType, TController>,
+            "Mach error: route handler must belong to the controller being registered."
+            );
+
+        detail::routing::RouteEndpoint endpoint{
+            .method = method,
+            .pattern = m_route + std::string(pattern),
+            .kind = detail::routing::EndpointKind::ControllerAction,
+            .controllerAction =
+                std::make_unique<detail::dispatching::ControllerActionInvoker<TController>>(
+                    std::forward<THandler>(handler))
+        };
+
+        m_controllerEndpoints.emplace_back(std::move(endpoint));
+    }
 }
