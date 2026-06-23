@@ -28,7 +28,7 @@ public:
 
 	static void configure(mach::ControllerBuilder<HomeController>& methods) {
 		methods.get("/age/{birth:int}", &HomeController::calculateAge);
-		methods.get("", &HomeController::sayHi);
+		methods.get(& HomeController::sayHi);
 	}
 };
 

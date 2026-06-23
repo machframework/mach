@@ -29,16 +29,31 @@ namespace mach
         ControllerBuilder<TController>& get(std::string_view pattern, THandler&& handler);
 
         template <typename THandler>
+        ControllerBuilder<TController>& get(THandler&& handler);
+
+        template <typename THandler>
         ControllerBuilder<TController>& post(std::string_view pattern, THandler&& handler);
+
+        template <typename THandler>
+        ControllerBuilder<TController>& post(THandler&& handler);
 
         template <typename THandler>
         ControllerBuilder<TController>& put(std::string_view pattern, THandler&& handler);
 
         template <typename THandler>
+        ControllerBuilder<TController>& put(THandler&& handler);
+
+        template <typename THandler>
         ControllerBuilder<TController>& patch(std::string_view pattern, THandler&& handler);
 
         template <typename THandler>
+        ControllerBuilder<TController>& patch(THandler&& handler);
+
+        template <typename THandler>
         ControllerBuilder<TController>& del(std::string_view pattern, THandler&& handler);
+
+        template <typename THandler>
+        ControllerBuilder<TController>& del(THandler&& handler);
 
 
     private:
@@ -81,6 +96,13 @@ namespace mach
 
     template <typename TController>
     template <typename THandler>
+    ControllerBuilder<TController>& ControllerBuilder<TController>::get(THandler&& handler)
+    {
+        return get<THandler>("", std::forward<THandler>(handler));
+    }
+
+    template <typename TController>
+    template <typename THandler>
     ControllerBuilder<TController>& ControllerBuilder<TController>::post(
         std::string_view pattern,
         THandler&& handler)
@@ -91,6 +113,13 @@ namespace mach
             std::forward<THandler>(handler));
 
         return *this;
+    }
+
+    template <typename TController>
+    template <typename THandler>
+    ControllerBuilder<TController>& ControllerBuilder<TController>::post(THandler&& handler)
+    {
+        return post<THandler>("", std::forward<THandler>(handler));
     }
 
     template <typename TController>
@@ -109,6 +138,13 @@ namespace mach
 
     template <typename TController>
     template <typename THandler>
+    ControllerBuilder<TController>& ControllerBuilder<TController>::put(THandler&& handler)
+    {
+        return put<THandler>("", std::forward<THandler>(handler));
+    }
+
+    template <typename TController>
+    template <typename THandler>
     ControllerBuilder<TController>& ControllerBuilder<TController>::patch(
         std::string_view pattern,
         THandler&& handler)
@@ -123,6 +159,13 @@ namespace mach
 
     template <typename TController>
     template <typename THandler>
+    ControllerBuilder<TController>& ControllerBuilder<TController>::patch(THandler&& handler)
+    {
+        return patch<THandler>("", std::forward<THandler>(handler));
+    }
+
+    template <typename TController>
+    template <typename THandler>
     ControllerBuilder<TController>& ControllerBuilder<TController>::del(
         std::string_view pattern,
         THandler&& handler)
@@ -133,6 +176,13 @@ namespace mach
             std::forward<THandler>(handler));
 
         return *this;
+    }
+
+    template <typename TController>
+    template <typename THandler>
+    ControllerBuilder<TController>& ControllerBuilder<TController>::del(THandler&& handler)
+    {
+        return del<THandler>("", std::forward<THandler>(handler));
     }
 
     template <typename TController>
