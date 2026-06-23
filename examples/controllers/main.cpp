@@ -18,11 +18,17 @@ public:
 
 		std::cout << "My age is: " << age << std::endl;
 
-		return noContent<int>();
+		return ok(age);
+	}
+
+	[[mach::get("")]]
+	mach::Reply<std::string> sayHi() {
+		return ok("Hi");
 	}
 
 	static void configure(mach::ControllerBuilder<HomeController>& methods) {
 		methods.get("/age/{birth:int}", &HomeController::calculateAge);
+		methods.get("", &HomeController::sayHi);
 	}
 };
 

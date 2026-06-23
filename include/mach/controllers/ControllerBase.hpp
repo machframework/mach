@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <mach/Context.hpp>
 #include <mach/results/Results.hpp>
 #include <mach/results/Reply.hpp>
@@ -13,12 +15,15 @@ namespace mach
 		mach::Context* context = nullptr;
 
 	protected:
-
 		template <typename T>
 		mach::Reply<T> ok(T value);
 
+		static mach::Reply<std::string> ok(const char* value);
+
 		template <typename T>
 		mach::Reply<T> created(T value);
+
+		static mach::Reply<std::string> created(const char* value);
 
 		template <typename T>
 		mach::Reply<T> noContent();
@@ -44,9 +49,17 @@ namespace mach
 		return mach::results::Results::ok<T>(value);
 	}
 
+	inline mach::Reply<std::string> ControllerBase::ok(const char* value) {
+		return mach::results::Results::ok(value);
+	}
+
 	template <typename T>
 	mach::Reply<T> ControllerBase::created(T value) {
 		return mach::results::Results::created<T>(value);
+	}
+
+	inline mach::Reply<std::string> ControllerBase::created(const char* value) {
+		return mach::results::Results::created(value);
 	}
 
 	template <typename T>

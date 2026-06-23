@@ -13,8 +13,12 @@ namespace mach::results
 		template <typename T>
 		static mach::Reply<T> ok(T value);
 
+		static mach::Reply<std::string> ok(const char* value);
+
 		template <typename T>
 		static mach::Reply<T> created(T value);
+
+		static mach::Reply<std::string> created(const char* value);
 
 		template <typename T>
 		static mach::Reply<T> noContent();
@@ -40,9 +44,17 @@ namespace mach::results
 		return mach::Reply<T>(http::StatusCode::Ok, value);
 	}
 
+	inline mach::Reply<std::string> Results::ok(const char* value) {
+		return ok<std::string>(value);
+	}
+
 	template <typename T>
 	mach::Reply<T> Results::created(T value) {
 		return mach::Reply<T>(http::StatusCode::Created, value);
+	}
+
+	inline mach::Reply<std::string> Results::created(const char* value) {
+		return created<std::string>(value);
 	}
 
 	template <typename T>
