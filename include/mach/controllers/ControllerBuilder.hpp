@@ -28,6 +28,19 @@ namespace mach
         template <typename THandler>
         ControllerBuilder<TController>& get(std::string_view pattern, THandler&& handler);
 
+        template <typename THandler>
+        ControllerBuilder<TController>& post(std::string_view pattern, THandler&& handler);
+
+        template <typename THandler>
+        ControllerBuilder<TController>& put(std::string_view pattern, THandler&& handler);
+
+        template <typename THandler>
+        ControllerBuilder<TController>& patch(std::string_view pattern, THandler&& handler);
+
+        template <typename THandler>
+        ControllerBuilder<TController>& del(std::string_view pattern, THandler&& handler);
+
+
     private:
         explicit ControllerBuilder();
 
@@ -60,6 +73,62 @@ namespace mach
     {
         addControllerMethod(
             http::Method::Get,
+            pattern,
+            std::forward<THandler>(handler));
+
+        return *this;
+    }
+
+    template <typename TController>
+    template <typename THandler>
+    ControllerBuilder<TController>& ControllerBuilder<TController>::post(
+        std::string_view pattern,
+        THandler&& handler)
+    {
+        addControllerMethod(
+            http::Method::Post,
+            pattern,
+            std::forward<THandler>(handler));
+
+        return *this;
+    }
+
+    template <typename TController>
+    template <typename THandler>
+    ControllerBuilder<TController>& ControllerBuilder<TController>::put(
+        std::string_view pattern,
+        THandler&& handler)
+    {
+        addControllerMethod(
+            http::Method::Put,
+            pattern,
+            std::forward<THandler>(handler));
+
+        return *this;
+    }
+
+    template <typename TController>
+    template <typename THandler>
+    ControllerBuilder<TController>& ControllerBuilder<TController>::patch(
+        std::string_view pattern,
+        THandler&& handler)
+    {
+        addControllerMethod(
+            http::Method::Patch,
+            pattern,
+            std::forward<THandler>(handler));
+
+        return *this;
+    }
+
+    template <typename TController>
+    template <typename THandler>
+    ControllerBuilder<TController>& ControllerBuilder<TController>::del(
+        std::string_view pattern,
+        THandler&& handler)
+    {
+        addControllerMethod(
+            http::Method::Delete,
             pattern,
             std::forward<THandler>(handler));
 
