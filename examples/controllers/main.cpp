@@ -10,7 +10,7 @@ class HomeController : public mach::ControllerBase {
 public:
 	inline static std::string route = "/home";
 
-	[[mach::get("/users")]]
+	[[mach::get("/users/age/{birth:int}")]]
 	mach::Reply<int> calculateAge() {
 		const int currentYear = 2026;
 		int birth = std::stoi(std::string(context->request.routeParam("birth")));
@@ -18,7 +18,7 @@ public:
 
 		std::cout << "My age is: " << age << std::endl;
 
-		return ok(age);
+		return noContent<int>();
 	}
 
 	static void configure(mach::ControllerBuilder<HomeController>& methods) {

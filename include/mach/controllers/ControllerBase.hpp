@@ -41,41 +41,41 @@ namespace mach
 
 	template <typename T>
 	mach::Reply<T> ControllerBase::ok(T value) {
-		return mach::results::Results::ok(value);
+		return mach::results::Results::ok<T>(value);
 	}
 
 	template <typename T>
 	mach::Reply<T> ControllerBase::created(T value) {
-		return mach::results::Results::created(value);
+		return mach::results::Results::created<T>(value);
 	}
 
 	template <typename T>
 	mach::Reply<T> ControllerBase::noContent() {
-		return mach::results::Results::noContent();
+		return mach::results::Results::noContent<T>();
 	}
 
 	template <typename T>
 	mach::Reply<T> ControllerBase::badRequest() {
-		return mach::results::Results::badRequest();
+		return mach::results::Results::badRequest<T>();
 	}
 
 	template <typename T>
 	mach::Reply<T> ControllerBase::unauthorized() {
-		return mach::results::Results::unauthorized();
+		return mach::results::Results::unauthorized<T>();
 	}
 
 	template <typename T>
 	mach::Reply<T> ControllerBase::forbidden() {
-		return mach::results::Results::forbidden();
+		return mach::results::Results::forbidden<T>();
 	}
 
 	template <typename T>
 	mach::Reply<T> ControllerBase::notFound() {
-		return mach::results::Results::notFound();
+		return mach::results::Results::notFound<T>();
 	}
 
 	template <typename T>
 	mach::Reply<T> ControllerBase::conflict() {
-		return mach::results::Results::conflict();
+		return mach::results::Results::conflict<T>();
 	}
 }

@@ -29,7 +29,9 @@ namespace mach::detail::dispatching
             TResult res = (controller.get()->*m_action)();
 
             ctx.response.status(res.statusCode());
-            ctx.response.body(std::move(std::to_string(res.value())));
+            if (res.hasValue()) {
+                ctx.response.body(std::move(std::to_string(res.value())));
+            }
         }
 
     private:
