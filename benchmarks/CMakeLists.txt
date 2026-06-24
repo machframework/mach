@@ -12,3 +12,8 @@ add_mach_bench(
     RoutingBenchmarks
     routing/main.cpp
 )
+
+add_mach_bench(
+    PipelineBenchmarks
+    pipeline/main.cpp
+)

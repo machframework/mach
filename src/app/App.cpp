@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 #include <mach/detail/routing/RouteEndpoint.hpp>
+#include <mach/detail/dispatching/MinimalApiInvoker.hpp>
 
 #include "server/Server.hpp"
 
@@ -14,7 +15,8 @@ namespace mach
 	public: 
 		Impl(
 			detail::app::ServerOptions serverOptions,
-			detail::di::Container container
+			detail::di::Container container,
+			detail::middleware::MiddlewarePipeline middlewarePipeline
 		);
 
 		~Impl() = default;
@@ -33,13 +35,19 @@ namespace mach
 
 		detail::routing::Router m_router;
 		detail::di::Container m_container;
+		detail::middleware::MiddlewarePipeline m_middlewarePipeline;
 	};
 
 	App::App(
 		detail::app::ServerOptions serverOptions,
-		detail::di::Container container
+		detail::di::Container container,
+		detail::middleware::MiddlewarePipeline middlewarePipeline
 	)
-		: m_impl(std::make_unique<Impl>(std::move(serverOptions), std::move(container)))
+		: m_impl(std::make_unique<Impl>(
+			std::move(serverOptions),
+			std::move(container),
+			std::move(middlewarePipeline)
+		))
 	{ }
 
 	App::~App() = default;
@@ -70,17 +78,20 @@ namespace mach
 
 	App::Impl::Impl(
 		detail::app::ServerOptions serverOptions,
-		detail::di::Container container
+		detail::di::Container container,
+		detail::middleware::MiddlewarePipeline middlewarePipeline
 	)
 		: m_serverOptions(std::move(serverOptions)),
-		m_container(std::move(container))
+		m_container(std::move(container)),
+		m_middlewarePipeline(std::move(middlewarePipeline))
 	{ }
 
 	void App::Impl::run() {
 		auto server = std::make_unique<detail::server::Server>(
 			std::move(m_serverOptions),
 			std::move(m_router),
-			std::move(m_container)
+			std::move(m_container),
+			std::move(m_middlewarePipeline)
 		);
 
 		server->run();
@@ -94,7 +105,7 @@ namespace mach
 		mach::detail::routing::RouteEndpoint endpoint{
 			.method = method,
 			.pattern = std::string(pattern),
-			.handler = handler
+			.invoker = std::make_unique<detail::dispatching::MinimalApiInvoker>(handler)
 		};
 
 		m_router.addRoute(std::move(endpoint));

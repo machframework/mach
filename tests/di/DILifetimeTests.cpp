@@ -54,10 +54,10 @@ int main() {
 
 		auto s = container.createScope();
 
-		auto logger1 = s.resolve<Logger>();
-		auto logger2 = s.resolve<Logger>();
+		auto& logger1 = s.resolve<Logger>();
+		auto& logger2 = s.resolve<Logger>();
 
-		if (logger1 != logger2) {
+		if (&logger1 != &logger2) {
 			test::fail(testName, "Ojbects are supposed to be the same");
 			return 1;
 		}
@@ -76,10 +76,10 @@ int main() {
 		auto s1 = container.createScope();
 		auto s2 = container.createScope();
 
-		auto logger1 = s1.resolve<Logger>();
-		auto logger2 = s2.resolve<Logger>();
+		auto& logger1 = s1.resolve<Logger>();
+		auto& logger2 = s2.resolve<Logger>();
 
-		if (logger1 == logger2) {
+		if (&logger1 == &logger2) {
 			test::fail(testName, "Objects were supposed to be different");
 			return 1;
 		}
@@ -99,10 +99,10 @@ int main() {
 		container.addService<Logger>(di::ServiceLifetime::Singleton);
 
 		auto s = container.createScope();
-		auto logger1 = s.resolve<Logger>();
-		auto logger2 = s.resolve<Logger>();
+		auto& logger1 = s.resolve<Logger>();
+		auto& logger2 = s.resolve<Logger>();
 
-		if (logger1 != logger2) {
+		if (&logger1 != &logger2) {
 			test::fail(testName, "Should've been the same object");
 			return 1;
 		}
@@ -124,10 +124,10 @@ int main() {
 		auto s1 = container.createScope();
 		auto s2 = container.createScope();
 
-		auto logger1 = s1.resolve<Logger>();
-		auto logger2 = s2.resolve<Logger>();
+		auto& logger1 = s1.resolve<Logger>();
+		auto& logger2 = s2.resolve<Logger>();
 
-		if (logger1 != logger2) {
+		if (&logger1 != &logger2) {
 			test::fail(testName, "Should've been the same object");
 			return 1;
 		}
@@ -148,10 +148,10 @@ int main() {
 
 		auto s = container.createScope();
 
-		auto logger1 = s.resolve<Logger>();
-		auto logger2 = s.resolve<Logger>();
+		auto& logger1 = s.resolve<Logger>();
+		auto& logger2 = s.resolve<Logger>();
 
-		if (logger1 == logger2) {
+		if (&logger1 == &logger2) {
 			test::fail(testName, "Should've been different objects");
 			return 1;
 		}
@@ -173,10 +173,10 @@ int main() {
 		auto s1 = container.createScope();
 		auto s2 = container.createScope();
 
-		auto logger1 = s1.resolve<Logger>();
-		auto logger2 = s2.resolve<Logger>();
+		auto& logger1 = s1.resolve<Logger>();
+		auto& logger2 = s2.resolve<Logger>();
 
-		if (logger1 == logger2) {
+		if (&logger1 == &logger2) {
 			test::fail(testName, "Should've been different objects");
 			return 1;
 		}

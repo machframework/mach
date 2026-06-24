@@ -9,7 +9,7 @@
 #include <mach/http/Method.hpp>
 
 #include <mach/detail/core/MinimalApiHandler.hpp>
-#include <mach/detail/dispatching/IControllerActionInvoker.hpp>
+#include <mach/detail/dispatching/IEndpointInvoker.hpp>
 #include <mach/detail/routing/RouteConstraint.hpp>
 
 namespace mach::detail::routing
@@ -24,9 +24,7 @@ namespace mach::detail::routing
 		std::string pattern;
 		std::vector<std::string> parameterNames;
 
-		EndpointKind kind = EndpointKind::MinimalApi;
-		MinimalApiHandler handler;
-		std::unique_ptr<dispatching::IControllerActionInvoker> controllerAction;
+		std::unique_ptr<dispatching::IEndpointInvoker> invoker;
 
 		bool operator==(const RouteEndpoint& other) const {
 			return method == other.method

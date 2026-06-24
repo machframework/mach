@@ -50,7 +50,7 @@ namespace mach::detail::di
                 .lifetime = lifetime,
                 .factory = [](Scope& scope) {
                     return std::make_shared<T>(
-                        *scope.resolve<Deps>()...
+                        scope.resolve<Deps>()...
                     );
                 }
             };

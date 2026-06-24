@@ -11,7 +11,11 @@ namespace mach
 		};
 	}
 
-	App AppBuilder::build() const {
-		return mach::App(std::move(m_serverOptions), std::move(m_container));
+	App AppBuilder::build(){
+		return mach::App(
+			std::move(m_serverOptions),
+			std::move(m_container),
+			std::move(m_middlewarePipeline)
+		);
 	}
 }

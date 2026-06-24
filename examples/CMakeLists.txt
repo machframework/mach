@@ -17,3 +17,8 @@ add_mach_example(
     mach_controllers
     controllers/main.cpp
 )
+
+add_mach_example(
+    mach_middleware
+    middleware/main.cpp
+)

@@ -56,12 +56,12 @@ int main() {
 
 	auto scope = container.createScope();
 
-	auto logger = scope.resolve<Logger>();
-	logger->Log("Logging from a dynamically resolved logger!");
+	auto& logger = scope.resolve<Logger>();
+	logger.Log("Logging from a dynamically resolved logger!");
 
 	// missing dependency
 	try {
-		auto userService = scope.resolve<UserService>();
+		auto& userService = scope.resolve<UserService>();
 	}
 	catch (const std::runtime_error& ex) {
 		std::cout << "Error: " << ex.what() << std::endl;

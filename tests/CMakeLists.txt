@@ -74,3 +74,7 @@ add_mach_test(
     controllers/BasicControllerTests.cpp
 )
 
+add_mach_test(
+    BasicMiddlewareTests
+    middleware/BasicMiddlewareTests.cpp
+)

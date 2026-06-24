@@ -206,8 +206,8 @@ namespace mach
         detail::routing::RouteEndpoint endpoint{
             .method = method,
             .pattern = m_route + std::string(pattern),
-            .kind = detail::routing::EndpointKind::ControllerAction,
-            .controllerAction =
+            //.kind = detail::routing::EndpointKind::ControllerAction,
+            .invoker =
                 std::make_unique<detail::dispatching::ControllerActionInvoker<TController, ReturnType>>(
                     std::forward<THandler>(handler))
         };

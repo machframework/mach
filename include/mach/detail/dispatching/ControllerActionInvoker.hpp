@@ -4,10 +4,9 @@
 #include <typeindex>
 
 #include <mach/detail/controllers/ControllerTraits.hpp>
+#include <mach/detail/dispatching/IEndpointInvoker.hpp>
 #include <mach/detail/results/ResultTraits.hpp>
 #include <mach/detail/serailization/Serializer.hpp>
-
-#include "IControllerActionInvoker.hpp"
 
 namespace mach::detail::dispatching 
 {
@@ -15,7 +14,7 @@ namespace mach::detail::dispatching
         mach::detail::controllers::MachController TController,
         mach::detail::results::ReplyResult TResult
     >
-    class ControllerActionInvoker final : public IControllerActionInvoker {
+    class ControllerActionInvoker final : public IEndpointInvoker {
     public:
         using Action = TResult (TController::*)();
 
@@ -23,15 +22,15 @@ namespace mach::detail::dispatching
             : m_action(action) {
         }
 
-        void invoke(Context& ctx, di::Scope& scope) const override {
-            auto controller = scope.resolve<TController>();
-            controller->context = &ctx;
+        void invoke(RequestExecution& execution) const override {
+            auto& controller = execution.scope.resolve<TController>();
+            controller.context = &execution.context;
 
-            TResult res = (controller.get()->*m_action)();
+            TResult res = (controller.*m_action)();
 
-            ctx.response.status(res.statusCode());
+            execution.context.response.status(res.statusCode());
             if (res.hasValue()) {
-                ctx.response.body(std::move(serialization::Serializer::serialize(res.value())));
+                execution.context.response.body(std::move(serialization::Serializer::serialize(res.value())));
             }
         }
 

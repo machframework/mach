@@ -11,8 +11,9 @@
 
 #include <mach/detail/app/ServerOptions.hpp>
 #include <mach/detail/controllers/ControllerTraits.hpp>
-#include <mach/detail/di/Container.hpp>
 #include <mach/detail/core/MinimalApiHandler.hpp>
+#include <mach/detail/di/Container.hpp>
+#include <mach/detail/middleware/MiddlewarePipeline.hpp>
 
 namespace mach
 {
@@ -200,7 +201,7 @@ namespace mach
 		}
 
 		template <detail::controllers::MachController TController>
-		void mapController();
+		App& mapController();
 
 		/**
 		 * Starts the application and begins accepting incoming HTTP requests.
@@ -213,7 +214,12 @@ namespace mach
 
 	private:
 	
-		App(detail::app::ServerOptions serverOptions, detail::di::Container container);
+		App(
+			detail::app::ServerOptions serverOptions,
+			detail::di::Container container,
+			detail::middleware::MiddlewarePipeline middlewarePipeline
+		);
+
 		void addRouteImpl(http::Method method, std::string_view pattern, detail::MinimalApiHandler handler);
 		void addControllerRoutesImpl(std::vector<detail::routing::RouteEndpoint> routes);
 
@@ -224,10 +230,11 @@ namespace mach
 	};
 
 	template <detail::controllers::MachController TController>
-	void App::mapController() {
+	App& App::mapController() {
 		ControllerBuilder<TController> builder;
 		TController::configure(builder);
 
 		addControllerRoutesImpl(std::move(builder.m_controllerEndpoints));
+		return *this;
 	}
 }
