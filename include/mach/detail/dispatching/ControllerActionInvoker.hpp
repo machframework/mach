@@ -23,10 +23,10 @@ namespace mach::detail::dispatching
         }
 
         void invoke(RequestExecution& execution) const override {
-            auto controller = execution.scope.resolve<TController>();
-            controller->context = &execution.context;
+            auto& controller = execution.scope.resolve<TController>();
+            controller.context = &execution.context;
 
-            TResult res = (controller.get()->*m_action)();
+            TResult res = (controller.*m_action)();
 
             execution.context.response.status(res.statusCode());
             if (res.hasValue()) {

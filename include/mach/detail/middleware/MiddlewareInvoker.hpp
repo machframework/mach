@@ -15,9 +15,9 @@ namespace mach::detail::middleware
 
 	template <typename TMiddleware>
 	void MiddlewareInvoker<TMiddleware>::invoke(dispatching::RequestExecution& execution, middleware::Next next) {
-		auto middleware = execution.scope.resolve<TMiddleware>();
+		auto& middleware = execution.scope.resolve<TMiddleware>();
 		
-		middleware->invoke(
+		middleware.invoke(
 			execution.context,
 			[&execution, next = std::move(next)] {
 				next(execution);

@@ -96,14 +96,9 @@ static void runDiContainerTests() {
             container.addService<Logger>(di::ServiceLifetime::Scoped);
 
             auto scope = container.createScope();
-            auto logger = scope.resolve<Logger>();
+            auto& logger = scope.resolve<Logger>();
 
-            if (!logger) {
-                test::fail(testName, "Resolved Logger is null");
-                return;
-            }
-
-            if (logger->log() != "logged") {
+            if (logger.log() != "logged") {
                 test::fail(testName, "Resolved Logger is not usable at runtime");
                 return;
             }
@@ -126,14 +121,9 @@ static void runDiContainerTests() {
             container.addService<Controller, Service>(di::ServiceLifetime::Scoped);
 
             auto scope = container.createScope();
-            auto controller = scope.resolve<Controller>();
+            auto& controller = scope.resolve<Controller>();
 
-            if (!controller) {
-                test::fail(testName, "Resolved Controller is null");
-                return;
-            }
-
-            if (controller->handle() != 25) {
+            if (controller.handle() != 25) {
                 test::fail(testName, "Resolved object graph produced wrong runtime result");
                 return;
             }
@@ -157,9 +147,9 @@ static void runDiContainerTests() {
             container.addService<Logger>(di::ServiceLifetime::Scoped);
 
             auto scope = container.createScope();
-            auto controller = scope.resolve<Controller>();
+            auto& controller = scope.resolve<Controller>();
 
-            if (!controller || controller->handle() != 25) {
+            if (controller.handle() != 25) {
                 test::fail(testName, "Container failed to resolve graph registered in reverse order");
                 return;
             }
@@ -180,17 +170,17 @@ static void runDiContainerTests() {
 
             auto scope = container.createScope();
 
-            auto first = scope.resolve<Counter>();
-            auto second = scope.resolve<Counter>();
+            auto& first = scope.resolve<Counter>();
+            auto& second = scope.resolve<Counter>();
 
-            if (first.get() != second.get()) {
+            if (&first != &second) {
                 test::fail(testName, "Scoped service returned different instances in same scope");
                 return;
             }
 
-            first->increment();
+            first.increment();
 
-            if (second->value != 1) {
+            if (second.value != 1) {
                 test::fail(testName, "Scoped service did not preserve state inside same scope");
                 return;
             }
@@ -212,17 +202,17 @@ static void runDiContainerTests() {
             auto scopeA = container.createScope();
             auto scopeB = container.createScope();
 
-            auto first = scopeA.resolve<Counter>();
-            auto second = scopeB.resolve<Counter>();
+            auto& first = scopeA.resolve<Counter>();
+            auto& second = scopeB.resolve<Counter>();
 
-            if (first.get() == second.get()) {
+            if (&first == &second) {
                 test::fail(testName, "Scoped service reused same instance across different scopes");
                 return;
             }
 
-            first->increment();
+            first.increment();
 
-            if (second->value != 0) {
+            if (second.value != 0) {
                 test::fail(testName, "Scoped state leaked across scopes");
                 return;
             }
@@ -244,17 +234,17 @@ static void runDiContainerTests() {
             auto scopeA = container.createScope();
             auto scopeB = container.createScope();
 
-            auto first = scopeA.resolve<Counter>();
-            auto second = scopeB.resolve<Counter>();
+            auto& first = scopeA.resolve<Counter>();
+            auto& second = scopeB.resolve<Counter>();
 
-            if (first.get() != second.get()) {
+            if (&first != &second) {
                 test::fail(testName, "Singleton service returned different instances across scopes");
                 return;
             }
 
-            first->increment();
+            first.increment();
 
-            if (second->value != 1) {
+            if (second.value != 1) {
                 test::fail(testName, "Singleton state was not shared across scopes");
                 return;
             }
@@ -275,17 +265,17 @@ static void runDiContainerTests() {
 
             auto scope = container.createScope();
 
-            auto first = scope.resolve<Counter>();
-            auto second = scope.resolve<Counter>();
+            auto& first = scope.resolve<Counter>();
+            auto& second = scope.resolve<Counter>();
 
-            if (first.get() == second.get()) {
+            if (&first != &second) {
                 test::fail(testName, "Transient service reused the same instance");
                 return;
             }
 
-            first->increment();
+            first.increment();
 
-            if (second->value != 0) {
+            if (second.value != 0) {
                 test::fail(testName, "Transient state leaked between instances");
                 return;
             }
@@ -304,7 +294,7 @@ static void runDiContainerTests() {
             di::Container container;
 
             auto scope = container.createScope();
-            auto logger = scope.resolve<Logger>();
+            auto& logger = scope.resolve<Logger>();
 
             (void)logger;
 
@@ -324,7 +314,7 @@ static void runDiContainerTests() {
             container.addService<UsesMissingDependency, Repository>(di::ServiceLifetime::Scoped);
 
             auto scope = container.createScope();
-            auto service = scope.resolve<UsesMissingDependency>();
+            auto& service = scope.resolve<UsesMissingDependency>();
 
             (void)service;
 
@@ -359,12 +349,7 @@ static void runDiContainerTests() {
             container.addService<EmptyCtor>(di::ServiceLifetime::Transient);
 
             auto scope = container.createScope();
-            auto service = scope.resolve<EmptyCtor>();
-
-            if (!service) {
-                test::fail(testName, "Resolved EmptyCtor is null");
-                return;
-            }
+            auto& service = scope.resolve<EmptyCtor>();
 
             test::success(testName);
         }
@@ -385,15 +370,15 @@ static void runDiContainerTests() {
 
             auto scope = container.createScope();
 
-            auto logger = scope.resolve<Logger>();
-            auto service = scope.resolve<Service>();
+            auto& logger = scope.resolve<Logger>();
+            auto& service = scope.resolve<Service>();
 
-            if (&service->logger != logger.get()) {
+            if (&service.logger != &logger) {
                 test::fail(testName, "Injected Logger reference does not point to scoped Logger instance");
                 return;
             }
 
-            if (&service->repository.logger != logger.get()) {
+            if (&service.repository.logger != &logger) {
                 test::fail(testName, "Nested injected Logger reference does not point to scoped Logger instance");
                 return;
             }
@@ -416,12 +401,12 @@ static void runDiContainerTests() {
             auto scopeA = container.createScope();
             auto scopeB = container.createScope();
 
-            auto first = scopeA.resolve<Counter>();
-            auto second = scopeB.resolve<Counter>();
+            auto& first = scopeA.resolve<Counter>();
+            auto& second = scopeB.resolve<Counter>();
 
-            first->value = 123;
+            first.value = 123;
 
-            if (second->value != 123) {
+            if (second.value != 123) {
                 test::fail(testName, "Singleton mutation was not visible from another scope");
                 return;
             }
@@ -444,19 +429,19 @@ static void runDiContainerTests() {
 
             auto scope = container.createScope();
 
-            auto counter = scope.resolve<Counter>();
-            auto consumer = scope.resolve<CounterConsumer>();
+            auto& counter = scope.resolve<Counter>();
+            auto& consumer = scope.resolve<CounterConsumer>();
 
-            counter->value = 42;
+            counter.value = 42;
 
-            if (consumer->read() != 42) {
+            if (consumer.read() != 42) {
                 test::fail(testName, "Injected reference did not observe mutation on scoped instance");
                 return;
             }
 
-            consumer->counter.value = 100;
+            consumer.counter.value = 100;
 
-            if (counter->value != 100) {
+            if (counter.value != 100) {
                 test::fail(testName, "Mutation through injected reference did not affect scoped instance");
                 return;
             }
