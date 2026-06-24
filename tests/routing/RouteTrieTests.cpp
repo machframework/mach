@@ -13,31 +13,31 @@ int main() {
 
 	mach::detail::routing::RouteTrie t;
 
-	auto endpoint1 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Get };
+	auto endpoint1 = mach::detail::routing::RouteEndpoint{ .method = mach::http::Method::Get };
 	t.addRoute({ "users" }, &endpoint1);
 
-	auto endpoint2 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Get };
+	auto endpoint2 = mach::detail::routing::RouteEndpoint{ .method = mach::http::Method::Get };
 	t.addRoute({ "users", "names" }, &endpoint2);
 
-	auto endpoint3 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Get };
+	auto endpoint3 = mach::detail::routing::RouteEndpoint{ .method = mach::http::Method::Get };
 	t.addRoute({ "users", "names", "desc" }, &endpoint3);
 
-	auto endpoint4 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Post };
+	auto endpoint4 = mach::detail::routing::RouteEndpoint{ .method = mach::http::Method::Post };
 	t.addRoute({ "users" }, &endpoint4);
 
-	auto endpoint5 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Get };
+	auto endpoint5 = mach::detail::routing::RouteEndpoint{ .method = mach::http::Method::Get };
 	t.addRoute({ "api", "v1", "users" }, &endpoint5);
 
-	auto endpoint6 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Get };
+	auto endpoint6 = mach::detail::routing::RouteEndpoint{ .method = mach::http::Method::Get };
 	t.addRoute({ "api", "v1", "posts" }, &endpoint6);
 
-	auto endpoint7 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Get };
+	auto endpoint7 = mach::detail::routing::RouteEndpoint{ .method = mach::http::Method::Get };
 	t.addRoute({ "health" }, &endpoint7);
 
-	auto endpoint8 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Delete };
+	auto endpoint8 = mach::detail::routing::RouteEndpoint{ .method = mach::http::Method::Delete };
 	t.addRoute({ "api", "v1", "users" }, &endpoint8);
 
-	auto endpoint9 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Get };
+	auto endpoint9 = mach::detail::routing::RouteEndpoint{ .method = mach::http::Method::Get };
 	t.addRoute({ "users", "{age}" }, &endpoint9);
 
 	t.debugDump();
@@ -48,7 +48,7 @@ int main() {
 	// -------------------------
 
 	try {
-		auto endpoint9 = mach::detail::routing::Endpoint{ .method = mach::http::Method::Delete };
+		auto endpoint9 = mach::detail::routing::RouteEndpoint{ .method = mach::http::Method::Delete };
 
 		t.addRoute(
 			{ "api", "v1", "users" },

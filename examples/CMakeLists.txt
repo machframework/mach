@@ -1,7 +1,19 @@
-add_executable(mach_hello_world
+function(add_mach_example example_name)
+    add_executable("${example_name}"
+        ${ARGN}
+    )
+
+    target_link_libraries("${example_name}"
+        PRIVATE mach
+    )
+endfunction()
+
+add_mach_example(
+    mach_hello_world
     hello_world/main.cpp
 )
 
-target_link_libraries(mach_hello_world
-    PRIVATE mach
+add_mach_example(
+    mach_controllers
+    controllers/main.cpp
 )

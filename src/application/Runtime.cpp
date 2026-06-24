@@ -5,10 +5,17 @@
 
 #include <mach/http/StatusCode.hpp>
 
-#include "routing/RoutingStatus.hpp"
-#include "ExecutionPlan.hpp"
+#include <mach/detail/application/ExecutionPlan.hpp>
+#include <mach/detail/routing/RoutingStatus.hpp>
 
-namespace mach::detail::application {
+namespace mach::detail::application 
+{
+	Runtime::Runtime(routing::Router router, di::Container container) 
+		: m_router(std::move(router)),
+		m_container(std::move(container)),
+		m_dispatcher(m_container)
+	{ }
+
 	void Runtime::handle(mach::Context& context) {
 		auto plan = m_router.route(context.request);
 		if (!plan.found()) {
@@ -37,7 +44,7 @@ namespace mach::detail::application {
 		}
 	}
 
-	void Runtime::addRoute(routing::Endpoint&& endpoint) {
+	void Runtime::addRoute(routing::RouteEndpoint&& endpoint) {
 		m_router.addRoute(std::move(endpoint));
 	}
 }

@@ -8,18 +8,27 @@
 #include <mach/Context.hpp>
 #include <mach/http/Method.hpp>
 
-#include <mach/detail/core/Handler.hpp>
-#include "routing/RouteConstraint.hpp"
+#include <mach/detail/core/MinimalApiHandler.hpp>
+#include <mach/detail/dispatching/IControllerActionInvoker.hpp>
+#include <mach/detail/routing/RouteConstraint.hpp>
 
 namespace mach::detail::routing
 {
-	struct Endpoint {
+	enum class EndpointKind {
+		MinimalApi,
+		ControllerAction
+	};
+
+	struct RouteEndpoint {
 		mach::http::Method method;
 		std::string pattern;
-		Handler handler;
 		std::vector<std::string> parameterNames;
 
-		bool operator==(const Endpoint& other) const {
+		EndpointKind kind = EndpointKind::MinimalApi;
+		MinimalApiHandler handler;
+		std::unique_ptr<dispatching::IControllerActionInvoker> controllerAction;
+
+		bool operator==(const RouteEndpoint& other) const {
 			return method == other.method
 				&& pattern == other.pattern;
 		}
@@ -33,8 +42,8 @@ namespace mach::detail::routing
 namespace std 
 {
 	template <>
-	struct hash<mach::detail::routing::Endpoint> {
-		size_t operator()(const mach::detail::routing::Endpoint& e) const noexcept {
+	struct hash<mach::detail::routing::RouteEndpoint> {
+		size_t operator()(const mach::detail::routing::RouteEndpoint& e) const noexcept {
 			size_t seed = 0;
 
 			mach::detail::routing::hash_combine(seed, std::hash<mach::http::Method>{}(e.method));

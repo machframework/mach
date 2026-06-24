@@ -8,9 +8,8 @@
 #include <vector>
 
 #include <mach/http/Method.hpp>
-
-#include "RouteConstraint.hpp"
-#include "routing/RouteMatch.hpp"
+#include <mach/detail/routing/RouteMatch.hpp>
+#include <mach/detail/routing/RouteConstraint.hpp>
 
 namespace mach::detail::routing
 {
@@ -21,7 +20,7 @@ namespace mach::detail::routing
 
 		void addRoute(
 			std::vector<std::string_view>&& segments,
-			routing::Endpoint* endpoint
+			routing::RouteEndpoint* endpoint
 		);
 
 		routing::RouteMatch matchRoute(
@@ -34,14 +33,20 @@ namespace mach::detail::routing
 	private:
 		struct RouteNode {
 			std::string segmentKey;
-			std::unordered_map<mach::http::Method, routing::Endpoint*> endpointsByMethod;
+			std::unordered_map<mach::http::Method, routing::RouteEndpoint*> endpointsByMethod;
 
 			std::unordered_map<std::string, std::unique_ptr<RouteNode>> childrenByStaticSegment;
 			std::unordered_map<std::optional<routing::RouteConstraint>, std::unique_ptr<RouteNode>> constrainedParameterChildren;
 
 			explicit RouteNode(std::string_view segmentKey = "")
-				: segmentKey(std::move(segmentKey))
+				: segmentKey(segmentKey)
 			{ }
+
+			RouteNode(const RouteNode&) = delete;
+			RouteNode& operator=(const RouteNode&) = delete;
+
+			RouteNode(RouteNode&&) noexcept = default;
+			RouteNode& operator=(RouteNode&&) noexcept = default;
 		};
 
 		static std::string segmentsToPath(const std::vector<std::string_view>& segments);

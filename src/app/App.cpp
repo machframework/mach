@@ -3,8 +3,8 @@
 #include <string>
 #include <stdexcept>
 
-#include "application/Runtime.hpp"
-#include "routing/Endpoint.hpp"
+#include <mach/detail/routing/RouteEndpoint.hpp>
+
 #include "server/Server.hpp"
 
 namespace mach
@@ -12,24 +12,34 @@ namespace mach
 	class App::Impl {
 	
 	public: 
-		Impl(std::string_view host, std::uint16_t port, std::size_t threadCount);
+		Impl(
+			detail::app::ServerOptions serverOptions,
+			detail::di::Container container
+		);
+
 		~Impl() = default;
 
 		std::string host() const noexcept;
 		std::uint16_t port() const noexcept;
 		std::size_t threadCount() const noexcept;
 
-		void addRoute(mach::http::Method method, std::string_view pattern, detail::Handler handler);
+		void addRoute(mach::http::Method method, std::string_view pattern, detail::MinimalApiHandler handler);
+		void addControllerRoutes(std::vector<detail::routing::RouteEndpoint> routes);
 
 		void run();
 
 	private:
-		detail::server::Server m_server;
-		detail::application::Runtime m_runtime;
+		detail::app::ServerOptions m_serverOptions;
+
+		detail::routing::Router m_router;
+		detail::di::Container m_container;
 	};
 
-	App::App(detail::app::ServerOptions serverOptions, detail::di::Container container)
-		: m_impl(std::make_unique<Impl>(serverOptions.host, serverOptions.port, serverOptions.threads))
+	App::App(
+		detail::app::ServerOptions serverOptions,
+		detail::di::Container container
+	)
+		: m_impl(std::make_unique<Impl>(std::move(serverOptions), std::move(container)))
 	{ }
 
 	App::~App() = default;
@@ -50,42 +60,61 @@ namespace mach
 		return m_impl->threadCount();
 	}
 
-	void App::addRouteImpl(http::Method method, std::string_view pattern, detail::Handler handler) {
+	void App::addRouteImpl(http::Method method, std::string_view pattern, detail::MinimalApiHandler handler) {
 		m_impl->addRoute(method, pattern, handler);
 	}
 
-	App::Impl::Impl(std::string_view host, std::uint16_t port, std::size_t threadCount) 
-		: m_server(host, port, threadCount, m_runtime)
+	void App::addControllerRoutesImpl(std::vector<detail::routing::RouteEndpoint> routes) {
+		m_impl->addControllerRoutes(std::move(routes));
+	}
+
+	App::Impl::Impl(
+		detail::app::ServerOptions serverOptions,
+		detail::di::Container container
+	)
+		: m_serverOptions(std::move(serverOptions)),
+		m_container(std::move(container))
 	{ }
 
 	void App::Impl::run() {
-		m_server.run();
+		auto server = std::make_unique<detail::server::Server>(
+			std::move(m_serverOptions),
+			std::move(m_router),
+			std::move(m_container)
+		);
+
+		server->run();
 	}
 
-	void App::Impl::addRoute(mach::http::Method method, std::string_view pattern, detail::Handler handler) {
+	void App::Impl::addRoute(mach::http::Method method, std::string_view pattern, detail::MinimalApiHandler handler) {
 		if (!handler) {
 			throw std::invalid_argument("Route handler cannot be empty");
 		}
 		
-		mach::detail::routing::Endpoint endpoint{
+		mach::detail::routing::RouteEndpoint endpoint{
 			.method = method,
 			.pattern = std::string(pattern),
 			.handler = handler
 		};
 
-		m_runtime.addRoute(std::move(endpoint));
+		m_router.addRoute(std::move(endpoint));
 	}
 
+	void App::Impl::addControllerRoutes(std::vector<detail::routing::RouteEndpoint> routes) {
+		for (auto& route : routes) {
+			m_router.addRoute(std::move(route));
+		}
+	}
 
 	std::string App::Impl::host() const noexcept {
-		return m_server.host();
+		return m_serverOptions.host;
 	}
 
 	std::uint16_t App::Impl::port() const noexcept {
-		return m_server.port();
+		return m_serverOptions.port;
 	}
 
 	std::size_t App::Impl::threadCount() const noexcept {
-		return m_server.threadCount();
+		return m_serverOptions.threads;
 	}
 }

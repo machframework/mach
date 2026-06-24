@@ -3,13 +3,16 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include <mach/Context.hpp>
 #include <mach/http/Method.hpp>
+#include <mach/controllers/ControllerBuilder.hpp>
 
 #include <mach/detail/app/ServerOptions.hpp>
+#include <mach/detail/controllers/ControllerTraits.hpp>
 #include <mach/detail/di/Container.hpp>
-#include <mach/detail/core/Handler.hpp>
+#include <mach/detail/core/MinimalApiHandler.hpp>
 
 namespace mach
 {
@@ -192,9 +195,12 @@ namespace mach
 			addRouteImpl(
 				method,
 				pattern,
-				detail::Handler{ std::forward<THandler>(handler) }
+				detail::MinimalApiHandler{ std::forward<THandler>(handler) }
 			);
 		}
+
+		template <detail::controllers::MachController TController>
+		void mapController();
 
 		/**
 		 * Starts the application and begins accepting incoming HTTP requests.
@@ -208,11 +214,20 @@ namespace mach
 	private:
 	
 		App(detail::app::ServerOptions serverOptions, detail::di::Container container);
-		void addRouteImpl(http::Method method, std::string_view pattern, detail::Handler handler);
+		void addRouteImpl(http::Method method, std::string_view pattern, detail::MinimalApiHandler handler);
+		void addControllerRoutesImpl(std::vector<detail::routing::RouteEndpoint> routes);
 
 		class Impl;
 		std::unique_ptr<Impl> m_impl;
 
 		friend class AppBuilder;
 	};
+
+	template <detail::controllers::MachController TController>
+	void App::mapController() {
+		ControllerBuilder<TController> builder;
+		TController::configure(builder);
+
+		addControllerRoutesImpl(std::move(builder.m_controllerEndpoints));
+	}
 }

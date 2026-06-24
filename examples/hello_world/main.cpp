@@ -5,6 +5,8 @@
 #include <mach/AppBuilder.hpp>
 #include <mach/Context.hpp>
 
+#include <mach/results/Reply.hpp>
+
 int main() {
 
 	try {

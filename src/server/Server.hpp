@@ -4,15 +4,32 @@
 #include <string>
 #include <string_view>
 
-#include "application/Runtime.hpp"
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/ip/address.hpp>
+
+#include <mach/detail/app/ServerOptions.hpp>
+#include <mach/detail/routing/Router.hpp>
+#include <mach/detail/di/Container.hpp>
+
+#include "adapter/inbound/BeastRequestAdapter.hpp"
+#include "adapter/outbound/BeastResponseAdapter.hpp"
+#include "BeastListener.hpp"
+#include "BeastSession.hpp"
 
 namespace mach::detail::server
 {
+	namespace net = boost::asio;
+
 	class Server {
 
 	public:
-		Server(const std::string_view& host, std::uint16_t port, std::size_t thread_count, application::Runtime& runtime);
-		~Server();
+		Server(
+			app::ServerOptions serverOptions,
+			routing::Router router,
+			di::Container container
+		);
+
+		~Server() = default;
 		
 		std::string host() const noexcept;
 		std::uint16_t port() const noexcept;
@@ -21,7 +38,13 @@ namespace mach::detail::server
 		void run();
 
 	private:
-		class Impl;
-		std::unique_ptr<Impl> m_impl;
+		boost::asio::ip::tcp::endpoint m_endpoint;
+		boost::asio::io_context m_ioc;
+		std::shared_ptr<BeastListener> m_listener;
+		std::size_t m_threadCount;
+
+		detail::application::Runtime m_runtime;
+		detail::http::adapter::BeastRequestAdapter m_requestAdapter;
+		detail::http::adapter::BeastResponseAdapter m_responseAdapter;
 	};
 }
