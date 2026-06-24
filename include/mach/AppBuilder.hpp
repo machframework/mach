@@ -216,15 +216,19 @@ namespace mach
 	template <typename T, typename... Deps>
 	AppBuilder& AppBuilder::use() {
 		constexpr bool isMiddlewareType = mach::detail::middleware::MachMiddleware<T>;
+		constexpr bool isController = mach::detail::controllers::ControllerType<T>;
 
 		static_assert(
 			isMiddlewareType,
 			"Mach error: middleware must expose a public method void invoke(mach::Context&, mach::Next)"
 		);
 
-		// validate deps
+		static_assert(
+			!isController,
+			"Mach error: middleware type must not be a controller."
+		);
 
-		if constexpr (isMiddlewareType) {
+		if constexpr (isMiddlewareType || !isController) {
 			m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Scoped);
 		}
 

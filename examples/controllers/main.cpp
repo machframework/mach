@@ -26,9 +26,9 @@ public:
 		return ok("Hi");
 	}
 
-	static void configure(mach::ControllerBuilder<HomeController>& methods) {
-		methods.get("/age/{birth:int}", &HomeController::calculateAge);
-		methods.get(& HomeController::sayHi);
+	static void configure(mach::ControllerBuilder<HomeController>& routes) {
+		routes.get("/age/{birth:int}", &HomeController::calculateAge);
+		routes.get(& HomeController::sayHi);
 	}
 };
 
