@@ -14,12 +14,8 @@ namespace mach::detail::dispatching
 		// create scope
 		auto scope = m_container.createScope();
 
-		// execute handler based on type
-		if (plan.endpoint->kind == routing::EndpointKind::MinimalApi) {
-			plan.endpoint->handler(context);
-		}
-		else {
-			plan.endpoint->controllerAction->invoke(context, scope);
-		}
+		auto execution = RequestExecution(context, scope);
+
+		plan.endpoint->invoker->invoke(execution);
 	}
 }

@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 #include <mach/detail/routing/RouteEndpoint.hpp>
+#include <mach/detail/dispatching/MinimalApiInvoker.hpp>
 
 #include "server/Server.hpp"
 
@@ -94,7 +95,7 @@ namespace mach
 		mach::detail::routing::RouteEndpoint endpoint{
 			.method = method,
 			.pattern = std::string(pattern),
-			.handler = handler
+			.invoker = std::make_unique<detail::dispatching::MinimalApiInvoker>(handler)
 		};
 
 		m_router.addRoute(std::move(endpoint));
