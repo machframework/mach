@@ -29,23 +29,11 @@ ROUTES = [
     ("controller_precedence_param", "/runtime/controller/precedence/asaf"),
 ]
 
-TEST_SETS = [
-    {
-        "name": "baseline",
-        "runs": [(16, 100), (16, 100)]
-    },
-    {
-        "name": "concurrency_curve",
-        "runs": [(16, 50), (16, 100), (16, 250), (16, 500), (16, 1000)]
-    },
-    {
-        "name": "thread_scaling",
-        "runs": [(2, 500), (4, 500), (8, 500), (16, 500)]
-    },
-    {
-        "name": "stress",
-        "runs": [(16, 2000)]
-    }
+TEST_SETS = [ 
+    { "name": "baseline", "runs": [(16, 100), (16, 100)] },
+    { "name": "concurrency_curve", "runs": [(16, 50), (16, 100), (16, 250), (16, 500), (16, 1000)] },
+    { "name": "thread_scaling", "runs": [(2, 500), (4, 500), (8, 500), (16, 500)] },
+    { "name": "stress", "runs": [(16, 2000)] } 
 ]
 
 # ---------------- SERVER CONTROL ----------------
