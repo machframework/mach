@@ -43,6 +43,12 @@ namespace mach
 		 */
 		AppBuilder(std::string_view host, std::uint16_t port, std::size_t threadCount = 1);
 
+		// testing 
+		AppBuilder(detail::app::ServerOptions options)
+			: m_serverOptions(std::move(options))
+		{ }
+		// testing
+
 		/**
 		 * Registers a scoped service in the dependency injection container.
 		 *

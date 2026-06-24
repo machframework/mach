@@ -65,6 +65,12 @@ add_mach_test(
 )
 
 add_mach_test(
-    CompileDITests.cpp
+    CompileDITests
     di/CompileDITests.cpp
 )
+
+add_mach_test(
+    BasicControllerTests
+    controllers/BasicControllerTests.cpp
+)
+

@@ -5,7 +5,6 @@
 #include <vector>
 #include <utility>
 
-#include <mach/detail/controllers/ControllerTraits.hpp>
 #include <mach/detail/core/FunctionTraits.hpp>
 #include <mach/detail/dispatching/ControllerActionInvoker.hpp>
 #include <mach/detail/routing/RouteEndpoint.hpp>
