@@ -2,9 +2,9 @@
 
 #include <functional>
 
-#include <mach/Context.hpp>
+#include <mach/detail/dispatching/RequestExecution.hpp>
 
 namespace mach
 {
-	using Next = std::function<void(mach::Context&)>;
+	using Next = std::function<void()>;
 }

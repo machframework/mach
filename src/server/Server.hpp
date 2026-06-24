@@ -10,6 +10,7 @@
 #include <mach/detail/app/ServerOptions.hpp>
 #include <mach/detail/routing/Router.hpp>
 #include <mach/detail/di/Container.hpp>
+#include <mach/detail/middleware/MiddlewarePipeline.hpp>
 
 #include "adapter/inbound/BeastRequestAdapter.hpp"
 #include "adapter/outbound/BeastResponseAdapter.hpp"
@@ -26,7 +27,8 @@ namespace mach::detail::server
 		Server(
 			app::ServerOptions serverOptions,
 			routing::Router router,
-			di::Container container
+			di::Container container,
+			middleware::MiddlewarePipeline middlewarePipeline
 		);
 
 		~Server() = default;

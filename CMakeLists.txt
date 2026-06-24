@@ -30,6 +30,7 @@ add_library(mach
     src/di/Scope.cpp
     src/di/Container.cpp
     src/app/AppBuilder.cpp
+    src/middleware/MiddlewarePipeline.cpp
 )
 
 target_include_directories(mach

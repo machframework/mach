@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mach/detail/middleware/Next.hpp>
+
 #include "IMiddlewareInvoker.hpp"
 
 namespace mach::detail::middleware
@@ -8,12 +10,18 @@ namespace mach::detail::middleware
 	class MiddlewareInvoker final : public IMiddlewareInvoker {
 
 	public:
-		void invoke(dispatching::RequestExecution& execution, mach::Next next) override;
+		void invoke(dispatching::RequestExecution& execution, middleware::Next next) override;
 	};
 
 	template <typename TMiddleware>
-	void MiddlewareInvoker<TMiddleware>::invoke(dispatching::RequestExecution& execution, mach::Next next) {
+	void MiddlewareInvoker<TMiddleware>::invoke(dispatching::RequestExecution& execution, middleware::Next next) {
 		auto middleware = execution.scope.resolve<TMiddleware>();
-		middleware->invoke(execution.context, std::move(next));
+		
+		middleware->invoke(
+			execution.context,
+			[&execution, next = std::move(next)] {
+				next(execution);
+			}
+		);
 	}
 }

@@ -8,16 +8,12 @@
 
 #include <mach/detail/dispatching/RequestExecution.hpp>
 
-//
-#include <mach/detail/middleware/MiddlewarePipeline.hpp>
-//
-
 class AuthMiddleware {
 
 public:
 	void invoke(mach::Context& context, mach::Next next) {
 		std::cout << "Before:\n";
-		next(context);
+		next();
 		std::cout << "After:\n";
 	}
 };
@@ -29,7 +25,11 @@ int main() {
 	builder.use<AuthMiddleware>();
 
 	auto app = builder.build();
+
 	app.get("/test", [](mach::Context& context) {
+		std::cout << "Inside handler\n";
 		context.response.body("Reached");
 	});
+
+	app.run();
 }

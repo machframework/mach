@@ -11,8 +11,9 @@
 
 #include <mach/detail/app/ServerOptions.hpp>
 #include <mach/detail/controllers/ControllerTraits.hpp>
-#include <mach/detail/di/Container.hpp>
 #include <mach/detail/core/MinimalApiHandler.hpp>
+#include <mach/detail/di/Container.hpp>
+#include <mach/detail/middleware/MiddlewarePipeline.hpp>
 
 namespace mach
 {
@@ -213,7 +214,12 @@ namespace mach
 
 	private:
 	
-		App(detail::app::ServerOptions serverOptions, detail::di::Container container);
+		App(
+			detail::app::ServerOptions serverOptions,
+			detail::di::Container container,
+			detail::middleware::MiddlewarePipeline middlewarePipeline
+		);
+
 		void addRouteImpl(http::Method method, std::string_view pattern, detail::MinimalApiHandler handler);
 		void addControllerRoutesImpl(std::vector<detail::routing::RouteEndpoint> routes);
 
