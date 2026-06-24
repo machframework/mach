@@ -1,18 +1,16 @@
 #pragma once
 
-#include <memory>
 #include <string>
 #include <string_view>
 #include <type_traits>
-#include <vector>
 
 #include <mach/App.hpp>
 
 #include <mach/detail/app/ServerOptions.hpp>
-#include <mach/detail/di/Container.hpp>
 #include <mach/detail/controllers/ControllerTraits.hpp>
+#include <mach/detail/di/Container.hpp>
+#include <mach/detail/middleware/MiddlewarePipeline.hpp>
 #include <mach/detail/middleware/MiddlewareTraits.hpp>
-#include <mach/detail/middleware/MiddlewareInvoker.hpp>
 
 namespace mach
 {
@@ -152,7 +150,7 @@ namespace mach
 	private:
 		detail::app::ServerOptions m_serverOptions;
 		detail::di::Container m_container;
-		std::vector<std::unique_ptr<detail::middleware::IMiddlewareInvoker>> m_middleware;
+		detail::middleware::MiddlewarePipeline m_middlewarePipeline;
 	};
 
 	template <typename T, typename... Deps>
@@ -231,8 +229,7 @@ namespace mach
 		}
 
 		// add to middleware pipeline
-		auto invoker = std::make_unique<detail::middleware::MiddlewareInvoker<T>>();
-		m_middleware.emplace_back(std::move(invoker));
+		m_middlewarePipeline.add<T>();
 
 		return *this;
 	}

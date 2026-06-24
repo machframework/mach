@@ -16,5 +16,6 @@ namespace mach::detail::dispatching
 
 	private:
 		di::Container& m_container;
+
 	};
 }
