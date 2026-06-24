@@ -1,14 +1,18 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <vector>
 
 #include <mach/App.hpp>
 
 #include <mach/detail/app/ServerOptions.hpp>
 #include <mach/detail/di/Container.hpp>
 #include <mach/detail/controllers/ControllerTraits.hpp>
+#include <mach/detail/middleware/MiddlewareTraits.hpp>
+#include <mach/detail/middleware/MiddlewareInvoker.hpp>
 
 namespace mach
 {
@@ -123,6 +127,9 @@ namespace mach
 		template <typename T, typename... Deps>
 		AppBuilder& addController();
 
+		template <typename T, typename... Deps>
+		AppBuilder& use();
+
 		/**
 		 * Builds and returns the application instance.
 		 *
@@ -145,6 +152,7 @@ namespace mach
 	private:
 		detail::app::ServerOptions m_serverOptions;
 		detail::di::Container m_container;
+		std::vector<std::unique_ptr<detail::middleware::IMiddlewareInvoker>> m_middleware;
 	};
 
 	template <typename T, typename... Deps>
@@ -167,7 +175,7 @@ namespace mach
 	AppBuilder& AppBuilder::addSingleton() {
 		static_assert(
 			!mach::detail::controllers::ValidController<T>,
-			"Mach error: Controllers must be registered using addController<T>(), not addSingleton<T>()."
+			"Mach error: controllers must be registered using addController<T>(), not addSingleton<T>()."
 		);
 
 		m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Singleton);
@@ -178,7 +186,7 @@ namespace mach
 	AppBuilder& AppBuilder::addTransient() {
 		static_assert(
 			!mach::detail::controllers::ValidController<T>,
-			"Mach error: Controllers must be registered using addController<T>(), not addTransient<T>()."
+			"Mach error: controllers must be registered using addController<T>(), not addTransient<T>()."
 		);
 
 		m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Transient);
@@ -192,17 +200,39 @@ namespace mach
 		
 		static_assert(
 			isControllerType,
-			"Controller must be derived from ControllerBase"
+			"Mach error: controller must be derived from ControllerBase"
 		);
 
 		static_assert(
 			hasRouteField,
-			"Controller must expose a public std::string route field"
+			"Mach error: controller must expose a public std::string route field"
 		);
 
 		if constexpr (isControllerType && hasRouteField) {
 			m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Transient);
 		}
+
+		return *this;
+	}
+
+	template <typename T, typename... Deps>
+	AppBuilder& AppBuilder::use() {
+		constexpr bool isMiddlewareType = mach::detail::middleware::MachMiddleware<T>;
+
+		static_assert(
+			isMiddlewareType,
+			"Mach error: middleware must expose a public method void invoke(mach::Context&, mach::Next)"
+		);
+
+		// validate deps
+
+		if constexpr (isMiddlewareType) {
+			m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Scoped);
+		}
+
+		// add to middleware pipeline
+		auto invoker = std::make_unique<detail::middleware::MiddlewareInvoker<T>>();
+		m_middleware.emplace_back(std::move(invoker));
 
 		return *this;
 	}
