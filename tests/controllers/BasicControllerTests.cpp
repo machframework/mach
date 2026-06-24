@@ -7,6 +7,11 @@
 
 #include "Testing.hpp"
 
+//
+#include <mach/detail/middleware/MiddlewareTraits.hpp>
+#include <mach/detail/middleware/MiddlewareInvoker.hpp>
+//
+
 // dependencies
 class Logger {
 
