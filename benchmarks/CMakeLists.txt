@@ -14,6 +14,6 @@ add_mach_bench(
 )
 
 add_mach_bench(
-    ControllersBenchmarks
-    controllers/main.cpp
+    PipelineBenchmarks
+    pipeline/main.cpp
 )

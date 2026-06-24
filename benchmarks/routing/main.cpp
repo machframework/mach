@@ -1,6 +1,7 @@
 #include <thread>
 
 #include <mach/App.hpp>
+#include <mach/AppBuilder.hpp>
 #include <mach/Context.hpp>
 
 int main() {
