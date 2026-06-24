@@ -6,8 +6,6 @@
 #include <mach/Context.hpp>
 #include <mach/middleware/Next.hpp>
 
-#include <mach/detail/dispatching/RequestExecution.hpp>
-
 class AuthMiddleware {
 
 public:

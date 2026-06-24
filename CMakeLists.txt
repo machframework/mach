@@ -31,7 +31,7 @@ add_library(mach
     src/di/Container.cpp
     src/app/AppBuilder.cpp
     src/middleware/MiddlewarePipeline.cpp
-)
+ "benchmarks/controllers/main.cpp")
 
 target_include_directories(mach
     PUBLIC
