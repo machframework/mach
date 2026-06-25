@@ -22,3 +22,8 @@ add_mach_example(
     mach_middleware
     middleware/main.cpp
 )
+
+add_mach_example(
+    mach_body_binding
+    body_binding/main.cpp
+)
