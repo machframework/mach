@@ -3,9 +3,9 @@
 
 #include <mach/AppBuilder.hpp>
 #include <mach/controllers/ControllerBase.hpp>
-#include <mach/results/Reply.hpp>
-
 #include <mach/Json.hpp>
+#include <mach/results/Reply.hpp>
+#include <mach/StringConversion.hpp>
 
 struct Person {
 	std::string name;
@@ -23,7 +23,7 @@ public:
 	mach::Reply<int> calculateAge() {
 		constexpr int currentYear = 2026;
 		
-		int birthYear = std::stoi(std::string(context->request.routeParam("birth")));
+		int birthYear = mach::fromString<int>(context->request.routeParam("birth"));
 		int age = currentYear - birthYear;
 
 		std::cout << "I am " << age << "\n";
