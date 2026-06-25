@@ -10,9 +10,6 @@ namespace mach::detail::dispatching
 	{ }
 
 	void Dispatcher::execute(mach::Context& context, application::ExecutionPlan&& plan) {
-		// construct execution chain
-
-		// create scope
 		auto scope = m_container.createScope();
 
 		auto execution = RequestExecution(context, scope);

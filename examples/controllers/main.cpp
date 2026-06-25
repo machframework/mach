@@ -5,30 +5,38 @@
 #include <mach/controllers/ControllerBase.hpp>
 #include <mach/results/Reply.hpp>
 
+#include <mach/Json.hpp>
+
+struct Person {
+	std::string name;
+	int age;
+};
+
+MACH_DEFINE_JSON(Person, name, age)
+
 class HomeController : public mach::ControllerBase {
 
 public:
 	inline static std::string route = "/home";
 
-	[[mach::get("/age/{birth:int}")]]
-	mach::Reply<int> calculateAge() {
+	[[mach::get]]
+	mach::Reply<Person> calculateAge(Person person) {
 		const int currentYear = 2026;
-		int birth = std::stoi(std::string(context->request.routeParam("birth")));
-		int age = currentYear - birth;
+		
+		std::cout << "My name is " << person.name
+			<< " and I am " << person.age << "\n";
 
-		std::cout << "My age is: " << age << std::endl;
-
-		return ok(age);
+		return ok(person);
 	}
 
-	[[mach::get("")]]
+	[[mach::get("/hi")]]
 	mach::Reply<std::string> sayHi() {
 		return ok("Hi");
 	}
 
 	static void configure(mach::ControllerBuilder<HomeController>& routes) {
-		routes.get("/age/{birth:int}", &HomeController::calculateAge);
-		routes.get(& HomeController::sayHi);
+		routes.get(&HomeController::calculateAge);
+		routes.get("/hi" ,& HomeController::sayHi);
 	}
 };
 

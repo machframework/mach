@@ -57,19 +57,6 @@ namespace mach::detail::dispatching
             }
             }();
 
-        /*TResult res;
-
-        if constexpr (sizeof...(TArgs) == 0) {
-            res = (controller.*m_action)();
-        }
-        else {
-            auto& binder = execution.scope.resolve<binding::BodyBinder>();
-            auto body = binder.bind<BodyType>(execution.context.request.body());
-            res = (controller.*m_action)(body);
-        }*/
-
-        //TResult res = (controller.*m_action)(body);
-
         execution.context.response.status(res.statusCode());
         if (res.hasValue()) {
             execution.context.response.body(std::move(serialization::Serializer::serialize(res.value())));
