@@ -53,7 +53,7 @@ namespace mach::detail::dispatching
                 auto& binder = execution.scope.resolve<binding::BodyBinder>();
                 BodyType body = binder.bind<BodyType>(execution.context.request.body());
 
-                return std::invoke(m_action, controller, body);
+                return std::invoke(m_action, controller, std::move(body));
             }
             }();
 

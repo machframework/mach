@@ -43,6 +43,20 @@ int main() {
         return mach::results::Results::ok("Context reached");
         });
 
+    app.get("/debug/context/request", [](mach::Context& context, CreateUserRequest request) {
+        context.response.setHeader("X-Age", std::to_string(request.age));
+        context.response.setHeader("X-Name", request.name);
+
+        return mach::results::Results::ok("Context + DTO reached");
+        });
+
+    app.get("/debug/request/context", [](CreateUserRequest request, mach::Context& context) {
+        context.response.setHeader("X-Age", std::to_string(request.age));
+        context.response.setHeader("X-Name", request.name);
+
+        return mach::results::Results::ok("DTO + Context reached");
+        });
+
     app.run();
 
     return 0;

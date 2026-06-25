@@ -39,20 +39,42 @@ namespace mach::detail::dispatching
                 return std::invoke(m_handler);
             }
             else if constexpr (sizeof...(TArgs) == 1) {
-                using BodyType = std::tuple_element_t<0, std::tuple<TArgs...>>;
+                using FirstType = std::tuple_element_t<0, std::tuple<TArgs...>>;
 
-                if constexpr (std::same_as<std::remove_cvref_t<BodyType>, mach::Context>) {
+                if constexpr (std::same_as<std::remove_cvref_t<FirstType>, mach::Context>) {
                     return std::invoke(m_handler, execution.context);
                 }
                 else {
                     auto& binder = execution.scope.resolve<binding::BodyBinder>();
-                    BodyType body = binder.bind<BodyType>(execution.context.request.body());
+                    FirstType body = binder.bind<FirstType>(execution.context.request.body());
 
-                    return std::invoke(m_handler, body);
+                    return std::invoke(m_handler, std::move(body));
+                }
+            }
+            else if constexpr (sizeof...(TArgs) == 2) {
+                using Arg0 = std::tuple_element_t<0, std::tuple<TArgs...>>;
+                using Arg1 = std::tuple_element_t<1, std::tuple<TArgs...>>;
+
+                // first is context, second is body
+                if constexpr (
+                    std::same_as<std::remove_cvref_t<Arg0>, mach::Context>
+                    && !std::same_as<std::remove_cvref_t<Arg1>, mach::Context>
+                    ) {
+                    auto& binder = execution.scope.resolve<binding::BodyBinder>();
+                    Arg1 body = binder.bind<Arg1>(execution.context.request.body());
+                    return std::invoke(m_handler, execution.context, std::move(body));
+                }
+                else if constexpr (
+                    std::same_as<std::remove_cvref_t<Arg1>, mach::Context>
+                    && !std::same_as<std::remove_cvref_t<Arg0>, mach::Context>
+                    ) {
+                    auto& binder = execution.scope.resolve<binding::BodyBinder>();
+                    Arg0 body = binder.bind<Arg0>(execution.context.request.body());
+                    return std::invoke(m_handler, std::move(body), execution.context);
                 }
             }
             else {
-                static_assert(sizeof...(TArgs) <= 1, "Mach error: minimal APIs currently support at most one parameter.");
+                static_assert(sizeof...(TArgs) <= 2, "Mach error: minimal APIs currently support at most one parameter.");
             }
             }();
 
