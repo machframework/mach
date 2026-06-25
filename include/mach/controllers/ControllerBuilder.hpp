@@ -54,7 +54,6 @@ namespace mach
         template <typename THandler>
         ControllerBuilder<TController>& del(THandler&& handler);
 
-
     private:
         explicit ControllerBuilder();
 
@@ -198,6 +197,13 @@ namespace mach
         using ReturnType = typename Traits::ReturnType;
         using ArgsTuple = typename Traits::ArgsTuple;
 
+        using InvokerType =
+            typename detail::dispatching::ControllerActionInvokerFromTuple<
+            TController,
+            ReturnType,
+            ArgsTuple
+            >::Type;
+
         static_assert(
             std::same_as<HandlerControllerType, TController>,
             "Mach error: route handler must belong to the controller being registered."
@@ -206,9 +212,9 @@ namespace mach
         detail::routing::RouteEndpoint endpoint{
             .method = method,
             .pattern = m_route + std::string(pattern),
-            .invoker =
-                std::make_unique<detail::dispatching::ControllerActionInvoker<TController, ReturnType, ArgsTuple>>(
-                    std::forward<THandler>(handler))
+            .invoker = std::make_unique<InvokerType>(
+                std::forward<THandler>(handler)
+             )
         };
 
         m_controllerEndpoints.emplace_back(std::move(endpoint));
