@@ -20,13 +20,15 @@ public:
 	inline static std::string route = "/home";
 
 	[[mach::get]]
-	mach::Reply<Person> calculateAge(Person person) {
-		const int currentYear = 2026;
+	mach::Reply<int> calculateAge() {
+		constexpr int currentYear = 2026;
 		
-		std::cout << "My name is " << person.name
-			<< " and I am " << person.age << "\n";
+		int birthYear = std::stoi(std::string(context->request.routeParam("birth")));
+		int age = currentYear - birthYear;
 
-		return ok(person);
+		std::cout << "I am " << age << "\n";
+
+		return ok(age);
 	}
 
 	[[mach::get("/hi")]]
@@ -35,7 +37,7 @@ public:
 	}
 
 	static void configure(mach::ControllerBuilder<HomeController>& routes) {
-		routes.get(&HomeController::calculateAge);
+		routes.get("/{birth:int}", &HomeController::calculateAge);
 		routes.get("/hi" ,& HomeController::sayHi);
 	}
 };

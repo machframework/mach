@@ -11,8 +11,8 @@
 
 #include <mach/detail/app/ServerOptions.hpp>
 #include <mach/detail/controllers/ControllerTraits.hpp>
-#include <mach/detail/core/MinimalApiHandler.hpp>
 #include <mach/detail/di/Container.hpp>
+#include <mach/detail/dispatching/MinimalApiInvoker.hpp>
 #include <mach/detail/middleware/MiddlewarePipeline.hpp>
 
 namespace mach
@@ -80,7 +80,7 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		template <typename THandler>
-		requires std::is_invocable_r_v<void, THandler, mach::Context&>
+		requires detail::MinimalApiHandler<THandler>
 		void get(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Get,
@@ -102,7 +102,7 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		template <typename THandler>
-		requires std::is_invocable_r_v<void, THandler, mach::Context&>
+		requires detail::MinimalApiHandler<THandler>
 		void post(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Post,
@@ -124,7 +124,7 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		template <typename THandler>
-		requires std::is_invocable_r_v<void, THandler, mach::Context&>
+		requires detail::MinimalApiHandler<THandler>
 		void put(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Put,
@@ -146,7 +146,7 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		template <typename THandler>
-		requires std::is_invocable_r_v<void, THandler, mach::Context&>
+		requires detail::MinimalApiHandler<THandler>
 		void patch(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Patch,
@@ -168,7 +168,7 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		template <typename THandler>
-		requires std::is_invocable_r_v<void, THandler, mach::Context&>
+		requires detail::MinimalApiHandler<THandler>
 		void del(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Delete,
@@ -191,14 +191,8 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		template <typename THandler>
-		requires std::is_invocable_r_v<void, THandler, mach::Context&>
-		void addRoute(http::Method method, std::string_view pattern, THandler&& handler) {
-			addRouteImpl(
-				method,
-				pattern,
-				detail::MinimalApiHandler{ std::forward<THandler>(handler) }
-			);
-		}
+		requires detail::MinimalApiHandler<THandler>
+		void addRoute(http::Method method, std::string_view pattern, THandler&& handler);
 
 		template <detail::controllers::MachController TController>
 		App& mapController();
@@ -220,7 +214,8 @@ namespace mach
 			detail::middleware::MiddlewarePipeline middlewarePipeline
 		);
 
-		void addRouteImpl(http::Method method, std::string_view pattern, detail::MinimalApiHandler handler);
+		void addRouteImpl(detail::routing::RouteEndpoint route);
+
 		void addControllerRoutesImpl(std::vector<detail::routing::RouteEndpoint> routes);
 
 		class Impl;
@@ -228,6 +223,37 @@ namespace mach
 
 		friend class AppBuilder;
 	};
+
+	template <typename THandler>
+		requires mach::detail::MinimalApiHandler<THandler>
+	void mach::App::addRoute(
+		http::Method method,
+		std::string_view pattern,
+		THandler&& handler
+	) {
+		using Handler = std::decay_t<THandler>;
+		using Traits = detail::FunctionTraits<Handler>;
+		using Result = typename Traits::ReturnType;
+		using ArgsTuple = typename Traits::ArgsTuple;
+
+		using Invoker = detail::dispatching::MinimalApiInvokerFromTupleT<
+			Handler,
+			Result,
+			ArgsTuple
+		>;
+
+		auto invoker = std::make_unique<Invoker>(
+			std::forward<THandler>(handler)
+		);
+
+		auto routeEndpoint = detail::routing::RouteEndpoint{
+			.method = method,
+			.pattern = std::string(pattern),
+			.invoker = std::move(invoker)
+		};
+
+		addRouteImpl(std::move(routeEndpoint));
+	}
 
 	template <detail::controllers::MachController TController>
 	App& App::mapController() {

@@ -2,9 +2,8 @@
 
 namespace mach::detail 
 {
-
     template <typename T>
-    struct FunctionTraits;
+    struct FunctionTraits : FunctionTraits<decltype(&T::operator())> {};
 
     template <typename Class, typename Return, typename... Args>
     struct FunctionTraits<Return(Class::*)(Args...)> {
@@ -20,4 +19,10 @@ namespace mach::detail
         using ArgsTuple = std::tuple<Args...>;
     };
 
+    template <typename T>
+    concept MinimalApiHandler =
+        requires {
+        typename FunctionTraits<std::remove_cvref_t<T>>::ReturnType;
+        typename FunctionTraits<std::remove_cvref_t<T>>::ArgsTuple;
+    };
 }
