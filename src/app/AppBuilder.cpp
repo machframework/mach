@@ -1,5 +1,7 @@
 #include <mach/AppBuilder.hpp>
 
+#include <mach/detail/binding/BodyBinder.hpp>
+
 #include <iostream>
 
 namespace mach
@@ -12,6 +14,8 @@ namespace mach
 	}
 
 	App AppBuilder::build(){
+		m_container.addService<detail::binding::BodyBinder>(detail::di::ServiceLifetime::Singleton);
+
 		return mach::App(
 			std::move(m_serverOptions),
 			std::move(m_container),

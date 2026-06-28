@@ -8,17 +8,11 @@
 #include <mach/Context.hpp>
 #include <mach/http/Method.hpp>
 
-#include <mach/detail/core/MinimalApiHandler.hpp>
 #include <mach/detail/dispatching/IEndpointInvoker.hpp>
 #include <mach/detail/routing/RouteConstraint.hpp>
 
 namespace mach::detail::routing
 {
-	enum class EndpointKind {
-		MinimalApi,
-		ControllerAction
-	};
-
 	struct RouteEndpoint {
 		mach::http::Method method;
 		std::string pattern;

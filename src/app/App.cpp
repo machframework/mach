@@ -25,7 +25,7 @@ namespace mach
 		std::uint16_t port() const noexcept;
 		std::size_t threadCount() const noexcept;
 
-		void addRoute(mach::http::Method method, std::string_view pattern, detail::MinimalApiHandler handler);
+		void addRoute(detail::routing::RouteEndpoint route);
 		void addControllerRoutes(std::vector<detail::routing::RouteEndpoint> routes);
 
 		void run();
@@ -68,8 +68,10 @@ namespace mach
 		return m_impl->threadCount();
 	}
 
-	void App::addRouteImpl(http::Method method, std::string_view pattern, detail::MinimalApiHandler handler) {
-		m_impl->addRoute(method, pattern, handler);
+	void App::addRouteImpl(
+		detail::routing::RouteEndpoint route
+	) {
+		m_impl->addRoute(std::move(route));
 	}
 
 	void App::addControllerRoutesImpl(std::vector<detail::routing::RouteEndpoint> routes) {
@@ -97,18 +99,12 @@ namespace mach
 		server->run();
 	}
 
-	void App::Impl::addRoute(mach::http::Method method, std::string_view pattern, detail::MinimalApiHandler handler) {
-		if (!handler) {
+	void App::Impl::addRoute(detail::routing::RouteEndpoint route) {
+		if (!route.invoker) {
 			throw std::invalid_argument("Route handler cannot be empty");
 		}
-		
-		mach::detail::routing::RouteEndpoint endpoint{
-			.method = method,
-			.pattern = std::string(pattern),
-			.invoker = std::make_unique<detail::dispatching::MinimalApiInvoker>(handler)
-		};
 
-		m_router.addRoute(std::move(endpoint));
+		m_router.addRoute(std::move(route));
 	}
 
 	void App::Impl::addControllerRoutes(std::vector<detail::routing::RouteEndpoint> routes) {

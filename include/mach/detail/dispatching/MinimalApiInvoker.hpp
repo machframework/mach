@@ -1,23 +1,102 @@
 #pragma once
 
+#include <tuple>
+#include <utility>
+
 #include <mach/detail/dispatching/IEndpointInvoker.hpp>
-#include <mach/detail/core/MinimalApiHandler.hpp>
+#include <mach/detail/results/ResultTraits.hpp>
 
 namespace mach::detail::dispatching
 {
+    template <
+        typename THandler,
+        mach::detail::results::ReplyResult TResult,
+        typename... TArgs
+    >
     class MinimalApiInvoker final : public IEndpointInvoker {
 
     public:
-        explicit MinimalApiInvoker(mach::detail::MinimalApiHandler handler)
-            : m_handler(std::move(handler))
-        {
-        }
+        using ArgsTuple = std::tuple<TArgs...>;
 
-        void invoke(RequestExecution& execution) const override {
-            m_handler(execution.context);
-        }
+        explicit MinimalApiInvoker(THandler handler)
+            : m_handler(std::move(handler))
+        { }
+
+        void invoke(RequestExecution& execution) const override;
 
     private:
-        MinimalApiHandler m_handler;
+        THandler m_handler;
     };
+
+    template <
+        typename THandler,
+        mach::detail::results::ReplyResult TResult,
+        typename... TArgs
+    >
+    void MinimalApiInvoker<THandler, TResult, TArgs...>::invoke(RequestExecution& execution) const {
+        TResult res = [&]() -> TResult {
+            if constexpr (sizeof...(TArgs) == 0) {
+                return std::invoke(m_handler);
+            }
+            else if constexpr (sizeof...(TArgs) == 1) {
+                using FirstType = std::tuple_element_t<0, std::tuple<TArgs...>>;
+
+                if constexpr (std::same_as<std::remove_cvref_t<FirstType>, mach::Context>) {
+                    return std::invoke(m_handler, execution.context);
+                }
+                else {
+                    auto& binder = execution.scope.resolve<binding::BodyBinder>();
+                    FirstType body = binder.bind<FirstType>(execution.context.request.body());
+
+                    return std::invoke(m_handler, std::move(body));
+                }
+            }
+            else if constexpr (sizeof...(TArgs) == 2) {
+                using Arg0 = std::tuple_element_t<0, std::tuple<TArgs...>>;
+                using Arg1 = std::tuple_element_t<1, std::tuple<TArgs...>>;
+
+                // first is context, second is body
+                if constexpr (
+                    std::same_as<std::remove_cvref_t<Arg0>, mach::Context>
+                    && !std::same_as<std::remove_cvref_t<Arg1>, mach::Context>
+                    ) {
+                    auto& binder = execution.scope.resolve<binding::BodyBinder>();
+                    Arg1 body = binder.bind<Arg1>(execution.context.request.body());
+                    return std::invoke(m_handler, execution.context, std::move(body));
+                }
+                else if constexpr (
+                    std::same_as<std::remove_cvref_t<Arg1>, mach::Context>
+                    && !std::same_as<std::remove_cvref_t<Arg0>, mach::Context>
+                    ) {
+                    auto& binder = execution.scope.resolve<binding::BodyBinder>();
+                    Arg0 body = binder.bind<Arg0>(execution.context.request.body());
+                    return std::invoke(m_handler, std::move(body), execution.context);
+                }
+            }
+            else {
+                static_assert(sizeof...(TArgs) <= 2, "Mach error: minimal APIs currently support at most one parameter.");
+            }
+            }();
+
+        execution.context.response.status(res.statusCode());
+        if (res.hasValue()) {
+            execution.context.response.body(std::move(serialization::Serializer::serialize(res.value())));
+        }
+    }
+
+    template <typename THandler, typename TResult, typename TArgsTuple>
+    struct MinimalApiInvokerFromTuple;
+
+    template <typename THandler, typename TResult, typename... TArgs>
+    struct MinimalApiInvokerFromTuple<
+        THandler,
+        TResult,
+        std::tuple<TArgs...>
+    > {
+        using Type = MinimalApiInvoker<THandler, TResult, TArgs...>;
+    };
+
+    template <typename THandler, typename TResult, typename TArgsTuple>
+    using MinimalApiInvokerFromTupleT =
+        typename MinimalApiInvokerFromTuple<THandler, TResult, TArgsTuple>::Type;
 }

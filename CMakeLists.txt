@@ -9,6 +9,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Boost REQUIRED)
 
+find_package(nlohmann_json CONFIG REQUIRED)
+
 # -------------------------
 # Core library
 # -------------------------
@@ -43,6 +45,11 @@ target_include_directories(mach
 target_link_libraries(mach
     PUBLIC
         Boost::headers
+)
+
+target_link_libraries(mach
+    PUBLIC
+        nlohmann_json::nlohmann_json
 )
 
 option(MACH_BUILD_EXAMPLES "Build Mach examples" ON)
