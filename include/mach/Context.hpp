@@ -1,10 +1,16 @@
 #pragma once
 
-#include <string>
-#include <unordered_map>
+#include <utility>
 
 #include <mach/Request.hpp>
 #include <mach/Response.hpp>
+
+#include <mach/detail/application/ExecutionPlan.hpp>
+
+namespace mach::detail::dispatching 
+{
+	class Dispatcher;
+}
 
 namespace mach
 {
@@ -24,8 +30,8 @@ namespace mach
 	 * - Not thread-safe. Concurrent access must be synchronized externally.
 	 */
 	struct Context {
-		Context(Request&& requst, Response&& response) 
-			: request(std::move(requst)),
+		Context(Request&& request, Response&& response) 
+			: request(std::move(request)),
 			response(std::move(response))
 		{ }
 
@@ -37,5 +43,9 @@ namespace mach
 
 		Request request;
 		Response response;
+
+		friend class detail::dispatching::Dispatcher;
+	private:
+		detail::application::ExecutionPlan executionPlan;
 	};
 }

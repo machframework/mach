@@ -11,6 +11,9 @@ namespace mach
 			std::string(host),
 			port, threadCount
 		};
+
+		// register preprocessing middleware
+		// register routing middleware
 	}
 
 	App AppBuilder::build(){

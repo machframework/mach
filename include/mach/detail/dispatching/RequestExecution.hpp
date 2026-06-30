@@ -1,17 +1,21 @@
 #pragma once
 
-#include <mach/Context.hpp>
 #include <mach/detail/di/Scope.hpp>
+
+namespace mach
+{
+	class Context;
+}
 
 namespace mach::detail::dispatching
 {
 	struct RequestExecution {
-		mach::Context& context;
-		di::Scope& scope;
-
 		RequestExecution(mach::Context& context, di::Scope& scope)
 			: context(context),
 			scope(scope)
 		{ }
+
+		mach::Context& context;
+		di::Scope& scope;
 	};
 }

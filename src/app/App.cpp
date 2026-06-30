@@ -89,6 +89,10 @@ namespace mach
 	{ }
 
 	void App::Impl::run() {
+		// add routing middleware
+		//m_container.
+		//m_middlewarePipeline.add
+
 		auto server = std::make_unique<detail::server::Server>(
 			std::move(m_serverOptions),
 			std::move(m_router),

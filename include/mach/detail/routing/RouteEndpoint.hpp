@@ -5,7 +5,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include <mach/Context.hpp>
 #include <mach/http/Method.hpp>
 
 #include <mach/detail/dispatching/IEndpointInvoker.hpp>
