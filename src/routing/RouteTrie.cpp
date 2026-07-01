@@ -228,6 +228,10 @@ namespace mach::detail::routing
 					);
 				}
 				
+				if (endpointsByMethod.empty()) {
+					return routing::RouteMatch(RoutingStatus::NotFound);
+				}
+
 				return routing::RouteMatch(RoutingStatus::MethodNotAllowed);
 			}
 

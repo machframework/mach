@@ -19,6 +19,9 @@ namespace mach::detail::di
 		template <typename T, typename... Deps>
 		void addService(ServiceLifetime lifetime);
 
+		template <typename T>
+        void addSingletonInstance(T&& instance);
+
 		const ServiceDescriptor& getDescriptor(std::type_index type) const;
         std::shared_ptr<void> getOrCreateSingleton(std::type_index type, Scope& container);
 
@@ -66,5 +69,23 @@ namespace mach::detail::di
                 );
             }
         }
+    }
+
+    template <typename T>
+    void Container::addSingletonInstance(T&& instance) {
+        ServiceDescriptor descriptor{
+            .type = typeid(T),
+            .lifetime = ServiceLifetime::Singleton
+        };
+
+        m_singletonInstances.emplace(
+            typeid(T),
+            std::make_shared<T>(std::move(instance))
+        );
+
+        m_serviceRegistry.emplace(
+            descriptor.type,
+            std::move(descriptor)
+        );
     }
 }

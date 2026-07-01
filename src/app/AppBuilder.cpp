@@ -1,8 +1,8 @@
 #include <mach/AppBuilder.hpp>
 
 #include <mach/detail/binding/BodyBinder.hpp>
-
-#include <iostream>
+#include <mach/detail/routing/Router.hpp>
+#include <mach/detail/routing/RoutingMiddleware.hpp>
 
 namespace mach
 {
@@ -11,6 +11,11 @@ namespace mach
 			std::string(host),
 			port, threadCount
 		};
+
+		// register preprocessing middleware
+
+		// register routing middleware
+		this->use<detail::routing::RoutingMiddleware, detail::routing::Router>();
 	}
 
 	App AppBuilder::build(){

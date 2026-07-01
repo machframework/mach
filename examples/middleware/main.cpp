@@ -5,6 +5,7 @@
 #include <mach/AppBuilder.hpp>
 #include <mach/Context.hpp>
 #include <mach/middleware/Next.hpp>
+#include <mach/results/Results.hpp>
 
 class AuthMiddleware {
 

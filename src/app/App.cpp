@@ -89,9 +89,12 @@ namespace mach
 	{ }
 
 	void App::Impl::run() {
+		// add router to container
+		m_container.addSingletonInstance<detail::routing::Router>(std::move(m_router));
+
 		auto server = std::make_unique<detail::server::Server>(
 			std::move(m_serverOptions),
-			std::move(m_router),
+			std::move(m_router), //
 			std::move(m_container),
 			std::move(m_middlewarePipeline)
 		);

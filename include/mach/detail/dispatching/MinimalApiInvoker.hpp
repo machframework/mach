@@ -1,16 +1,18 @@
 #pragma once
 
-#include <tuple>
 #include <utility>
+#include <tuple>
+#include <type_traits>
 
 #include <mach/detail/dispatching/IEndpointInvoker.hpp>
 #include <mach/detail/results/ResultTraits.hpp>
+#include <mach/detail/core/TypeTraits.hpp>
 
 namespace mach::detail::dispatching
 {
     template <
         typename THandler,
-        mach::detail::results::ReplyResult TResult,
+        typename TResult,
         typename... TArgs
     >
     class MinimalApiInvoker final : public IEndpointInvoker {
@@ -30,11 +32,11 @@ namespace mach::detail::dispatching
 
     template <
         typename THandler,
-        mach::detail::results::ReplyResult TResult,
+        typename TResult,
         typename... TArgs
     >
     void MinimalApiInvoker<THandler, TResult, TArgs...>::invoke(RequestExecution& execution) const {
-        TResult res = [&]() -> TResult {
+        auto handlerCallback = [&]() -> TResult {
             if constexpr (sizeof...(TArgs) == 0) {
                 return std::invoke(m_handler);
             }
@@ -76,11 +78,24 @@ namespace mach::detail::dispatching
             else {
                 static_assert(sizeof...(TArgs) <= 2, "Mach error: minimal APIs currently support at most one parameter.");
             }
-            }();
+            };
 
-        execution.context.response.status(res.statusCode());
-        if (res.hasValue()) {
-            execution.context.response.body(std::move(serialization::Serializer::serialize(res.value())));
+        if constexpr (std::same_as<TResult, void>) {
+            handlerCallback();
+        }
+        else if constexpr (results::ReplyResult<TResult>) {
+            TResult res = handlerCallback();
+
+            execution.context.response.status(res.statusCode());
+            if (res.hasValue()) {
+                execution.context.response.body(std::move(serialization::Serializer::serialize(res.value())));
+            }
+        }
+        else {
+            static_assert(
+                always_false_v<TResult>,
+                "Mach error: minimal API handlers must return void or mach::Reply<T>."
+            );
         }
     }
 

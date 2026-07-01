@@ -4,6 +4,8 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <utility>
+#include <type_traits>
 
 #include <mach/Context.hpp>
 #include <mach/http/Method.hpp>
@@ -233,8 +235,13 @@ namespace mach
 	) {
 		using Handler = std::decay_t<THandler>;
 		using Traits = detail::FunctionTraits<Handler>;
-		using Result = typename Traits::ReturnType;
 		using ArgsTuple = typename Traits::ArgsTuple;
+		using Result = typename Traits::ReturnType;
+
+		/*static_assert(
+			detail::results::ReplyResult<Result>,
+			"Mach error: minimal API handlers must return mach::Reply<T>."
+			);*/
 
 		using Invoker = detail::dispatching::MinimalApiInvokerFromTupleT<
 			Handler,

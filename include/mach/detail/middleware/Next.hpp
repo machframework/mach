@@ -2,7 +2,10 @@
 
 #include <functional>
 
-#include <mach/detail/dispatching/RequestExecution.hpp>
+namespace mach::detail::dispatching
+{
+	class RequestExecution;
+}
 
 namespace mach::detail::middleware
 {

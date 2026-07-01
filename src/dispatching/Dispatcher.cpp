@@ -1,4 +1,7 @@
 #include <mach/detail/dispatching/Dispatcher.hpp>
+
+#include <mach/Context.hpp>
+
 #include <mach/detail/middleware/Next.hpp>
 #include <mach/detail/routing/RouteEndpoint.hpp>
 
@@ -9,13 +12,13 @@ namespace mach::detail::dispatching
 		m_middlewarePipeline(std::move(middlewarePipeline))
 	{ }
 
-	void Dispatcher::execute(mach::Context& context, application::ExecutionPlan&& plan) {
+	void Dispatcher::execute(mach::Context& context) {
 		auto scope = m_container.createScope();
 
-		auto execution = RequestExecution(context, scope);
+		RequestExecution execution(context, scope);
 
-		auto terminal = [&plan](RequestExecution& execution) {
-			plan.endpoint->invoker->invoke(execution);
+		auto terminal = [](RequestExecution& execution) {
+			execution.context.executionPlan.endpoint->invoker->invoke(execution);
 		};
 
 		m_middlewarePipeline.invoke(execution, terminal);

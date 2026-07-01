@@ -10,7 +10,6 @@ namespace mach::detail::application
 {
 	struct ExecutionPlan {
 		routing::RoutingStatus status;
-		// middleware[]
 		routing::RouteEndpoint* endpoint;
 		std::unordered_map<std::string, std::string> params;
 

@@ -43,7 +43,7 @@ public:
 };
 
 int main() {
-	auto builder = mach::AppBuilder("127.0.0.1", 3143, 16);
+	auto builder = mach::AppBuilder("127.0.0.1", 3143, 12);
 	builder.addController<HomeController>();
 
 	auto app = builder.build();
