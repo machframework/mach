@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include <mach/Context.hpp>
 #include <mach/middleware/Next.hpp>
 
@@ -15,7 +17,8 @@ namespace mach::detail::routing
 		{ }
 
 		void invoke(mach::Context& context, mach::Next next) {
-			// route
+			auto plan = m_router.route(context.request);
+			context.executionPlan = std::move(plan);
 
 			next();
 		}

@@ -7,9 +7,16 @@
 
 #include <mach/detail/application/ExecutionPlan.hpp>
 
-namespace mach::detail::dispatching 
+namespace mach::detail
 {
-	class Dispatcher;
+	namespace dispatching
+	{
+		class Dispatcher;
+	}
+	namespace routing
+	{
+		class RoutingMiddleware;
+	}
 }
 
 namespace mach
@@ -45,6 +52,7 @@ namespace mach
 		Response response;
 
 		friend class detail::dispatching::Dispatcher;
+		friend class detail::routing::RoutingMiddleware;
 	private:
 		detail::application::ExecutionPlan executionPlan;
 	};
