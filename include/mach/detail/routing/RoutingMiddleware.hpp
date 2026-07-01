@@ -19,6 +19,15 @@ namespace mach::detail::routing
 		void invoke(mach::Context& context, mach::Next next) {
 			auto plan = m_router.route(context.request);
 
+			if (!plan.found()) {
+				auto statusCode = routing::toStatusCode(plan.status);
+
+				context.response.status(statusCode);
+				context.response.body(mach::http::reasonPhrase(statusCode));
+
+				return;
+			}
+
 			context.request.setRouteParams(std::move(plan.params));
 			context.executionPlan = std::move(plan);
 
