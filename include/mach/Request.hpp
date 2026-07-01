@@ -18,6 +18,10 @@ namespace mach::detail
 	{
 		class Runtime;
 	}
+	namespace routing
+	{
+		class RoutingMiddleware;
+	}
 }
 
 namespace mach
@@ -140,5 +144,6 @@ namespace mach
 
 		friend class detail::http::adapter::BeastRequestAdapter;
 		friend class detail::application::Runtime;
+		friend class detail::routing::RoutingMiddleware;
 	};
 }
