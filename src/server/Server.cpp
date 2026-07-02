@@ -1,6 +1,8 @@
 #include "Server.hpp"
 
+#include <exception>
 #include <format>
+#include <mutex>
 #include <thread>
 #include <vector>
 
@@ -56,23 +58,39 @@ namespace mach::detail::server
 
 		detail::logging::Logger::info(std::format("Starting Mach server on {}:{} with {} threads", host(), port(), m_threadCount));
 
-		for (int i = 0; i < m_threadCount - 1; ++i) {
-			threads.emplace_back(
-				[this]
-				{
-					m_ioc.run();
+		std::mutex exceptionMutex;
+		std::exception_ptr iocException = nullptr;
+
+		auto runIoContext = [&] {
+			try {
+				m_ioc.run();
+			}
+			catch (...) {
+				std::lock_guard lock(exceptionMutex);
+				if (!iocException) {
+					iocException = std::current_exception();
 				}
-			);
+
+				m_ioc.stop();
+			}
+		};
+
+		for (int i = 0; i < m_threadCount - 1; ++i) {
+			threads.emplace_back(runIoContext);
 		}
 
 		// Run main thread
-		m_ioc.run();
+		runIoContext();
 
-		// Join threadss
+		// Join threads
 		for (auto& thread : threads) {
 			if (thread.joinable()) {
 				thread.join();
 			}
+		}
+
+		if (iocException) {
+			std::rethrow_exception(iocException);
 		}
 	}
 }

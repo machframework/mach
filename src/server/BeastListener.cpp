@@ -11,7 +11,9 @@
 
 #include "BeastListener.hpp"
 
+#include <format>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <utility>
 
@@ -46,28 +48,31 @@ namespace mach::detail::server
         m_acceptor.open(endpoint.protocol(), ec);
         if (ec) {
             Logger::error("Failed to open acceptor");
-            return;
+            throw std::runtime_error("Failed to open acceptor: " + ec.message());
         }
 
         // Allow address reuse
         m_acceptor.set_option(net::socket_base::reuse_address(true), ec);
         if (ec) {
-            Logger::error("Failed to set socket option");
-            return;
+            throw std::runtime_error(
+                "Failed to configure socket options: " + ec.message()
+            );
         }
 
         // Bind to the server address
         m_acceptor.bind(endpoint, ec);
         if (ec) {
-            Logger::error("Failed to bind acceptor");
-            return;
+            throw std::runtime_error(
+                std::format("Failed to bind to {}:{}: {}", endpoint.address().to_string(), endpoint.port(), ec.message())
+            );
         }
 
         // Start listening for connections
         m_acceptor.listen(net::socket_base::max_listen_connections, ec);
         if (ec) {
-            Logger::error("Failed to listen");
-            return;
+            throw std::runtime_error(
+                "Failed to start listening for incoming requests: " + ec.message()
+            );
         }
     }
 
@@ -85,9 +90,14 @@ namespace mach::detail::server
             net::make_strand(m_ioc), net::redirect_error(net::use_awaitable, ec)
         );
 
+        if (ec == net::error::operation_aborted) {
+            co_return; // acceptor closed
+        }
+
         if (ec) {
-            Logger::error("Failed to accept connection");
-            co_return; // To avoid infinite loop
+            Logger::error("Failed to accept connection: " + ec.message());
+            co_await do_accept();
+            co_return;
         } 
 
 		auto& executor = socket.get_executor();
@@ -109,7 +119,7 @@ namespace mach::detail::server
             net::detached
         );
 
-        // Accept another connection in the same session
+        // Accept the next incoming connection
         co_await do_accept();
     }
 }

@@ -104,7 +104,7 @@ namespace mach
 			server->run();
 		}
 		catch (const std::exception& ex) {
-			std::cout << "Failed to start Mach application: " << ex.what() << std::endl;
+			std::cout << "Mach error: " << ex.what() << std::endl;
 			return 1;
 		}
 
