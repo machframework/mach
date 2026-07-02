@@ -202,11 +202,16 @@ namespace mach
 		/**
 		 * Starts the application and begins accepting incoming HTTP requests.
 		 *
+		 * @return Exit status code. Returns 0 on successful shutdown, or a non-zero
+		 *         value if the application failed to start or encountered a fatal
+		 *         startup error.
+		 * 
 		 * This function blocks the calling thread until the application stops.
 		 *
 		 * @thread_safety This function is not thread-safe.
 		 */
-		void run();
+		[[nodiscard]]
+		int run() noexcept;
 
 	private:
 	

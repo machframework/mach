@@ -18,7 +18,7 @@ namespace mach::detail::server
 		middleware::MiddlewarePipeline middlewarePipeline
 	)
 		: m_threadCount(serverOptions.threads),
-		m_endpoint(boost::asio::ip::make_address(serverOptions.host), serverOptions.port),
+		m_endpoint(boost::asio::ip::make_address(serverOptions.host), static_cast<std::uint16_t>(serverOptions.port)),
 		m_ioc(static_cast<int>(serverOptions.threads)),
 		m_runtime(std::move(router), std::move(container), std::move(middlewarePipeline))
 	{}

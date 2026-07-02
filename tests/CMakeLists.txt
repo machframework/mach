@@ -78,3 +78,8 @@ add_mach_test(
     BasicMiddlewareTests
     middleware/BasicMiddlewareTests.cpp
 )
+
+add_mach_test(
+    BeastHardeningTests
+    hardening/server/main.cpp
+)

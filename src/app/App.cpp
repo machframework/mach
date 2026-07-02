@@ -1,5 +1,6 @@
 #include <mach/App.hpp>
 
+#include <iostream>
 #include <string>
 #include <stdexcept>
 
@@ -28,7 +29,7 @@ namespace mach
 		void addRoute(detail::routing::RouteEndpoint route);
 		void addControllerRoutes(std::vector<detail::routing::RouteEndpoint> routes);
 
-		void run();
+		int run();
 
 	private:
 		detail::app::ServerOptions m_serverOptions;
@@ -52,8 +53,8 @@ namespace mach
 
 	App::~App() = default;
 
-	void App::run() {
-		m_impl->run();
+	int App::run() noexcept {
+		return m_impl->run();
 	}
 
 	std::string App::host() const noexcept {
@@ -88,18 +89,26 @@ namespace mach
 		m_middlewarePipeline(std::move(middlewarePipeline))
 	{ }
 
-	void App::Impl::run() {
+	int App::Impl::run() {
 		// add router to container
 		m_container.addSingletonInstance<detail::routing::Router>(std::move(m_router));
 
-		auto server = std::make_unique<detail::server::Server>(
-			std::move(m_serverOptions),
-			std::move(m_router), //
-			std::move(m_container),
-			std::move(m_middlewarePipeline)
-		);
+		try {
+			auto server = std::make_unique<detail::server::Server>(
+				std::move(m_serverOptions),
+				std::move(m_router), //
+				std::move(m_container),
+				std::move(m_middlewarePipeline)
+			);
 
-		server->run();
+			server->run();
+		}
+		catch (const std::exception& ex) {
+			std::cout << "Failed to start Mach application: " << ex.what() << std::endl;
+			return 1;
+		}
+
+		return 0;
 	}
 
 	void App::Impl::addRoute(detail::routing::RouteEndpoint route) {

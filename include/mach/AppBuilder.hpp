@@ -43,7 +43,7 @@ namespace mach
 		 *
 		 * @throws std::invalid_argument If the supplied configuration is invalid.
 		 */
-		AppBuilder(std::string_view host, std::uint16_t port, std::size_t threadCount = 1);
+		AppBuilder(std::string_view host, std::int32_t port = 3143, std::int64_t threadCount = 1);
 
 		// testing 
 		AppBuilder(detail::app::ServerOptions options)
