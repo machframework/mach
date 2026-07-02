@@ -6,8 +6,9 @@
 #include <thread>
 #include <vector>
 
-#include <boost/asio/detached.hpp>
 #include <boost/asio/co_spawn.hpp>
+#include <boost/asio/detached.hpp>
+#include <boost/asio/signal_set.hpp>
 
 #include <mach/logging/Logging.hpp>
 
@@ -45,6 +46,14 @@ namespace mach::detail::server
 			m_requestAdapter,
 			m_responseAdapter
 		);
+
+		// configure signals
+		net::signal_set signals(m_ioc, SIGINT, SIGTERM);
+		signals.async_wait([this](boost::system::error_code ec, int signal) {
+			if (!ec) {
+				m_ioc.stop();
+			}
+		});
 
 		net::co_spawn(
 			m_ioc,
