@@ -112,6 +112,8 @@ namespace mach
 
 		try {
 
+			detail::server::Server* server = nullptr;
+
 			{
 				std::lock_guard lock(m_serverMutex);
 
@@ -134,24 +136,37 @@ namespace mach
 					std::move(m_container),
 					std::move(m_middlewarePipeline)
 				);
+
+				server = m_server.get();
 			}
 
-			m_server->run();
+			m_state = AppState::Running;
+			server->run();
+
+			{
+				std::lock_guard lock(m_serverMutex);
+				m_server.reset();
+			}
+
+			return 0;
 		}
 		catch (const std::exception& ex) {
 			std::cout << "Mach error: " << ex.what() << std::endl;
 			return 1;
 		}
-
-		return 0;
 	}
 
 	void App::Impl::stop() {
-		std::lock_guard lock(m_serverMutex);
+		detail::server::Server* server = nullptr;
+		
+		{
+			std::lock_guard lock(m_serverMutex);
+			server = m_server.get();
+		}
 
-		if (m_server && m_state == AppState::Running) {
-			m_server->stop();
-			m_server.reset();
+		if (server && m_state == AppState::Running) {
+			server->stop();
+			m_state = AppState::Stopped;
 		}
 	}
 
