@@ -1,12 +1,12 @@
 #include <stdexcept>
 
-#include <mach/App.hpp>
+#include <mach/AppBuilder.hpp>
 #include <mach/Context.hpp>
 
 #include "Testing.hpp"
 
 int main() {
-	auto app = mach::App("127.0.0.1", 3143, testing::THREADS);
+	auto app = mach::AppBuilder(std::move(testing::serverOptions)).build();
 
 	// -------------------------
 	// Missing leading '/'

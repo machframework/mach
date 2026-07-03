@@ -1,4 +1,4 @@
-#include <mach/App.hpp>
+#include <mach/AppBuilder.hpp>
 #include <mach/Context.hpp>
 #include <mach/http/Method.hpp>
 
@@ -66,7 +66,7 @@ bool testDuplicateParameterNamesAreRejected()
 {
 	constexpr auto testName = "Reject duplicate route parameter names";
 
-	auto app = mach::App("127.0.0.1", 3143, threads);
+	auto app = mach::AppBuilder(testing::serverOptions).build();
 
 	try {
 		app.addRoute(
@@ -114,7 +114,7 @@ int main()
 		return 1;
 	}
 
-	auto app = mach::App("127.0.0.1", 3143, threads);
+	auto app = mach::AppBuilder(testing::serverOptions).build();
 
 	app.addRoute(
 		mach::http::Method::Get,
