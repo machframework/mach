@@ -120,7 +120,7 @@ private:
 // controller
 
 int main() {
-	auto builder = mach::AppBuilder(std::move(test::serverOptions));
+	auto builder = mach::AppBuilder(std::move(testing::serverOptions));
 
 	builder.addSingleton<Logger>();
 	builder.addScoped<Initiator>();

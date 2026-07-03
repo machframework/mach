@@ -99,14 +99,14 @@ static void runDiContainerTests() {
             auto& logger = scope.resolve<Logger>();
 
             if (logger.log() != "logged") {
-                test::fail(testName, "Resolved Logger is not usable at runtime");
+                testing::fail(testName, "Resolved Logger is not usable at runtime");
                 return;
             }
 
-            test::success(testName);
+            testing::success(testName);
         }
         catch (const std::exception& ex) {
-            test::fail(testName, ex.what());
+            testing::fail(testName, ex.what());
         }
     }
 
@@ -124,14 +124,14 @@ static void runDiContainerTests() {
             auto& controller = scope.resolve<Controller>();
 
             if (controller.handle() != 25) {
-                test::fail(testName, "Resolved object graph produced wrong runtime result");
+                testing::fail(testName, "Resolved object graph produced wrong runtime result");
                 return;
             }
 
-            test::success(testName);
+            testing::success(testName);
         }
         catch (const std::exception& ex) {
-            test::fail(testName, ex.what());
+            testing::fail(testName, ex.what());
         }
     }
 
@@ -150,14 +150,14 @@ static void runDiContainerTests() {
             auto& controller = scope.resolve<Controller>();
 
             if (controller.handle() != 25) {
-                test::fail(testName, "Container failed to resolve graph registered in reverse order");
+                testing::fail(testName, "Container failed to resolve graph registered in reverse order");
                 return;
             }
 
-            test::success(testName);
+            testing::success(testName);
         }
         catch (const std::exception& ex) {
-            test::fail(testName, ex.what());
+            testing::fail(testName, ex.what());
         }
     }
 
@@ -174,21 +174,21 @@ static void runDiContainerTests() {
             auto& second = scope.resolve<Counter>();
 
             if (&first != &second) {
-                test::fail(testName, "Scoped service returned different instances in same scope");
+                testing::fail(testName, "Scoped service returned different instances in same scope");
                 return;
             }
 
             first.increment();
 
             if (second.value != 1) {
-                test::fail(testName, "Scoped service did not preserve state inside same scope");
+                testing::fail(testName, "Scoped service did not preserve state inside same scope");
                 return;
             }
 
-            test::success(testName);
+            testing::success(testName);
         }
         catch (const std::exception& ex) {
-            test::fail(testName, ex.what());
+            testing::fail(testName, ex.what());
         }
     }
 
@@ -206,21 +206,21 @@ static void runDiContainerTests() {
             auto& second = scopeB.resolve<Counter>();
 
             if (&first == &second) {
-                test::fail(testName, "Scoped service reused same instance across different scopes");
+                testing::fail(testName, "Scoped service reused same instance across different scopes");
                 return;
             }
 
             first.increment();
 
             if (second.value != 0) {
-                test::fail(testName, "Scoped state leaked across scopes");
+                testing::fail(testName, "Scoped state leaked across scopes");
                 return;
             }
 
-            test::success(testName);
+            testing::success(testName);
         }
         catch (const std::exception& ex) {
-            test::fail(testName, ex.what());
+            testing::fail(testName, ex.what());
         }
     }
 
@@ -238,21 +238,21 @@ static void runDiContainerTests() {
             auto& second = scopeB.resolve<Counter>();
 
             if (&first != &second) {
-                test::fail(testName, "Singleton service returned different instances across scopes");
+                testing::fail(testName, "Singleton service returned different instances across scopes");
                 return;
             }
 
             first.increment();
 
             if (second.value != 1) {
-                test::fail(testName, "Singleton state was not shared across scopes");
+                testing::fail(testName, "Singleton state was not shared across scopes");
                 return;
             }
 
-            test::success(testName);
+            testing::success(testName);
         }
         catch (const std::exception& ex) {
-            test::fail(testName, ex.what());
+            testing::fail(testName, ex.what());
         }
     }
 
@@ -269,21 +269,21 @@ static void runDiContainerTests() {
             auto& second = scope.resolve<Counter>();
 
             if (&first != &second) {
-                test::fail(testName, "Transient service reused the same instance");
+                testing::fail(testName, "Transient service reused the same instance");
                 return;
             }
 
             first.increment();
 
             if (second.value != 0) {
-                test::fail(testName, "Transient state leaked between instances");
+                testing::fail(testName, "Transient state leaked between instances");
                 return;
             }
 
-            test::success(testName);
+            testing::success(testName);
         }
         catch (const std::exception& ex) {
-            test::fail(testName, ex.what());
+            testing::fail(testName, ex.what());
         }
     }
 
@@ -298,10 +298,10 @@ static void runDiContainerTests() {
 
             (void)logger;
 
-            test::fail(testName, "Resolving an unregistered service did not throw");
+            testing::fail(testName, "Resolving an unregistered service did not throw");
         }
         catch (const std::exception&) {
-            test::success(testName);
+            testing::success(testName);
         }
     }
 
@@ -318,10 +318,10 @@ static void runDiContainerTests() {
 
             (void)service;
 
-            test::fail(testName, "Resolving service with missing dependency did not throw");
+            testing::fail(testName, "Resolving service with missing dependency did not throw");
         }
         catch (const std::exception&) {
-            test::success(testName);
+            testing::success(testName);
         }
     }
 
@@ -334,10 +334,10 @@ static void runDiContainerTests() {
             container.addService<Logger>(di::ServiceLifetime::Scoped);
             container.addService<Logger>(di::ServiceLifetime::Singleton);
 
-            test::fail(testName, "Duplicate registration did not throw");
+            testing::fail(testName, "Duplicate registration did not throw");
         }
         catch (const std::exception&) {
-            test::success(testName);
+            testing::success(testName);
         }
     }
 
@@ -351,10 +351,10 @@ static void runDiContainerTests() {
             auto scope = container.createScope();
             auto& service = scope.resolve<EmptyCtor>();
 
-            test::success(testName);
+            testing::success(testName);
         }
         catch (const std::exception& ex) {
-            test::fail(testName, ex.what());
+            testing::fail(testName, ex.what());
         }
     }
 
@@ -374,19 +374,19 @@ static void runDiContainerTests() {
             auto& service = scope.resolve<Service>();
 
             if (&service.logger != &logger) {
-                test::fail(testName, "Injected Logger reference does not point to scoped Logger instance");
+                testing::fail(testName, "Injected Logger reference does not point to scoped Logger instance");
                 return;
             }
 
             if (&service.repository.logger != &logger) {
-                test::fail(testName, "Nested injected Logger reference does not point to scoped Logger instance");
+                testing::fail(testName, "Nested injected Logger reference does not point to scoped Logger instance");
                 return;
             }
 
-            test::success(testName);
+            testing::success(testName);
         }
         catch (const std::exception& ex) {
-            test::fail(testName, ex.what());
+            testing::fail(testName, ex.what());
         }
     }
 
@@ -407,14 +407,14 @@ static void runDiContainerTests() {
             first.value = 123;
 
             if (second.value != 123) {
-                test::fail(testName, "Singleton mutation was not visible from another scope");
+                testing::fail(testName, "Singleton mutation was not visible from another scope");
                 return;
             }
 
-            test::success(testName);
+            testing::success(testName);
         }
         catch (const std::exception& ex) {
-            test::fail(testName, ex.what());
+            testing::fail(testName, ex.what());
         }
     }
 
@@ -435,26 +435,26 @@ static void runDiContainerTests() {
             counter.value = 42;
 
             if (consumer.read() != 42) {
-                test::fail(testName, "Injected reference did not observe mutation on scoped instance");
+                testing::fail(testName, "Injected reference did not observe mutation on scoped instance");
                 return;
             }
 
             consumer.counter.value = 100;
 
             if (counter.value != 100) {
-                test::fail(testName, "Mutation through injected reference did not affect scoped instance");
+                testing::fail(testName, "Mutation through injected reference did not affect scoped instance");
                 return;
             }
 
-            test::success(testName);
+            testing::success(testName);
         }
         catch (const std::exception& ex) {
-            test::fail(testName, ex.what());
+            testing::fail(testName, ex.what());
         }
     }
 
     std::cout << "\n";
-    test::success("All container tests");
+    testing::success("All container tests");
 }
 
 int main() {

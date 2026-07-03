@@ -14,12 +14,12 @@ const int threads = static_cast<int>(std::thread::hardware_concurrency());
 void fail(std::string_view testName, std::string_view message)
 {
 	std::cerr
-		<< test::RED
+		<< testing::RED
 		<< "[FAIL] "
 		<< testName
 		<< ": "
 		<< message
-		<< test::RESET
+		<< testing::RESET
 		<< std::endl;
 }
 
@@ -31,7 +31,7 @@ bool requireEqual(
 {
 	if (expected != actual) {
 		std::cerr
-			<< test::RED
+			<< testing::RED
 			<< "[FAIL] "
 			<< testName
 			<< ": "
@@ -41,14 +41,14 @@ bool requireEqual(
 			<< "' but is '"
 			<< actual
 			<< "'"
-			<< test::RESET
+			<< testing::RESET
 			<< std::endl;
 
 		return false;
 	}
 
 	std::cout
-		<< test::GREEN
+		<< testing::GREEN
 		<< "[SUCCESS] "
 		<< testName
 		<< ": "
@@ -56,7 +56,7 @@ bool requireEqual(
 		<< " is '"
 		<< actual
 		<< "'"
-		<< test::RESET
+		<< testing::RESET
 		<< std::endl;
 
 	return true;
@@ -80,24 +80,24 @@ bool testDuplicateParameterNamesAreRejected()
 	}
 	catch (const std::invalid_argument& e) {
 		std::cout
-			<< test::GREEN
+			<< testing::GREEN
 			<< "[SUCCESS] "
 			<< testName
 			<< " threw std::invalid_argument: "
 			<< e.what()
-			<< test::RESET
+			<< testing::RESET
 			<< std::endl;
 
 		return true;
 	}
 	catch (const std::exception& e) {
 		std::cerr
-			<< test::RED
+			<< testing::RED
 			<< "[FAIL] "
 			<< testName
 			<< ": expected std::invalid_argument, but got different std::exception: "
 			<< e.what()
-			<< test::RESET
+			<< testing::RESET
 			<< std::endl;
 
 		return false;
@@ -138,9 +138,9 @@ int main()
 
 			if (nameOk && ageOk) {
 				std::cout
-					<< test::GREEN
+					<< testing::GREEN
 					<< "[SUCCESS] Multiple route parameter extraction passed!"
-					<< test::RESET
+					<< testing::RESET
 					<< std::endl;
 			}
 		}
@@ -166,17 +166,17 @@ int main()
 		"/users/me",
 		[](mach::Context&) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] Static route precedence: /users/me hit static route"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 	);
 
 	std::cout
-		<< test::GREEN
+		<< testing::GREEN
 		<< "[SUCCESS] Route parameter registration tests passed!"
-		<< test::RESET
+		<< testing::RESET
 		<< std::endl;
 
 	std::cout

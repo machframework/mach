@@ -19,7 +19,7 @@ bool requireEqual(
 {
 	if (expected != actual) {
 		std::cerr
-			<< test::RED
+			<< testing::RED
 			<< "[FAIL] "
 			<< testName
 			<< ": "
@@ -29,14 +29,14 @@ bool requireEqual(
 			<< "' but is '"
 			<< actual
 			<< "'"
-			<< test::RESET
+			<< testing::RESET
 			<< std::endl;
 
 		return false;
 	}
 
 	std::cout
-		<< test::GREEN
+		<< testing::GREEN
 		<< "[SUCCESS] "
 		<< testName
 		<< ": "
@@ -44,7 +44,7 @@ bool requireEqual(
 		<< " is '"
 		<< actual
 		<< "'"
-		<< test::RESET
+		<< testing::RESET
 		<< std::endl;
 
 	return true;
@@ -59,31 +59,31 @@ int main()
 			action();
 
 			std::cout
-				<< test::RED
+				<< testing::RED
 				<< "[FAIL] " << testName << " - expected std::invalid_argument but nothing was thrown"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (const std::invalid_argument&) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] " << testName << " passed!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (const std::exception& ex) {
 			std::cout
-				<< test::RED
+				<< testing::RED
 				<< "[FAIL] " << testName << " - expected std::invalid_argument but got: "
 				<< ex.what()
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
 			std::cout
-				<< test::RED
+				<< testing::RED
 				<< "[FAIL] " << testName << " - expected std::invalid_argument but got unknown exception"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		};
@@ -93,24 +93,24 @@ int main()
 			action();
 
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] " << testName << " passed!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (const std::exception& ex) {
 			std::cout
-				<< test::RED
+				<< testing::RED
 				<< "[FAIL] " << testName << " - unexpected exception: "
 				<< ex.what()
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
 			std::cout
-				<< test::RED
+				<< testing::RED
 				<< "[FAIL] " << testName << " - unknown unexpected exception"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		};
@@ -192,9 +192,9 @@ int main()
 
 			if (nameOk && ageOk) {
 				std::cout
-					<< test::GREEN
+					<< testing::GREEN
 					<< "[SUCCESS] Multiple constrained route parameter extraction passed!"
-					<< test::RESET
+					<< testing::RESET
 					<< std::endl;
 			}
 			});
@@ -211,9 +211,9 @@ int main()
 				"route parameter 'slug'"
 			)) {
 				std::cout
-					<< test::GREEN
+					<< testing::GREEN
 					<< "[SUCCESS] Implicit string route parameter extraction passed!"
-					<< test::RESET
+					<< testing::RESET
 					<< std::endl;
 			}
 			});
@@ -230,9 +230,9 @@ int main()
 				"route parameter 'orderId'"
 			)) {
 				std::cout
-					<< test::GREEN
+					<< testing::GREEN
 					<< "[SUCCESS] Constrained int route parameter extraction passed!"
-					<< test::RESET
+					<< testing::RESET
 					<< std::endl;
 			}
 		});
@@ -241,17 +241,17 @@ int main()
 	expectNoThrow("Register static route competing with constrained param route", [&] {
 		app.get("/orders/latest", [](mach::Context&) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] Static route precedence over constrained parameter route passed!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 			});
 		});
 
 	std::cout
-		<< test::GREEN
+		<< testing::GREEN
 		<< "[SUCCESS] Route parameter registration torture tests completed!"
-		<< test::RESET
+		<< testing::RESET
 		<< std::endl;
 
 	std::cout

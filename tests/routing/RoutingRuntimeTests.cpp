@@ -8,7 +8,7 @@
 
 int main()
 {
-	auto builder = mach::AppBuilder("127.0.0.1", 3143, test::THREADS);
+	auto builder = mach::AppBuilder("127.0.0.1", 3143, testing::THREADS);
 	auto app = builder.build();
 
 	// -------------------------
@@ -88,9 +88,9 @@ int main()
 	}
 
 	std::cout
-		<< test::GREEN
+		<< testing::GREEN
 		<< "[INFO] Routing runtime test server running on http://127.0.0.1:3143"
-		<< test::RESET
+		<< testing::RESET
 		<< std::endl;
 
 	std::cout

@@ -10,14 +10,14 @@
 
 int main()
 {
-	auto app = mach::App("127.0.0.1", 3143, test::THREADS);
+	auto app = mach::App("127.0.0.1", 3143, testing::THREADS);
 
 	auto pass = [](std::string_view testName) {
 		std::cout
-			<< test::GREEN
+			<< testing::GREEN
 			<< "[SUCCESS] "
 			<< testName
-			<< test::RESET
+			<< testing::RESET
 			<< std::endl;
 		};
 
@@ -27,42 +27,42 @@ int main()
 			pass(testName);
 		}
 		catch (const std::exception& ex) {
-			test::fail(testName, ex.what());
+			testing::fail(testName, ex.what());
 		}
 		catch (...) {
-			test::fail(testName, "Unknown exception thrown");
+			testing::fail(testName, "Unknown exception thrown");
 		}
 		};
 
 	auto expectInvalidArgument = [&](std::string_view testName, auto&& action) {
 		try {
 			action();
-			test::fail(testName, "Expected std::invalid_argument but nothing was thrown");
+			testing::fail(testName, "Expected std::invalid_argument but nothing was thrown");
 		}
 		catch (const std::invalid_argument&) {
 			pass(testName);
 		}
 		catch (const std::exception& ex) {
-			test::fail(testName, std::string("Expected std::invalid_argument but got: ") + ex.what());
+			testing::fail(testName, std::string("Expected std::invalid_argument but got: ") + ex.what());
 		}
 		catch (...) {
-			test::fail(testName, "Expected std::invalid_argument but got unknown exception");
+			testing::fail(testName, "Expected std::invalid_argument but got unknown exception");
 		}
 		};
 
 	auto expectLogicError = [&](std::string_view testName, auto&& action) {
 		try {
 			action();
-			test::fail(testName, "Expected std::logic_error but nothing was thrown");
+			testing::fail(testName, "Expected std::logic_error but nothing was thrown");
 		}
 		catch (const std::logic_error&) {
 			pass(testName);
 		}
 		catch (const std::exception& ex) {
-			test::fail(testName, std::string("Expected std::logic_error but got: ") + ex.what());
+			testing::fail(testName, std::string("Expected std::logic_error but got: ") + ex.what());
 		}
 		catch (...) {
-			test::fail(testName, "Expected std::logic_error but got unknown exception");
+			testing::fail(testName, "Expected std::logic_error but got unknown exception");
 		}
 		};
 

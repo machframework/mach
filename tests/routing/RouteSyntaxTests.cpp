@@ -6,7 +6,7 @@
 #include "Testing.hpp"
 
 int main() {
-	auto app = mach::App("127.0.0.1", 3143, test::THREADS);
+	auto app = mach::App("127.0.0.1", 3143, testing::THREADS);
 
 	// -------------------------
 	// Missing leading '/'
@@ -23,13 +23,13 @@ int main() {
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown! Missing leading / tests passed!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 	}
@@ -49,13 +49,13 @@ int main() {
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
@@ -66,13 +66,13 @@ int main() {
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
@@ -83,21 +83,21 @@ int main() {
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
 		std::cout
-			<< test::GREEN
+			<< testing::GREEN
 			<< testName
 			<< " tests passed!"
-			<< test::RESET
+			<< testing::RESET
 			<< "\n";
 	}
 
@@ -116,13 +116,13 @@ int main() {
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
@@ -133,13 +133,13 @@ int main() {
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
@@ -150,13 +150,13 @@ int main() {
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
@@ -167,13 +167,13 @@ int main() {
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
@@ -184,21 +184,21 @@ int main() {
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
 		std::cout
-			<< test::GREEN
+			<< testing::GREEN
 			<< testName
 			<< " tests passed!"
-			<< test::RESET
+			<< testing::RESET
 			<< "\n";
 	}
 
@@ -217,13 +217,13 @@ int main() {
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
@@ -234,13 +234,13 @@ int main() {
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
@@ -251,21 +251,21 @@ int main() {
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
 		std::cout
-			<< test::GREEN
+			<< testing::GREEN
 			<< testName
 			<< " tests passed!"
-			<< test::RESET
+			<< testing::RESET
 			<< "\n";
 	}
 
@@ -284,13 +284,13 @@ int main() {
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown! Missing leading / tests passed!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
@@ -301,21 +301,21 @@ int main() {
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown! Missing leading / tests passed!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
 		std::cout
-			<< test::GREEN
+			<< testing::GREEN
 			<< testName
 			<< " tests passed!"
-			<< test::RESET
+			<< testing::RESET
 			<< "\n";
 	}
 
@@ -334,13 +334,13 @@ int main() {
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown! Missing leading / tests passed!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
@@ -351,29 +351,29 @@ int main() {
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown! Missing leading / tests passed!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
 		std::cout
-			<< test::GREEN
+			<< testing::GREEN
 			<< testName
 			<< " tests passed!"
-			<< test::RESET
+			<< testing::RESET
 			<< "\n";
 	}
 
 	std::cout
-		<< test::GREEN
+		<< testing::GREEN
 		<< "\nRoute syntax tests passed!"
-		<< test::RESET
+		<< testing::RESET
 		<< "\n";
 
 	return 0;
