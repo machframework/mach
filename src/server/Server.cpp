@@ -51,7 +51,7 @@ namespace mach::detail::server
 		net::signal_set signals(m_ioc, SIGINT, SIGTERM);
 		signals.async_wait([this](boost::system::error_code ec, int signal) {
 			if (!ec) {
-				m_ioc.stop();
+				stop();
 			}
 		});
 
@@ -101,5 +101,10 @@ namespace mach::detail::server
 		if (iocException) {
 			std::rethrow_exception(iocException);
 		}
+	}
+
+	void Server::stop() {
+		m_listener->stop();
+		m_ioc.stop();
 	}
 }

@@ -9,6 +9,15 @@
 
 #include "server/Server.hpp"
 
+namespace
+{
+	enum class AppState {
+		Ready,
+		Running,
+		Stopped
+	};
+}
+
 namespace mach
 {
 	class App::Impl {
@@ -30,10 +39,14 @@ namespace mach
 		void addControllerRoutes(std::vector<detail::routing::RouteEndpoint> routes);
 
 		int run();
+		void stop();
 
 	private:
 		detail::app::ServerOptions m_serverOptions;
+		AppState m_state = AppState::Ready;
 
+		std::mutex m_serverMutex;
+		std::unique_ptr<detail::server::Server> m_server;
 		detail::routing::Router m_router;
 		detail::di::Container m_container;
 		detail::middleware::MiddlewarePipeline m_middlewarePipeline;
@@ -55,6 +68,10 @@ namespace mach
 
 	int App::run() noexcept {
 		return m_impl->run();
+	}
+
+	void App::stop() {
+		m_impl->stop();
 	}
 
 	std::string App::host() const noexcept {
@@ -94,14 +111,32 @@ namespace mach
 		m_container.addSingletonInstance<detail::routing::Router>(std::move(m_router));
 
 		try {
-			auto server = std::make_unique<detail::server::Server>(
-				std::move(m_serverOptions),
-				std::move(m_router), //
-				std::move(m_container),
-				std::move(m_middlewarePipeline)
-			);
 
-			server->run();
+			{
+				std::lock_guard lock(m_serverMutex);
+
+				if (m_state != AppState::Ready) {
+					if (m_state == AppState::Running) {
+						throw std::logic_error("The application is already running");
+					}
+					else {
+						throw std::logic_error("The application has already run");
+					}
+				}
+
+				if (m_server) {
+					throw std::logic_error("The application is already running");
+				}
+
+				m_server = std::make_unique<detail::server::Server>(
+					std::move(m_serverOptions),
+					std::move(m_router), //
+					std::move(m_container),
+					std::move(m_middlewarePipeline)
+				);
+			}
+
+			m_server->run();
 		}
 		catch (const std::exception& ex) {
 			std::cout << "Mach error: " << ex.what() << std::endl;
@@ -109,6 +144,15 @@ namespace mach
 		}
 
 		return 0;
+	}
+
+	void App::Impl::stop() {
+		std::lock_guard lock(m_serverMutex);
+
+		if (m_server && m_state == AppState::Running) {
+			m_server->stop();
+			m_server.reset();
+		}
 	}
 
 	void App::Impl::addRoute(detail::routing::RouteEndpoint route) {

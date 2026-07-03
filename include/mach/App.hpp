@@ -213,6 +213,8 @@ namespace mach
 		[[nodiscard]]
 		int run() noexcept;
 
+		void stop();
+
 	private:
 	
 		App(

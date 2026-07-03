@@ -38,6 +38,7 @@ namespace mach::detail::server
 		std::size_t threadCount() const noexcept;
 
 		void run();
+		void stop();
 
 	private:
 		boost::asio::ip::tcp::endpoint m_endpoint;

@@ -81,6 +81,14 @@ namespace mach::detail::server
         co_await do_accept();
     }
 
+    void BeastListener::stop() {
+        boost::system::error_code ec;
+
+        // cancel pending async operations
+        m_acceptor.cancel(ec);
+        m_acceptor.close(ec);
+    }
+
     net::awaitable<void> BeastListener::do_accept()
     {
 		beast::error_code ec;
