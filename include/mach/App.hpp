@@ -83,7 +83,7 @@ namespace mach
 		 */
 		template <typename THandler>
 		requires detail::MinimalApiHandler<THandler>
-		void get(std::string_view pattern, THandler&& handler) {
+		void mapGet(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Get,
 				pattern,
@@ -105,7 +105,7 @@ namespace mach
 		 */
 		template <typename THandler>
 		requires detail::MinimalApiHandler<THandler>
-		void post(std::string_view pattern, THandler&& handler) {
+		void mapPost(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Post,
 				pattern,
@@ -127,7 +127,7 @@ namespace mach
 		 */
 		template <typename THandler>
 		requires detail::MinimalApiHandler<THandler>
-		void put(std::string_view pattern, THandler&& handler) {
+		void mapPut(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Put,
 				pattern,
@@ -149,7 +149,7 @@ namespace mach
 		 */
 		template <typename THandler>
 		requires detail::MinimalApiHandler<THandler>
-		void patch(std::string_view pattern, THandler&& handler) {
+		void mapPatch(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Patch,
 				pattern,
@@ -171,7 +171,7 @@ namespace mach
 		 */
 		template <typename THandler>
 		requires detail::MinimalApiHandler<THandler>
-		void del(std::string_view pattern, THandler&& handler) {
+		void mapDelete(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Delete,
 				pattern,

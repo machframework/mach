@@ -45,10 +45,10 @@ public:
         : m_requestIds(requestIds) {}
 
     static void configure(mach::ControllerBuilder<HomeController>& builder) {
-        builder.get("/controller/static", &HomeController::staticLookup);
-        builder.get("/controller/request-id", &HomeController::requestId);
-        builder.get("/controller/precedence/me", &HomeController::precedenceStatic);
-        builder.get("/controller/precedence/{name}", &HomeController::precedenceParam);
+        builder.mapGet("/controller/static", &HomeController::staticLookup);
+        builder.mapGet("/controller/request-id", &HomeController::requestId);
+        builder.mapGet("/controller/precedence/me", &HomeController::precedenceStatic);
+        builder.mapGet("/controller/precedence/{name}", &HomeController::precedenceParam);
     }
 
     mach::Reply<std::string> staticLookup() {
@@ -79,9 +79,9 @@ public:
         : m_users(users) {}
 
     static void configure(mach::ControllerBuilder<UsersController>& builder) {
-        builder.get("/{id}", &UsersController::getUser);
-        builder.get("/{userId}/posts/{postId}", &UsersController::getUserPost);
-        builder.get("/birth-year/{year:int}", &UsersController::birthYear);
+        builder.mapGet("/{id}", &UsersController::getUser);
+        builder.mapGet("/{userId}/posts/{postId}", &UsersController::getUserPost);
+        builder.mapGet("/birth-year/{year:int}", &UsersController::birthYear);
     }
 
     mach::Reply<std::string> getUser() {

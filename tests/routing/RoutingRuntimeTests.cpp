@@ -15,7 +15,7 @@ int main()
 	// Static route
 	// -------------------------
 	{
-		app.get("/runtime/static", [](mach::Context& context) {
+		app.mapGet("/runtime/static", [](mach::Context& context) {
 			context.response.body("static route reached");
 			});
 	}
@@ -24,11 +24,11 @@ int main()
 	// Static route beats parameter route
 	// -------------------------
 	{
-		app.get("/runtime/precedence/{id}", [](mach::Context& context) {
+		app.mapGet("/runtime/precedence/{id}", [](mach::Context& context) {
 			context.response.body("parameter route reached");
 			});
 
-		app.get("/runtime/precedence/me", [](mach::Context& context) {
+		app.mapGet("/runtime/precedence/me", [](mach::Context& context) {
 			context.response.body("static route reached");
 			});
 	}
@@ -37,7 +37,7 @@ int main()
 	// Parameter extraction
 	// -------------------------
 	{ // problematic for next one
-		app.get("/runtime/users/{id}", [](mach::Context& context) {
+		app.mapGet("/runtime/users/{id}", [](mach::Context& context) {
 			context.response.body(
 				"user id: " + std::string(context.request.routeParam("id"))
 			);
@@ -48,7 +48,7 @@ int main()
 	// Multiple parameter extraction
 	// -------------------------
 	{
-		app.get("/runtime/users/{userId}/posts/{postId}", [](mach::Context& context) {
+		app.mapGet("/runtime/users/{userId}/posts/{postId}", [](mach::Context& context) {
 			context.response.body(
 				"user id: 123 " +
 				std::string(context.request.routeParam("userId")) +
@@ -62,7 +62,7 @@ int main()
 	// Int constraint
 	// -------------------------
 	{
-		app.get("/runtime/orders/{id:int}", [](mach::Context& context) {
+		app.mapGet("/runtime/orders/{id:int}", [](mach::Context& context) {
 			context.response.body(
 				"order id: " + std::string(context.request.routeParam("id"))
 			);
@@ -73,7 +73,7 @@ int main()
 	// MethodNotAllowed route
 	// -------------------------
 	{
-		app.get("/runtime/get-only", [](mach::Context& context) {
+		app.mapGet("/runtime/get-only", [](mach::Context& context) {
 			context.response.body("GET route reached");
 			});
 	}
@@ -82,7 +82,7 @@ int main()
 	// POST route
 	// -------------------------
 	{
-		app.post("/runtime/post-route", [](mach::Context& context) {
+		app.mapPost("/runtime/post-route", [](mach::Context& context) {
 			context.response.body("POST route reached");
 			});
 	}

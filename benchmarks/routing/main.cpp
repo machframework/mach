@@ -11,31 +11,31 @@ int main() {
 	auto app = builder.build();
 
 	// root
-	app.get("/", [](mach::Context& context) {
+	app.mapGet("/", [](mach::Context& context) {
 		context.response.body("Ok root");
 	});
 
 	// static route lookup
-	app.get("/runtime/static", [](mach::Context& context) {
+	app.mapGet("/runtime/static", [](mach::Context& context) {
 		context.response.body("Ok static route");
 	});
 
 	// single parameter extraction
-	app.get("/runtime/users/{userId:int}", [](mach::Context& context) {
+	app.mapGet("/runtime/users/{userId:int}", [](mach::Context& context) {
 		context.response.body("Ok single param");
 	});
 
 	// multiple parameters
-	app.get("/runtime/users/{userName}/posts/{postId:int}", [](mach::Context& context) {
+	app.mapGet("/runtime/users/{userName}/posts/{postId:int}", [](mach::Context& context) {
 		context.response.body("Ok multiple params");
 	});
 
 	// static-vs-param precedence path
-	app.get("/runtime/precedence/me", [](mach::Context& context) {
+	app.mapGet("/runtime/precedence/me", [](mach::Context& context) {
 		context.response.body("Ok precedence");
 	});
 
-	app.get("/runtime/precedence/{userName}", [](mach::Context& context) {
+	app.mapGet("/runtime/precedence/{userName}", [](mach::Context& context) {
 		context.response.body("Reached when name isn't 'me'");
 	});
 

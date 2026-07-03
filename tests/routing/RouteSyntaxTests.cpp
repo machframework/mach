@@ -17,7 +17,7 @@ int main() {
 		std::cout << "TEST: " << testName << "\n";
 
 		try {
-			app.get("users/", [](mach::Context& context) {
+			app.mapGet("users/", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
@@ -43,7 +43,7 @@ int main() {
 		std::cout << "TEST: " << testName << "\n";
 
 		try {
-			app.get("/user#s", [](mach::Context& context) {
+			app.mapGet("/user#s", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
@@ -60,7 +60,7 @@ int main() {
 		}
 
 		try {
-			app.get("/use?rs", [](mach::Context& context) {
+			app.mapGet("/use?rs", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
@@ -77,7 +77,7 @@ int main() {
 		}
 
 		try {
-			app.get("/users#", [](mach::Context& context) {
+			app.mapGet("/users#", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
@@ -110,7 +110,7 @@ int main() {
 		std::cout << "TEST: " << testName << "\n";
 
 		try {
-			app.get("/{users", [](mach::Context& context) {
+			app.mapGet("/{users", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
@@ -127,7 +127,7 @@ int main() {
 		}
 
 		try {
-			app.get("/users}", [](mach::Context& context) {
+			app.mapGet("/users}", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
@@ -144,7 +144,7 @@ int main() {
 		}
 
 		try {
-			app.get("/{users}}", [](mach::Context& context) {
+			app.mapGet("/{users}}", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
@@ -161,7 +161,7 @@ int main() {
 		}
 
 		try {
-			app.get("/{users}{}", [](mach::Context& context) {
+			app.mapGet("/{users}{}", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
@@ -178,7 +178,7 @@ int main() {
 		}
 
 		try {
-			app.get("/{users}name", [](mach::Context& context) {
+			app.mapGet("/{users}name", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
@@ -211,7 +211,7 @@ int main() {
 		std::cout << "TEST: " << testName << "\n";
 
 		try {
-			app.get("/{}", [](mach::Context& context) {
+			app.mapGet("/{}", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
@@ -228,7 +228,7 @@ int main() {
 		}
 
 		try {
-			app.get("/{name:}", [](mach::Context& context) {
+			app.mapGet("/{name:}", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
@@ -245,7 +245,7 @@ int main() {
 		}
 
 		try {
-			app.get("/{:int}", [](mach::Context& context) {
+			app.mapGet("/{:int}", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
@@ -278,7 +278,7 @@ int main() {
 		std::cout << "TEST: " << testName << "\n";
 
 		try {
-			app.get("/{name}/{name}", [](mach::Context& context) {
+			app.mapGet("/{name}/{name}", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
@@ -295,7 +295,7 @@ int main() {
 		}
 
 		try {
-			app.get("/{name:int}/{name}", [](mach::Context& context) {
+			app.mapGet("/{name:int}/{name}", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
@@ -328,7 +328,7 @@ int main() {
 		std::cout << "TEST: " << testName << "\n";
 
 		try {
-			app.get("/{name:banana}", [](mach::Context& context) {
+			app.mapGet("/{name:banana}", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
@@ -345,7 +345,7 @@ int main() {
 		}
 
 		try {
-			app.get("/{name:integer}", [](mach::Context& context) {
+			app.mapGet("/{name:integer}", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}

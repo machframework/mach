@@ -25,7 +25,7 @@ int main() {
 
 	auto app = builder.build();
 
-	app.get("/test", [](mach::Context& context) {
+	app.mapGet("/test", [](mach::Context& context) {
 		std::cout << "Inside handler\n";
 		context.response.body("Reached");
 	});

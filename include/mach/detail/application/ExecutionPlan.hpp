@@ -9,8 +9,8 @@
 namespace mach::detail::application
 {
 	struct ExecutionPlan {
-		routing::RoutingStatus status;
-		routing::RouteEndpoint* endpoint;
+		routing::RoutingStatus status = routing::RoutingStatus::NotFound;
+		routing::RouteEndpoint* endpoint = nullptr;
 		std::unordered_map<std::string, std::string> params;
 
 		bool found() const noexcept {

@@ -111,7 +111,7 @@ public:
 	}
 
 	static void configure(mach::ControllerBuilder<UserController>& methods) {
-		methods.get("/{type:int}", &UserController::getByType);
+		methods.mapGet("/{type:int}", &UserController::getByType);
 	}
 
 private:

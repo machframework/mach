@@ -117,63 +117,63 @@ int main()
 
 	// Invalid constraint names
 	expectInvalidArgument("Reject unknown constraint type", [&] {
-		app.get("/users/{name:banana}", [](mach::Context&) {
+		app.mapGet("/users/{name:banana}", [](mach::Context&) {
 			std::cout << "Shouldn't be reached" << std::endl;
 			});
 		});
 
 	expectInvalidArgument("Reject empty constraint after colon", [&] {
-		app.get("/users/{name:}", [](mach::Context&) {
+		app.mapGet("/users/{name:}", [](mach::Context&) {
 			std::cout << "Shouldn't be reached" << std::endl;
 			});
 		});
 
 	expectInvalidArgument("Reject constraint with spaces", [&] {
-		app.get("/users/{name: int}", [](mach::Context&) {
+		app.mapGet("/users/{name: int}", [](mach::Context&) {
 			std::cout << "Shouldn't be reached" << std::endl;
 			});
 		});
 
 	expectInvalidArgument("Reject constraint with extra colon", [&] {
-		app.get("/users/{name:int:banana}", [](mach::Context&) {
+		app.mapGet("/users/{name:int:banana}", [](mach::Context&) {
 			std::cout << "Shouldn't be reached" << std::endl;
 			});
 		});
 
 	expectInvalidArgument("Reject constraint with weird characters", [&] {
-		app.get("/users/{name:i#nt}", [](mach::Context&) {
+		app.mapGet("/users/{name:i#nt}", [](mach::Context&) {
 			std::cout << "Shouldn't be reached" << std::endl;
 			});
 		});
 
 	// Malformed parameter syntax
 	expectInvalidArgument("Reject empty parameter name", [&] {
-		app.get("/users/{:int}", [](mach::Context&) {
+		app.mapGet("/users/{:int}", [](mach::Context&) {
 			std::cout << "Shouldn't be reached" << std::endl;
 			});
 		});
 
 	expectInvalidArgument("Reject duplicate parameter names", [&] {
-		app.get("/users/{id:int}/posts/{id:int}", [](mach::Context&) {
+		app.mapGet("/users/{id:int}/posts/{id:int}", [](mach::Context&) {
 			std::cout << "Shouldn't be reached" << std::endl;
 			});
 		});
 
 	expectInvalidArgument("Reject nested braces", [&] {
-		app.get("/users/{{id:int}}", [](mach::Context&) {
+		app.mapGet("/users/{{id:int}}", [](mach::Context&) {
 			std::cout << "Shouldn't be reached" << std::endl;
 			});
 		});
 
 	expectInvalidArgument("Reject mixed nested braces", [&] {
-		app.get("/users/{id:{int}}", [](mach::Context&) {
+		app.mapGet("/users/{id:{int}}", [](mach::Context&) {
 			std::cout << "Shouldn't be reached" << std::endl;
 			});
 		});
 
 	// Valid registrations
 	expectNoThrow("Register explicit string constraint", [&] {
-		app.get("/users/{name:string}/{age:int}", [](mach::Context& context) {
+		app.mapGet("/users/{name:string}/{age:int}", [](mach::Context& context) {
 			constexpr auto testName = "Extract multiple constrained route parameters";
 
 			bool nameOk = requireEqual(
@@ -201,7 +201,7 @@ int main()
 		});
 
 	expectNoThrow("Register implicit string parameter", [&] {
-		app.get("/posts/{slug}", [](mach::Context& context) {
+		app.mapGet("/posts/{slug}", [](mach::Context& context) {
 			constexpr auto testName = "Extract implicit string parameter";
 
 			if (requireEqual(
@@ -220,7 +220,7 @@ int main()
 		});
 
 	expectNoThrow("Register int-only route", [&] {
-		app.get("/orders/{orderId:int}", [](mach::Context& context) {
+		app.mapGet("/orders/{orderId:int}", [](mach::Context& context) {
 			constexpr auto testName = "Extract constrained int parameter";
 
 			if (requireEqual(
@@ -239,7 +239,7 @@ int main()
 	});
 
 	expectNoThrow("Register static route competing with constrained param route", [&] {
-		app.get("/orders/latest", [](mach::Context&) {
+		app.mapGet("/orders/latest", [](mach::Context&) {
 			std::cout
 				<< testing::GREEN
 				<< "[SUCCESS] Static route precedence over constrained parameter route passed!"
