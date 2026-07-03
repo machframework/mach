@@ -17,3 +17,8 @@ add_mach_bench(
     PipelineBenchmarks
     pipeline/main.cpp
 )
+
+target_include_directories(PipelineBenchmarks
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/src
+)

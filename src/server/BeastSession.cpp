@@ -38,7 +38,10 @@ namespace mach::detail::server
         m_runtime(runtime),
         m_requestAdapter(requestAdapter),
         m_responseAdapter(responseAdapter)
-    {}
+    {
+		s_aliveSessions++;
+        s_createdSessions++;
+    }
 
     // Start the asynchronous operation
     net::awaitable<void> BeastSession::run() {

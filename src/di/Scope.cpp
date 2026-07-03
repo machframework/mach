@@ -32,5 +32,8 @@ namespace mach::detail::di
 
 	Scope::Scope(Container& container) 
 		: m_container(container)
-	{ }
+	{ 
+		s_createdScopes++;
+		s_aliveScopes++;
+	}
 }

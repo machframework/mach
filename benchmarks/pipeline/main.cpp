@@ -1,11 +1,15 @@
+#include <iostream>
+#include <string>
+#include <string_view>
+#include <thread>
+
 #include <mach/AppBuilder.hpp>
 #include <mach/controllers/ControllerBase.hpp>
 #include <mach/controllers/ControllerBuilder.hpp>
 #include <mach/Context.hpp>
 #include <mach/results/Reply.hpp>
 
-#include <string>
-#include <string_view>
+#include "server/BeastSession.hpp"
 
 struct RequestIdService {
     std::string make() const {
@@ -124,7 +128,25 @@ int main() {
     app.mapController<HomeController>();
     app.mapController<UsersController>();
 
-    app.run();
+	std::jthread diagnosticThread([]() {
+		while (true) {
+			std::this_thread::sleep_for(std::chrono::seconds(5));
+            std::cout
+                << "\n===== Lifetime Diagnostics =====\n"
+                << "Scope\n"
+                << "  Alive:     " << mach::detail::di::Scope::aliveCount() << '\n'
+                << "  Created:   " << mach::detail::di::Scope::createdCount() << '\n'
+                << '\n'
+                << "Session\n"
+                << "  Alive:     " << mach::detail::server::BeastSession::aliveCount() << '\n'
+                << "  Created:   " << mach::detail::server::BeastSession::createdCount() << '\n'
+                << '\n'
+                << "Middleware Pipeline\n"
+                << "  Alive:     " << mach::detail::middleware::MiddlewarePipeline::aliveCount() << '\n'
+                << "  Created:   " << mach::detail::middleware::MiddlewarePipeline::createdCount() << '\n'
+                << "===============================\n";
+		}
+		});
 
-    return 0;
+    return app.run();
 }
