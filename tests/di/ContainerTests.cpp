@@ -268,7 +268,7 @@ static void runDiContainerTests() {
             auto& first = scope.resolve<Counter>();
             auto& second = scope.resolve<Counter>();
 
-            if (&first != &second) {
+            if (&first == &second) {
                 testing::fail(testName, "Transient service reused the same instance");
                 return;
             }

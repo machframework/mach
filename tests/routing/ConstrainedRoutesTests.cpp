@@ -1,4 +1,4 @@
-#include <mach/App.hpp>
+#include <mach/AppBuilder.hpp>
 #include <mach/Context.hpp>
 #include <mach/http/Method.hpp>
 
@@ -52,7 +52,7 @@ bool requireEqual(
 
 int main()
 {
-	auto app = mach::App("127.0.0.1", 3143, threads);
+	auto app = mach::AppBuilder(std::move(testing::serverOptions)).build();
 
 	auto expectInvalidArgument = [](std::string_view testName, auto&& action) {
 		try {

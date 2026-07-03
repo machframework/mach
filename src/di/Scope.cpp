@@ -23,6 +23,9 @@ namespace mach::detail::di
 		if (descriptor.lifetime == ServiceLifetime::Scoped) {
 			m_scopedInstances.emplace(descriptor.type, instance);
 		}
+		else {
+			m_transientInstances.push_back(instance);
+		}
 
 		return instance;
 	}

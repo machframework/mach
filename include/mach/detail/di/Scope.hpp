@@ -3,6 +3,7 @@
 #include <memory>
 #include <typeindex>
 #include <unordered_map>
+#include <vector>
 
 #include <mach/detail/di/ServiceDescriptor.hpp>
 
@@ -22,6 +23,8 @@ namespace mach::detail::di
 		std::shared_ptr<void> resolve(std::type_index type);
 
 		std::unordered_map<std::type_index, std::shared_ptr<void>> m_scopedInstances;
+		std::vector<std::shared_ptr<void>> m_transientInstances;
+
 		Container& m_container;
 
 		friend class Container;
