@@ -141,9 +141,13 @@ int main() {
                 << "  Alive:     " << mach::detail::server::BeastSession::aliveCount() << '\n'
                 << "  Created:   " << mach::detail::server::BeastSession::createdCount() << '\n'
                 << '\n'
-                << "Middleware Pipeline\n"
-                << "  Alive:     " << mach::detail::middleware::MiddlewarePipeline::aliveCount() << '\n'
-                << "  Created:   " << mach::detail::middleware::MiddlewarePipeline::createdCount() << '\n'
+                << "Request\n"
+                << "  Alive:     " << mach::Request::aliveCount() << '\n'
+                << "  Created:   " << mach::Request::createdCount() << '\n'
+                << '\n'
+                << "Response\n"
+                << "  Alive:     " << mach::Response::aliveCount() << '\n'
+                << "  Created:   " << mach::Response::createdCount() << '\n'
                 << "===============================\n";
 		}
 		});

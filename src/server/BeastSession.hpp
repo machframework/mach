@@ -101,7 +101,9 @@ namespace mach::detail::server
 
         auto context = m_requestAdapter.adapt(std::move(req));
      
+#ifndef NDEBUG
         Logger::info(std::format("Received request: {}", context.request.target()));
+#endif
 
         m_runtime.handle(context);
         

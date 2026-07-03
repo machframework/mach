@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -34,6 +35,19 @@ namespace mach
 	class Response {
 
 	public:
+
+		~Response() {
+			s_aliveResponses--;
+		}
+
+		static std::int64_t aliveCount() {
+			return s_aliveResponses.load();
+		}
+
+		static std::int64_t createdCount() {
+			return s_createdResponses.load();
+		}
+
 		/**
 		 * Returns the HTTP version used in the response (e.g. 1.0, 1.1, 2.0, 3.0).
 		 * NOTE: Mach currently supports HTTP/1.0 only
@@ -126,6 +140,9 @@ namespace mach
 		http::StatusCode m_status;
 		std::string m_body;
 		std::unordered_map<std::string, std::string> m_headers;
+
+		static inline std::atomic<std::int64_t> s_createdResponses = 0;
+		static inline std::atomic<std::int64_t> s_aliveResponses = 0;
 
 		friend class detail::http::adapter::BeastRequestAdapter;
 		friend class detail::http::adapter::BeastResponseAdapter;
