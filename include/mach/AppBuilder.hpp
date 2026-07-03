@@ -47,7 +47,7 @@ namespace mach
 
 		// testing 
 		AppBuilder(detail::app::ServerOptions options)
-			: m_serverOptions(std::move(options))
+			: AppBuilder(options.host, options.port, options.threads)
 		{ }
 		// testing
 

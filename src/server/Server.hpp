@@ -26,7 +26,6 @@ namespace mach::detail::server
 	public:
 		Server(
 			app::ServerOptions serverOptions,
-			routing::Router router,
 			di::Container container,
 			middleware::MiddlewarePipeline middlewarePipeline
 		);

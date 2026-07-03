@@ -16,14 +16,13 @@ namespace mach::detail::server
 {
 	Server::Server(
 		app::ServerOptions serverOptions,
-		routing::Router router,
 		di::Container container,
 		middleware::MiddlewarePipeline middlewarePipeline
 	)
 		: m_threadCount(serverOptions.threads),
 		m_endpoint(boost::asio::ip::make_address(serverOptions.host), static_cast<std::uint16_t>(serverOptions.port)),
 		m_ioc(static_cast<int>(serverOptions.threads)),
-		m_runtime(std::move(router), std::move(container), std::move(middlewarePipeline))
+		m_runtime(std::move(container), std::move(middlewarePipeline))
 	{}
 
 	std::string Server::host() const noexcept {

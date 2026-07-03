@@ -19,16 +19,13 @@ namespace mach::detail::application
 		Runtime& operator=(Runtime&&) = delete;
 
 		Runtime(
-			routing::Router router,
 			di::Container container,
 			middleware::MiddlewarePipeline middlewarePipeline
 		);
 
 		void handle(mach::Context& context);
-		void addRoute(routing::RouteEndpoint&& endpoint);
 
 	private:
-		routing::Router m_router;
 		di::Container m_container;
 		dispatching::Dispatcher m_dispatcher;
 	};
