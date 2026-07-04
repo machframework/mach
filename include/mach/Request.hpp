@@ -1,6 +1,5 @@
 #pragma once
 
-#include <atomic>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -46,28 +45,6 @@ namespace mach
 	class Request {
 
 	public:
-
-		Request(const Request&) {
-			++s_aliveRequests;
-			++s_createdRequests;
-		}
-
-		Request(Request&&) noexcept {
-			++s_aliveRequests;
-			++s_createdRequests;
-		}
-
-		~Request() {
-			s_aliveRequests--;
-		}
-
-		static std::int64_t aliveCount() {
-			return s_aliveRequests.load();
-		}
-
-		static std::int64_t createdCount() {
-			return s_createdRequests.load();
-		}
 
 		/**
 		 * Returns the HTTP method used in the request (e.g. GET, POST, PUT).
@@ -168,8 +145,5 @@ namespace mach
 		friend class detail::http::adapter::BeastRequestAdapter;
 		friend class detail::application::Runtime;
 		friend class detail::routing::RoutingMiddleware;
-
-		static inline std::atomic<std::int64_t> s_createdRequests = 0;
-		static inline std::atomic<std::int64_t> s_aliveRequests = 0;
 	};
 }

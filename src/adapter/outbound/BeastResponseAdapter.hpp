@@ -18,6 +18,6 @@ namespace mach::detail::http::adapter
 		beast::http::response<beast::http::string_body> adapt(mach::Context&& context);
 
 	private:
-		unsigned int fromMachVersion(mach::http::Version version);
+		static unsigned int fromMachVersion(mach::http::Version version);
 	};
 }

@@ -10,6 +10,9 @@ from datetime import date, datetime
 
 # ---------------- CONFIG ----------------
 
+#env = os.environ.copy()
+#env["MALLOC_ARENA_MAX"] = "2"
+
 ROOT = Path(__file__).resolve().parents[2]
 
 BASE_URL = "http://127.0.0.1:3143"
@@ -57,9 +60,7 @@ def start_server():
     print("[INFO] Starting stability benchmark server...")
 
     return subprocess.Popen(
-        [str(SERVER_BIN)],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
+        [str(SERVER_BIN)]
     )
 
 

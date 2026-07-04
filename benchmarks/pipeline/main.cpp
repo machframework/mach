@@ -141,16 +141,10 @@ int main() {
                 << "  Alive:     " << mach::detail::server::BeastSession::aliveCount() << '\n'
                 << "  Created:   " << mach::detail::server::BeastSession::createdCount() << '\n'
                 << '\n'
-                << "Request\n"
-                << "  Alive:     " << mach::Request::aliveCount() << '\n'
-                << "  Created:   " << mach::Request::createdCount() << '\n'
-                << '\n'
-                << "Response\n"
-                << "  Alive:     " << mach::Response::aliveCount() << '\n'
-                << "  Created:   " << mach::Response::createdCount() << '\n'
                 << "===============================\n";
 		}
 		});
 
+    std::cout << "=== DIRECT BEAST RESPONSE BUILD 123 ===\n";
     return app.run();
 }

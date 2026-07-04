@@ -89,45 +89,40 @@ namespace mach::detail::server
         m_acceptor.close(ec);
     }
 
-    net::awaitable<void> BeastListener::do_accept()
-    {
-		beast::error_code ec;
+    net::awaitable<void> BeastListener::do_accept() {
+        while (true) {
+            beast::error_code ec;
 
-        // The new connection gets its own strand
-        tcp::socket socket = co_await m_acceptor.async_accept(
-            net::make_strand(m_ioc), net::redirect_error(net::use_awaitable, ec)
-        );
+            tcp::socket socket = co_await m_acceptor.async_accept(
+                net::make_strand(m_ioc),
+                net::redirect_error(net::use_awaitable, ec)
+            );
 
-        if (ec == net::error::operation_aborted) {
-            co_return; // acceptor closed
+            if (ec == net::error::operation_aborted) {
+                co_return;
+            }
+
+            if (ec) {
+                Logger::error("Failed to accept connection: " + ec.message());
+                continue;
+            }
+
+            auto executor = socket.get_executor();
+
+            auto session = std::make_shared<BeastSession>(
+                std::move(socket),
+                m_runtime,
+                m_requestAdapter,
+                m_responseAdapter
+            );
+
+            net::co_spawn(
+                executor,
+                [session]() -> net::awaitable<void> {
+                    co_await session->run();
+                }(),
+                net::detached
+            );
         }
-
-        if (ec) {
-            Logger::error("Failed to accept connection: " + ec.message());
-            co_await do_accept();
-            co_return;
-        } 
-
-		auto& executor = socket.get_executor();
-
-        // Create the session and run it
-        auto session = std::make_shared<BeastSession>(
-            std::move(socket),
-            m_runtime,
-            m_requestAdapter,
-            m_responseAdapter
-        );
-
-        net::co_spawn(
-            executor,
-            [session]() -> net::awaitable<void>
-            {
-                co_await session->run();
-            }(),
-            net::detached
-        );
-
-        // Accept the next incoming connection
-        co_await do_accept();
     }
 }

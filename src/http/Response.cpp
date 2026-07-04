@@ -10,10 +10,7 @@ namespace mach
 	):
 		m_version(version),
 		m_status(status)
-	{
-		s_createdResponses++;
-		s_aliveResponses++;
-	}
+	{ }
 
 	http::Version Response::version() const noexcept
 	{

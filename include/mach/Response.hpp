@@ -1,6 +1,5 @@
 #pragma once
 
-#include <atomic>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -35,28 +34,6 @@ namespace mach
 	class Response {
 
 	public:
-
-		Response(const Response&) {
-			++s_aliveResponses;
-			++s_createdResponses;
-		}
-
-		Response(Response&&) noexcept {
-			++s_aliveResponses;
-			++s_createdResponses;
-		}
-
-		~Response() {
-			s_aliveResponses--;
-		}
-
-		static std::int64_t aliveCount() {
-			return s_aliveResponses.load();
-		}
-
-		static std::int64_t createdCount() {
-			return s_createdResponses.load();
-		}
 
 		/**
 		 * Returns the HTTP version used in the response (e.g. 1.0, 1.1, 2.0, 3.0).
@@ -141,8 +118,8 @@ namespace mach
 		void setHeader(std::string_view name, std::string_view value);
 
 	private:
-		Response(
-			http::Version version,
+		explicit Response(
+			http::Version version = http::Version::Http11,
 			http::StatusCode status = http::StatusCode::Ok
 		);
 
@@ -150,9 +127,6 @@ namespace mach
 		http::StatusCode m_status;
 		std::string m_body;
 		std::unordered_map<std::string, std::string> m_headers;
-
-		static inline std::atomic<std::int64_t> s_createdResponses = 0;
-		static inline std::atomic<std::int64_t> s_aliveResponses = 0;
 
 		friend class detail::http::adapter::BeastRequestAdapter;
 		friend class detail::http::adapter::BeastResponseAdapter;

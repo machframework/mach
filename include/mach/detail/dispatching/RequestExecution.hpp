@@ -4,7 +4,7 @@
 
 namespace mach
 {
-	class Context;
+	struct Context;
 }
 
 namespace mach::detail::dispatching

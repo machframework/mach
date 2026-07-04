@@ -19,7 +19,6 @@
 
 #include "application/Runtime.hpp"
 #include "adapter/inbound/BeastRequestAdapter.hpp"
-#include "adapter/outbound/BeastResponseAdapter.hpp"
 
 namespace mach::detail::server
 {

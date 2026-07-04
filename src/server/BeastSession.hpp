@@ -15,14 +15,11 @@
 #include <format>
 
 #include <boost/asio/awaitable.hpp>
-#include <boost/asio/dispatch.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/beast/core/tcp_stream.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
-#include <boost/beast/version.hpp>
 #include <boost/beast/core/flat_buffer.hpp>
-#include <boost/beast/http/string_body.hpp>
 #include <boost/beast/http/message.hpp>
 
 #include <mach/Context.hpp>
@@ -45,7 +42,6 @@ namespace mach::detail::server
     class BeastSession : public std::enable_shared_from_this<BeastSession> {
         beast::tcp_stream m_stream;
         beast::flat_buffer m_buffer;
-        http::request<http::string_body> m_req;
 
     public:
         BeastSession(
@@ -56,23 +52,23 @@ namespace mach::detail::server
         );
 
         ~BeastSession() {
-			s_aliveSessions--;
+			--s_aliveSessions;
         }
 
         static std::int64_t aliveCount() {
 			return s_aliveSessions.load();
         }
 
-		static std::int64_t createdCount() {
-			return s_createdSessions.load();
-		}
+	static std::int64_t createdCount() {
+		return s_createdSessions.load();
+	}
 
         // Start the asynchronous operation
         net::awaitable<void> run();
 
-        net::awaitable<void> do_read();
+        net::awaitable<bool> do_read();
 
-        net::awaitable<void> send_response(http::message_generator&& msg);
+        net::awaitable<bool> send_response(http::message_generator&& msg);
 
         void do_close();
 
@@ -90,26 +86,12 @@ namespace mach::detail::server
 
 		static inline std::atomic<std::int64_t> s_createdSessions = 0;
 		static inline std::atomic<std::int64_t> s_aliveSessions = 0;
-
-        std::atomic<std::int64_t> m_requestCount = 0;
     };
 
     template <typename Body, typename Allocator>
     http::message_generator BeastSession::handle_request(
-        http::request<Body, http::basic_fields<Allocator>>&& req) 
+        http::request<Body, http::basic_fields<Allocator>>&& req)
     {
-        ++m_requestCount;
-
-        if (m_requestCount % 100000 == 0) {
-            std::cout
-                << "[BeastSession] "
-                << "session=" << this
-                << " requests=" << m_requestCount
-                << " buffer_size=" << m_buffer.size()
-                << " buffer_capacity=" << m_buffer.capacity()
-                << '\n';
-        }
-
         bool keepAlive = req.keep_alive();
         auto version = req.version();
 
@@ -119,7 +101,7 @@ namespace mach::detail::server
         Logger::info(std::format("Received request: {}", context.request.target()));
 #endif
 
-        m_runtime.handle(context);
+        // m_runtime.handle(context);
         
         auto res = m_responseAdapter.adapt(std::move(context));
 
