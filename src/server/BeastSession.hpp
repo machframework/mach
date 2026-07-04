@@ -101,7 +101,7 @@ namespace mach::detail::server
         Logger::info(std::format("Received request: {}", context.request.target()));
 #endif
 
-        // m_runtime.handle(context);
+        m_runtime.handle(context);
         
         auto res = m_responseAdapter.adapt(std::move(context));
 
