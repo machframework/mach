@@ -117,10 +117,10 @@ namespace mach::detail::server
             );
 
             net::co_spawn(
-                executor,
+                m_ioc,
                 [session]() -> net::awaitable<void> {
                     co_await session->run();
-                }(),
+                },
                 net::detached
             );
         }

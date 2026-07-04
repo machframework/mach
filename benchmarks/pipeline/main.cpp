@@ -128,23 +128,22 @@ int main() {
     app.mapController<HomeController>();
     app.mapController<UsersController>();
 
-	std::jthread diagnosticThread([]() {
-		while (true) {
-			std::this_thread::sleep_for(std::chrono::seconds(5));
-            std::cout
-                << "\n===== Lifetime Diagnostics =====\n"
-                << "Scope\n"
-                << "  Alive:     " << mach::detail::di::Scope::aliveCount() << '\n'
-                << "  Created:   " << mach::detail::di::Scope::createdCount() << '\n'
-                << '\n'
-                << "Session\n"
-                << "  Alive:     " << mach::detail::server::BeastSession::aliveCount() << '\n'
-                << "  Created:   " << mach::detail::server::BeastSession::createdCount() << '\n'
-                << '\n'
-                << "===============================\n";
-		}
-		});
+	//std::jthread diagnosticThread([]() {
+	//	while (true) {
+	//		std::this_thread::sleep_for(std::chrono::seconds(5));
+ //           std::cout
+ //               << "\n===== Lifetime Diagnostics =====\n"
+ //               << "Scope\n"
+ //               << "  Alive:     " << mach::detail::di::Scope::aliveCount() << '\n'
+ //               << "  Created:   " << mach::detail::di::Scope::createdCount() << '\n'
+ //               << '\n'
+ //               << "Session\n"
+ //               << "  Alive:     " << mach::detail::server::BeastSession::aliveCount() << '\n'
+ //               << "  Created:   " << mach::detail::server::BeastSession::createdCount() << '\n'
+ //               << '\n'
+ //               << "===============================\n";
+	//	}
+	//	});
 
-    std::cout << "=== DIRECT BEAST RESPONSE BUILD 123 ===\n";
     return app.run();
 }

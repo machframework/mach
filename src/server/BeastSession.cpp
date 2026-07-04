@@ -52,7 +52,11 @@ namespace mach::detail::server
         );
 
         while (true) {
-            if (const bool keepAlive = co_await do_read(); !keepAlive) {
+            const bool keepAlive = co_await do_read();
+
+
+            if (!keepAlive) {
+                Logger::info("Session closing");
                 do_close();
                 co_return;
             }
@@ -63,7 +67,7 @@ namespace mach::detail::server
         // Make the request empty before reading,
         // otherwise the operation behavior is undefined.
 
-        http::request<http::string_body> req;
+        http::request<http::string_body> req = {};
 
         // Set the timeout.
         m_stream.expires_after(std::chrono::seconds(30));
@@ -87,11 +91,13 @@ namespace mach::detail::server
             ec == net::error::operation_aborted ||
             ec == beast::error::timeout)
         {
+            m_buffer.consume(m_buffer.size());
             co_return false;
         }
 
         if (ec) {
             Logger::error(std::format("Failed to read request: {}", ec.message()));
+            m_buffer.consume(m_buffer.size());
             co_return false;
         }
 
@@ -100,7 +106,7 @@ namespace mach::detail::server
     }
 
     net::awaitable<bool> BeastSession::send_response(http::message_generator&& msg) {
-        bool keep_alive = msg.keep_alive();
+        const bool keep_alive = msg.keep_alive();
 
         beast::error_code ec;
 
