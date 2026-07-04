@@ -47,6 +47,16 @@ namespace mach
 
 	public:
 
+		Request(const Request&) {
+			++s_aliveRequests;
+			++s_createdRequests;
+		}
+
+		Request(Request&&) noexcept {
+			++s_aliveRequests;
+			++s_createdRequests;
+		}
+
 		~Request() {
 			s_aliveRequests--;
 		}

@@ -36,6 +36,16 @@ namespace mach
 
 	public:
 
+		Response(const Response&) {
+			++s_aliveResponses;
+			++s_createdResponses;
+		}
+
+		Response(Response&&) noexcept {
+			++s_aliveResponses;
+			++s_createdResponses;
+		}
+
 		~Response() {
 			s_aliveResponses--;
 		}
