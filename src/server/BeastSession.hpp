@@ -90,12 +90,26 @@ namespace mach::detail::server
 
 		static inline std::atomic<std::int64_t> s_createdSessions = 0;
 		static inline std::atomic<std::int64_t> s_aliveSessions = 0;
+
+        std::atomic<std::int64_t> m_requestCount = 0;
     };
 
     template <typename Body, typename Allocator>
     http::message_generator BeastSession::handle_request(
         http::request<Body, http::basic_fields<Allocator>>&& req) 
     {
+        ++m_requestCount;
+
+        if (m_requestCount % 100000 == 0) {
+            std::cout
+                << "[BeastSession] "
+                << "session=" << this
+                << " requests=" << m_requestCount
+                << " buffer_size=" << m_buffer.size()
+                << " buffer_capacity=" << m_buffer.capacity()
+                << '\n';
+        }
+
         bool keepAlive = req.keep_alive();
         auto version = req.version();
 
