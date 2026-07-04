@@ -60,8 +60,10 @@ def start_server():
     print("[INFO] Starting stability benchmark server...")
 
     return subprocess.Popen(
-        [str(SERVER_BIN)]
-    )
+        [str(SERVER_BIN)],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+        )
 
 
 def wait_for_server():
