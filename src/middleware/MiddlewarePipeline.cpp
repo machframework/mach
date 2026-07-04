@@ -11,9 +11,9 @@ namespace mach::detail::middleware
 
 			current = [middleware, next = std::move(next)](
 				dispatching::RequestExecution& execution
-				) {
+				) mutable {
 					middleware->invoke(execution, next);
-			};
+				};
 		}
 
 		current(execution);

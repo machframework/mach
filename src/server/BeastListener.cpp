@@ -11,7 +11,9 @@
 
 #include "BeastListener.hpp"
 
+#include <format>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <utility>
 
@@ -46,28 +48,31 @@ namespace mach::detail::server
         m_acceptor.open(endpoint.protocol(), ec);
         if (ec) {
             Logger::error("Failed to open acceptor");
-            return;
+            throw std::runtime_error("Failed to open acceptor: " + ec.message());
         }
 
         // Allow address reuse
         m_acceptor.set_option(net::socket_base::reuse_address(true), ec);
         if (ec) {
-            Logger::error("Failed to set socket option");
-            return;
+            throw std::runtime_error(
+                "Failed to configure socket options: " + ec.message()
+            );
         }
 
         // Bind to the server address
         m_acceptor.bind(endpoint, ec);
         if (ec) {
-            Logger::error("Failed to bind acceptor");
-            return;
+            throw std::runtime_error(
+                std::format("Failed to bind to {}:{}: {}", endpoint.address().to_string(), endpoint.port(), ec.message())
+            );
         }
 
         // Start listening for connections
         m_acceptor.listen(net::socket_base::max_listen_connections, ec);
         if (ec) {
-            Logger::error("Failed to listen");
-            return;
+            throw std::runtime_error(
+                "Failed to start listening for incoming requests: " + ec.message()
+            );
         }
     }
 
@@ -76,40 +81,48 @@ namespace mach::detail::server
         co_await do_accept();
     }
 
-    net::awaitable<void> BeastListener::do_accept()
-    {
-		beast::error_code ec;
+    void BeastListener::stop() {
+        boost::system::error_code ec;
 
-        // The new connection gets its own strand
-        tcp::socket socket = co_await m_acceptor.async_accept(
-            net::make_strand(m_ioc), net::redirect_error(net::use_awaitable, ec)
-        );
+        // cancel pending async operations
+        m_acceptor.cancel(ec);
+        m_acceptor.close(ec);
+    }
 
-        if (ec) {
-            Logger::error("Failed to accept connection");
-            co_return; // To avoid infinite loop
-        } 
+    net::awaitable<void> BeastListener::do_accept() {
+        while (true) {
+            beast::error_code ec;
 
-		auto& executor = socket.get_executor();
+            tcp::socket socket = co_await m_acceptor.async_accept(
+                net::make_strand(m_ioc),
+                net::redirect_error(net::use_awaitable, ec)
+            );
 
-        // Create the session and run it
-        auto session = std::make_shared<BeastSession>(
-            std::move(socket),
-            m_runtime,
-            m_requestAdapter,
-            m_responseAdapter
-        );
+            if (ec == net::error::operation_aborted) {
+                co_return;
+            }
 
-        net::co_spawn(
-            executor,
-            [session]() -> net::awaitable<void>
-            {
-                co_await session->run();
-            }(),
-            net::detached
-        );
+            if (ec) {
+                Logger::error("Failed to accept connection: " + ec.message());
+                continue;
+            }
 
-        // Accept another connection in the same session
-        co_await do_accept();
+            auto executor = socket.get_executor();
+
+            auto session = std::make_shared<BeastSession>(
+                std::move(socket),
+                m_runtime,
+                m_requestAdapter,
+                m_responseAdapter
+            );
+
+            net::co_spawn(
+                m_ioc,
+                [session]() -> net::awaitable<void> {
+                    co_await session->run();
+                },
+                net::detached
+            );
+        }
     }
 }

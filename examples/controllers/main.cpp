@@ -37,8 +37,8 @@ public:
 	}
 
 	static void configure(mach::ControllerBuilder<HomeController>& routes) {
-		routes.get("/{birth:int}", &HomeController::calculateAge);
-		routes.get("/hi" ,& HomeController::sayHi);
+		routes.mapGet("/{birth:int}", &HomeController::calculateAge);
+		routes.mapGet("/hi" ,& HomeController::sayHi);
 	}
 };
 

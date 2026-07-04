@@ -34,6 +34,7 @@ namespace mach
 	class Response {
 
 	public:
+
 		/**
 		 * Returns the HTTP version used in the response (e.g. 1.0, 1.1, 2.0, 3.0).
 		 * NOTE: Mach currently supports HTTP/1.0 only
@@ -117,8 +118,8 @@ namespace mach
 		void setHeader(std::string_view name, std::string_view value);
 
 	private:
-		Response(
-			http::Version version,
+		explicit Response(
+			http::Version version = http::Version::Http11,
 			http::StatusCode status = http::StatusCode::Ok
 		);
 

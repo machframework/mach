@@ -1,11 +1,15 @@
+#include <iostream>
+#include <string>
+#include <string_view>
+#include <thread>
+
 #include <mach/AppBuilder.hpp>
 #include <mach/controllers/ControllerBase.hpp>
 #include <mach/controllers/ControllerBuilder.hpp>
 #include <mach/Context.hpp>
 #include <mach/results/Reply.hpp>
 
-#include <string>
-#include <string_view>
+#include "server/BeastSession.hpp"
 
 struct RequestIdService {
     std::string make() const {
@@ -45,10 +49,10 @@ public:
         : m_requestIds(requestIds) {}
 
     static void configure(mach::ControllerBuilder<HomeController>& builder) {
-        builder.get("/controller/static", &HomeController::staticLookup);
-        builder.get("/controller/request-id", &HomeController::requestId);
-        builder.get("/controller/precedence/me", &HomeController::precedenceStatic);
-        builder.get("/controller/precedence/{name}", &HomeController::precedenceParam);
+        builder.mapGet("/controller/static", &HomeController::staticLookup);
+        builder.mapGet("/controller/request-id", &HomeController::requestId);
+        builder.mapGet("/controller/precedence/me", &HomeController::precedenceStatic);
+        builder.mapGet("/controller/precedence/{name}", &HomeController::precedenceParam);
     }
 
     mach::Reply<std::string> staticLookup() {
@@ -79,9 +83,9 @@ public:
         : m_users(users) {}
 
     static void configure(mach::ControllerBuilder<UsersController>& builder) {
-        builder.get("/{id}", &UsersController::getUser);
-        builder.get("/{userId}/posts/{postId}", &UsersController::getUserPost);
-        builder.get("/birth-year/{year:int}", &UsersController::birthYear);
+        builder.mapGet("/{id}", &UsersController::getUser);
+        builder.mapGet("/{userId}/posts/{postId}", &UsersController::getUserPost);
+        builder.mapGet("/birth-year/{year:int}", &UsersController::birthYear);
     }
 
     mach::Reply<std::string> getUser() {
@@ -124,7 +128,22 @@ int main() {
     app.mapController<HomeController>();
     app.mapController<UsersController>();
 
-    app.run();
+	//std::jthread diagnosticThread([]() {
+	//	while (true) {
+	//		std::this_thread::sleep_for(std::chrono::seconds(5));
+ //           std::cout
+ //               << "\n===== Lifetime Diagnostics =====\n"
+ //               << "Scope\n"
+ //               << "  Alive:     " << mach::detail::di::Scope::aliveCount() << '\n'
+ //               << "  Created:   " << mach::detail::di::Scope::createdCount() << '\n'
+ //               << '\n'
+ //               << "Session\n"
+ //               << "  Alive:     " << mach::detail::server::BeastSession::aliveCount() << '\n'
+ //               << "  Created:   " << mach::detail::server::BeastSession::createdCount() << '\n'
+ //               << '\n'
+ //               << "===============================\n";
+	//	}
+	//	});
 
-    return 0;
+    return app.run();
 }

@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "routing/RouteTrie.hpp"
-#include "routing/RoutingStatus.hpp"
+#include <mach/detail/routing/RouteTrie.hpp>
+#include <mach/detail/routing/RoutingStatus.hpp>
 #include "Testing.hpp"
 
 void fail(
@@ -54,30 +54,30 @@ int main() {
 			{ "api", "v1", "users" },
 			&endpoint9);
 
-		std::cerr << test::RED
+		std::cerr << testing::RED
 			<< "[FAIL] Expected std::logic_error"
-			<< test::RESET
+			<< testing::RESET
 			<< std::endl;
 
 		return 1;
 	}
 	catch (const std::logic_error& e) {
-		std::cout << test::GREEN
+		std::cout << testing::GREEN
 			<< "[SUCCESS] Duplicate route insertion threw std::logic_error: "
 			<< e.what()
-			<< test::RESET
+			<< testing::RESET
 			<< std::endl;
 	}
 	catch (...) {
-		std::cerr << test::RED
+		std::cerr << testing::RED
 			<< "[FAIL] Wrong exception type thrown"
-			<< test::RESET
+			<< testing::RESET
 			<< std::endl;
 
 		return 1;
 	}
 
-	std::cout << test::GREEN << "[SUCCESS] Duplicate route tests passed!" << test::RESET << std::endl;
+	std::cout << testing::GREEN << "[SUCCESS] Duplicate route tests passed!" << testing::RESET << std::endl;
 
 	//t.debugDump();
 	//return 0;
@@ -205,7 +205,7 @@ int main() {
 		}
 	}
 
-	std::cout << test::GREEN << "[SUCCESS] Found route tests passed!" << test::RESET << std::endl;
+	std::cout << testing::GREEN << "[SUCCESS] Found route tests passed!" << testing::RESET << std::endl;
 
 	// -------------------------
 	// Not Found tests
@@ -279,7 +279,7 @@ int main() {
 		}
 	}
 
-	std::cout << test::GREEN << "[SUCCESS] Not Found tests passed!" << test::RESET << std::endl;
+	std::cout << testing::GREEN << "[SUCCESS] Not Found tests passed!" << testing::RESET << std::endl;
 
 	// -------------------------
 	// Method Not Allowed tests
@@ -353,9 +353,9 @@ int main() {
 		}
 	}
 
-	std::cout << test::GREEN << "[SUCCESS] Method Not Allowed tests passed!" << test::RESET << std::endl;
+	std::cout << testing::GREEN << "[SUCCESS] Method Not Allowed tests passed!" << testing::RESET << std::endl;
 
-	std::cout << test::GREEN << "[SUCCESS] All tests passed!" << test::RESET << std::endl;
+	std::cout << testing::GREEN << "[SUCCESS] All tests passed!" << testing::RESET << std::endl;
 	return 0;
 }
 
@@ -365,7 +365,7 @@ void fail(
 	mach::detail::routing::RoutingStatus actual)
 {
 	std::cerr
-		<< test::RED
+		<< testing::RED
 		<< "[FAIL] "
 		<< testName
 		<< ": status should've been '"
@@ -373,6 +373,6 @@ void fail(
 		<< "' but is '"
 		<< mach::detail::routing::toString(actual)
 		<< "'"
-		<< test::RESET
+		<< testing::RESET
 		<< std::endl;
 }

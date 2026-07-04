@@ -1,5 +1,6 @@
 #include <mach/App.hpp>
 
+#include <iostream>
 #include <string>
 #include <stdexcept>
 
@@ -7,6 +8,15 @@
 #include <mach/detail/dispatching/MinimalApiInvoker.hpp>
 
 #include "server/Server.hpp"
+
+namespace
+{
+	enum class AppState {
+		Ready,
+		Running,
+		Stopped
+	};
+}
 
 namespace mach
 {
@@ -28,11 +38,15 @@ namespace mach
 		void addRoute(detail::routing::RouteEndpoint route);
 		void addControllerRoutes(std::vector<detail::routing::RouteEndpoint> routes);
 
-		void run();
+		int run();
+		void stop();
 
 	private:
 		detail::app::ServerOptions m_serverOptions;
+		AppState m_state = AppState::Ready;
 
+		std::mutex m_serverMutex;
+		std::unique_ptr<detail::server::Server> m_server;
 		detail::routing::Router m_router;
 		detail::di::Container m_container;
 		detail::middleware::MiddlewarePipeline m_middlewarePipeline;
@@ -52,8 +66,12 @@ namespace mach
 
 	App::~App() = default;
 
-	void App::run() {
-		m_impl->run();
+	int App::run() noexcept {
+		return m_impl->run();
+	}
+
+	void App::stop() {
+		m_impl->stop();
 	}
 
 	std::string App::host() const noexcept {
@@ -88,18 +106,67 @@ namespace mach
 		m_middlewarePipeline(std::move(middlewarePipeline))
 	{ }
 
-	void App::Impl::run() {
+	int App::Impl::run() {
 		// add router to container
 		m_container.addSingletonInstance<detail::routing::Router>(std::move(m_router));
 
-		auto server = std::make_unique<detail::server::Server>(
-			std::move(m_serverOptions),
-			std::move(m_router), //
-			std::move(m_container),
-			std::move(m_middlewarePipeline)
-		);
+		try {
 
-		server->run();
+			detail::server::Server* server = nullptr;
+
+			{
+				std::lock_guard lock(m_serverMutex);
+
+				if (m_state != AppState::Ready) {
+					if (m_state == AppState::Running) {
+						throw std::logic_error("The application is already running");
+					}
+					else {
+						throw std::logic_error("The application has already run");
+					}
+				}
+
+				if (m_server) {
+					throw std::logic_error("The application is already running");
+				}
+
+				m_server = std::make_unique<detail::server::Server>(
+					std::move(m_serverOptions),
+					std::move(m_container),
+					std::move(m_middlewarePipeline)
+				);
+
+				server = m_server.get();
+			}
+
+			m_state = AppState::Running;
+			server->run();
+
+			{
+				std::lock_guard lock(m_serverMutex);
+				m_server.reset();
+			}
+
+			return 0;
+		}
+		catch (const std::exception& ex) {
+			std::cout << "Mach error: " << ex.what() << std::endl;
+			return 1;
+		}
+	}
+
+	void App::Impl::stop() {
+		detail::server::Server* server = nullptr;
+		
+		{
+			std::lock_guard lock(m_serverMutex);
+			server = m_server.get();
+		}
+
+		if (server && m_state == AppState::Running) {
+			server->stop();
+			m_state = AppState::Stopped;
+		}
 	}
 
 	void App::Impl::addRoute(detail::routing::RouteEndpoint route) {

@@ -1,12 +1,12 @@
 #include <stdexcept>
 
-#include <mach/App.hpp>
+#include <mach/AppBuilder.hpp>
 #include <mach/Context.hpp>
 
 #include "Testing.hpp"
 
 int main() {
-	auto app = mach::App("127.0.0.1", 3143, test::THREADS);
+	auto app = mach::AppBuilder(std::move(testing::serverOptions)).build();
 
 	// -------------------------
 	// Missing leading '/'
@@ -17,19 +17,19 @@ int main() {
 		std::cout << "TEST: " << testName << "\n";
 
 		try {
-			app.get("users/", [](mach::Context& context) {
+			app.mapGet("users/", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown! Missing leading / tests passed!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 	}
@@ -43,61 +43,61 @@ int main() {
 		std::cout << "TEST: " << testName << "\n";
 
 		try {
-			app.get("/user#s", [](mach::Context& context) {
+			app.mapGet("/user#s", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
 		try {
-			app.get("/use?rs", [](mach::Context& context) {
+			app.mapGet("/use?rs", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
 		try {
-			app.get("/users#", [](mach::Context& context) {
+			app.mapGet("/users#", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
 		std::cout
-			<< test::GREEN
+			<< testing::GREEN
 			<< testName
 			<< " tests passed!"
-			<< test::RESET
+			<< testing::RESET
 			<< "\n";
 	}
 
@@ -110,95 +110,95 @@ int main() {
 		std::cout << "TEST: " << testName << "\n";
 
 		try {
-			app.get("/{users", [](mach::Context& context) {
+			app.mapGet("/{users", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
 		try {
-			app.get("/users}", [](mach::Context& context) {
+			app.mapGet("/users}", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
 		try {
-			app.get("/{users}}", [](mach::Context& context) {
+			app.mapGet("/{users}}", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
 		try {
-			app.get("/{users}{}", [](mach::Context& context) {
+			app.mapGet("/{users}{}", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
 		try {
-			app.get("/{users}name", [](mach::Context& context) {
+			app.mapGet("/{users}name", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
 		std::cout
-			<< test::GREEN
+			<< testing::GREEN
 			<< testName
 			<< " tests passed!"
-			<< test::RESET
+			<< testing::RESET
 			<< "\n";
 	}
 
@@ -211,61 +211,61 @@ int main() {
 		std::cout << "TEST: " << testName << "\n";
 
 		try {
-			app.get("/{}", [](mach::Context& context) {
+			app.mapGet("/{}", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
 		try {
-			app.get("/{name:}", [](mach::Context& context) {
+			app.mapGet("/{name:}", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
 		try {
-			app.get("/{:int}", [](mach::Context& context) {
+			app.mapGet("/{:int}", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
 		std::cout
-			<< test::GREEN
+			<< testing::GREEN
 			<< testName
 			<< " tests passed!"
-			<< test::RESET
+			<< testing::RESET
 			<< "\n";
 	}
 
@@ -278,44 +278,44 @@ int main() {
 		std::cout << "TEST: " << testName << "\n";
 
 		try {
-			app.get("/{name}/{name}", [](mach::Context& context) {
+			app.mapGet("/{name}/{name}", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown! Missing leading / tests passed!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
 		try {
-			app.get("/{name:int}/{name}", [](mach::Context& context) {
+			app.mapGet("/{name:int}/{name}", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown! Missing leading / tests passed!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
 		std::cout
-			<< test::GREEN
+			<< testing::GREEN
 			<< testName
 			<< " tests passed!"
-			<< test::RESET
+			<< testing::RESET
 			<< "\n";
 	}
 
@@ -328,52 +328,52 @@ int main() {
 		std::cout << "TEST: " << testName << "\n";
 
 		try {
-			app.get("/{name:banana}", [](mach::Context& context) {
+			app.mapGet("/{name:banana}", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown! Missing leading / tests passed!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
 		try {
-			app.get("/{name:integer}", [](mach::Context& context) {
+			app.mapGet("/{name:integer}", [](mach::Context& context) {
 				// shouldn't be reached
 				});
 		}
 		catch (const std::invalid_argument& ex) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown! Missing leading / tests passed!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 
 		catch (...) {
-			test::fail(testName, "An unknown exception was thrown");
+			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
 
 		std::cout
-			<< test::GREEN
+			<< testing::GREEN
 			<< testName
 			<< " tests passed!"
-			<< test::RESET
+			<< testing::RESET
 			<< "\n";
 	}
 
 	std::cout
-		<< test::GREEN
+		<< testing::GREEN
 		<< "\nRoute syntax tests passed!"
-		<< test::RESET
+		<< testing::RESET
 		<< "\n";
 
 	return 0;

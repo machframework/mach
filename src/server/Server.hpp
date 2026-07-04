@@ -26,7 +26,6 @@ namespace mach::detail::server
 	public:
 		Server(
 			app::ServerOptions serverOptions,
-			routing::Router router,
 			di::Container container,
 			middleware::MiddlewarePipeline middlewarePipeline
 		);
@@ -38,6 +37,7 @@ namespace mach::detail::server
 		std::size_t threadCount() const noexcept;
 
 		void run();
+		void stop();
 
 	private:
 		boost::asio::ip::tcp::endpoint m_endpoint;

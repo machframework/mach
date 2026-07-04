@@ -20,7 +20,7 @@ namespace mach
 		m_target(std::move(target)),
 		m_body(std::move(body)),
 		m_headers(std::move(headers))
-	{}
+	{ }
 
 	http::Version Request::version() const noexcept
 	{

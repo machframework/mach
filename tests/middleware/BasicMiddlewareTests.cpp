@@ -113,7 +113,7 @@ public:
 	}
 
 	static void configure(mach::ControllerBuilder<UserController>& methods) {
-		methods.get("/{type:int}", &UserController::getByType);
+		methods.mapGet("/{type:int}", &UserController::getByType);
 	}
 
 private:
@@ -141,7 +141,7 @@ private:
 // middleware
 
 int main() {
-	auto builder = mach::AppBuilder(std::move(test::serverOptions));
+	auto builder = mach::AppBuilder(std::move(testing::serverOptions));
 
 	builder.addSingleton<Logger>();
 	builder.addScoped<Initiator>();
@@ -155,7 +155,5 @@ int main() {
 	auto app = builder.build();
 	app.mapController<UserController>();
 
-	app.run();
-
-	return 0;
+	return app.run();
 }

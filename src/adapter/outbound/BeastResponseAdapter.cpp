@@ -5,7 +5,9 @@ namespace mach::detail::http::adapter
 	beast::http::response<beast::http::string_body> BeastResponseAdapter::adapt(mach::Context&& context) {
 		beast::http::response<beast::http::string_body> res;
 
-		res.version(fromMachVersion(context.response.version()));
+		auto version = context.response.version();
+		auto beastVersion = fromMachVersion(version);
+		res.version(beastVersion);
 		res.result(static_cast<unsigned int>(context.response.status()));
 		res.body() = context.response.body();
 

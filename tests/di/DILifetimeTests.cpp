@@ -58,14 +58,14 @@ int main() {
 		auto& logger2 = s.resolve<Logger>();
 
 		if (&logger1 != &logger2) {
-			test::fail(testName, "Ojbects are supposed to be the same");
+			testing::fail(testName, "Ojbects are supposed to be the same");
 			return 1;
 		}
 
 		std::cout
-			<< test::GREEN
+			<< testing::GREEN
 			<< "[SUCCESS] " << testName << " passed!"
-			<< test::RESET
+			<< testing::RESET
 			<< std::endl;
 	}
 	
@@ -80,14 +80,14 @@ int main() {
 		auto& logger2 = s2.resolve<Logger>();
 
 		if (&logger1 == &logger2) {
-			test::fail(testName, "Objects were supposed to be different");
+			testing::fail(testName, "Objects were supposed to be different");
 			return 1;
 		}
 
 		std::cout
-			<< test::GREEN
+			<< testing::GREEN
 			<< "[SUCCESS] " << testName << " passed!"
-			<< test::RESET
+			<< testing::RESET
 			<< std::endl;
 	}
 
@@ -103,14 +103,14 @@ int main() {
 		auto& logger2 = s.resolve<Logger>();
 
 		if (&logger1 != &logger2) {
-			test::fail(testName, "Should've been the same object");
+			testing::fail(testName, "Should've been the same object");
 			return 1;
 		}
 
 		std::cout
-			<< test::GREEN
+			<< testing::GREEN
 			<< "[SUCCESS] " << testName << " passed!"
-			<< test::RESET
+			<< testing::RESET
 			<< std::endl;
 	}
 
@@ -128,14 +128,14 @@ int main() {
 		auto& logger2 = s2.resolve<Logger>();
 
 		if (&logger1 != &logger2) {
-			test::fail(testName, "Should've been the same object");
+			testing::fail(testName, "Should've been the same object");
 			return 1;
 		}
 
 		std::cout
-			<< test::GREEN
+			<< testing::GREEN
 			<< "[SUCCESS] " << testName << " passed!"
-			<< test::RESET
+			<< testing::RESET
 			<< std::endl;
 	}
 
@@ -152,14 +152,14 @@ int main() {
 		auto& logger2 = s.resolve<Logger>();
 
 		if (&logger1 == &logger2) {
-			test::fail(testName, "Should've been different objects");
+			testing::fail(testName, "Should've been different objects");
 			return 1;
 		}
 
 		std::cout
-			<< test::GREEN
+			<< testing::GREEN
 			<< "[SUCCESS] " << testName << " passed!"
-			<< test::RESET
+			<< testing::RESET
 			<< std::endl;
 	}
 
@@ -177,21 +177,21 @@ int main() {
 		auto& logger2 = s2.resolve<Logger>();
 
 		if (&logger1 == &logger2) {
-			test::fail(testName, "Should've been different objects");
+			testing::fail(testName, "Should've been different objects");
 			return 1;
 		}
 
 		std::cout
-			<< test::GREEN
+			<< testing::GREEN
 			<< "[SUCCESS] " << testName << " passed!"
-			<< test::RESET
+			<< testing::RESET
 			<< std::endl;
 	}
 	
 	std::cout
-		<< test::GREEN
+		<< testing::GREEN
 		<< "\n[SUCCESS] DI Lifetime tests passed!"
-		<< test::RESET
+		<< testing::RESET
 		<< std::endl;
 
 	return 0;

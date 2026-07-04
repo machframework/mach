@@ -15,11 +15,11 @@ int main() {
 		auto builder = mach::AppBuilder("127.0.0.1", 3143, threads);
 		auto app = builder.build();
 
-		app.get("/users/{name:string}", [](mach::Context& context) {
+		app.mapGet("/users/{name:string}", [](mach::Context& context) {
 			std::cout << "My name is " << context.request.routeParam("name") << std::endl;
 		});
 
-		app.get("/users/{name}/{age:int}", [](mach::Context& context) {
+		app.mapGet("/users/{name}/{age:int}", [](mach::Context& context) {
 			std::cout << "My name is: " << context.request.routeParam("name")
 				<< " and my age is: " << context.request.routeParam("age") << std::endl;
 		});

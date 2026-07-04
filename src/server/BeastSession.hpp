@@ -11,17 +11,15 @@
 
 #pragma once
 
+#include <atomic>
 #include <format>
 
 #include <boost/asio/awaitable.hpp>
-#include <boost/asio/dispatch.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/beast/core/tcp_stream.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
-#include <boost/beast/version.hpp>
 #include <boost/beast/core/flat_buffer.hpp>
-#include <boost/beast/http/string_body.hpp>
 #include <boost/beast/http/message.hpp>
 
 #include <mach/Context.hpp>
@@ -44,7 +42,6 @@ namespace mach::detail::server
     class BeastSession : public std::enable_shared_from_this<BeastSession> {
         beast::tcp_stream m_stream;
         beast::flat_buffer m_buffer;
-        http::request<http::string_body> m_req;
 
     public:
         BeastSession(
@@ -54,12 +51,24 @@ namespace mach::detail::server
             detail::http::adapter::BeastResponseAdapter& responseAdapter
         );
 
+        ~BeastSession() {
+			--s_aliveSessions;
+        }
+
+        static std::int64_t aliveCount() {
+			return s_aliveSessions.load();
+        }
+
+	static std::int64_t createdCount() {
+		return s_createdSessions.load();
+	}
+
         // Start the asynchronous operation
         net::awaitable<void> run();
 
-        net::awaitable<void> do_read();
+        net::awaitable<bool> do_read();
 
-        net::awaitable<void> send_response(http::message_generator&& msg);
+        net::awaitable<bool> send_response(http::message_generator&& msg);
 
         void do_close();
 
@@ -74,18 +83,23 @@ namespace mach::detail::server
         detail::application::Runtime& m_runtime;
         detail::http::adapter::BeastRequestAdapter& m_requestAdapter;
         detail::http::adapter::BeastResponseAdapter& m_responseAdapter;
+
+		static inline std::atomic<std::int64_t> s_createdSessions = 0;
+		static inline std::atomic<std::int64_t> s_aliveSessions = 0;
     };
 
     template <typename Body, typename Allocator>
     http::message_generator BeastSession::handle_request(
-        http::request<Body, http::basic_fields<Allocator>>&& req) 
+        http::request<Body, http::basic_fields<Allocator>>&& req)
     {
         bool keepAlive = req.keep_alive();
         auto version = req.version();
 
         auto context = m_requestAdapter.adapt(std::move(req));
      
+#ifndef NDEBUG
         Logger::info(std::format("Received request: {}", context.request.target()));
+#endif
 
         m_runtime.handle(context);
         

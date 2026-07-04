@@ -1,11 +1,14 @@
 #include "Server.hpp"
 
+#include <exception>
 #include <format>
+#include <mutex>
 #include <thread>
 #include <vector>
 
-#include <boost/asio/detached.hpp>
 #include <boost/asio/co_spawn.hpp>
+#include <boost/asio/detached.hpp>
+#include <boost/asio/signal_set.hpp>
 
 #include <mach/logging/Logging.hpp>
 
@@ -13,14 +16,13 @@ namespace mach::detail::server
 {
 	Server::Server(
 		app::ServerOptions serverOptions,
-		routing::Router router,
 		di::Container container,
 		middleware::MiddlewarePipeline middlewarePipeline
 	)
 		: m_threadCount(serverOptions.threads),
-		m_endpoint(boost::asio::ip::make_address(serverOptions.host), serverOptions.port),
+		m_endpoint(boost::asio::ip::make_address(serverOptions.host), static_cast<std::uint16_t>(serverOptions.port)),
 		m_ioc(static_cast<int>(serverOptions.threads)),
-		m_runtime(std::move(router), std::move(container), std::move(middlewarePipeline))
+		m_runtime(std::move(container), std::move(middlewarePipeline))
 	{}
 
 	std::string Server::host() const noexcept {
@@ -44,6 +46,14 @@ namespace mach::detail::server
 			m_responseAdapter
 		);
 
+		// configure signals
+		net::signal_set signals(m_ioc, SIGINT, SIGTERM);
+		signals.async_wait([this](boost::system::error_code ec, int signal) {
+			if (!ec) {
+				stop();
+			}
+		});
+
 		net::co_spawn(
 			m_ioc,
 			m_listener->run(),
@@ -56,23 +66,44 @@ namespace mach::detail::server
 
 		detail::logging::Logger::info(std::format("Starting Mach server on {}:{} with {} threads", host(), port(), m_threadCount));
 
-		for (int i = 0; i < m_threadCount - 1; ++i) {
-			threads.emplace_back(
-				[this]
-				{
-					m_ioc.run();
+		std::mutex exceptionMutex;
+		std::exception_ptr iocException = nullptr;
+
+		auto runIoContext = [&] {
+			try {
+				m_ioc.run();
+			}
+			catch (...) {
+				std::lock_guard lock(exceptionMutex);
+				if (!iocException) {
+					iocException = std::current_exception();
 				}
-			);
+
+				m_ioc.stop();
+			}
+		};
+
+		for (int i = 0; i < m_threadCount - 1; ++i) {
+			threads.emplace_back(runIoContext);
 		}
 
 		// Run main thread
-		m_ioc.run();
+		runIoContext();
 
-		// Join threadss
+		// Join threads
 		for (auto& thread : threads) {
 			if (thread.joinable()) {
 				thread.join();
 			}
 		}
+
+		if (iocException) {
+			std::rethrow_exception(iocException);
+		}
+	}
+
+	void Server::stop() {
+		m_listener->stop();
+		m_ioc.stop();
 	}
 }

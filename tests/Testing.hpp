@@ -5,7 +5,7 @@
 
 #include <mach/detail/app/ServerOptions.hpp>
 
-namespace test
+namespace testing
 {
     inline constexpr const char* GREEN = "\033[32m";
     inline constexpr const char* RED = "\033[31m";
@@ -21,20 +21,20 @@ namespace test
 
 	inline void fail(std::string_view testName, std::string_view message) {
 		std::cerr
-			<< test::RED
+			<< testing::RED
 			<< "[FAIL] "
 			<< testName
 			<< ": "
 			<< message
-			<< test::RESET
+			<< testing::RESET
 			<< std::endl;
 	}
 
 	inline void success(std::string_view testName) {
 		std::cout
-			<< test::GREEN
+			<< testing::GREEN
 			<< "[SUCCESS] " << testName << " passed!"
-			<< test::RESET
+			<< testing::RESET
 			<< std::endl;
 	}
 }

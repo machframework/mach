@@ -1,0 +1,85 @@
+,,,,,,,,,,,,,
+SESSION START,2026-07-03T17:08:45,87e3373,,,,,,,,,,,
+date,timestamp,test_set,phase,route_name,path,threads,connections,duration,rps,avg_latency_us,max_latency_us,requests,transfer_per_sec
+2026-07-03,2026-07-03T17:18:46,endurance_10m_500,steady,controller_static,/runtime/controller/static,16,500,10m,104123.38,20870,2000000,62486139,9.33MB
+,,,,,,,,,,,,,
+SESSION START,2026-07-03T17:24:05,87e3373,,,,,,,,,,,
+2026-07-03,2026-07-03T17:25:06,endurance_10m_500,steady,controller_static,/runtime/controller/static,16,500,1m,248637.21,,,,
+2026-07-03,2026-07-03T17:26:08,endurance_10m_1000,steady,controller_static,/runtime/controller/static,16,1000,1m,245919.3,,,,
+2026-07-03,2026-07-03T17:28:11,recovery_spike,spike_1,controller_static,/runtime/controller/static,16,2000,2m,239464.32,2170,285490,14942809,33.20MB
+2026-07-03,2026-07-03T17:30:16,recovery_spike,recovery_1,controller_static,/runtime/controller/static,16,100,2m,236351.92,5790,1030000,14779310,32.83MB
+2026-07-03,2026-07-03T17:32:21,recovery_spike,spike_2,controller_static,/runtime/controller/static,16,2000,2m,241824.8,10500,2000000,28759587,31.97MB
+2026-07-03,2026-07-03T17:34:26,recovery_spike,recovery_2,controller_static,/runtime/controller/static,16,100,2m,236048.45,404.68,21100,28385840,31.56MB
+2026-07-03,2026-07-03T17:35:34,endurance_10m_500,steady,controller_di_singleton,/runtime/controller/request-id,16,500,1m,248797.91,10220,2000000,29043036,32.29MB
+2026-07-03,2026-07-03T17:36:37,endurance_10m_1000,steady,controller_di_singleton,/runtime/controller/request-id,16,1000,1m,247880.19,405.4,32190,28349415,31.52MB
+2026-07-03,2026-07-03T17:38:39,recovery_spike,spike_1,controller_di_singleton,/runtime/controller/request-id,16,2000,2m,240559.13,2090,240600,14952802,30.61MB
+2026-07-03,2026-07-03T17:40:44,recovery_spike,recovery_1,controller_di_singleton,/runtime/controller/request-id,16,100,2m,236219.6,5550,988010,14897591,30.50MB
+2026-07-03,2026-07-03T17:42:50,recovery_spike,spike_2,controller_di_singleton,/runtime/controller/request-id,16,2000,2m,241959.41,10340,2000000,28875128,29.59MB
+2026-07-03,2026-07-03T17:44:55,recovery_spike,recovery_2,controller_di_singleton,/runtime/controller/request-id,16,100,2m,236232.38,404.64,14710,28369886,29.06MB
+2026-07-03,2026-07-03T17:46:03,endurance_10m_500,steady,controller_multiple_params,/runtime/users/asaf/posts/42,16,500,1m,246283.27,10230,2000000,29059237,29.77MB
+2026-07-03,2026-07-03T17:47:05,endurance_10m_1000,steady,controller_multiple_params,/runtime/users/asaf/posts/42,16,1000,1m,250111.37,404.37,7930,28371411,29.06MB
+2026-07-03,2026-07-03T17:49:08,recovery_spike,spike_1,controller_multiple_params,/runtime/users/asaf/posts/42,16,2000,2m,243441.08,2120,250820,14801610,30.30MB
+2026-07-03,2026-07-03T17:51:13,recovery_spike,recovery_1,controller_multiple_params,/runtime/users/asaf/posts/42,16,100,2m,240503.08,5670,1010000,15031749,30.77MB
+2026-07-03,2026-07-03T17:53:18,recovery_spike,spike_2,controller_multiple_params,/runtime/users/asaf/posts/42,16,2000,2m,245465.66,10380,2000000,29237149,29.95MB
+2026-07-03,2026-07-03T17:55:23,recovery_spike,recovery_2,controller_multiple_params,/runtime/users/asaf/posts/42,16,100,2m,240375.14,398.17,36540,28884324,29.59MB
+,,,,,,,,,,10160,2000000,29480353,30.20MB
+,,,,,,,,,,397.81,28890,28869051,29.57MB
+SESSION START,2026-07-04T16:34:44,758eb42,,,,,,,,,,,
+2026-07-04,2026-07-04T16:44:44,endurance_10m_500,steady,controller_static,/runtime/controller/static,16,500,10m,260881.77,,,,
+2026-07-04,2026-07-04T16:54:46,endurance_10m_1000,steady,controller_static,/runtime/controller/static,16,1000,10m,267874.1,1910,227030,156553145,34.83MB
+2026-07-04,2026-07-04T16:56:49,recovery_spike,spike_1,controller_static,/runtime/controller/static,16,2000,2m,262621.32,3870,986140,160751144,35.77MB
+2026-07-04,2026-07-04T16:58:54,recovery_spike,recovery_1,controller_static,/runtime/controller/static,16,100,2m,248059.51,4200,971970,31540857,35.06MB
+,,,,,,,,,,385.43,24320,29791959,33.12MB
+,,,,,,,,,,,,,
+SESSION START,2026-07-04T17:18:53,758eb42,,,,,,,,,,,
+2026-07-04,2026-07-04T17:28:54,endurance_10m_500,steady,controller_static,/runtime/controller/static,16,500,10m,262628.66,1900,289080,157603327,35.06MB
+2026-07-04,2026-07-04T17:38:56,endurance_10m_1000,steady,controller_static,/runtime/controller/static,16,1000,10m,261813.25,3930,939730,157114018,34.96MB
+2026-07-04,2026-07-04T17:40:58,recovery_spike,spike_1,controller_static,/runtime/controller/static,16,2000,2m,261374.61,9900,1990000,31390931,34.90MB
+2026-07-04,2026-07-04T17:43:03,recovery_spike,recovery_1,controller_static,/runtime/controller/static,16,100,2m,248138.53,384.9,6430,29801360,33.13MB
+2026-07-04,2026-07-04T17:45:08,recovery_spike,spike_2,controller_static,/runtime/controller/static,16,2000,2m,261392.3,9750,2000000,31393125,34.90MB
+2026-07-04,2026-07-04T17:47:14,recovery_spike,recovery_2,controller_static,/runtime/controller/static,16,100,2m,248160.52,384.87,6560,29804057,33.13MB
+2026-07-04,2026-07-04T17:57:21,endurance_10m_500,steady,controller_di_singleton,/runtime/controller/request-id,16,500,10m,262953.45,1900,251530,157798286,32.35MB
+2026-07-04,2026-07-04T18:07:23,endurance_10m_1000,steady,controller_di_singleton,/runtime/controller/request-id,16,1000,10m,263905.04,3900,937590,158369276,32.47MB
+2026-07-04,2026-07-04T18:09:25,recovery_spike,spike_1,controller_di_singleton,/runtime/controller/request-id,16,2000,2m,261677.07,9850,2000000,31427481,32.19MB
+2026-07-04,2026-07-04T18:11:30,recovery_spike,recovery_1,controller_di_singleton,/runtime/controller/request-id,16,100,2m,248312.46,384.65,6010,29822184,30.55MB
+2026-07-04,2026-07-04T18:13:36,recovery_spike,spike_2,controller_di_singleton,/runtime/controller/request-id,16,2000,2m,261535.92,9500,2000000,31388145,32.18MB
+2026-07-04,2026-07-04T18:15:41,recovery_spike,recovery_2,controller_di_singleton,/runtime/controller/request-id,16,100,2m,248260.39,384.77,8430,29816010,30.54MB
+2026-07-04,2026-07-04T18:25:48,endurance_10m_500,steady,controller_multiple_params,/runtime/users/asaf/posts/42,16,500,10m,259071.27,1930,257240,155468277,31.87MB
+2026-07-04,2026-07-04T18:35:50,endurance_10m_1000,steady,controller_multiple_params,/runtime/users/asaf/posts/42,16,1000,10m,268225.42,3830,917330,160962094,33.00MB
+2026-07-04,2026-07-04T18:37:53,recovery_spike,spike_1,controller_multiple_params,/runtime/users/asaf/posts/42,16,2000,2m,261405.81,9780,2000000,31394721,32.16MB
+2026-07-04,2026-07-04T18:39:58,recovery_spike,recovery_1,controller_multiple_params,/runtime/users/asaf/posts/42,16,100,2m,248155.08,384.84,6060,29803324,30.53MB
+2026-07-04,2026-07-04T18:42:03,recovery_spike,spike_2,controller_multiple_params,/runtime/users/asaf/posts/42,16,2000,2m,261250.79,9770,2000000,31376030,32.14MB
+2026-07-04,2026-07-04T18:44:08,recovery_spike,recovery_2,controller_multiple_params,/runtime/users/asaf/posts/42,16,100,2m,248017.82,385.11,6650,29786870,30.51MB
+,,,,,,,,,,,,,
+SESSION START,2026-07-04T21:36:50,3a4a2d1,debug,,,,,,,,,,
+2026-07-04,2026-07-04T21:37:20,asan_leak_smoke,steady,controller_static,/runtime/controller/static,16,200,30s,40474.29,5000,267590,1218259,5.40MB
+2026-07-04,2026-07-04T21:37:46,asan_leak_smoke,spike,controller_static,/runtime/controller/static,16,1000,20s,39361.13,32860,1990000,790888,5.26MB
+2026-07-04,2026-07-04T21:38:11,asan_leak_smoke,recovery,controller_static,/runtime/controller/static,16,100,20s,40736.25,2360,45710,818768,5.44MB
+2026-07-04,2026-07-04T21:38:48,asan_leak_smoke,steady,controller_di_singleton,/runtime/controller/request-id,16,200,30s,40845.79,4980,275390,1229415,5.03MB
+2026-07-04,2026-07-04T21:39:13,asan_leak_smoke,spike,controller_di_singleton,/runtime/controller/request-id,16,1000,20s,39810.44,32790,1990000,799996,4.90MB
+2026-07-04,2026-07-04T21:39:38,asan_leak_smoke,recovery,controller_di_singleton,/runtime/controller/request-id,16,100,20s,40989.38,2410,100640,823818,5.04MB
+2026-07-04,2026-07-04T21:40:16,asan_leak_smoke,steady,controller_multiple_params,/runtime/users/asaf/posts/42,16,200,30s,38198.92,5350,293910,1149595,4.70MB
+2026-07-04,2026-07-04T21:40:41,asan_leak_smoke,spike,controller_multiple_params,/runtime/users/asaf/posts/42,16,1000,20s,37231.29,33480,1990000,748206,4.58MB
+2026-07-04,2026-07-04T21:41:06,asan_leak_smoke,recovery,controller_multiple_params,/runtime/users/asaf/posts/42,16,100,20s,38335.89,2510,49150,770464,4.72MB
+,,,,,,,,,,,,,
+SESSION START,2026-07-04T21:51:51,3a4a2d1,,,,,,,,,,,
+2026-07-04,2026-07-04T21:52:21,asan_leak_smoke,steady,controller_static,/runtime/controller/static,16,200,30s,38533.31,5260,273560,1159758,5.14MB
+2026-07-04,2026-07-04T21:52:46,asan_leak_smoke,spike,controller_static,/runtime/controller/static,16,1000,20s,38709.4,32630,1990000,777827,5.17MB
+2026-07-04,2026-07-04T21:53:11,asan_leak_smoke,recovery,controller_static,/runtime/controller/static,16,100,20s,40191.27,2440,87830,807850,5.37MB
+2026-07-04,2026-07-04T21:53:49,asan_leak_smoke,steady,controller_di_singleton,/runtime/controller/request-id,16,200,30s,39957.22,4910,206240,1202684,4.92MB
+2026-07-04,2026-07-04T21:54:14,asan_leak_smoke,spike,controller_di_singleton,/runtime/controller/request-id,16,1000,20s,39304.22,33190,2000000,789689,4.84MB
+2026-07-04,2026-07-04T21:54:39,asan_leak_smoke,recovery,controller_di_singleton,/runtime/controller/request-id,16,100,20s,40460.68,2430,89290,813260,4.98MB
+2026-07-04,2026-07-04T21:55:16,asan_leak_smoke,steady,controller_multiple_params,/runtime/users/asaf/posts/42,16,200,30s,37211.49,5290,225830,1117374,4.58MB
+2026-07-04,2026-07-04T21:55:41,asan_leak_smoke,spike,controller_multiple_params,/runtime/users/asaf/posts/42,16,1000,20s,36601.37,33890,2000000,735491,4.50MB
+2026-07-04,2026-07-04T21:56:06,asan_leak_smoke,recovery,controller_multiple_params,/runtime/users/asaf/posts/42,16,100,20s,37718.29,2550,52280,758147,4.64MB
+,,,,,,,,,,,,,
+SESSION START,2026-07-04T21:59:53,3a4a2d1,,,,,,,,,,,
+2026-07-04,2026-07-04T22:00:23,asan_leak_smoke,steady,controller_static,/runtime/controller/static,16,200,30s,40155.6,4940,237430,1208621,5.36MB
+2026-07-04,2026-07-04T22:00:49,asan_leak_smoke,spike,controller_static,/runtime/controller/static,16,1000,20s,39108.25,32690,2000000,786102,5.22MB
+2026-07-04,2026-07-04T22:01:14,asan_leak_smoke,recovery,controller_static,/runtime/controller/static,16,100,20s,40291.44,2390,46990,809837,5.38MB
+2026-07-04,2026-07-04T22:01:51,asan_leak_smoke,steady,controller_di_singleton,/runtime/controller/request-id,16,200,30s,40765.77,4870,236570,1226981,5.02MB
+2026-07-04,2026-07-04T22:02:16,asan_leak_smoke,spike,controller_di_singleton,/runtime/controller/request-id,16,1000,20s,39615.8,32880,1990000,796239,4.87MB
+2026-07-04,2026-07-04T22:02:41,asan_leak_smoke,recovery,controller_di_singleton,/runtime/controller/request-id,16,100,20s,40806.17,2410,98350,820194,5.02MB
+2026-07-04,2026-07-04T22:03:18,asan_leak_smoke,steady,controller_multiple_params,/runtime/users/asaf/posts/42,16,200,30s,37841.27,5380,292170,1138935,4.66MB
+2026-07-04,2026-07-04T22:03:44,asan_leak_smoke,spike,controller_multiple_params,/runtime/users/asaf/posts/42,16,1000,20s,36938.84,34030,2000000,742443,4.54MB
+2026-07-04,2026-07-04T22:04:09,asan_leak_smoke,recovery,controller_multiple_params,/runtime/users/asaf/posts/42,16,100,20s,37882.42,2590,94630,761178,4.66MB

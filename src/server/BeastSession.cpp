@@ -11,19 +11,15 @@
 
 #include "BeastSession.hpp"
 
-//
-#include <iostream>
-//
-
 #include <chrono>
-#include <cstddef>
 #include <memory>
 #include <string>
 #include <utility>
 
 #include <boost/asio/redirect_error.hpp>
 #include <boost/asio/use_awaitable.hpp>
-#include <boost/core/ignore_unused.hpp>
+
+#include <boost/asio/dispatch.hpp>
 
 namespace mach::detail::server
 {
@@ -38,7 +34,10 @@ namespace mach::detail::server
         m_runtime(runtime),
         m_requestAdapter(requestAdapter),
         m_responseAdapter(responseAdapter)
-    {}
+    {
+		s_aliveSessions++;
+        s_createdSessions++;
+    }
 
     // Start the asynchronous operation
     net::awaitable<void> BeastSession::run() {
@@ -47,16 +46,28 @@ namespace mach::detail::server
         // for single-threaded contexts, this example code is written to be
         // thread-safe by default.
 
-        co_await net::dispatch(m_stream.get_executor(), net::use_awaitable);
-		co_await do_read();
+        co_await net::dispatch(
+            m_stream.get_executor(),
+            net::use_awaitable
+        );
 
-        co_return;
+        while (true) {
+            const bool keepAlive = co_await do_read();
+
+
+            if (!keepAlive) {
+                Logger::info("Session closing");
+                do_close();
+                co_return;
+            }
+        }
     }
 
-    net::awaitable<void> BeastSession::do_read() {
+    net::awaitable<bool> BeastSession::do_read() {
         // Make the request empty before reading,
         // otherwise the operation behavior is undefined.
-        m_req = {};
+
+        http::request<http::string_body> req = {};
 
         // Set the timeout.
         m_stream.expires_after(std::chrono::seconds(30));
@@ -67,33 +78,35 @@ namespace mach::detail::server
         co_await http::async_read(
             m_stream,
             m_buffer,
-            m_req,
+            req,
             net::redirect_error(net::use_awaitable, ec)
         );
 
         // This means they closed the connection
         if (ec == http::error::end_of_stream ||
+            ec == http::error::bad_method ||
             ec == net::error::eof ||
             ec == net::error::connection_reset ||
             ec == net::error::connection_aborted ||
+            ec == net::error::operation_aborted ||
             ec == beast::error::timeout)
         {
-            do_close();
-            co_return;
+            m_buffer.consume(m_buffer.size());
+            co_return false;
         }
 
         if (ec) {
             Logger::error(std::format("Failed to read request: {}", ec.message()));
-			Logger::error(std::format("Method was '{}', target was '{}'", std::string( m_req.method_string()), std::string( m_req.target())));
-            co_return;
+            m_buffer.consume(m_buffer.size());
+            co_return false;
         }
 
         // Send the response
-        co_await send_response(handle_request(std::move(m_req)));
+        co_return co_await send_response(handle_request(std::move(req)));
     }
 
-    net::awaitable<void> BeastSession::send_response(http::message_generator&& msg) {
-        bool keep_alive = msg.keep_alive();
+    net::awaitable<bool> BeastSession::send_response(http::message_generator&& msg) {
+        const bool keep_alive = msg.keep_alive();
 
         beast::error_code ec;
 
@@ -106,18 +119,10 @@ namespace mach::detail::server
 
         if (ec) {
             Logger::error(std::format("Failed to write response: {}", ec.message()));
-            co_return;
+            co_return false;
         }
 
-        if (!keep_alive) {
-            // This means we should close the connection, usually because
-            // the response indicated the "Connection: close" semantic.
-            do_close();
-            co_return;
-        }
-
-        // Read another request
-        co_await do_read();
+        co_return keep_alive;
     }
 
     void BeastSession::do_close() {

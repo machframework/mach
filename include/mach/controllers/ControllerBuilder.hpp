@@ -25,34 +25,34 @@ namespace mach
         ControllerBuilder& operator=(ControllerBuilder&&) = delete;
 
         template <typename THandler>
-        ControllerBuilder<TController>& get(std::string_view pattern, THandler&& handler);
+        ControllerBuilder<TController>& mapGet(std::string_view pattern, THandler&& handler);
 
         template <typename THandler>
-        ControllerBuilder<TController>& get(THandler&& handler);
+        ControllerBuilder<TController>& mapGet(THandler&& handler);
 
         template <typename THandler>
-        ControllerBuilder<TController>& post(std::string_view pattern, THandler&& handler);
+        ControllerBuilder<TController>& mapPost(std::string_view pattern, THandler&& handler);
 
         template <typename THandler>
-        ControllerBuilder<TController>& post(THandler&& handler);
+        ControllerBuilder<TController>& mapPost(THandler&& handler);
 
         template <typename THandler>
-        ControllerBuilder<TController>& put(std::string_view pattern, THandler&& handler);
+        ControllerBuilder<TController>& mapPut(std::string_view pattern, THandler&& handler);
 
         template <typename THandler>
-        ControllerBuilder<TController>& put(THandler&& handler);
+        ControllerBuilder<TController>& mapPut(THandler&& handler);
 
         template <typename THandler>
-        ControllerBuilder<TController>& patch(std::string_view pattern, THandler&& handler);
+        ControllerBuilder<TController>& mapPatch(std::string_view pattern, THandler&& handler);
 
         template <typename THandler>
-        ControllerBuilder<TController>& patch(THandler&& handler);
+        ControllerBuilder<TController>& mapPatch(THandler&& handler);
 
         template <typename THandler>
-        ControllerBuilder<TController>& del(std::string_view pattern, THandler&& handler);
+        ControllerBuilder<TController>& mapDelete(std::string_view pattern, THandler&& handler);
 
         template <typename THandler>
-        ControllerBuilder<TController>& del(THandler&& handler);
+        ControllerBuilder<TController>& mapDelete(THandler&& handler);
 
     private:
         explicit ControllerBuilder();
@@ -80,7 +80,7 @@ namespace mach
 
     template <typename TController>
     template <typename THandler>
-    ControllerBuilder<TController>& ControllerBuilder<TController>::get(
+    ControllerBuilder<TController>& ControllerBuilder<TController>::mapGet(
         std::string_view pattern,
         THandler&& handler)
     {
@@ -94,14 +94,14 @@ namespace mach
 
     template <typename TController>
     template <typename THandler>
-    ControllerBuilder<TController>& ControllerBuilder<TController>::get(THandler&& handler)
+    ControllerBuilder<TController>& ControllerBuilder<TController>::mapGet(THandler&& handler)
     {
-        return get<THandler>("", std::forward<THandler>(handler));
+        return mapGet<THandler>("", std::forward<THandler>(handler));
     }
 
     template <typename TController>
     template <typename THandler>
-    ControllerBuilder<TController>& ControllerBuilder<TController>::post(
+    ControllerBuilder<TController>& ControllerBuilder<TController>::mapPost(
         std::string_view pattern,
         THandler&& handler)
     {
@@ -115,14 +115,14 @@ namespace mach
 
     template <typename TController>
     template <typename THandler>
-    ControllerBuilder<TController>& ControllerBuilder<TController>::post(THandler&& handler)
+    ControllerBuilder<TController>& ControllerBuilder<TController>::mapPost(THandler&& handler)
     {
-        return post<THandler>("", std::forward<THandler>(handler));
+        return mapPost<THandler>("", std::forward<THandler>(handler));
     }
 
     template <typename TController>
     template <typename THandler>
-    ControllerBuilder<TController>& ControllerBuilder<TController>::put(
+    ControllerBuilder<TController>& ControllerBuilder<TController>::mapPut(
         std::string_view pattern,
         THandler&& handler)
     {
@@ -136,14 +136,14 @@ namespace mach
 
     template <typename TController>
     template <typename THandler>
-    ControllerBuilder<TController>& ControllerBuilder<TController>::put(THandler&& handler)
+    ControllerBuilder<TController>& ControllerBuilder<TController>::mapPut(THandler&& handler)
     {
-        return put<THandler>("", std::forward<THandler>(handler));
+        return mapPut<THandler>("", std::forward<THandler>(handler));
     }
 
     template <typename TController>
     template <typename THandler>
-    ControllerBuilder<TController>& ControllerBuilder<TController>::patch(
+    ControllerBuilder<TController>& ControllerBuilder<TController>::mapPatch(
         std::string_view pattern,
         THandler&& handler)
     {
@@ -157,14 +157,14 @@ namespace mach
 
     template <typename TController>
     template <typename THandler>
-    ControllerBuilder<TController>& ControllerBuilder<TController>::patch(THandler&& handler)
+    ControllerBuilder<TController>& ControllerBuilder<TController>::mapPatch(THandler&& handler)
     {
-        return patch<THandler>("", std::forward<THandler>(handler));
+        return mapPatch<THandler>("", std::forward<THandler>(handler));
     }
 
     template <typename TController>
     template <typename THandler>
-    ControllerBuilder<TController>& ControllerBuilder<TController>::del(
+    ControllerBuilder<TController>& ControllerBuilder<TController>::mapDelete(
         std::string_view pattern,
         THandler&& handler)
     {
@@ -178,9 +178,9 @@ namespace mach
 
     template <typename TController>
     template <typename THandler>
-    ControllerBuilder<TController>& ControllerBuilder<TController>::del(THandler&& handler)
+    ControllerBuilder<TController>& ControllerBuilder<TController>::mapDelete(THandler&& handler)
     {
-        return del<THandler>("", std::forward<THandler>(handler));
+        return mapDelete<THandler>("", std::forward<THandler>(handler));
     }
 
     template <typename TController>

@@ -19,7 +19,6 @@
 
 #include "application/Runtime.hpp"
 #include "adapter/inbound/BeastRequestAdapter.hpp"
-#include "adapter/outbound/BeastResponseAdapter.hpp"
 
 namespace mach::detail::server
 {
@@ -45,6 +44,7 @@ namespace mach::detail::server
 
         // Start accepting incoming connections
         net::awaitable<void> run();
+        void stop();
 
     private:
         net::awaitable<void> do_accept();

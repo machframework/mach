@@ -83,7 +83,7 @@ namespace mach
 		 */
 		template <typename THandler>
 		requires detail::MinimalApiHandler<THandler>
-		void get(std::string_view pattern, THandler&& handler) {
+		void mapGet(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Get,
 				pattern,
@@ -105,7 +105,7 @@ namespace mach
 		 */
 		template <typename THandler>
 		requires detail::MinimalApiHandler<THandler>
-		void post(std::string_view pattern, THandler&& handler) {
+		void mapPost(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Post,
 				pattern,
@@ -127,7 +127,7 @@ namespace mach
 		 */
 		template <typename THandler>
 		requires detail::MinimalApiHandler<THandler>
-		void put(std::string_view pattern, THandler&& handler) {
+		void mapPut(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Put,
 				pattern,
@@ -149,7 +149,7 @@ namespace mach
 		 */
 		template <typename THandler>
 		requires detail::MinimalApiHandler<THandler>
-		void patch(std::string_view pattern, THandler&& handler) {
+		void mapPatch(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Patch,
 				pattern,
@@ -171,7 +171,7 @@ namespace mach
 		 */
 		template <typename THandler>
 		requires detail::MinimalApiHandler<THandler>
-		void del(std::string_view pattern, THandler&& handler) {
+		void mapDelete(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Delete,
 				pattern,
@@ -202,11 +202,18 @@ namespace mach
 		/**
 		 * Starts the application and begins accepting incoming HTTP requests.
 		 *
+		 * @return Exit status code. Returns 0 on successful shutdown, or a non-zero
+		 *         value if the application failed to start or encountered a fatal
+		 *         startup error.
+		 * 
 		 * This function blocks the calling thread until the application stops.
 		 *
 		 * @thread_safety This function is not thread-safe.
 		 */
-		void run();
+		[[nodiscard]]
+		int run() noexcept;
+
+		void stop();
 
 	private:
 	

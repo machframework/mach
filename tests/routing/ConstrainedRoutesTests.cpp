@@ -1,4 +1,4 @@
-#include <mach/App.hpp>
+#include <mach/AppBuilder.hpp>
 #include <mach/Context.hpp>
 #include <mach/http/Method.hpp>
 
@@ -19,7 +19,7 @@ bool requireEqual(
 {
 	if (expected != actual) {
 		std::cerr
-			<< test::RED
+			<< testing::RED
 			<< "[FAIL] "
 			<< testName
 			<< ": "
@@ -29,14 +29,14 @@ bool requireEqual(
 			<< "' but is '"
 			<< actual
 			<< "'"
-			<< test::RESET
+			<< testing::RESET
 			<< std::endl;
 
 		return false;
 	}
 
 	std::cout
-		<< test::GREEN
+		<< testing::GREEN
 		<< "[SUCCESS] "
 		<< testName
 		<< ": "
@@ -44,7 +44,7 @@ bool requireEqual(
 		<< " is '"
 		<< actual
 		<< "'"
-		<< test::RESET
+		<< testing::RESET
 		<< std::endl;
 
 	return true;
@@ -52,38 +52,38 @@ bool requireEqual(
 
 int main()
 {
-	auto app = mach::App("127.0.0.1", 3143, threads);
+	auto app = mach::AppBuilder(std::move(testing::serverOptions)).build();
 
 	auto expectInvalidArgument = [](std::string_view testName, auto&& action) {
 		try {
 			action();
 
 			std::cout
-				<< test::RED
+				<< testing::RED
 				<< "[FAIL] " << testName << " - expected std::invalid_argument but nothing was thrown"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (const std::invalid_argument&) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] " << testName << " passed!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (const std::exception& ex) {
 			std::cout
-				<< test::RED
+				<< testing::RED
 				<< "[FAIL] " << testName << " - expected std::invalid_argument but got: "
 				<< ex.what()
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
 			std::cout
-				<< test::RED
+				<< testing::RED
 				<< "[FAIL] " << testName << " - expected std::invalid_argument but got unknown exception"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		};
@@ -93,87 +93,87 @@ int main()
 			action();
 
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] " << testName << " passed!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (const std::exception& ex) {
 			std::cout
-				<< test::RED
+				<< testing::RED
 				<< "[FAIL] " << testName << " - unexpected exception: "
 				<< ex.what()
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		catch (...) {
 			std::cout
-				<< test::RED
+				<< testing::RED
 				<< "[FAIL] " << testName << " - unknown unexpected exception"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 		}
 		};
 
 	// Invalid constraint names
 	expectInvalidArgument("Reject unknown constraint type", [&] {
-		app.get("/users/{name:banana}", [](mach::Context&) {
+		app.mapGet("/users/{name:banana}", [](mach::Context&) {
 			std::cout << "Shouldn't be reached" << std::endl;
 			});
 		});
 
 	expectInvalidArgument("Reject empty constraint after colon", [&] {
-		app.get("/users/{name:}", [](mach::Context&) {
+		app.mapGet("/users/{name:}", [](mach::Context&) {
 			std::cout << "Shouldn't be reached" << std::endl;
 			});
 		});
 
 	expectInvalidArgument("Reject constraint with spaces", [&] {
-		app.get("/users/{name: int}", [](mach::Context&) {
+		app.mapGet("/users/{name: int}", [](mach::Context&) {
 			std::cout << "Shouldn't be reached" << std::endl;
 			});
 		});
 
 	expectInvalidArgument("Reject constraint with extra colon", [&] {
-		app.get("/users/{name:int:banana}", [](mach::Context&) {
+		app.mapGet("/users/{name:int:banana}", [](mach::Context&) {
 			std::cout << "Shouldn't be reached" << std::endl;
 			});
 		});
 
 	expectInvalidArgument("Reject constraint with weird characters", [&] {
-		app.get("/users/{name:i#nt}", [](mach::Context&) {
+		app.mapGet("/users/{name:i#nt}", [](mach::Context&) {
 			std::cout << "Shouldn't be reached" << std::endl;
 			});
 		});
 
 	// Malformed parameter syntax
 	expectInvalidArgument("Reject empty parameter name", [&] {
-		app.get("/users/{:int}", [](mach::Context&) {
+		app.mapGet("/users/{:int}", [](mach::Context&) {
 			std::cout << "Shouldn't be reached" << std::endl;
 			});
 		});
 
 	expectInvalidArgument("Reject duplicate parameter names", [&] {
-		app.get("/users/{id:int}/posts/{id:int}", [](mach::Context&) {
+		app.mapGet("/users/{id:int}/posts/{id:int}", [](mach::Context&) {
 			std::cout << "Shouldn't be reached" << std::endl;
 			});
 		});
 
 	expectInvalidArgument("Reject nested braces", [&] {
-		app.get("/users/{{id:int}}", [](mach::Context&) {
+		app.mapGet("/users/{{id:int}}", [](mach::Context&) {
 			std::cout << "Shouldn't be reached" << std::endl;
 			});
 		});
 
 	expectInvalidArgument("Reject mixed nested braces", [&] {
-		app.get("/users/{id:{int}}", [](mach::Context&) {
+		app.mapGet("/users/{id:{int}}", [](mach::Context&) {
 			std::cout << "Shouldn't be reached" << std::endl;
 			});
 		});
 
 	// Valid registrations
 	expectNoThrow("Register explicit string constraint", [&] {
-		app.get("/users/{name:string}/{age:int}", [](mach::Context& context) {
+		app.mapGet("/users/{name:string}/{age:int}", [](mach::Context& context) {
 			constexpr auto testName = "Extract multiple constrained route parameters";
 
 			bool nameOk = requireEqual(
@@ -192,16 +192,16 @@ int main()
 
 			if (nameOk && ageOk) {
 				std::cout
-					<< test::GREEN
+					<< testing::GREEN
 					<< "[SUCCESS] Multiple constrained route parameter extraction passed!"
-					<< test::RESET
+					<< testing::RESET
 					<< std::endl;
 			}
 			});
 		});
 
 	expectNoThrow("Register implicit string parameter", [&] {
-		app.get("/posts/{slug}", [](mach::Context& context) {
+		app.mapGet("/posts/{slug}", [](mach::Context& context) {
 			constexpr auto testName = "Extract implicit string parameter";
 
 			if (requireEqual(
@@ -211,16 +211,16 @@ int main()
 				"route parameter 'slug'"
 			)) {
 				std::cout
-					<< test::GREEN
+					<< testing::GREEN
 					<< "[SUCCESS] Implicit string route parameter extraction passed!"
-					<< test::RESET
+					<< testing::RESET
 					<< std::endl;
 			}
 			});
 		});
 
 	expectNoThrow("Register int-only route", [&] {
-		app.get("/orders/{orderId:int}", [](mach::Context& context) {
+		app.mapGet("/orders/{orderId:int}", [](mach::Context& context) {
 			constexpr auto testName = "Extract constrained int parameter";
 
 			if (requireEqual(
@@ -230,28 +230,28 @@ int main()
 				"route parameter 'orderId'"
 			)) {
 				std::cout
-					<< test::GREEN
+					<< testing::GREEN
 					<< "[SUCCESS] Constrained int route parameter extraction passed!"
-					<< test::RESET
+					<< testing::RESET
 					<< std::endl;
 			}
 		});
 	});
 
 	expectNoThrow("Register static route competing with constrained param route", [&] {
-		app.get("/orders/latest", [](mach::Context&) {
+		app.mapGet("/orders/latest", [](mach::Context&) {
 			std::cout
-				<< test::GREEN
+				<< testing::GREEN
 				<< "[SUCCESS] Static route precedence over constrained parameter route passed!"
-				<< test::RESET
+				<< testing::RESET
 				<< std::endl;
 			});
 		});
 
 	std::cout
-		<< test::GREEN
+		<< testing::GREEN
 		<< "[SUCCESS] Route parameter registration torture tests completed!"
-		<< test::RESET
+		<< testing::RESET
 		<< std::endl;
 
 	std::cout
