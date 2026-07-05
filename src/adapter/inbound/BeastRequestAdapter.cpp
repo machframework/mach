@@ -46,6 +46,12 @@ namespace mach::detail::http::adapter
 
 		// create an empty response
 		mach::Response res(version);
+			
+		if (version == mach::http::Version::Unknown) {
+			adapterRejectedRequest = true;
+			res.status(mach::http::StatusCode::HttpVersionNotSupported);
+			res.body("Unsupported HTTP version.");
+		}
 
 		if (method == mach::http::Method::Unknown) {
 			adapterRejectedRequest = true;
@@ -85,11 +91,10 @@ namespace mach::detail::http::adapter
 	}
 
 	mach::http::Version BeastRequestAdapter::fromBeastVersion(unsigned int version) {
+		// Mach currently supports HTTP/1.0 and HTTP/1.1 only.
 		switch (version) {
 		case 10: return mach::http::Version::Http10;
 		case 11: return mach::http::Version::Http11;
-		case 20: return mach::http::Version::Http2;
-		case 30: return mach::http::Version::Http3;
 		default: return mach::http::Version::Unknown;
 		}
 	}
