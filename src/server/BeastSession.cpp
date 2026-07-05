@@ -26,26 +26,6 @@
 #include <mach/http/StatusCode.hpp>
 #include <mach/http/Version.hpp>
 
-namespace
-{
-    namespace http = boost::beast::http;
-
-    http::message_generator makeReadErrorResponse(mach::http::StatusCode status)
-    {
-        http::response<http::string_body> res;
-        
-        constexpr unsigned http11Version = 11;
-        res.version(http11Version);
-        res.result(static_cast<unsigned int>(status));
-        res.set(http::field::server, "Mach");
-        res.set(http::field::content_type, "text/plain");
-        res.keep_alive(false);
-        res.body() = mach::http::reasonPhrase(status);
-
-        res.prepare_payload();
-        return res;
-    }
-}
 namespace mach::detail::server
 {
     // Take ownership of the stream
@@ -160,5 +140,21 @@ namespace mach::detail::server
         m_stream.socket().shutdown(tcp::socket::shutdown_send, ec);
 
         // At this point the connection is closed gracefully
+    }
+
+    http::message_generator BeastSession::makeReadErrorResponse(mach::http::StatusCode status)
+    {
+        http::response<http::string_body> res;
+
+        constexpr unsigned http11Version = 11;
+        res.version(http11Version);
+        res.result(static_cast<unsigned int>(status));
+        res.set(http::field::server, "Mach");
+        res.set(http::field::content_type, "text/plain");
+        res.keep_alive(false);
+        res.body() = mach::http::reasonPhrase(status);
+
+        res.prepare_payload();
+        return res;
     }
 }

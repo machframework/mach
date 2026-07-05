@@ -12,6 +12,7 @@
 #pragma once
 
 #include <format>
+#include <optional>
 #include <utility>
 
 #include <boost/asio/awaitable.hpp>
@@ -69,6 +70,8 @@ namespace mach::detail::server
         http::message_generator handle_request(
             http::request<Body, http::basic_fields<Allocator>>&& req);
 
+        http::message_generator makeReadErrorResponse(mach::http::StatusCode status);
+
         detail::application::Runtime& m_runtime;
         detail::http::adapter::BeastRequestAdapter& m_requestAdapter;
         detail::http::adapter::BeastResponseAdapter& m_responseAdapter;
@@ -82,24 +85,35 @@ namespace mach::detail::server
         auto version = req.version();
 
         bool adapterRejectedRequest = false;
-        auto context = m_requestAdapter.adapt(std::move(req), adapterRejectedRequest); 
-    
+        
+        try {
+            auto context = m_requestAdapter.adapt(std::move(req), adapterRejectedRequest);
+
 #ifndef NDEBUG
-        Logger::info(std::format("Received request: {}", context.request.target()));
+            Logger::info(std::format("Received request: {}", context.request.target()));
 #endif
 
-        if (!adapterRejectedRequest) {
-            m_runtime.handle(context);
+            if (!adapterRejectedRequest) {
+                m_runtime.handle(context);
+            }
+
+            auto res = m_responseAdapter.adapt(std::move(context));
+
+            res.set(http::field::server, "Mach");
+            res.set(http::field::content_type, "text/plain");
+            res.keep_alive(keepAlive);
+
+            res.prepare_payload();
+
+            return res;
         }
-        
-        auto res = m_responseAdapter.adapt(std::move(context));
-
-        res.set(http::field::server, "Mach");
-        res.set(http::field::content_type, "text/plain");
-        res.keep_alive(keepAlive);
-
-        res.prepare_payload();
-
-        return res;
+        catch (const std::exception& ex) {
+            Logger::error(std::format("Request handling failed: {}", ex.what()));
+            return makeReadErrorResponse(mach::http::StatusCode::InternalServerError);
+        }
+        catch (...) {
+            Logger::error("Request handling failed with unknown exception.");
+            return makeReadErrorResponse(mach::http::StatusCode::InternalServerError);
+        }
     }
 }
