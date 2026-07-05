@@ -102,7 +102,6 @@ namespace mach::detail::server
         );
 
         if (ec == http::error::end_of_stream ||
-            ec == http::error::bad_method ||
             ec == net::error::eof ||
             ec == net::error::connection_reset ||
             ec == net::error::connection_aborted ||
@@ -120,7 +119,6 @@ namespace mach::detail::server
         }
         else if (ec) {
             Logger::warning(std::format("Failed to read request: {}", ec.message()));
-            m_buffer.consume(m_buffer.size());
             co_return false;
         }
 
@@ -149,7 +147,7 @@ namespace mach::detail::server
         );
 
         if (ec) {
-            Logger::error(std::format("Failed to write response: {}", ec.message()));
+            Logger::warning(std::format("Failed to write response: {}", ec.message()));
             co_return false;
         }
 
