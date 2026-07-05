@@ -1,28 +1,45 @@
 #include "BeastRequestAdapter.hpp"
 
+#include <string_view>
+#include <unordered_map>
+
 #include <mach/http/Method.hpp>
 #include <mach/http/StatusCode.hpp>
 
-#include <unordered_map>
+namespace
+{
+	bool containsControlCharacters(std::string_view target) {
+		for (unsigned char c : target) {
+			if (std::iscntrl(c)) {
+				return true;
+			}
+		}
 
+		return false;
+	}
+}
 namespace mach::detail::http::adapter
 {
 	mach::Context BeastRequestAdapter::adapt(
 		beast::http::request<beast::http::string_body>&& rawRequest,
 		bool& adapterRejectedRequest) 
 	{
-		// adapt request
 		auto version = fromBeastVersion(rawRequest.version());
+		auto method = fromBeastVerb(rawRequest.method());
+		std::string target(rawRequest.target());
 		
 		std::unordered_map<std::string, std::string> headers;
 		for (auto const& field : rawRequest.base()) {
-			headers.insert_or_assign(std::string(field.name_string()), std::string(field.value()));
-		};
+			headers.insert_or_assign(
+				std::string(field.name_string()),
+				std::string(field.value())
+			);
+		}
 
 		mach::Request req(
-			fromBeastVerb(rawRequest.method()),
+			method,
 			version,
-			std::move(std::string(rawRequest.target())),
+			std::move(target),
 			std::move(rawRequest.body()),
 			std::move(headers)
 		);
@@ -30,9 +47,25 @@ namespace mach::detail::http::adapter
 		// create an empty response
 		mach::Response res(version);
 
-		if (req.method() == mach::http::Method::Unknown) {
-			res.status(mach::http::StatusCode::NotImplemented);
+		if (method == mach::http::Method::Unknown) {
 			adapterRejectedRequest = true;
+			res.status(mach::http::StatusCode::NotImplemented);
+			res.body("Unsupported HTTP method.");
+		}
+		else if (req.target().empty()) {
+			adapterRejectedRequest = true;
+			res.status(mach::http::StatusCode::BadRequest);
+			res.body("Request target must not be empty.");
+		}
+		else if (req.target().front() != '/') {
+			adapterRejectedRequest = true;
+			res.status(mach::http::StatusCode::BadRequest);
+			res.body("Request target must start with '/'.");
+		}
+		else if (containsControlCharacters(req.target())) {
+			adapterRejectedRequest = true;
+			res.status(mach::http::StatusCode::BadRequest);
+			res.body("Request target contains control characters.");
 		}
 
 		return mach::Context(std::move(req), std::move(res));
