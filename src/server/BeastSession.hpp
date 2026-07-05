@@ -11,16 +11,17 @@
 
 #pragma once
 
-#include <atomic>
 #include <format>
+#include <utility>
 
 #include <boost/asio/awaitable.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/beast/core/tcp_stream.hpp>
 #include <boost/beast/core.hpp>
-#include <boost/beast/http.hpp>
 #include <boost/beast/core/flat_buffer.hpp>
+#include <boost/beast/http.hpp>
 #include <boost/beast/http/message.hpp>
+#include <boost/beast/http/parser.hpp>
 
 #include <mach/Context.hpp>
 #include <mach/logging/Logging.hpp>
@@ -51,18 +52,6 @@ namespace mach::detail::server
             detail::http::adapter::BeastResponseAdapter& responseAdapter
         );
 
-        ~BeastSession() {
-			--s_aliveSessions;
-        }
-
-        static std::int64_t aliveCount() {
-			return s_aliveSessions.load();
-        }
-
-	static std::int64_t createdCount() {
-		return s_createdSessions.load();
-	}
-
         // Start the asynchronous operation
         net::awaitable<void> run();
 
@@ -83,9 +72,6 @@ namespace mach::detail::server
         detail::application::Runtime& m_runtime;
         detail::http::adapter::BeastRequestAdapter& m_requestAdapter;
         detail::http::adapter::BeastResponseAdapter& m_responseAdapter;
-
-		static inline std::atomic<std::int64_t> s_createdSessions = 0;
-		static inline std::atomic<std::int64_t> s_aliveSessions = 0;
     };
 
     template <typename Body, typename Allocator>
@@ -95,13 +81,16 @@ namespace mach::detail::server
         bool keepAlive = req.keep_alive();
         auto version = req.version();
 
-        auto context = m_requestAdapter.adapt(std::move(req));
-     
+        bool adapterRejectedRequest = false;
+        auto context = m_requestAdapter.adapt(std::move(req), adapterRejectedRequest); 
+    
 #ifndef NDEBUG
         Logger::info(std::format("Received request: {}", context.request.target()));
 #endif
 
-        m_runtime.handle(context);
+        if (!adapterRejectedRequest) {
+            m_runtime.handle(context);
+        }
         
         auto res = m_responseAdapter.adapt(std::move(context));
 

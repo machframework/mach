@@ -112,7 +112,7 @@ private:
 };
 
 int main() {
-    auto builder = mach::AppBuilder("127.0.0.1", 3143, 16);
+    auto builder = mach::AppBuilder("127.0.0.1", 3143, 12);
 
     builder.addSingleton<RequestIdService>();
     builder.addScoped<UserService>();
@@ -127,23 +127,6 @@ int main() {
 
     app.mapController<HomeController>();
     app.mapController<UsersController>();
-
-	//std::jthread diagnosticThread([]() {
-	//	while (true) {
-	//		std::this_thread::sleep_for(std::chrono::seconds(5));
- //           std::cout
- //               << "\n===== Lifetime Diagnostics =====\n"
- //               << "Scope\n"
- //               << "  Alive:     " << mach::detail::di::Scope::aliveCount() << '\n'
- //               << "  Created:   " << mach::detail::di::Scope::createdCount() << '\n'
- //               << '\n'
- //               << "Session\n"
- //               << "  Alive:     " << mach::detail::server::BeastSession::aliveCount() << '\n'
- //               << "  Created:   " << mach::detail::server::BeastSession::createdCount() << '\n'
- //               << '\n'
- //               << "===============================\n";
-	//	}
-	//	});
 
     return app.run();
 }

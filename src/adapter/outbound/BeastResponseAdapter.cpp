@@ -1,5 +1,7 @@
 #include "BeastResponseAdapter.hpp"
 
+#include <mach/http/StatusCode.hpp>
+
 namespace mach::detail::http::adapter
 {
 	beast::http::response<beast::http::string_body> BeastResponseAdapter::adapt(mach::Context&& context) {
@@ -9,7 +11,13 @@ namespace mach::detail::http::adapter
 		auto beastVersion = fromMachVersion(version);
 		res.version(beastVersion);
 		res.result(static_cast<unsigned int>(context.response.status()));
-		res.body() = context.response.body();
+		
+		if (context.response.body().empty()) {
+			res.body() = mach::http::reasonPhrase(context.response.status());
+		}
+		else {
+			res.body() = context.response.body();
+		}
 
 		for (const auto& [name, value] : context.response.m_headers) {
 			res.set(name, value);

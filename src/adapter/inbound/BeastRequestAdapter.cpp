@@ -1,10 +1,16 @@
 #include "BeastRequestAdapter.hpp"
 
+#include <mach/http/Method.hpp>
+#include <mach/http/StatusCode.hpp>
+
 #include <unordered_map>
 
 namespace mach::detail::http::adapter
 {
-	mach::Context BeastRequestAdapter::adapt(beast::http::request<beast::http::string_body>&& rawRequest) {
+	mach::Context BeastRequestAdapter::adapt(
+		beast::http::request<beast::http::string_body>&& rawRequest,
+		bool& adapterRejectedRequest) 
+	{
 		// adapt request
 		auto version = fromBeastVersion(rawRequest.version());
 		
@@ -23,6 +29,11 @@ namespace mach::detail::http::adapter
 
 		// create an empty response
 		mach::Response res(version);
+
+		if (req.method() == mach::http::Method::Unknown) {
+			res.status(mach::http::StatusCode::NotImplemented);
+			adapterRejectedRequest = true;
+		}
 
 		return mach::Context(std::move(req), std::move(res));
 	}
