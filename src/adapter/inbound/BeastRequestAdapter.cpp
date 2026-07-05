@@ -6,6 +6,8 @@
 #include <mach/http/Method.hpp>
 #include <mach/http/StatusCode.hpp>
 
+#include "http/HttpUtils.hpp"
+
 namespace
 {
 	bool containsControlCharacters(std::string_view target) {
@@ -30,8 +32,11 @@ namespace mach::detail::http::adapter
 		
 		std::unordered_map<std::string, std::string> headers;
 		for (auto const& field : rawRequest.base()) {
+			auto key = std::string(field.name_string());
+			toLowercaseInPlace(key);
+
 			headers.insert_or_assign(
-				std::string(field.name_string()),
+				std::move(key),
 				std::string(field.value())
 			);
 		}
@@ -52,8 +57,7 @@ namespace mach::detail::http::adapter
 			res.status(mach::http::StatusCode::HttpVersionNotSupported);
 			res.body("Unsupported HTTP version.");
 		}
-
-		if (method == mach::http::Method::Unknown) {
+		else if (method == mach::http::Method::Unknown) {
 			adapterRejectedRequest = true;
 			res.status(mach::http::StatusCode::NotImplemented);
 			res.body("Unsupported HTTP method.");
