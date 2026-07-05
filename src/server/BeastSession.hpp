@@ -11,8 +11,8 @@
 
 #pragma once
 
-#include <atomic>
 #include <format>
+#include <utility>
 
 #include <boost/asio/awaitable.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -80,13 +80,16 @@ namespace mach::detail::server
         bool keepAlive = req.keep_alive();
         auto version = req.version();
 
-        auto context = m_requestAdapter.adapt(std::move(req));
-     
+        bool adapterRejectedRequest = false;
+        auto context = m_requestAdapter.adapt(std::move(req), adapterRejectedRequest); 
+    
 #ifndef NDEBUG
         Logger::info(std::format("Received request: {}", context.request.target()));
 #endif
 
-        m_runtime.handle(context);
+        if (!adapterRejectedRequest) {
+            m_runtime.handle(context);
+        }
         
         auto res = m_responseAdapter.adapt(std::move(context));
 

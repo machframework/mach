@@ -52,7 +52,6 @@ namespace mach::detail::server
             const bool keepAlive = co_await do_read();
 
             if (!keepAlive) {
-                Logger::info("Session closing");
                 do_close();
                 co_return;
             }
@@ -65,9 +64,8 @@ namespace mach::detail::server
 
         http::request<http::string_body> req = {};
 
-        // Set the timeout.
+        // Set the read timeout
         m_stream.expires_after(std::chrono::seconds(30));
-
 		beast::error_code ec;
 
         // Read a request
@@ -78,7 +76,6 @@ namespace mach::detail::server
             net::redirect_error(net::use_awaitable, ec)
         );
 
-        // This means they closed the connection
         if (ec == http::error::end_of_stream ||
             ec == http::error::bad_method ||
             ec == net::error::eof ||
@@ -92,7 +89,7 @@ namespace mach::detail::server
         }
 
         if (ec) {
-            Logger::error(std::format("Failed to read request: {}", ec.message()));
+            Logger::warning(std::format("Failed to read request: {}", ec.message()));
             m_buffer.consume(m_buffer.size());
             co_return false;
         }
@@ -104,6 +101,8 @@ namespace mach::detail::server
     net::awaitable<bool> BeastSession::send_response(http::message_generator&& msg) {
         const bool keep_alive = msg.keep_alive();
 
+        // Set the write timeout
+        m_stream.expires_after(std::chrono::seconds(30));
         beast::error_code ec;
 
         // Write the response

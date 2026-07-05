@@ -25,7 +25,8 @@ namespace mach::http
 		RequestTimeout = 408,
 		Conflict = 409,
 
-		InternalServerError = 500
+		InternalServerError = 500,
+		NotImplemented = 501
 	};
 
 	constexpr std::string reasonPhrase(StatusCode status)
@@ -48,6 +49,9 @@ namespace mach::http
 
 		case StatusCode::InternalServerError:
 			return "Internal Server Error";
+		
+		case StatusCode::NotImplemented:
+			return "Not Implemented";
 		}
 
 		return "Unknown Status";

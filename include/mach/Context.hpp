@@ -53,6 +53,7 @@ namespace mach
 
 		friend class detail::dispatching::Dispatcher;
 		friend class detail::routing::RoutingMiddleware;
+
 	private:
 		detail::application::ExecutionPlan executionPlan;
 	};
