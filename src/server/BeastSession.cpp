@@ -13,14 +13,39 @@
 
 #include <chrono>
 #include <memory>
+#include <optional>
 #include <string>
 #include <utility>
 
+#include <boost/asio/dispatch.hpp>
 #include <boost/asio/redirect_error.hpp>
 #include <boost/asio/use_awaitable.hpp>
+#include <boost/beast/core/error.hpp>
+#include <boost/beast/http/message_generator.hpp>
 
-#include <boost/asio/dispatch.hpp>
+#include <mach/http/StatusCode.hpp>
+#include <mach/http/Version.hpp>
 
+namespace
+{
+    namespace http = boost::beast::http;
+
+    http::message_generator makeReadErrorResponse(mach::http::StatusCode status)
+    {
+        http::response<http::string_body> res;
+        
+        constexpr unsigned http11Version = 11;
+        res.version(http11Version);
+        res.result(static_cast<unsigned int>(status));
+        res.set(http::field::server, "Mach");
+        res.set(http::field::content_type, "text/plain");
+        res.keep_alive(false);
+        res.body() = mach::http::reasonPhrase(status);
+
+        res.prepare_payload();
+        return res;
+    }
+}
 namespace mach::detail::server
 {
     // Take ownership of the stream
@@ -59,20 +84,20 @@ namespace mach::detail::server
     }
 
     net::awaitable<bool> BeastSession::do_read() {
-        // Make the request empty before reading,
-        // otherwise the operation behavior is undefined.
-
-        http::request<http::string_body> req = {};
-
         // Set the read timeout
         m_stream.expires_after(std::chrono::seconds(30));
 		beast::error_code ec;
+
+        http::request_parser<http::string_body> parser;
+        parser.body_limit(1024 * 1024);
+        parser.header_limit(16 * 1024);
+        constexpr std::size_t maxTargetSize = 8 * 1024;
 
         // Read a request
         co_await http::async_read(
             m_stream,
             m_buffer,
-            req,
+            parser,
             net::redirect_error(net::use_awaitable, ec)
         );
 
@@ -84,14 +109,25 @@ namespace mach::detail::server
             ec == net::error::operation_aborted ||
             ec == beast::error::timeout)
         {
+            co_return false;
+        }
+
+        if (ec == http::error::body_limit) {
+            co_return co_await send_response(makeReadErrorResponse(mach::http::StatusCode::PayloadTooLarge));
+        }
+        else if (ec == http::error::header_limit) {
+            co_return co_await send_response(makeReadErrorResponse(mach::http::StatusCode::RequestHeaderFieldsTooLarge));
+        }
+        else if (ec) {
+            Logger::warning(std::format("Failed to read request: {}", ec.message()));
             m_buffer.consume(m_buffer.size());
             co_return false;
         }
 
-        if (ec) {
-            Logger::warning(std::format("Failed to read request: {}", ec.message()));
-            m_buffer.consume(m_buffer.size());
-            co_return false;
+        auto req = parser.release();
+
+        if (req.target().size() > maxTargetSize) {
+            co_return co_await send_response(makeReadErrorResponse(mach::http::StatusCode::UriTooLong));
         }
 
         // Send the response

@@ -24,6 +24,9 @@ namespace mach::http
 		MethodNotAllowed = 405,
 		RequestTimeout = 408,
 		Conflict = 409,
+		PayloadTooLarge = 413,
+		UriTooLong = 414,
+		RequestHeaderFieldsTooLarge = 431,
 
 		InternalServerError = 500,
 		NotImplemented = 501
@@ -46,6 +49,15 @@ namespace mach::http
 
 		case StatusCode::MethodNotAllowed:
 			return "Method Not Allowed";
+
+		case StatusCode::PayloadTooLarge:
+			return "Payload Too Large";
+
+		case StatusCode::UriTooLong:
+			return "URI Too Long";
+
+		case StatusCode::RequestHeaderFieldsTooLarge:
+			return "Request Header Fields Too Large";
 
 		case StatusCode::InternalServerError:
 			return "Internal Server Error";
