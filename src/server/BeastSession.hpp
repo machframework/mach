@@ -51,18 +51,6 @@ namespace mach::detail::server
             detail::http::adapter::BeastResponseAdapter& responseAdapter
         );
 
-        ~BeastSession() {
-			--s_aliveSessions;
-        }
-
-        static std::int64_t aliveCount() {
-			return s_aliveSessions.load();
-        }
-
-	static std::int64_t createdCount() {
-		return s_createdSessions.load();
-	}
-
         // Start the asynchronous operation
         net::awaitable<void> run();
 
@@ -83,9 +71,6 @@ namespace mach::detail::server
         detail::application::Runtime& m_runtime;
         detail::http::adapter::BeastRequestAdapter& m_requestAdapter;
         detail::http::adapter::BeastResponseAdapter& m_responseAdapter;
-
-		static inline std::atomic<std::int64_t> s_createdSessions = 0;
-		static inline std::atomic<std::int64_t> s_aliveSessions = 0;
     };
 
     template <typename Body, typename Allocator>

@@ -34,10 +34,7 @@ namespace mach::detail::server
         m_runtime(runtime),
         m_requestAdapter(requestAdapter),
         m_responseAdapter(responseAdapter)
-    {
-		s_aliveSessions++;
-        s_createdSessions++;
-    }
+    { }
 
     // Start the asynchronous operation
     net::awaitable<void> BeastSession::run() {
@@ -53,7 +50,6 @@ namespace mach::detail::server
 
         while (true) {
             const bool keepAlive = co_await do_read();
-
 
             if (!keepAlive) {
                 Logger::info("Session closing");
