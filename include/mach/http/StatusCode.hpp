@@ -29,7 +29,8 @@ namespace mach::http
 		RequestHeaderFieldsTooLarge = 431,
 
 		InternalServerError = 500,
-		NotImplemented = 501
+		NotImplemented = 501,
+		HttpVersionNotSupported = 505
 	};
 
 	constexpr std::string reasonPhrase(StatusCode status)

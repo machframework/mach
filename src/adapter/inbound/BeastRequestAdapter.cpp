@@ -1,38 +1,81 @@
 #include "BeastRequestAdapter.hpp"
 
+#include <string_view>
+#include <unordered_map>
+
 #include <mach/http/Method.hpp>
 #include <mach/http/StatusCode.hpp>
 
-#include <unordered_map>
+#include "http/HttpUtils.hpp"
 
+namespace
+{
+	bool containsControlCharacters(std::string_view target) {
+		for (unsigned char c : target) {
+			if (std::iscntrl(c)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+}
 namespace mach::detail::http::adapter
 {
 	mach::Context BeastRequestAdapter::adapt(
 		beast::http::request<beast::http::string_body>&& rawRequest,
 		bool& adapterRejectedRequest) 
 	{
-		// adapt request
 		auto version = fromBeastVersion(rawRequest.version());
+		auto method = fromBeastVerb(rawRequest.method());
+		std::string target(rawRequest.target());
 		
 		std::unordered_map<std::string, std::string> headers;
 		for (auto const& field : rawRequest.base()) {
-			headers.insert_or_assign(std::string(field.name_string()), std::string(field.value()));
-		};
+			auto key = std::string(field.name_string());
+			toLowercaseInPlace(key);
+
+			headers.insert_or_assign(
+				std::move(key),
+				std::string(field.value())
+			);
+		}
 
 		mach::Request req(
-			fromBeastVerb(rawRequest.method()),
+			method,
 			version,
-			std::move(std::string(rawRequest.target())),
+			std::move(target),
 			std::move(rawRequest.body()),
 			std::move(headers)
 		);
 
 		// create an empty response
 		mach::Response res(version);
-
-		if (req.method() == mach::http::Method::Unknown) {
-			res.status(mach::http::StatusCode::NotImplemented);
+			
+		if (version == mach::http::Version::Unknown) {
 			adapterRejectedRequest = true;
+			res.status(mach::http::StatusCode::HttpVersionNotSupported);
+			res.body("Unsupported HTTP version.");
+		}
+		else if (method == mach::http::Method::Unknown) {
+			adapterRejectedRequest = true;
+			res.status(mach::http::StatusCode::NotImplemented);
+			res.body("Unsupported HTTP method.");
+		}
+		else if (req.target().empty()) {
+			adapterRejectedRequest = true;
+			res.status(mach::http::StatusCode::BadRequest);
+			res.body("Request target must not be empty.");
+		}
+		else if (req.target().front() != '/') {
+			adapterRejectedRequest = true;
+			res.status(mach::http::StatusCode::BadRequest);
+			res.body("Request target must start with '/'.");
+		}
+		else if (containsControlCharacters(req.target())) {
+			adapterRejectedRequest = true;
+			res.status(mach::http::StatusCode::BadRequest);
+			res.body("Request target contains control characters.");
 		}
 
 		return mach::Context(std::move(req), std::move(res));
@@ -52,11 +95,10 @@ namespace mach::detail::http::adapter
 	}
 
 	mach::http::Version BeastRequestAdapter::fromBeastVersion(unsigned int version) {
+		// Mach currently supports HTTP/1.0 and HTTP/1.1 only.
 		switch (version) {
 		case 10: return mach::http::Version::Http10;
 		case 11: return mach::http::Version::Http11;
-		case 20: return mach::http::Version::Http2;
-		case 30: return mach::http::Version::Http3;
 		default: return mach::http::Version::Unknown;
 		}
 	}

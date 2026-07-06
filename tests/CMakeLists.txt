@@ -83,3 +83,8 @@ add_mach_test(
     BeastHardeningTests
     hardening/server/main.cpp
 )
+
+add_mach_test(
+    InboundAdapterTests
+    hardening/adapters/InboundAdapterTests.cpp
+)
