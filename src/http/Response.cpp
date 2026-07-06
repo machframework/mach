@@ -1,5 +1,7 @@
 #include "mach/Response.hpp"
 
+#include <stdexcept>
+
 #include "HttpUtils.hpp"
 
 namespace mach
@@ -48,8 +50,12 @@ namespace mach
 		return m_headers.find(normalizedName) != m_headers.end();
 	}
 
-	void Response::status(http::StatusCode status) noexcept
+	void Response::status(http::StatusCode status)
 	{
+		if (!http::isValidStatusCode(status)) {
+			throw std::invalid_argument("Invalid HTTP status code");
+		}
+
 		m_status = status;
 	}
 

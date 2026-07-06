@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <utility>
 
 #include <mach/Context.hpp>
@@ -23,7 +24,7 @@ namespace mach::detail::routing
 				auto statusCode = routing::toStatusCode(plan.status);
 
 				context.response.status(statusCode);
-				context.response.body(mach::http::reasonPhrase(statusCode));
+				context.response.body(std::string(mach::http::reasonPhrase(statusCode)));
 
 				return;
 			}
