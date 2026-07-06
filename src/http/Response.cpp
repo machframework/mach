@@ -69,6 +69,12 @@ namespace mach
 		std::string normalizedName = std::string(name);
 		detail::http::toLowercaseInPlace(normalizedName);
 
+		if (normalizedName == "connection") {
+			throw std::invalid_argument(
+				"The 'Connection' header is managed by Mach and cannot be set manually."
+			);
+		}
+
 		m_headers.insert_or_assign(
 			normalizedName,
 			std::string(value)
