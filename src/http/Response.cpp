@@ -66,8 +66,11 @@ namespace mach
 
 	void Response::setHeader(std::string_view name, std::string_view value)
 	{
+		std::string normalizedName = std::string(name);
+		detail::http::toLowercaseInPlace(normalizedName);
+
 		m_headers.insert_or_assign(
-			std::string(name),
+			normalizedName,
 			std::string(value)
 		);
 	}
