@@ -12,12 +12,7 @@ namespace mach::detail::http::adapter
 		res.version(beastVersion);
 		res.result(static_cast<unsigned int>(context.response.status()));
 		
-		if (context.response.body().empty()) {
-			res.body() = mach::http::reasonPhrase(context.response.status());
-		}
-		else {
-			res.body() = context.response.body();
-		}
+		res.body() = context.response.body();
 
 		for (const auto& [name, value] : context.response.m_headers) {
 			res.set(name, value);
