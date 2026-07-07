@@ -88,6 +88,7 @@ namespace mach::detail::server
         
         try {
             auto context = m_requestAdapter.adapt(std::move(req), adapterRejectedRequest);
+			auto method = context.request.method();
 
 #ifndef NDEBUG
             Logger::info(std::format("Received request: {}", context.request.target()));
@@ -102,9 +103,15 @@ namespace mach::detail::server
             res.set(http::field::server, "Mach");
             res.set(http::field::content_type, "text/plain");
             res.keep_alive(keepAlive);
+
+            if (res.result() == http::status::no_content
+                || res.result() == http::status::not_modified) {
+				res.body().clear();
+            }
+
             res.prepare_payload();
 
-			if (context.request.method() == mach::http::Method::Head) {
+			if (method == mach::http::Method::Head) {
                 const auto bodySize = res.body().size();
 
                 res.body().clear();
