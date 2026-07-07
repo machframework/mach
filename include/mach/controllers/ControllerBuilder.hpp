@@ -54,6 +54,12 @@ namespace mach
         template <typename THandler>
         ControllerBuilder<TController>& mapDelete(THandler&& handler);
 
+        template <typename THandler>
+        ControllerBuilder<TController>& mapHead(std::string_view pattern, THandler&& handler);
+
+        template <typename THandler>
+        ControllerBuilder<TController>& mapHead(THandler&& handler);
+
     private:
         explicit ControllerBuilder();
 
@@ -181,6 +187,27 @@ namespace mach
     ControllerBuilder<TController>& ControllerBuilder<TController>::mapDelete(THandler&& handler)
     {
         return mapDelete<THandler>("", std::forward<THandler>(handler));
+    }
+
+    template <typename TController>
+    template <typename THandler>
+    ControllerBuilder<TController>& ControllerBuilder<TController>::mapHead(
+        std::string_view pattern,
+        THandler&& handler)
+    {
+        addControllerMethod(
+            http::Method::Head,
+            pattern,
+            std::forward<THandler>(handler));
+
+        return *this;
+    }
+
+    template <typename TController>
+    template <typename THandler>
+    ControllerBuilder<TController>& ControllerBuilder<TController>::mapHead(THandler&& handler)
+    {
+        return mapHead<THandler>("", std::forward<THandler>(handler));
     }
 
     template <typename TController>

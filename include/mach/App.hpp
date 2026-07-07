@@ -180,6 +180,28 @@ namespace mach
 		}
 
 		/**
+		 * Registers a HEAD request handler.
+		 *
+		 * @param pattern The route pattern to match (e.g. "/api/users").
+		 * @param handler The function invoked when the route is matched.
+		 *
+		 * @throws std::invalid_argument If the supplied handler is invalid.
+		 * @throws std::logic_error If a route with the same method and pattern
+		 *         has already been registered.
+		 *
+		 * @thread_safety This function is not thread-safe.
+		 */
+		template <typename THandler>
+			requires detail::MinimalApiHandler<THandler>
+		void mapHead(std::string_view pattern, THandler&& handler) {
+			addRoute(
+				http::Method::Head,
+				pattern,
+				std::forward<THandler>(handler)
+			);
+		}
+
+		/**
 		 * Registers a route handler.
 		 *
 		 * @param method The HTTP method to match (e.g. GET, POST).
