@@ -22,6 +22,7 @@
 #include <boost/asio/use_awaitable.hpp>
 #include <boost/beast/core/error.hpp>
 #include <boost/beast/http/message_generator.hpp>
+#include <boost/beast/http/serializer.hpp>
 
 #include <mach/http/StatusCode.hpp>
 #include <mach/http/Version.hpp>

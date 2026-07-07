@@ -237,7 +237,15 @@ namespace mach::detail::routing
 						)
 					);
 				}
-				
+				else if (method == http::Method::Head && endpointsByMethod.contains(http::Method::Get)) {
+					auto endpoint = endpointsByMethod.find(http::Method::Get)->second;
+					return routing::RouteMatch(
+						endpoint,
+						std::move(
+							makeRouteParameters(endpoint->parameterNames, std::move(capturedValues))
+						)
+					);
+				}
 				if (endpointsByMethod.empty()) {
 					return routing::RouteMatch(RoutingStatus::NotFound);
 				}

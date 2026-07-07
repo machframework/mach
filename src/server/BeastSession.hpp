@@ -102,8 +102,14 @@ namespace mach::detail::server
             res.set(http::field::server, "Mach");
             res.set(http::field::content_type, "text/plain");
             res.keep_alive(keepAlive);
-
             res.prepare_payload();
+
+			if (context.request.method() == mach::http::Method::Head) {
+                const auto bodySize = res.body().size();
+
+                res.body().clear();
+                res.content_length(bodySize);
+			}
 
             return res;
         }
