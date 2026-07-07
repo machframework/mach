@@ -1,8 +1,24 @@
 #include "mach/Response.hpp"
 
+#include <format>
 #include <stdexcept>
+#include <unordered_set>
 
 #include "HttpUtils.hpp"
+
+namespace
+{
+	static const std::unordered_set<std::string_view> reservedResponseHeaders = {
+	"connection",
+	"keep-alive",
+	"transfer-encoding",
+	"content-length",
+	"set-cookie",
+	"trailer",
+	"upgrade",
+	"proxy-connection"
+	};
+}
 
 namespace mach
 {
@@ -69,14 +85,16 @@ namespace mach
 		std::string normalizedName = std::string(name);
 		detail::http::toLowercaseInPlace(normalizedName);
 
-		if (normalizedName == "connection") {
+		if (reservedResponseHeaders.contains(normalizedName)) {
 			throw std::invalid_argument(
-				"The 'Connection' header is managed by Mach and cannot be set manually."
+				std::format(
+					"The '{}' header is managed by Mach and cannot be set manually.", normalizedName
+				)
 			);
 		}
 
 		m_headers.insert_or_assign(
-			normalizedName,
+			std::move(normalizedName),
 			std::string(value)
 		);
 	}

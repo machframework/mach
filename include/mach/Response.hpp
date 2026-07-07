@@ -115,6 +115,9 @@ namespace mach
 		 *
 		 * @param name header name to set.
 		 * @param value value to set in header.
+		 * 
+		 * @throws std::invalid_argument If the header name is "Connection" or "Transfer-Encoding"
+		 *		   (case-insensitive).
 		 *
 		 * @thread_safety This function is not thread-safe.
 		 */
