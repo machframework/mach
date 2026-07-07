@@ -35,7 +35,7 @@ public:
 	mach::Reply<std::string> sayHi() {
 		return ok("Hi");
 	}
-
+	
 	static void configure(mach::ControllerBuilder<HomeController>& routes) {
 		routes.mapGet("/{birth:int}", &HomeController::calculateAge);
 		routes.mapGet("/hi" ,& HomeController::sayHi);
@@ -49,7 +49,5 @@ int main() {
 	auto app = builder.build();
 	app.mapController<HomeController>();
 
-	app.run();
-
-	return 0;
+	return app.run();
 }
