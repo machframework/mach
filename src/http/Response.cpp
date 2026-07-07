@@ -8,7 +8,7 @@
 
 namespace
 {
-	static const std::unordered_set<std::string_view> reservedResponseHeaders = {
+	inline const std::unordered_set<std::string_view> reservedResponseHeaders = {
 	"connection",
 	"keep-alive",
 	"transfer-encoding",
@@ -18,6 +18,25 @@ namespace
 	"upgrade",
 	"proxy-connection"
 	};
+
+	inline bool isValidHeaderName(std::string_view name) noexcept {
+		for (unsigned char c : name) {
+			if (!std::isalnum(static_cast<unsigned char>(c)) &&
+				c != '!' && c != '#' && c != '$' && c != '%' &&
+				c != '&' && c != '\'' && c != '*' && c != '+' &&
+				c != '-' && c != '.' && c != '^' && c != '_' &&
+				c != '`' && c != '|' && c != '~') {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	inline bool containsCrOrLf(std::string_view value) noexcept {
+		return value.find('\r') != std::string_view::npos ||
+			value.find('\n') != std::string_view::npos;
+	}
 }
 
 namespace mach
@@ -85,6 +104,23 @@ namespace mach
 		std::string normalizedName = std::string(name);
 		detail::http::toLowercaseInPlace(normalizedName);
 
+		if (normalizedName.empty()) {
+			throw std::invalid_argument("Header name cannot be empty");
+		}
+		if (!isValidHeaderName(normalizedName)) {
+			throw std::invalid_argument(
+				std::format(
+					"Invalid header name '{}'.", normalizedName
+				)
+			);
+		}
+		if (containsCrOrLf(value)) {
+			throw std::invalid_argument(
+				std::format(
+					"Header '{}' value cannot contain CR or LF characters.", normalizedName
+				)
+			);
+		}
 		if (reservedResponseHeaders.contains(normalizedName)) {
 			throw std::invalid_argument(
 				std::format(
