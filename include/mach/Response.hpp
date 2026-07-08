@@ -37,7 +37,7 @@ namespace mach
 
 		/**
 		 * Returns the HTTP version used in the response (e.g. 1.0, 1.1, 2.0, 3.0).
-		 * NOTE: Mach currently supports HTTP/1.0 only
+		 * NOTE: Mach currently supports HTTP/1.0 and HTTP/1.1 only
 		 *
 		 * @return HTTP version used in the request-handling context.
 		 *
@@ -93,10 +93,13 @@ namespace mach
 		 * Sets the HTTP status code of the response.
 		 *
 		 * @param status HTTP status code to set.
+		 * 
+		 * @throws std::invalid_argument If the provided status code is not a valid HTTP status code
+         * 		   supported by Mach.
 		 *
 		 * @thread_safety This function is not thread-safe.
 		 */
-		void status(http::StatusCode status) noexcept;
+		void status(http::StatusCode status);
 
 		/**
 		 * Sets the body of the response.
@@ -112,6 +115,10 @@ namespace mach
 		 *
 		 * @param name header name to set.
 		 * @param value value to set in header.
+		 * 
+		 * @throws std::invalid_argument If the header name is empty, contains
+		 *         characters that are not permitted in HTTP header field names,
+		 *         or is a reserved header (case-insensitive).
 		 *
 		 * @thread_safety This function is not thread-safe.
 		 */
