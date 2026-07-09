@@ -42,7 +42,7 @@ namespace
     //}
 
     bool isParameter(std::string_view segment) {
-		return segment.find('{') != std::string_view::npos
+        return segment.find('{') != std::string_view::npos
             && segment.find('}') != std::string_view::npos
             && segment.find('{') < segment.find('}');
     }
@@ -89,28 +89,52 @@ namespace
         return std::string(segment);
     }
 
-    bool hasBalancedBraces(std::string_view pattern)
+    bool hasBalancedBracesPerSegment(const std::vector<std::string_view>& segments)
     {
-        int depth = 0;
+        for (const auto segment : segments) {
+            int depth = 0;
 
-        for (const char ch : pattern) {
-            if (ch == '{') {
-                ++depth;
+            for (const char ch : segment) {
+                if (ch == '{') {
+                    ++depth;
+                }
+                else if (ch == '}') {
+                    --depth;
 
-                if (depth > 1) {
-                    return false;
+                    if (depth < 0) {
+                        return false;
+                    }
                 }
             }
-            else if (ch == '}') {
-                --depth;
 
-                if (depth < 0) {
-                    return false;
+            if (depth != 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool hasNestedBraces(const std::vector<std::string_view>& segments)
+    {
+        for (const auto segment : segments) {
+            int depth = 0;
+
+            for (const char ch : segment) {
+                if (ch == '{') {
+                    ++depth;
+
+                    if (depth > 1) {
+                        return true;
+                    }
+                }
+                else if (ch == '}') {
+                    --depth;
                 }
             }
         }
 
-        return depth == 0;
+        return false;
     }
 
     bool emptyParameter(const std::vector<std::string_view>& parameters, std::string_view& empty) {
@@ -208,10 +232,15 @@ namespace mach::detail::routing
                 std::format("Invalid route definition '{}': Route must not contain whitespace", pattern)
             );
         }
-        if (!hasBalancedBraces(pattern)) {
+        if (!hasBalancedBracesPerSegment(segments)) {
             throw std::invalid_argument(
                 std::format("Invalid route definition '{}': Route must contain balanced braces", pattern)
             );
+        }
+        if (hasNestedBraces(segments)) {
+			throw std::invalid_argument(
+				std::format("Invalid route definition '{}': Route must not contain nested braces", pattern)
+			);
         }
         if (!parametersOccupyEntireSegments(segments, invalid)) {
             throw std::invalid_argument(
