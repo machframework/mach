@@ -36,9 +36,15 @@ namespace
         return segments;
     }
 
+    //bool isParameter(std::string_view segment) {
+    //    return segment.front() == '{'
+    //        && segment.back() == '}';
+    //}
+
     bool isParameter(std::string_view segment) {
-        return segment.front() == '{'
-            && segment.back() == '}';
+		return segment.find('{') != std::string_view::npos
+            && segment.find('}') != std::string_view::npos
+            && segment.find('{') < segment.find('}');
     }
 
     std::vector<std::string_view> extractParameterSegments(const std::vector<std::string_view>& segments) {
@@ -66,7 +72,7 @@ namespace
         return false;
     }
 
-    bool containsSpaces(const std::vector<std::string_view>& segments, std::string_view invalidSegment) {
+    bool containsSpaces(const std::vector<std::string_view>& segments) {
         for (const auto& segment : segments) {
             if (segment.find(' ') != std::string_view::npos) {
                 return true;
@@ -83,33 +89,28 @@ namespace
         return std::string(segment);
     }
 
-    bool validBraces(const std::vector<std::string_view>& segments) {
-        for (const auto& seg : segments) {
-            if (!isParameter(seg)) {
-                if ((seg.find('{') != std::string_view::npos || seg.find('}') != std::string_view::npos)) {
+    bool hasBalancedBraces(std::string_view pattern)
+    {
+        int depth = 0;
+
+        for (const char ch : pattern) {
+            if (ch == '{') {
+                ++depth;
+
+                if (depth > 1) {
                     return false;
                 }
             }
-            else {
-                auto opens = std::count(
-                    seg.begin(),
-                    seg.end(),
-                    '{'
-                );
+            else if (ch == '}') {
+                --depth;
 
-                auto closes = std::count(
-                    seg.begin(),
-                    seg.end(),
-                    '}'
-                );
-
-                if (opens != 1 || closes != 1) {
+                if (depth < 0) {
                     return false;
                 }
             }
         }
 
-        return true;
+        return depth == 0;
     }
 
     bool emptyParameter(const std::vector<std::string_view>& parameters, std::string_view& empty) {
@@ -135,6 +136,24 @@ namespace
 
         return false;
     }
+
+    bool parameterOccupiesEntireSegment(std::string_view segment)
+    {
+        return segment.size() >= 2 &&
+            segment.front() == '{' &&
+            segment.find('}') == segment.length() - 1;
+    }
+
+	bool parametersOccupyEntireSegments(const std::vector<std::string_view>& segments, std::string_view& invalid)
+	{
+		for (const auto& segment : segments) {
+			if (isParameter(segment) && !parameterOccupiesEntireSegment(segment)) {
+				invalid = segment;
+				return false;
+			}
+		}
+		return true;
+	}
 }
 
 namespace mach::detail::routing
@@ -154,10 +173,11 @@ namespace mach::detail::routing
 	void Router::addRoute(RouteEndpoint&& endpoint) {
         // enforce syntax
         const auto& pattern = endpoint.pattern;
+        std::string_view invalid;
 
         if (pattern.empty()) {
             throw std::invalid_argument(
-                std::format("Invalid route definition '{}': Route cannot be empty", pattern)
+                std::format("Invalid route definition: Route cannot be empty")
             );
         }
         if (pattern.front() != '/') {
@@ -183,38 +203,38 @@ namespace mach::detail::routing
 
         auto segments = splitToSegments(pattern); 
 
-        std::string_view segmentWithSpaces;
-        if (containsSpaces(segments, segmentWithSpaces)) {
+        if (containsSpaces(segments)) {
             throw std::invalid_argument(
                 std::format("Invalid route definition '{}': Route cannot contain white spaces", pattern)
             );
         }
-
-        if (!validBraces(segments)) {
+        if (!hasBalancedBraces(pattern)) {
             throw std::invalid_argument(
                 std::format("Invalid route definition '{}': Route must contain balanced braces", pattern)
+            );
+        }
+        if (!parametersOccupyEntireSegments(segments, invalid)) {
+            throw std::invalid_argument(
+                std::format("Invalid route definition '{}': Route parameters must occupy an entire path segment", pattern)
             );
         }
 
         const auto parameters = extractParameterSegments(segments);
 
-        std::string_view emptyParam;
-        if (emptyParameter(parameters, emptyParam)) {
+        if (emptyParameter(parameters, invalid)) {
             throw std::invalid_argument(
                 std::format(
-                    "Duplicate route parameter '{}' in route '{}'",
-                    extractParameter(emptyParam),
+                    "Empty route parameter in route '{}'",
                     endpoint.pattern
                 )
             );
         }
 
-        std::string_view duplicate;
-        if (containsDuplicateParameters(parameters, duplicate)) {
+        if (containsDuplicateParameters(parameters, invalid)) {
             throw std::invalid_argument(
                 std::format(
                     "Duplicate route parameter '{}' in route '{}'",
-                    extractParameter(duplicate),
+                    extractParameter(invalid),
                     endpoint.pattern
                 )
             );

@@ -37,11 +37,16 @@ namespace
 		// find constraint
 		auto constraintType = mach::detail::routing::toRouteConstraint(constraint);
 		if (!constraintType) {
-			throw std::invalid_argument("Invalid constraint type");
+			throw std::invalid_argument(
+				std::format("Invalid constraint type: '{}'", constraint)
+			);
 		}
 
 		if (param.empty()) {
-			throw std::invalid_argument("Parameter name cannot be empty");
+			return {
+				"", // empty param name
+				*constraintType
+			};
 		}
 	
 
@@ -95,6 +100,15 @@ namespace mach::detail::routing
 				if (isParameter(nextSegmentKey)) {
 					// find constraints
 					const auto [parameter, constraint] = extractParameter(nextSegmentKey);
+
+					if (parameter == "") {
+						throw std::invalid_argument(
+							std::format(
+								"Empty route parameter in route '{}'",
+								endpoint->pattern
+							)
+						);
+					}
 
 					if (!curr->constrainedParameterChildren.contains(constraint)) {
 						curr->constrainedParameterChildren.emplace(
