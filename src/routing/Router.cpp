@@ -187,12 +187,12 @@ namespace mach::detail::routing
         }
         if (pattern.length() != 1 && pattern.back() == '/') {
             throw std::invalid_argument(
-                std::format("Invalid route definition '{}': Route cannot end with '/'", pattern)
+                std::format("Invalid route definition '{}': Route must not end with '/'", pattern)
             );
         }
         if (containsRepeatedSlash(pattern)) {
             throw std::invalid_argument(
-                std::format("Invalid route definition '{}': Route cannot contain repeated '/'", pattern)
+                std::format("Invalid route definition '{}': Route must not contain consecutive  '/' characters", pattern)
             );
         }
         if (pattern.find('#') != std::string::npos || pattern.find('?') != std::string::npos) {
@@ -205,7 +205,7 @@ namespace mach::detail::routing
 
         if (containsSpaces(segments)) {
             throw std::invalid_argument(
-                std::format("Invalid route definition '{}': Route cannot contain white spaces", pattern)
+                std::format("Invalid route definition '{}': Route must not contain whitespace", pattern)
             );
         }
         if (!hasBalancedBraces(pattern)) {
@@ -224,7 +224,7 @@ namespace mach::detail::routing
         if (emptyParameter(parameters, invalid)) {
             throw std::invalid_argument(
                 std::format(
-                    "Empty route parameter in route '{}'",
+                    "Invalid route definition '{}': Route parameter name cannot be empty",
                     endpoint.pattern
                 )
             );
@@ -233,9 +233,9 @@ namespace mach::detail::routing
         if (containsDuplicateParameters(parameters, invalid)) {
             throw std::invalid_argument(
                 std::format(
-                    "Duplicate route parameter '{}' in route '{}'",
-                    extractParameter(invalid),
-                    endpoint.pattern
+                    "Invalid route definition '{}': Duplicate route parameter '{}'",
+                    endpoint.pattern,
+                    extractParameter(invalid)
                 )
             );
         }

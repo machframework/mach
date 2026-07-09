@@ -19,7 +19,7 @@ namespace
 			&& segment.back() == '}';
 	}
 
-	std::pair<std::string, RouteConstraint> extractParameter(std::string_view segment) {
+	std::pair<std::string, RouteConstraint> extractParameter(std::string_view pattern, std::string_view segment) {
 		segment.remove_prefix(1);
 		segment.remove_suffix(1);
 
@@ -34,11 +34,24 @@ namespace
 		auto param = segment.substr(0, pos);
 		auto constraint = segment.substr(pos + 1);
 
+		if (constraint.empty()) {
+			throw std::invalid_argument(
+				std::format(
+					"Invalid route definition '{}': Route parameter constraint cannot be empty",
+					pattern
+				)
+			);
+		}
+
 		// find constraint
 		auto constraintType = mach::detail::routing::toRouteConstraint(constraint);
 		if (!constraintType) {
 			throw std::invalid_argument(
-				std::format("Invalid constraint type: '{}'", constraint)
+				std::format(
+					"Invalid route definition '{}': Unknown route parameter constraint '{}'",
+					pattern,
+					constraint
+				)
 			);
 		}
 
@@ -99,12 +112,12 @@ namespace mach::detail::routing
 				
 				if (isParameter(nextSegmentKey)) {
 					// find constraints
-					const auto [parameter, constraint] = extractParameter(nextSegmentKey);
+					const auto [parameter, constraint] = extractParameter(endpoint->pattern, nextSegmentKey);
 
 					if (parameter == "") {
 						throw std::invalid_argument(
 							std::format(
-								"Empty route parameter in route '{}'",
+								"Invalid route definition '{}': Route parameter name cannot be empty",
 								endpoint->pattern
 							)
 						);
@@ -142,7 +155,7 @@ namespace mach::detail::routing
 		if (curr->endpointsByMethod.contains(endpoint->method)) {
 			throw std::logic_error(
 				std::format(
-					"Duplicate route registered: {} {}",
+					"Duplicate route registration '{} {}'",
 					mach::http::toString(endpoint->method),
 					segmentsToPath(segments)
 				)
