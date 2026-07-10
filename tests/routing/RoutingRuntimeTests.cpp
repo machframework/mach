@@ -15,6 +15,15 @@ int main()
 	// Static route
 	// -------------------------
 	{
+		app.mapGet("/", [](mach::Context& context) {
+			context.response.body("Root reached");
+			});
+	}
+
+	// -------------------------
+	// Static route
+	// -------------------------
+	{
 		app.mapGet("/runtime/static", [](mach::Context& context) {
 			context.response.body("static route reached");
 			});
