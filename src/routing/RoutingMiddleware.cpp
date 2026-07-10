@@ -25,7 +25,9 @@ namespace mach::detail::routing
 				allow += toString(method);
 			}
 
-			context.response.setHeader("Allow", allow);
+			if (!allow.empty()) {
+				context.response.setHeader("allow", allow);
+			}
 
 			return;
 		}
