@@ -190,6 +190,7 @@ namespace mach::detail::routing
         plan.status = match.status;
         plan.endpoint = match.endpoint;
         plan.params = std::move(match.params);
+        plan.allowedMethods = std::move(match.allowedMethods);
 
         return plan;
     }

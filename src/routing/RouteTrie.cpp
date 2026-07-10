@@ -5,8 +5,9 @@
 #include <functional>
 #include <iostream>
 #include <optional>
-#include <utility>
 #include <stdexcept>
+#include <unordered_set>
+#include <utility>
 
 #include <mach/detail/routing/RouteConstraint.hpp>
 
@@ -176,6 +177,7 @@ namespace mach::detail::routing
 		const RouteNode* curr = &m_root;
 
 		std::vector<std::string> capturedValues;
+		std::unordered_set<mach::http::Method> allowedMethods;
 
 		// check for root
 		if (segments.empty()) {
@@ -231,7 +233,11 @@ namespace mach::detail::routing
 								);
 							}
 
-							return routing::RouteMatch(RoutingStatus::MethodNotAllowed);
+							for (const auto& entry : childNode->endpointsByMethod) {
+								allowedMethods.insert(entry.first);
+							}
+
+							return routing::RouteMatch(std::move(allowedMethods));
 						}
 
 						auto endpoint = childNode->endpointsByMethod.find(method)->second;
@@ -277,7 +283,11 @@ namespace mach::detail::routing
 					return routing::RouteMatch(RoutingStatus::NotFound);
 				}
 
-				return routing::RouteMatch(RoutingStatus::MethodNotAllowed);
+				for (const auto& entry : endpointsByMethod) {
+					allowedMethods.insert(entry.first);
+				}
+
+				return routing::RouteMatch(std::move(allowedMethods));
 			}
 
 			curr = nextSegment->second.get();

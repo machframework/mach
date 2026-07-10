@@ -33,6 +33,7 @@ add_library(mach
     src/di/Container.cpp
     src/app/AppBuilder.cpp
     src/middleware/MiddlewarePipeline.cpp
+    src/routing/RoutingMiddleware.cpp
 )
 
 target_include_directories(mach
