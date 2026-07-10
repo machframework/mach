@@ -12,7 +12,7 @@ int main()
 	auto app = builder.build();
 
 	// -------------------------
-	// Static route
+	// Root route
 	// -------------------------
 	{
 		app.mapGet("/", [](mach::Context& context) {

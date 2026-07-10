@@ -185,6 +185,15 @@ namespace mach::detail::routing
 				auto endpoint = curr->endpointsByMethod.find(method)->second;
 				return RouteMatch(endpoint);
 			}
+			if (curr->endpointsByMethod.empty()) {
+				return routing::RouteMatch(RoutingStatus::NotFound);
+			}
+
+			for (const auto& entry : curr->endpointsByMethod) {
+				allowedMethods.insert(entry.first);
+			}
+
+			return routing::RouteMatch(std::move(allowedMethods));
 		}
 
 		for (auto it = segments.begin(); it != segments.end(); ++it) {
