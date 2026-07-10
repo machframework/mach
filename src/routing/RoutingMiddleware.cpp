@@ -13,16 +13,16 @@ namespace mach::detail::routing
 
 			std::string allow = "";
 
-			for (auto method : mach::http::allMethods) {
+			for (const mach::http::Method method : mach::http::allMethods) {
 				if (!plan.allowedMethods.contains(method)) {
 					continue;
 				}
 
-				if (allow.empty()) {
-					allow + ", ";
+				if (!allow.empty()) {
+					allow += ", ";
 				}
 
-				allow += mach::http::toString(method);
+				allow += toString(method);
 			}
 
 			context.response.setHeader("Allow", allow);
