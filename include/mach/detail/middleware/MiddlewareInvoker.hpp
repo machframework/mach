@@ -10,11 +10,11 @@ namespace mach::detail::middleware
 	class MiddlewareInvoker final : public IMiddlewareInvoker {
 
 	public:
-		void invoke(dispatching::RequestExecution& execution, middleware::Next next) override;
+		void invoke(dispatching::RequestExecution& execution, const middleware::Next& next) override;
 	};
 
 	template <typename TMiddleware>
-	void MiddlewareInvoker<TMiddleware>::invoke(dispatching::RequestExecution& execution, middleware::Next next) {
+	void MiddlewareInvoker<TMiddleware>::invoke(dispatching::RequestExecution& execution, const middleware::Next& next) {
 		auto& middleware = execution.scope.resolve<TMiddleware>();
 		
 		middleware.invoke(

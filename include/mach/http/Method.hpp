@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <string_view>
 
 namespace mach::http
@@ -28,4 +29,14 @@ namespace mach::http
 		default: return "UNKNOWN";
 		}
 	}
+
+	inline constexpr std::array allMethods{
+	Method::Get,
+	Method::Head,
+	Method::Post,
+	Method::Put,
+	Method::Patch,
+	Method::Delete,
+	Method::Options
+	};
 }

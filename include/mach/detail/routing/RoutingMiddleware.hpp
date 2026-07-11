@@ -17,23 +17,7 @@ namespace mach::detail::routing
 			: m_router(router)
 		{ }
 
-		void invoke(mach::Context& context, mach::Next next) {
-			auto plan = m_router.route(context.request);
-
-			if (!plan.found()) {
-				auto statusCode = routing::toStatusCode(plan.status);
-
-				context.response.status(statusCode);
-				context.response.body(std::string(mach::http::reasonPhrase(statusCode)));
-
-				return;
-			}
-
-			context.request.setRouteParams(std::move(plan.params));
-			context.executionPlan = std::move(plan);
-
-			next();
-		}
+		void invoke(mach::Context& context, const mach::Next& next);
 	private:
 		Router& m_router;
 	};

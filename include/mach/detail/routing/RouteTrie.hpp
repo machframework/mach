@@ -49,7 +49,14 @@ namespace mach::detail::routing
 			RouteNode& operator=(RouteNode&&) noexcept = default;
 		};
 
-		static std::string segmentsToPath(const std::vector<std::string_view>& segments);
+		routing::RouteMatch matchRoute(
+			mach::http::Method method,
+			const std::vector<std::string_view>& segments,
+			std::size_t index,
+			std::vector<std::string>& capturedValues,
+			std::unordered_set<mach::http::Method>& allowedMethods,
+			const RouteNode* curr
+		) const;
 
 		RouteNode m_root;
 	};

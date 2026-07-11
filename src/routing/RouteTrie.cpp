@@ -5,8 +5,9 @@
 #include <functional>
 #include <iostream>
 #include <optional>
-#include <utility>
 #include <stdexcept>
+#include <unordered_set>
+#include <utility>
 
 #include <mach/detail/routing/RouteConstraint.hpp>
 
@@ -19,7 +20,7 @@ namespace
 			&& segment.back() == '}';
 	}
 
-	std::pair<std::string, RouteConstraint> extractParameter(std::string_view segment) {
+	std::pair<std::string, RouteConstraint> extractParameter(std::string_view pattern, std::string_view segment) {
 		segment.remove_prefix(1);
 		segment.remove_suffix(1);
 
@@ -34,14 +35,32 @@ namespace
 		auto param = segment.substr(0, pos);
 		auto constraint = segment.substr(pos + 1);
 
+		if (constraint.empty()) {
+			throw std::invalid_argument(
+				std::format(
+					"Invalid route definition '{}': Route parameter constraint cannot be empty",
+					pattern
+				)
+			);
+		}
+
 		// find constraint
 		auto constraintType = mach::detail::routing::toRouteConstraint(constraint);
 		if (!constraintType) {
-			throw std::invalid_argument("Invalid constraint type");
+			throw std::invalid_argument(
+				std::format(
+					"Invalid route definition '{}': Unknown route parameter constraint '{}'",
+					pattern,
+					constraint
+				)
+			);
 		}
 
 		if (param.empty()) {
-			throw std::invalid_argument("Parameter name cannot be empty");
+			return {
+				"", // empty param name
+				*constraintType
+			};
 		}
 	
 
@@ -51,7 +70,7 @@ namespace
 		};
 	}
 
-	std::unordered_map<std::string, std::string> makeRouteParameters(const std::vector<std::string>& names, std::vector<std::string>&& values) {
+	std::unordered_map<std::string, std::string> makeRouteParameters(const std::vector<std::string>& names, const std::vector<std::string>& values) {
 		std::unordered_map<std::string, std::string> params;
 
 		if (names.size() != values.size()) {
@@ -73,7 +92,7 @@ namespace mach::detail::routing
 	void RouteTrie::addRoute(
 		std::vector<std::string_view>&& segments,
 		routing::RouteEndpoint* endpoint
-	) 
+	)
 	{
 		RouteNode* curr = &m_root;
 
@@ -85,16 +104,25 @@ namespace mach::detail::routing
 
 		for (auto it = segments.begin(); it != segments.end(); ++it) {
 			const auto& nextSegmentKey = *it;
-			
+
 			auto nextSegment = curr->childrenByStaticSegment.find(std::string(nextSegmentKey));
 
 			// child does not exist yet
 			if (nextSegment == curr->childrenByStaticSegment.end()) {
 				RouteNode* next = nullptr;
-				
+
 				if (isParameter(nextSegmentKey)) {
 					// find constraints
-					const auto [parameter, constraint] = extractParameter(nextSegmentKey);
+					const auto [parameter, constraint] = extractParameter(endpoint->pattern, nextSegmentKey);
+
+					if (parameter == "") {
+						throw std::invalid_argument(
+							std::format(
+								"Invalid route definition '{}': Route parameter name cannot be empty",
+								endpoint->pattern
+							)
+						);
+					}
 
 					if (!curr->constrainedParameterChildren.contains(constraint)) {
 						curr->constrainedParameterChildren.emplace(
@@ -116,7 +144,7 @@ namespace mach::detail::routing
 
 					next = pos->second.get();
 				}
-				
+
 				curr = next;
 			}
 			else {
@@ -126,13 +154,27 @@ namespace mach::detail::routing
 
 		// same route and method, reject
 		if (curr->endpointsByMethod.contains(endpoint->method)) {
-			throw std::logic_error(
-				std::format(
-					"Duplicate route registered: {} {}",
-					mach::http::toString(endpoint->method),
-					segmentsToPath(segments)
-				)
-			);
+			auto conflictingEndpoint = curr->endpointsByMethod.find(endpoint->method)->second;
+
+			if (endpoint->pattern == conflictingEndpoint->pattern) {
+				throw std::invalid_argument(
+					std::format(
+						"Invalid route definition '{}': An identical route is already registered for method {}",
+						endpoint->pattern,
+						mach::http::toString(endpoint->method)
+					)
+				);
+			}
+			else {
+				throw std::invalid_argument(
+					std::format(
+						"Invalid route definition '{}': The route is ambiguous with existing route '{}' for method {}",
+						endpoint->pattern,
+						conflictingEndpoint->pattern,
+						mach::http::toString(endpoint->method)
+					)
+				);
+			}
 		}
 
 		// same route, different method
@@ -149,6 +191,28 @@ namespace mach::detail::routing
 		const RouteNode* curr = &m_root;
 
 		std::vector<std::string> capturedValues;
+		std::unordered_set<mach::http::Method> allowedMethods;
+
+		return matchRoute(
+			method,
+			segments,
+			0,
+			capturedValues,
+			allowedMethods,
+			curr
+		);
+	}
+
+	routing::RouteMatch RouteTrie::matchRoute(
+		mach::http::Method method,
+		const std::vector<std::string_view>& segments,
+		std::size_t index,
+		std::vector<std::string>& capturedValues,
+		std::unordered_set<mach::http::Method>& allowedMethods,
+		const RouteNode* curr
+	) const
+	{
+		auto segmentsSize = segments.size();
 
 		// check for root
 		if (segments.empty()) {
@@ -156,75 +220,28 @@ namespace mach::detail::routing
 				auto endpoint = curr->endpointsByMethod.find(method)->second;
 				return RouteMatch(endpoint);
 			}
+			if (curr->endpointsByMethod.empty()) {
+				return routing::RouteMatch(RoutingStatus::NotFound);
+			}
+
+			for (const auto& entry : curr->endpointsByMethod) {
+				allowedMethods.insert(entry.first);
+			}
+
+			return routing::RouteMatch(allowedMethods);
 		}
 
-		for (auto it = segments.begin(); it != segments.end(); ++it) {
-			if (!curr) {
-				return routing::RouteMatch(RoutingStatus::NotFound);
-			}
+		// reached the end of the segments without finding a match
+		if (index >= segmentsSize || !curr) {
+			return routing::RouteMatch(RoutingStatus::NotFound);
+		}
 
-			auto nextSegment = curr->childrenByStaticSegment.find(std::string(*it));
-			if (nextSegment == curr->childrenByStaticSegment.end()) {
-				// check for parameters
-				if (!curr->constrainedParameterChildren.empty()) {
-					// find the parameter type of the segment
-					RouteConstraint constraint = RouteConstraint::String; // default to string
+		auto segmentKey = std::string(segments[index]);
+		auto nextSegment = curr->childrenByStaticSegment.find(segmentKey);
 
-					if (satisfiesConstraint(*it, RouteConstraint::Int)) {
-						constraint = RouteConstraint::Int;
-					}
-
-					RouteNode* childNode = nullptr;
-
-					if (curr->constrainedParameterChildren.contains(constraint)) {
-						childNode = curr->constrainedParameterChildren.find(constraint)->second.get();
-					}
-					else if (curr->constrainedParameterChildren.contains(RouteConstraint::String)) {
-						childNode = curr->constrainedParameterChildren.find(RouteConstraint::String)->second.get();
-					}
-					else {
-						// not found for the given param types
-						return RouteMatch(RoutingStatus::NotFound);
-					}
-
-					capturedValues.push_back(std::string(*it));
-
-					if (std::next(it) == segments.end()) {
-						if (childNode->endpointsByMethod.empty()) {
-							return routing::RouteMatch(RoutingStatus::NotFound);
-						}
-						if (!childNode->endpointsByMethod.contains(method)) {
-							if (method == http::Method::Head && childNode->endpointsByMethod.contains(http::Method::Get)) {
-								auto endpoint = childNode->endpointsByMethod.find(http::Method::Get)->second;
-								return routing::RouteMatch(
-									endpoint,
-									std::move(
-										makeRouteParameters(endpoint->parameterNames, std::move(capturedValues))
-									)
-								);
-							}
-
-							return routing::RouteMatch(RoutingStatus::MethodNotAllowed);
-						}
-
-						auto endpoint = childNode->endpointsByMethod.find(method)->second;
-
-						return routing::RouteMatch(
-							endpoint,
-							std::move(
-								makeRouteParameters(endpoint->parameterNames, std::move(capturedValues))
-							)
-						);
-					}
-
-					curr = childNode;
-					continue;
-				}
-
-				return routing::RouteMatch(RoutingStatus::NotFound);
-			}
-
-			if (std::next(it) == segments.end()) {
+		// try static route first
+		if (nextSegment != curr->childrenByStaticSegment.end()) {
+			if (index == segments.size() - 1) {
 				const auto& endpointsByMethod = nextSegment->second->endpointsByMethod;
 
 				if (endpointsByMethod.contains(method)) {
@@ -233,7 +250,7 @@ namespace mach::detail::routing
 					return routing::RouteMatch(
 						endpoint,
 						std::move(
-							makeRouteParameters(endpoint->parameterNames, std::move(capturedValues))
+							makeRouteParameters(endpoint->parameterNames, capturedValues)
 						)
 					);
 				}
@@ -242,7 +259,7 @@ namespace mach::detail::routing
 					return routing::RouteMatch(
 						endpoint,
 						std::move(
-							makeRouteParameters(endpoint->parameterNames, std::move(capturedValues))
+							makeRouteParameters(endpoint->parameterNames, capturedValues)
 						)
 					);
 				}
@@ -250,14 +267,94 @@ namespace mach::detail::routing
 					return routing::RouteMatch(RoutingStatus::NotFound);
 				}
 
-				return routing::RouteMatch(RoutingStatus::MethodNotAllowed);
+				for (const auto& entry : endpointsByMethod) {
+					allowedMethods.insert(entry.first);
+				}
+
+				return routing::RouteMatch(allowedMethods);
 			}
 
-			curr = nextSegment->second.get();
+			auto result = matchRoute(
+				method,
+				segments,
+				index + 1,
+				capturedValues,
+				allowedMethods,
+				nextSegment->second.get() // continue down the static route
+			);
+
+			if (result.status != RoutingStatus::NotFound) {
+				return result;
+			}
 		}
 
-		// reached the end of the segment list without finding a match
-		return routing::RouteMatch(routing::RoutingStatus::NotFound);
+		// check for parameters
+		if (!curr->constrainedParameterChildren.empty()) {
+			// find the parameter type of the segment
+			RouteConstraint constraint = RouteConstraint::String; // default to string
+
+			if (satisfiesConstraint(segmentKey, RouteConstraint::Int)) {
+				constraint = RouteConstraint::Int;
+			}
+
+			RouteNode* childNode = nullptr;
+
+			if (curr->constrainedParameterChildren.contains(constraint)) {
+				childNode = curr->constrainedParameterChildren.find(constraint)->second.get();
+			}
+			else if (curr->constrainedParameterChildren.contains(RouteConstraint::String)) {
+				childNode = curr->constrainedParameterChildren.find(RouteConstraint::String)->second.get();
+			}
+			else {
+				// not found for the given param types
+				return RouteMatch(RoutingStatus::NotFound);
+			}
+
+			capturedValues.push_back(segmentKey);
+
+			if (index == segmentsSize - 1) {
+				if (childNode->endpointsByMethod.empty()) {
+					return routing::RouteMatch(RoutingStatus::NotFound);
+				}
+				if (!childNode->endpointsByMethod.contains(method)) {
+					if (method == http::Method::Head && childNode->endpointsByMethod.contains(http::Method::Get)) {
+						auto endpoint = childNode->endpointsByMethod.find(http::Method::Get)->second;
+						return routing::RouteMatch(
+							endpoint,
+							std::move(
+								makeRouteParameters(endpoint->parameterNames, capturedValues)
+							)
+						);
+					}
+
+					for (const auto& entry : childNode->endpointsByMethod) {
+						allowedMethods.insert(entry.first);
+					}
+
+					return routing::RouteMatch(allowedMethods);
+				}
+
+				auto endpoint = childNode->endpointsByMethod.find(method)->second;
+
+				return routing::RouteMatch(
+					endpoint,
+					std::move(
+						makeRouteParameters(endpoint->parameterNames, capturedValues)
+					)
+				);
+			}
+
+			return matchRoute(
+				method,
+				segments,
+				index + 1,
+				capturedValues,
+				allowedMethods,
+				childNode // continue down the parameterized route
+			);
+		}
+
+		return routing::RouteMatch(RoutingStatus::NotFound);
 	}
 
 	void RouteTrie::debugDump() const {
@@ -314,19 +411,5 @@ namespace mach::detail::routing
 
 		print(m_root, "", true, false, std::nullopt);
 		std::cout << '\n';
-	}
-
-	std::string RouteTrie::segmentsToPath(const std::vector<std::string_view>& segments) {
-		std::string path = "/";
-
-		for (std::size_t i = 0; i < segments.size(); ++i) {
-			path += segments[i];
-
-			if (i + 1 < segments.size()) {
-				path += '/';
-			}
-		}
-
-		return path;
 	}
 }

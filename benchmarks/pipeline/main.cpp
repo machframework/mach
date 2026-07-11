@@ -28,14 +28,14 @@ struct UserService {
 };
 
 struct HeaderMiddleware {
-    void invoke(mach::Context& ctx, auto next) {
+    void invoke(mach::Context& ctx, const mach::Next& next) {
         ctx.response.setHeader("X-Mach-Benchmark", "middleware");
         next();
     }
 };
 
 struct TouchMiddleware {
-    void invoke(mach::Context& ctx, auto next) {
+    void invoke(mach::Context& ctx, const mach::Next& next) {
         ctx.response.setHeader("X-Touched", "1");
         next();
     }

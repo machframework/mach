@@ -12,6 +12,15 @@ int main()
 	auto app = builder.build();
 
 	// -------------------------
+	// Root route
+	// -------------------------
+	{
+		app.mapGet("/", [](mach::Context& context) {
+			context.response.body("Root reached");
+			});
+	}
+
+	// -------------------------
 	// Static route
 	// -------------------------
 	{
@@ -50,7 +59,7 @@ int main()
 	{
 		app.mapGet("/runtime/users/{userId}/posts/{postId}", [](mach::Context& context) {
 			context.response.body(
-				"user id: 123 " +
+				"user id: " +
 				std::string(context.request.routeParam("userId")) +
 				", post id: " +
 				std::string(context.request.routeParam("postId"))
@@ -84,6 +93,22 @@ int main()
 	{
 		app.mapPost("/runtime/post-route", [](mach::Context& context) {
 			context.response.body("POST route reached");
+			});
+	}
+
+	// -------------------------
+	// Static branch fallback to parameter route
+	// -------------------------
+	{
+		app.mapGet("/runtime/me/profile", [](mach::Context& context) {
+			context.response.body("static route reached");
+			});
+
+		app.mapGet("/runtime/{username}/posts", [](mach::Context& context) {
+			context.response.body(
+				"parameter route reached: " +
+				std::string(context.request.routeParam("username"))
+			);
 			});
 	}
 

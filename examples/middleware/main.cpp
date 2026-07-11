@@ -10,7 +10,7 @@
 class AuthMiddleware {
 
 public:
-	void invoke(mach::Context& context, mach::Next next) {
+	void invoke(mach::Context& context, const mach::Next& next) {
 		std::cout << "Before:\n";
 		next();
 		std::cout << "After:\n";
@@ -30,5 +30,5 @@ int main() {
 		context.response.body("Reached");
 	});
 
-	app.run();
+	return app.run();
 }

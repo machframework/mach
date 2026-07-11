@@ -14,7 +14,7 @@ namespace mach::detail::middleware
         !std::is_const_v<T> &&
         !std::is_reference_v<T> &&
         !std::is_pointer_v<T> &&
-        requires(T middleware, mach::Context & ctx, mach::Next next) {
+        requires(T middleware, mach::Context & ctx, const mach::Next& next) {
             { middleware.invoke(ctx, next) } -> std::same_as<void>;
     };
 }

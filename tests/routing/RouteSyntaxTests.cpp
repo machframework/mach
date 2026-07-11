@@ -25,6 +25,7 @@ int main() {
 			std::cout
 				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown! Missing leading / tests passed!"
+				<< " Got: " << ex.what()
 				<< testing::RESET
 				<< std::endl;
 		}
@@ -51,6 +52,7 @@ int main() {
 			std::cout
 				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
+				<< " Got: " << ex.what()
 				<< testing::RESET
 				<< std::endl;
 		}
@@ -68,6 +70,7 @@ int main() {
 			std::cout
 				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
+				<< " Got: " << ex.what()
 				<< testing::RESET
 				<< std::endl;
 		}
@@ -85,6 +88,7 @@ int main() {
 			std::cout
 				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
+				<< " Got: " << ex.what()
 				<< testing::RESET
 				<< std::endl;
 		}
@@ -118,6 +122,7 @@ int main() {
 			std::cout
 				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
+				<< " Got: " << ex.what()
 				<< testing::RESET
 				<< std::endl;
 		}
@@ -135,6 +140,7 @@ int main() {
 			std::cout
 				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
+				<< " Got: " << ex.what()
 				<< testing::RESET
 				<< std::endl;
 		}
@@ -152,6 +158,7 @@ int main() {
 			std::cout
 				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
+				<< " Got: " << ex.what()
 				<< testing::RESET
 				<< std::endl;
 		}
@@ -169,6 +176,7 @@ int main() {
 			std::cout
 				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
+				<< " Got: " << ex.what()
 				<< testing::RESET
 				<< std::endl;
 		}
@@ -186,6 +194,41 @@ int main() {
 			std::cout
 				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
+				<< " Got: " << ex.what()
+				<< testing::RESET
+				<< std::endl;
+		}
+		catch (...) {
+			testing::fail(testName, "An unknown exception was thrown");
+			return 1;
+		}
+
+		std::cout
+			<< testing::GREEN
+			<< testName
+			<< " tests passed!"
+			<< testing::RESET
+			<< "\n";
+	}
+
+	// -------------------------
+	// Nested braces
+	// -------------------------
+	{
+		const std::string testName = "Nested braces";
+
+		std::cout << "TEST: " << testName << "\n";
+
+		try {
+			app.mapGet("/{{users}}", [](mach::Context& context) {
+				// shouldn't be reached
+				});
+		}
+		catch (const std::invalid_argument& ex) {
+			std::cout
+				<< testing::GREEN
+				<< "[SUCCESS] invalid_argument exception thrown!"
+				<< " Got: " << ex.what()
 				<< testing::RESET
 				<< std::endl;
 		}
@@ -219,6 +262,7 @@ int main() {
 			std::cout
 				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
+				<< " Got: " << ex.what()
 				<< testing::RESET
 				<< std::endl;
 		}
@@ -236,6 +280,7 @@ int main() {
 			std::cout
 				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
+				<< " Got: " << ex.what()
 				<< testing::RESET
 				<< std::endl;
 		}
@@ -253,6 +298,7 @@ int main() {
 			std::cout
 				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown!"
+				<< " Got: " << ex.what()
 				<< testing::RESET
 				<< std::endl;
 		}
@@ -285,7 +331,8 @@ int main() {
 		catch (const std::invalid_argument& ex) {
 			std::cout
 				<< testing::GREEN
-				<< "[SUCCESS] invalid_argument exception thrown! Missing leading / tests passed!"
+				<< "[SUCCESS] invalid_argument exception thrown! Duplicate parameter names tests passed!"
+				<< " Got: " << ex.what()
 				<< testing::RESET
 				<< std::endl;
 		}
@@ -303,6 +350,7 @@ int main() {
 			std::cout
 				<< testing::GREEN
 				<< "[SUCCESS] invalid_argument exception thrown! Missing leading / tests passed!"
+				<< " Got: " << ex.what()
 				<< testing::RESET
 				<< std::endl;
 		}
@@ -335,7 +383,8 @@ int main() {
 		catch (const std::invalid_argument& ex) {
 			std::cout
 				<< testing::GREEN
-				<< "[SUCCESS] invalid_argument exception thrown! Missing leading / tests passed!"
+				<< "[SUCCESS] invalid_argument exception thrown! Unknown constraints tests passed!"
+				<< " Got: " << ex.what()
 				<< testing::RESET
 				<< std::endl;
 		}
@@ -352,7 +401,8 @@ int main() {
 		catch (const std::invalid_argument& ex) {
 			std::cout
 				<< testing::GREEN
-				<< "[SUCCESS] invalid_argument exception thrown! Missing leading / tests passed!"
+				<< "[SUCCESS] invalid_argument exception thrown! Unknown constraints tests passed!"
+				<< " Got: " << ex.what()
 				<< testing::RESET
 				<< std::endl;
 		}

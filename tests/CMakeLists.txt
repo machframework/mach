@@ -88,3 +88,8 @@ add_mach_test(
     InboundAdapterTests
     hardening/adapters/InboundAdapterTests.cpp
 )
+
+add_mach_test(
+    RouteRegistrationAmbiguityTests
+    routing/RouteRegistrationAmbiguityTests.cpp
+)

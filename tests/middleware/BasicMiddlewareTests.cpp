@@ -129,7 +129,7 @@ public:
 		: m_logger(logger)
 	{}
 
-	void invoke(mach::Context& context, mach::Next next) {
+	void invoke(mach::Context& context, const mach::Next& next) {
 		m_logger.log("Before:");
 		next();
 		m_logger.log("After:");
