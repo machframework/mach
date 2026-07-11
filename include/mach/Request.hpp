@@ -7,6 +7,7 @@
 
 #include <mach/http/Method.hpp>
 #include <mach/http/Version.hpp>
+#include <mach/StringConversion.hpp>
 
 namespace mach::detail
 {
@@ -109,6 +110,23 @@ namespace mach
 		 */
 		bool containsHeader(std::string_view name) const noexcept;
 
+		/** 
+		 * Returns the value of a route parameter converted to the specified type.
+		 * 
+		 * @tparam T Type to convert the route parameter value to.
+		 * 
+		 * @param name Route parameter name (case-sensitive). 
+		 * 
+		 * @return The route parameter value converted to T. 
+		 * 
+		 * @throws std::invalid_argument If the route parameter value cannot be converted to T. 
+		 * @throws std::out_of_range If the route parameter does not exist. 
+		 * @throws std::bad_alloc If memory allocation fails during conversion. 
+		 * @thread_safety This function is thread-safe. 
+		 */
+		template <typename T>
+		T routeParam(std::string_view name) const;
+
 		/**
 		 * Returns the value of an HTTP header.
 		 *
@@ -146,4 +164,9 @@ namespace mach
 		friend class detail::application::Runtime;
 		friend class detail::routing::RoutingMiddleware;
 	};
+
+	template <typename T>
+	T Request::routeParam(std::string_view name) const {
+		return mach::fromString<T>(routeParam(name));
+	}
 }

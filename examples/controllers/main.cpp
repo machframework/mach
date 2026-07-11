@@ -23,7 +23,7 @@ public:
 	mach::Reply<int> calculateAge() {
 		constexpr int currentYear = 2026;
 		
-		int birthYear = mach::fromString<int>(context->request.routeParam("birth"));
+		int birthYear = context->request.routeParam<int>("birth");
 		int age = currentYear - birthYear;
 
 		std::cout << "I am " << age << "\n";
