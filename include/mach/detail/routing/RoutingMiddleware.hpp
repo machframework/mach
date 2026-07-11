@@ -17,7 +17,7 @@ namespace mach::detail::routing
 			: m_router(router)
 		{ }
 
-		void invoke(mach::Context& context, mach::Next next);
+		void invoke(mach::Context& context, const mach::Next& next);
 	private:
 		Router& m_router;
 	};

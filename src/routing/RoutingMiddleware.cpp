@@ -2,7 +2,7 @@
 
 namespace mach::detail::routing
 {
-	void RoutingMiddleware::invoke(mach::Context& context, mach::Next next) {
+	void RoutingMiddleware::invoke(mach::Context& context, const mach::Next& next) {
 		auto plan = m_router.route(context.request);
 
 		if (!plan.found()) {
