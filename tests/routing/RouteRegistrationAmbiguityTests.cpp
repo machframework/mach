@@ -61,5 +61,20 @@ int main() {
 			testing::fail(testName, "An unknown exception was thrown");
 			return 1;
 		}
+
+		try {
+			app.mapGet("/users/{age:int}", [](mach::Context& context) {
+				});
+
+			std::cout
+				<< testing::GREEN
+				<< "[SUCCESS] registration succeeded! Path parameter ambiguity tests passed!"
+				<< testing::RESET
+				<< std::endl;
+		}
+		catch (...) {
+			testing::fail(testName, "An unknown exception was thrown");
+			return 1;
+		}
 	}
 }

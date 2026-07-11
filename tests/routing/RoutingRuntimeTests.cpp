@@ -96,6 +96,22 @@ int main()
 			});
 	}
 
+	// -------------------------
+	// Static branch fallback to parameter route
+	// -------------------------
+	{
+		app.mapGet("/runtime/me/profile", [](mach::Context& context) {
+			context.response.body("static route reached");
+			});
+
+		app.mapGet("/runtime/{username}/profile", [](mach::Context& context) {
+			context.response.body(
+				"parameter route reached: " +
+				std::string(context.request.routeParam("username"))
+			);
+			});
+	}
+
 	std::cout
 		<< testing::GREEN
 		<< "[INFO] Routing runtime test server running on http://127.0.0.1:3143"
