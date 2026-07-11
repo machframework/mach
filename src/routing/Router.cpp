@@ -197,7 +197,7 @@ namespace mach::detail::routing
 
 	void Router::addRoute(RouteEndpoint&& endpoint) {
         // enforce syntax
-        const auto& pattern = endpoint.pattern;
+        auto& pattern = endpoint.pattern;
         std::string_view invalid;
 
         if (pattern.empty()) {
@@ -210,15 +210,14 @@ namespace mach::detail::routing
                 std::format("Invalid route definition '{}': Route must begin with '/'", pattern)
             );
         }
-        if (pattern.length() != 1 && pattern.back() == '/') {
-            throw std::invalid_argument(
-                std::format("Invalid route definition '{}': Route must not end with '/'", pattern)
-            );
-        }
         if (containsRepeatedSlash(pattern)) {
             throw std::invalid_argument(
                 std::format("Invalid route definition '{}': Route must not contain consecutive  '/' characters", pattern)
             );
+        }
+        if (pattern.length() != 1 && pattern.back() == '/') {
+			// remove trailing slash
+            pattern.pop_back();
         }
         if (pattern.find('#') != std::string::npos || pattern.find('?') != std::string::npos) {
             throw std::invalid_argument(

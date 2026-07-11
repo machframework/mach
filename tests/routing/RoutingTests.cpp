@@ -392,9 +392,9 @@ int main()
 	// Reject trailing slash
 	// -------------------------
 	{
-		constexpr std::string_view testName = "Reject trailing slash";
+		constexpr std::string_view testName = "Accept trailing slash";
 
-		expectInvalidArgument(testName, [&] {
+		expectValid(testName, [&] {
 			app.mapGet("/routing/trailing-slash/", [](mach::Context&) {});
 			});
 	}
