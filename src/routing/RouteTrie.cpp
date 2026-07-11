@@ -154,13 +154,27 @@ namespace mach::detail::routing
 
 		// same route and method, reject
 		if (curr->endpointsByMethod.contains(endpoint->method)) {
-			throw std::logic_error(
-				std::format(
-					"Duplicate route registration '{} {}'",
-					mach::http::toString(endpoint->method),
-					segmentsToPath(segments)
-				)
-			);
+			auto conflictingEndpoint = curr->endpointsByMethod.find(endpoint->method)->second;
+
+			if(endpoint->pattern == conflictingEndpoint->pattern) {
+				throw std::invalid_argument(
+					std::format(
+						"Invalid route definition '{}': An identical route is already registered for method {}",
+						endpoint->pattern,
+						mach::http::toString(endpoint->method)
+					)
+				);
+			}
+			else {
+				throw std::invalid_argument(
+					std::format(
+						"Invalid route definition '{}': The route is ambiguous with existing route '{}' for method {}",
+						endpoint->pattern,
+						conflictingEndpoint->pattern,
+						mach::http::toString(endpoint->method)
+					)
+				);
+			}
 		}
 
 		// same route, different method
