@@ -389,7 +389,7 @@ int main()
 	}
 
 	// -------------------------
-	// Reject trailing slash
+	// Accept trailing slash
 	// -------------------------
 	{
 		constexpr std::string_view testName = "Accept trailing slash";
