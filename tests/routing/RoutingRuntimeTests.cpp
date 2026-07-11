@@ -59,7 +59,7 @@ int main()
 	{
 		app.mapGet("/runtime/users/{userId}/posts/{postId}", [](mach::Context& context) {
 			context.response.body(
-				"user id: 123 " +
+				"user id: " +
 				std::string(context.request.routeParam("userId")) +
 				", post id: " +
 				std::string(context.request.routeParam("postId"))
@@ -104,7 +104,7 @@ int main()
 			context.response.body("static route reached");
 			});
 
-		app.mapGet("/runtime/{username}/profile", [](mach::Context& context) {
+		app.mapGet("/runtime/{username}/posts", [](mach::Context& context) {
 			context.response.body(
 				"parameter route reached: " +
 				std::string(context.request.routeParam("username"))

@@ -27,7 +27,7 @@ namespace mach::detail::routing
 			endpoint(endpoint)
 		{ }
 
-		explicit RouteMatch(std::unordered_set<mach::http::Method>&& allowedMethods)
+		explicit RouteMatch(std::unordered_set<mach::http::Method> allowedMethods)
 			: status(routing::RoutingStatus::MethodNotAllowed),
 			allowedMethods(std::move(allowedMethods))
 		{ }
