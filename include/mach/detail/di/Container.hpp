@@ -164,7 +164,6 @@ namespace mach::detail::di
                 );
         }
 
-
         constexpr bool validService =
             serviceIsClass &&
             serviceIsNotPointer &&
@@ -263,8 +262,10 @@ namespace mach::detail::di
                                 );
 
                             if constexpr (constructibleImplementation) {
+								const std::type_index type = typeid(T);
+
                                 ServiceDescriptor descriptor{
-                                    .type = typeid(T),
+                                    .type = type,
                                     .lifetime = lifetime,
                                     .factory = [](Scope& scope) {
                                         return std::make_shared<T>(
@@ -274,15 +275,15 @@ namespace mach::detail::di
                                 };
 
                                 auto [_, inserted] = m_serviceRegistry.emplace(
-                                    descriptor.type,
+                                    type,
                                     std::move(descriptor)
                                 );
 
                                 if (!inserted) {
                                     throw std::logic_error(
                                         std::format(
-                                            "Mach DI error: duplicate dependency registration: {}",
-                                            descriptor.type.name()
+                                            "Mach DI error: duplicate service registration: {}",
+                                            type.name()
                                         )
                                     );
                                 }
