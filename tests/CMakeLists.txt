@@ -99,7 +99,7 @@ add_mach_test(
     hardening/di/CompileTimeGuards.cpp
 )
 
-set(MACH_DI_COMPILE_FAILURE_TEST 0)
+set(MACH_DI_COMPILE_FAILURE_TEST 16)
 
 target_compile_definitions(
     CompileTimeGuards

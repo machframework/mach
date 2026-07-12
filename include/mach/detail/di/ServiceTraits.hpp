@@ -6,6 +6,15 @@
 
 namespace mach::detail::di
 {
+    template <typename T, typename = void>
+    inline constexpr bool isCompleteType = false;
+
+    template <typename T>
+    inline constexpr bool isCompleteType<
+        T,
+        std::void_t<decltype(sizeof(T))>
+    > = true;
+
     template <typename T>
     concept CompleteType = requires {
         sizeof(T);
