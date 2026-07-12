@@ -26,8 +26,10 @@ namespace mach::detail::di
 		std::unordered_map<std::type_index, std::shared_ptr<void>> m_scopedInstances;
 		std::vector<std::shared_ptr<void>> m_transientInstances;
 
-		Container& m_container;
+		std::vector<std::type_index> m_resolutionStack;
+
 		friend class Container;
+		Container& m_container;
 	};
 
 	template <typename T>
