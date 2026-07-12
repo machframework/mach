@@ -122,6 +122,7 @@ namespace mach
 		 * @throws std::invalid_argument If the route parameter value cannot be converted to T. 
 		 * @throws std::out_of_range If the route parameter does not exist. 
 		 * @throws std::bad_alloc If memory allocation fails during conversion. 
+		 * 
 		 * @thread_safety This function is thread-safe. 
 		 */
 		template <typename T>

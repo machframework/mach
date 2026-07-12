@@ -112,6 +112,28 @@ int main()
 			});
 	}
 
+	// -------------------------
+	// Static branch fallback to parameter route with double backtracking
+	// -------------------------
+	{
+		app.mapGet("/runtime/me/profile/details", [](mach::Context& context) {
+			context.response.body("first static route reached");
+			});
+
+		app.mapGet("/runtime/{username}/posts/archive/details", [](mach::Context& context) {
+			context.response.body("second static route reached");
+			});
+
+		app.mapGet("/runtime/{username}/posts/{postId}/comments", [](mach::Context& context) {
+			context.response.body(
+				"username: " +
+				std::string(context.request.routeParam("username")) +
+				", post id: " +
+				std::string(context.request.routeParam("postId"))
+			);
+			});
+	}
+
 	std::cout
 		<< testing::GREEN
 		<< "[INFO] Routing runtime test server running on http://127.0.0.1:3143"
@@ -168,9 +190,16 @@ int main()
 
 		<< "GET  /runtime/does-not-exist\n"
 		<< "=> 404\n"
+
+		<< "GET /runtime/me/posts\n"
+		<< "=> 200, 'parameter route reached: me'\n"
+		<< "\n"
+
+		<< "GET /runtime/me/posts/archive/comments\n"
+		<< "=> 200, 'username: me, post id: archive'\n"
+		<< "\n"
+
 		<< std::endl;
 
-	app.run();
-
-	return 0;
+	return app.run();
 }
