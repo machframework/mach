@@ -106,3 +106,8 @@ target_compile_definitions(
     PRIVATE
         MACH_DI_COMPILE_FAILURE_TEST=${MACH_DI_COMPILE_FAILURE_TEST}
 )
+
+add_mach_test(
+    AdvancedLifetimeTests
+    hardening/di/AdvancedLifetimeTests.cpp
+)
