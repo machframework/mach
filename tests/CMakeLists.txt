@@ -1,21 +1,21 @@
-function(add_mach_test bench_name)
-    add_executable("${bench_name}"
+function(add_mach_test test_name)
+    add_executable("${test_name}"
         ${ARGN}
     )
 
-    target_link_libraries("${bench_name}"
+    target_link_libraries("${test_name}"
         PRIVATE mach
     )
 
-    target_include_directories("${bench_name}"
+    target_include_directories("${test_name}"
         PRIVATE
             ${CMAKE_SOURCE_DIR}/src
             ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
     add_test(
-        NAME "${bench_name}"
-        COMMAND "${bench_name}"
+        NAME "${test_name}"
+        COMMAND "${test_name}"
     )
 endfunction()
 
@@ -92,4 +92,17 @@ add_mach_test(
 add_mach_test(
     RouteRegistrationAmbiguityTests
     routing/RouteRegistrationAmbiguityTests.cpp
+)
+
+add_mach_test(
+    CompileTimeGuards
+    hardening/di/CompileTimeGuards.cpp
+)
+
+set(MACH_DI_COMPILE_FAILURE_TEST 0)
+
+target_compile_definitions(
+    CompileTimeGuards
+    PRIVATE
+        MACH_DI_COMPILE_FAILURE_TEST=${MACH_DI_COMPILE_FAILURE_TEST}
 )
