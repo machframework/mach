@@ -22,7 +22,7 @@ namespace mach::detail::di
 		template <typename T>
         void addSingletonInstance(T&& instance);
 
-		const ServiceDescriptor& getDescriptor(std::type_index type) const;
+		const ServiceDescriptor* getDescriptor(std::type_index type) const;
         std::shared_ptr<void> getOrCreateSingleton(std::type_index type, Scope& container);
 
 		Scope createScope();

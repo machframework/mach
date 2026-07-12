@@ -12,16 +12,25 @@ namespace mach::detail::di
 			return m_scopedInstances.find(type)->second;
 		}
 
-		const auto& descriptor = m_container.getDescriptor(type);
+		const auto* descriptor = m_container.getDescriptor(type);
 
-		if (descriptor.lifetime == ServiceLifetime::Singleton) {
-			return m_container.getOrCreateSingleton(descriptor.type, *this);
+		if (descriptor == nullptr) {
+			throw std::logic_error(
+				std::format(
+					"Mach DI error: service not registered: {}",
+					type.name()
+				)
+			);
 		}
 
-		auto instance = descriptor.factory(*this);
+		if (descriptor->lifetime == ServiceLifetime::Singleton) {
+			return m_container.getOrCreateSingleton(descriptor->type, *this);
+		}
 
-		if (descriptor.lifetime == ServiceLifetime::Scoped) {
-			m_scopedInstances.emplace(descriptor.type, instance);
+		auto instance = descriptor->factory(*this);
+
+		if (descriptor->lifetime == ServiceLifetime::Scoped) {
+			m_scopedInstances.emplace(descriptor->type, instance);
 		}
 		else {
 			m_transientInstances.push_back(instance);

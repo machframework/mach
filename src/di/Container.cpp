@@ -5,14 +5,14 @@
 
 namespace mach::detail::di
 {
-	const ServiceDescriptor& Container::getDescriptor(std::type_index type) const {
-		if (!m_serviceRegistry.contains(type)) {
-			throw std::runtime_error(
-				std::format("Dependency missing: {}", type.name())
-			);
+	const ServiceDescriptor* Container::getDescriptor(std::type_index type) const {
+		const auto descriptor = m_serviceRegistry.find(type);
+
+		if(descriptor == m_serviceRegistry.end()) {
+			return nullptr;
 		}
 
-		return m_serviceRegistry.find(type)->second;
+		return &descriptor->second;
 	}
 
 	Scope Container::createScope() {

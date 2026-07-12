@@ -63,7 +63,7 @@ int main() {
 	try {
 		auto& userService = scope.resolve<UserService>();
 	}
-	catch (const std::runtime_error& ex) {
+	catch (const std::logic_error& ex) {
 		std::cout << "Error: " << ex.what() << std::endl;
 	}
 }
