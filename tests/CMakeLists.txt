@@ -121,3 +121,8 @@ add_mach_test(
     DIThreadSafetyTests
     hardening/di/DIThreadSafetyTests.cpp
 )
+
+add_mach_test(
+    ConstructionExceptionSafety
+    hardening/di/ConstructionExceptionSafety.cpp
+)
