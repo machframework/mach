@@ -111,3 +111,8 @@ add_mach_test(
     AdvancedLifetimeTests
     hardening/di/AdvancedLifetimeTests.cpp
 )
+
+add_mach_test(
+    DIInvalidLifetimeTests
+    hardening/di/DIInvalidLifetimeTests.cpp
+)
