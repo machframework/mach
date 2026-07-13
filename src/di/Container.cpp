@@ -1,8 +1,6 @@
 #include <mach/detail/di/Container.hpp>
 
-#include <format>
-#include <mutex>
-#include <stdexcept>
+#include <vector>
 
 namespace mach::detail::di
 {
@@ -23,6 +21,18 @@ namespace mach::detail::di
 	void Container::finalizeRegistrations() {
 		for (const auto& [type, descriptor] : m_serviceRegistry) {
 			if (descriptor.lifetime == ServiceLifetime::Singleton) {
+				const auto scopedDependency = findScopedDependency(descriptor);
+
+				if (scopedDependency) {
+					throw std::logic_error(
+						"Mach error: singleton service '" +
+						std::string(type.name()) +
+						"' cannot depend directly or indirectly on scoped service '" +
+						std::string(scopedDependency->name()) +
+						"'"
+					);
+				}
+
 				m_singletonEntries.try_emplace(
 					type,
 					std::make_unique<SingletonEntry>()
@@ -44,5 +54,23 @@ namespace mach::detail::di
 		);
 
 		return entry.instance;
+	}
+
+	std::optional<std::type_index> Container::findScopedDependency(const ServiceDescriptor& descriptor) const {
+		for (const auto dependencyType : descriptor.dependencies) {
+			const auto& dependency =
+				m_serviceRegistry.at(dependencyType);
+
+			if (dependency.lifetime == ServiceLifetime::Scoped) {
+				return dependencyType;
+			}
+
+			if (auto scopedDependency =
+				findScopedDependency(dependency)) {
+				return scopedDependency;
+			}
+		}
+
+		return std::nullopt;
 	}
 }

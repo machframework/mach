@@ -4,6 +4,7 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <stdexcept>
 #include <typeindex>
 
@@ -31,6 +32,8 @@ namespace mach::detail::di
         void finalizeRegistrations();
 
 	private:
+        std::optional<std::type_index> findScopedDependency(const ServiceDescriptor& descriptor) const;
+
 		std::unordered_map<std::type_index, ServiceDescriptor> m_serviceRegistry;
 
         struct SingletonEntry {
@@ -271,11 +274,14 @@ namespace mach::detail::di
                                 );
 
                             if constexpr (constructibleImplementation) {
-								const std::type_index type = typeid(T);
+                                const std::type_index type = typeid(T);
 
                                 ServiceDescriptor descriptor{
                                     .type = type,
                                     .lifetime = lifetime,
+                                    .dependencies = {
+                                        std::type_index(typeid(Deps))...
+                                    },
                                     .factory = [](Scope& scope) {
                                         return std::make_shared<T>(
                                             scope.resolve<Deps>()...
