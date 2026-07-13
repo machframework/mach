@@ -126,3 +126,8 @@ add_mach_test(
     ConstructionExceptionSafety
     hardening/di/ConstructionExceptionSafety.cpp
 )
+
+add_mach_test(
+    ResourceCleanupTests
+    hardening/di/ResourceCleanupTests.cpp
+)
