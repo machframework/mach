@@ -116,3 +116,8 @@ add_mach_test(
     DIInvalidLifetimeTests
     hardening/di/DIInvalidLifetimeTests.cpp
 )
+
+add_mach_test(
+    DIThreadSafetyTests
+    hardening/di/DIThreadSafetyTests.cpp
+)
