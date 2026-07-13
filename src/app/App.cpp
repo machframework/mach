@@ -109,6 +109,7 @@ namespace mach
 	int App::Impl::run() {
 		// add router to container
 		m_container.addSingletonInstance<detail::routing::Router>(std::move(m_router));
+		m_container.finalizeRegistrations();
 
 		try {
 

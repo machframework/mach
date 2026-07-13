@@ -3,6 +3,7 @@
 #include <format>
 #include <functional>
 #include <memory>
+#include <mutex>
 #include <stdexcept>
 #include <typeindex>
 
@@ -27,9 +28,17 @@ namespace mach::detail::di
 
 		Scope createScope();
 
+        void finalizeRegistrations();
+
 	private:
 		std::unordered_map<std::type_index, ServiceDescriptor> m_serviceRegistry;
-        std::unordered_map<std::type_index, std::shared_ptr<void>> m_singletonInstances;
+
+        struct SingletonEntry {
+            std::once_flag initializationFlag;
+            std::shared_ptr<void> instance;
+        };
+
+        std::unordered_map<std::type_index, std::unique_ptr<SingletonEntry>> m_singletonEntries;
 	};
 
     template <typename T, typename... Deps>
@@ -297,18 +306,46 @@ namespace mach::detail::di
 
     template <typename T>
     void Container::addSingletonInstance(T&& instance) {
+        const std::type_index type = typeid(T);
+
+        if (m_serviceRegistry.contains(type) ||
+            m_singletonEntries.contains(type)) {
+            throw std::logic_error(
+                "Mach error: service is already registered"
+            );
+        }
+
         ServiceDescriptor descriptor{
-            .type = typeid(T),
+            .type = type,
             .lifetime = ServiceLifetime::Singleton
         };
 
-        m_singletonInstances.emplace(
-            typeid(T),
-            std::make_shared<T>(std::move(instance))
+        auto sharedInstance = std::make_shared<T>(
+            std::move(instance)
+        );
+
+        auto [it, inserted] = m_singletonEntries.try_emplace(
+            type,
+            std::make_unique<SingletonEntry>()
+        );
+
+        if (!inserted) {
+            throw std::logic_error(
+                "Mach error: singleton entry already exists"
+            );
+        }
+
+        auto& entry = *it->second;
+
+        std::call_once(
+            entry.initializationFlag,
+            [&entry, sharedInstance = std::move(sharedInstance)]() mutable {
+                entry.instance = std::move(sharedInstance);
+            }
         );
 
         m_serviceRegistry.emplace(
-            descriptor.type,
+            type,
             std::move(descriptor)
         );
     }

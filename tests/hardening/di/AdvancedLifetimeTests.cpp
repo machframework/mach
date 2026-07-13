@@ -104,6 +104,8 @@ namespace
             di::ServiceLifetime::Transient
         );
 
+        container.finalizeRegistrations();
+
         auto scope = container.createScope();
 
         try {
@@ -147,6 +149,8 @@ namespace
         container.addService<FirstConsumer, Dependency>(
             di::ServiceLifetime::Transient
         );
+
+        container.finalizeRegistrations();
 
         auto firstScope = container.createScope();
         auto secondScope = container.createScope();
@@ -197,6 +201,8 @@ namespace
             di::ServiceLifetime::Transient
         );
 
+        container.finalizeRegistrations();
+
         auto scope = container.createScope();
 
         try {
@@ -240,6 +246,8 @@ namespace
         container.addService<FirstConsumer, Dependency>(
             di::ServiceLifetime::Transient
         );
+
+        container.finalizeRegistrations();
 
         auto firstScope = container.createScope();
         auto secondScope = container.createScope();
@@ -286,6 +294,8 @@ namespace
             di::ServiceLifetime::Transient
         );
 
+        container.finalizeRegistrations();
+
         auto scope = container.createScope();
 
         try {
@@ -330,6 +340,8 @@ namespace
             di::ServiceLifetime::Transient
         );
 
+        container.finalizeRegistrations();
+
         auto firstScope = container.createScope();
         auto secondScope = container.createScope();
 
@@ -372,6 +384,8 @@ namespace
         container.addService<ThrowingService>(
             di::ServiceLifetime::Scoped
         );
+
+        container.finalizeRegistrations();
 
         auto scope = container.createScope();
 
@@ -443,6 +457,8 @@ namespace
         container.addService<ThrowingService>(
             di::ServiceLifetime::Singleton
         );
+
+        container.finalizeRegistrations();
 
         auto firstScope = container.createScope();
 
