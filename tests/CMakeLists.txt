@@ -131,3 +131,8 @@ add_mach_test(
     ResourceCleanupTests
     hardening/di/ResourceCleanupTests.cpp
 )
+
+add_mach_test(
+    ImmovableServiceTests
+    hardening/di/ImmovableServiceTests.cpp
+)
