@@ -64,7 +64,8 @@ namespace mach
 			throw;
 		}
 		
-		m_container.addService<detail::binding::BodyBinder>(detail::di::ServiceLifetime::Singleton);
+		
+		m_container.addService<detail::binding::BodyBinder>(detail::di::ServiceLifetime::Singleton, detail::di::ServiceAccess::Internal);
 
 		return mach::App(
 			std::move(m_serverOptions),

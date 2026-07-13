@@ -7,6 +7,8 @@
 #include <optional>
 #include <stdexcept>
 #include <typeindex>
+#include <unordered_map>
+#include <unordered_set>
 
 #include <mach/detail/di/ServiceLifetime.hpp>
 #include <mach/detail/di/ServiceTraits.hpp>
@@ -19,7 +21,7 @@ namespace mach::detail::di
 		
 	public:
 		template <typename T, typename... Deps>
-		void addService(ServiceLifetime lifetime);
+		void addService(ServiceLifetime lifetime, ServiceAccess access = ServiceAccess::User);
 
 		template <typename T>
         void addSingletonInstance(T&& instance);
@@ -31,10 +33,15 @@ namespace mach::detail::di
 
         void finalizeRegistrations();
 
+        template <typename T>
+        void reserveInternal();
+
 	private:
         std::optional<std::type_index> findScopedDependency(const ServiceDescriptor& descriptor) const;
+        std::optional<std::type_index> findInaccessibleDependency(const ServiceDescriptor& descriptor) const;
 
 		std::unordered_map<std::type_index, ServiceDescriptor> m_serviceRegistry;
+        std::unordered_set<std::type_index> m_reservedTypes;
 
         struct SingletonEntry {
             std::once_flag initializationFlag;
@@ -45,7 +52,7 @@ namespace mach::detail::di
 	};
 
     template <typename T, typename... Deps>
-    void Container::addService(ServiceLifetime lifetime) {
+    void Container::addService(ServiceLifetime lifetime, ServiceAccess access) {
         constexpr bool serviceIsClass =
             std::is_class_v<T>;
 
@@ -82,7 +89,6 @@ namespace mach::detail::di
 
 
         // Service shape validation
-
         static_assert(
             serviceIsNotPointer,
             "Mach DI error: service type must not be a pointer"
@@ -130,7 +136,6 @@ namespace mach::detail::di
 
 
         // Dependency shape validation
-
         static_assert(
             dependenciesAreNotPointers,
             "Mach DI error: dependency types must not be pointers"
@@ -279,6 +284,7 @@ namespace mach::detail::di
                                 ServiceDescriptor descriptor{
                                     .type = type,
                                     .lifetime = lifetime,
+                                    .access = access,
                                     .dependencies = {
                                         std::type_index(typeid(Deps))...
                                     },
@@ -323,7 +329,8 @@ namespace mach::detail::di
 
         ServiceDescriptor descriptor{
             .type = type,
-            .lifetime = ServiceLifetime::Singleton
+            .lifetime = ServiceLifetime::Singleton,
+            .access = ServiceAccess::Internal
         };
 
         auto sharedInstance = std::make_shared<T>(
@@ -354,5 +361,10 @@ namespace mach::detail::di
             type,
             std::move(descriptor)
         );
+    }
+
+    template <typename T>
+    void Container::reserveInternal() {
+        m_reservedTypes.insert(typeid(T));
     }
 }
