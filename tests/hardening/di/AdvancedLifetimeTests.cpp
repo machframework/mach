@@ -84,6 +84,34 @@ namespace
         inline static bool s_shouldThrow = true;
     };
 
+    class TrackedService
+    {
+    public:
+        TrackedService()
+        {
+            ++s_aliveCount;
+        }
+
+        ~TrackedService()
+        {
+            --s_aliveCount;
+        }
+
+        static void reset() noexcept
+        {
+            s_aliveCount = 0;
+        }
+
+        [[nodiscard]]
+        static int aliveCount() noexcept
+        {
+            return s_aliveCount;
+        }
+
+    private:
+        inline static int s_aliveCount = 0;
+    };
+
 
     void testScopedDependencySharedWithinScope()
     {
@@ -519,6 +547,82 @@ namespace
             testing::fail(testName, exception.what());
         }
     }
+
+
+    void testScopedInstanceDestroyedWithScope()
+    {
+        constexpr std::string_view testName =
+            "Scoped instance destroyed with scope";
+
+        TrackedService::reset();
+
+        di::Container container;
+
+        container.addService<TrackedService>(
+            di::ServiceLifetime::Scoped
+        );
+
+        container.finalizeRegistrations();
+
+        {
+            auto scope = container.createScope();
+
+            [[maybe_unused]]
+            auto& service = scope.resolve<TrackedService>();
+
+            if (TrackedService::aliveCount() != 1) {
+                testing::fail(
+                    testName,
+                    "Scoped instance was not alive after resolution"
+                );
+
+                return;
+            }
+        }
+
+        if (TrackedService::aliveCount() != 0) {
+            testing::fail(
+                testName,
+                "Scoped instance survived scope destruction"
+            );
+
+            return;
+        }
+
+        testing::success(testName);
+    }
+
+
+    void testUnusedScopeConstructsNothing()
+    {
+        constexpr std::string_view testName =
+            "Unused scope constructs no services";
+
+        TrackedService::reset();
+
+        di::Container container;
+
+        container.addService<TrackedService>(
+            di::ServiceLifetime::Scoped
+        );
+
+        container.finalizeRegistrations();
+
+        {
+            auto scope = container.createScope();
+        }
+
+        if (TrackedService::aliveCount() != 0) {
+            testing::fail(
+                testName,
+                "Creating an unused scope constructed a service"
+            );
+
+            return;
+        }
+
+        testing::success(testName);
+    }
 }
 
 
@@ -535,6 +639,9 @@ int main()
 
     testScopedConstructionFailureDoesNotPoisonCache();
     testSingletonConstructionFailureDoesNotPoisonCache();
+
+    testScopedInstanceDestroyedWithScope();
+    testUnusedScopeConstructsNothing();
 
     return 0;
 }
