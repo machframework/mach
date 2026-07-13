@@ -20,11 +20,18 @@ namespace mach::detail::di
 	}
 
 	std::shared_ptr<void> Container::getOrCreateSingleton(std::type_index type, Scope& scope) {
-		if (m_singletonInstances.contains(type)) {
-			return m_singletonInstances.find(type)->second;
+		// TODO: make thread-safe for first call of each singleton
+		auto storedInstance = m_singletonInstances.find(type);
+		if (storedInstance != m_singletonInstances.end()) {
+			return storedInstance->second;
 		}
 
-		auto instance = m_serviceRegistry.find(type)->second.factory(scope);
+		auto descriptor = m_serviceRegistry.find(type);
+		if (descriptor == m_serviceRegistry.end()) {
+			return nullptr;
+		}
+
+		auto instance = descriptor->second.factory(scope);
 		m_singletonInstances.emplace(type, instance);
 
 		return instance;
