@@ -136,3 +136,8 @@ add_mach_test(
     ImmovableServiceTests
     hardening/di/ImmovableServiceTests.cpp
 )
+
+add_mach_test(
+    DIReservedServiceTests
+    hardening/di/DIReservedServiceTests.cpp
+)

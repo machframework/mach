@@ -64,7 +64,8 @@ namespace mach
 			throw;
 		}
 		
-		
+		m_container.reserveInternal<detail::routing::Router>();
+
 		m_container.addService<detail::binding::BodyBinder>(detail::di::ServiceLifetime::Singleton, detail::di::ServiceAccess::Internal);
 
 		return mach::App(
