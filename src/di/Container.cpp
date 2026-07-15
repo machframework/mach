@@ -53,7 +53,6 @@ namespace mach::detail::di
 	}
 
 	std::shared_ptr<void> Container::getOrCreateSingleton(std::type_index type, Scope& scope) {
-		// TODO: make thread-safe for first call of each singleton
 		auto& entry = *m_singletonEntries.at(type);
 		const auto& descriptor = m_serviceRegistry.at(type);
 

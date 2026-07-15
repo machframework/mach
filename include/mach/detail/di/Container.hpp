@@ -281,6 +281,15 @@ namespace mach::detail::di
                             if constexpr (constructibleImplementation) {
                                 const std::type_index type = typeid(T);
 
+                                if (m_reservedTypes.contains(type)) {
+                                    throw std::logic_error(
+                                        std::format(
+											"Mach DI error: service '{}' is reserved for internal use",
+											std::string(type.name())
+										)
+                                    );
+                                }
+
                                 ServiceDescriptor descriptor{
                                     .type = type,
                                     .lifetime = lifetime,
@@ -365,6 +374,7 @@ namespace mach::detail::di
 
     template <typename T>
     void Container::reserveInternal() {
+        // TODO: enforce in registration
         m_reservedTypes.insert(typeid(T));
     }
 }
