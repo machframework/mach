@@ -20,14 +20,6 @@ namespace mach::detail::di
         sizeof(T);
     };
 
-    template <typename T>
-    inline constexpr bool isValidServiceType =
-        CompleteType<T> &&
-        std::same_as<T, std::remove_cvref_t<T>>&&
-        std::is_class_v<T> &&
-        !std::same_as<T, std::string> &&
-        !std::same_as<T, std::string_view>;
-
     template <typename T, typename... Deps>
     inline constexpr bool containsType =
         (std::same_as<T, Deps> || ...);
