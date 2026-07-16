@@ -46,7 +46,7 @@ namespace mach
 		// register preprocessing middleware
 
 		// register routing middleware
-		this->use<detail::routing::RoutingMiddleware, detail::routing::Router>();
+		this->use<detail::routing::RoutingMiddleware, detail::routing::Router>(mach::detail::di::ServiceAccess::Internal);
 	}
 
 	App AppBuilder::build(){
