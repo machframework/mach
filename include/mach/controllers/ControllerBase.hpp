@@ -24,8 +24,7 @@ namespace mach
 
 		static mach::Reply<std::string> created(const char* value);
 
-		template <typename T>
-		mach::Reply<T> noContent();
+		mach::Reply<> noContent();
 
 		template <typename T>
 		mach::Reply<T> badRequest();
@@ -61,9 +60,8 @@ namespace mach
 		return mach::results::created(value);
 	}
 
-	template <typename T>
-	mach::Reply<T> ControllerBase::noContent() {
-		return mach::results::noContent<T>();
+	inline mach::Reply<> ControllerBase::noContent() {
+		return mach::results::noContent();
 	}
 
 	template <typename T>

@@ -4,6 +4,7 @@
 #include <memory>
 #include <tuple>
 #include <typeindex>
+#include <utility>
 
 #include <mach/detail/binding/BodyBinder.hpp>
 #include <mach/detail/controllers/ControllerTraits.hpp>
@@ -34,8 +35,8 @@ namespace mach::detail::dispatching
     };
 
     template <
-        mach::detail::controllers::MachController TController,
-        mach::detail::results::ReplyResult TResult,
+        detail::controllers::MachController TController,
+        detail::results::ReplyResult TResult,
         typename... TArgs
     >
     void ControllerActionInvoker<TController, TResult, TArgs...>::invoke(RequestExecution& execution) const {
@@ -58,8 +59,15 @@ namespace mach::detail::dispatching
             }();
 
         execution.context.response.status(res.statusCode());
-        if (res.hasValue()) {
-            execution.context.response.body(std::move(serialization::Serializer::serialize(res.value())));
+        
+        using ValueType = typename TResult::ValueType;
+
+        if constexpr (!std::same_as<ValueType, void>) {
+            if (res.hasValue()) {
+                execution.context.response.body(
+                    serialization::Serializer::serialize(res.value())
+                );
+            }
         }
     }
 
