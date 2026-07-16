@@ -17,28 +17,28 @@ namespace mach
 		template <typename T>
 		mach::Reply<T> ok(T value);
 
-		static mach::Reply<std::string> ok(const char* value);
+		mach::Reply<std::string> ok(const char* value);
 
 		template <typename T>
 		mach::Reply<T> created(T value);
 
-		static mach::Reply<std::string> created(const char* value);
+		mach::Reply<std::string> created(const char* value);
 
 		mach::Reply<> noContent();
 
-		template <typename T>
+		template <typename T = void>
 		mach::Reply<T> badRequest();
 
-		template <typename T>
+		template <typename T = void>
 		mach::Reply<T> unauthorized();
 
-		template <typename T>
+		template <typename T = void>
 		mach::Reply<T> forbidden();
 
-		template <typename T>
+		template <typename T = void>
 		mach::Reply<T> notFound();
 
-		template <typename T>
+		template <typename T = void>
 		mach::Reply<T> conflict();
 	};
 
