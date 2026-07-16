@@ -247,7 +247,7 @@ namespace mach
 
 		void addRouteImpl(detail::routing::RouteEndpoint route);
 
-		void addControllerRoutesImpl(std::vector<detail::routing::RouteEndpoint> routes);
+		void addControllerRoutesImpl(std::vector<detail::routing::RouteEndpoint> routes, std::type_index controllerType);
 
 		class Impl;
 		std::unique_ptr<Impl> m_impl;
@@ -296,7 +296,7 @@ namespace mach
 		ControllerBuilder<TController> builder;
 		TController::configure(builder);
 
-		addControllerRoutesImpl(std::move(builder.m_controllerEndpoints));
+		addControllerRoutesImpl(std::move(builder.m_controllerEndpoints), typeid(TController));
 		return *this;
 	}
 }

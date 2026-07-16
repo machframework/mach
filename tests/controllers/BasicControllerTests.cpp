@@ -136,7 +136,5 @@ int main() {
 	auto app = builder.build();
 	app.mapController<UserController>();
 
-	app.run();
-
-	return 0;
+	return app.run();
 }
