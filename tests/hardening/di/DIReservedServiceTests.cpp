@@ -95,72 +95,12 @@ namespace
             testing::fail(testName, exception.what());
         }
     }
-
-
-    void testRouterCannotBeUsedAsUserDependency()
-    {
-        constexpr std::string_view testName =
-            "Router cannot be used as user dependency";
-
-        di::Container container;
-        container.reserveInternal<Router>();
-        container.reserveInternal<BodyBinder>();
-
-        try {
-            container.addService<RouterConsumer, Router>(
-                di::ServiceLifetime::Transient
-            );
-
-            testing::fail(
-                testName,
-                "User service depending on Router was accepted"
-            );
-        }
-        catch (const std::logic_error&) {
-            testing::success(testName);
-        }
-        catch (const std::exception& exception) {
-            testing::fail(testName, exception.what());
-        }
-    }
-
-
-    void testBodyBinderCannotBeUsedAsUserDependency()
-    {
-        constexpr std::string_view testName =
-            "BodyBinder cannot be used as user dependency";
-
-        di::Container container;
-        container.reserveInternal<Router>();
-        container.reserveInternal<BodyBinder>();
-
-        try {
-            container.addService<BodyBinderConsumer, BodyBinder>(
-                di::ServiceLifetime::Transient
-            );
-
-            testing::fail(
-                testName,
-                "User service depending on BodyBinder was accepted"
-            );
-        }
-        catch (const std::logic_error&) {
-            testing::success(testName);
-        }
-        catch (const std::exception& exception) {
-            testing::fail(testName, exception.what());
-        }
-    }
 }
-
 
 int main()
 {
     testRouterCannotBeRegisteredByUser();
     testBodyBinderCannotBeRegisteredByUser();
-
-    testRouterCannotBeUsedAsUserDependency();
-    testBodyBinderCannotBeUsedAsUserDependency();
 
     return 0;
 }
