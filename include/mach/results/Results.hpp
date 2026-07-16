@@ -25,9 +25,8 @@ namespace mach::results {
         return created(std::string(value));
     }
 
-    template <typename T>
-    Reply<T> noContent() {
-        return Reply<T>(http::StatusCode::NoContent);
+    inline Reply<> noContent() {
+        return Reply<>(http::StatusCode::NoContent);
     }
 
     template <typename T>
@@ -54,5 +53,4 @@ namespace mach::results {
     Reply<T> conflict() {
         return Reply<T>(http::StatusCode::Conflict);
     }
-
 }

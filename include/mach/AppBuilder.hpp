@@ -9,6 +9,7 @@
 #include <mach/detail/app/ServerOptions.hpp>
 #include <mach/detail/controllers/ControllerTraits.hpp>
 #include <mach/detail/di/Container.hpp>
+#include <mach/detail/di/ServiceDescriptor.hpp>
 #include <mach/detail/middleware/MiddlewarePipeline.hpp>
 #include <mach/detail/middleware/MiddlewareTraits.hpp>
 
@@ -151,6 +152,9 @@ namespace mach
 		detail::app::ServerOptions m_serverOptions;
 		detail::di::Container m_container;
 		detail::middleware::MiddlewarePipeline m_middlewarePipeline;
+
+		template <typename T, typename... Deps>
+		AppBuilder& use(mach::detail::di::ServiceAccess access);
 	};
 
 	template <typename T, typename... Deps>
@@ -215,21 +219,26 @@ namespace mach
 
 	template <typename T, typename... Deps>
 	AppBuilder& AppBuilder::use() {
+		return this->use<T, Deps...>(mach::detail::di::ServiceAccess::User);
+	}
+
+	template <typename T, typename... Deps>
+	AppBuilder& AppBuilder::use(mach::detail::di::ServiceAccess access) {
 		constexpr bool isMiddlewareType = mach::detail::middleware::MachMiddleware<T>;
 		constexpr bool isController = mach::detail::controllers::ControllerType<T>;
 
 		static_assert(
 			isMiddlewareType,
 			"Mach error: middleware must expose a public method void invoke(mach::Context&, mach::Next)"
-		);
+			);
 
 		static_assert(
 			!isController,
 			"Mach error: middleware type must not be a controller."
-		);
+			);
 
 		if constexpr (isMiddlewareType || !isController) {
-			m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Scoped);
+			m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Scoped, access);
 		}
 
 		// add to middleware pipeline

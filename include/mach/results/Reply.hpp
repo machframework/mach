@@ -7,10 +7,12 @@
 
 namespace mach
 {
-	template <typename T>
+	template <typename T = void>
 	class Reply {
 	
 	public:
+		using ValueType = T;
+
 		Reply(http::StatusCode statusCode, T value);
 		explicit Reply(http::StatusCode statusCode);
 
@@ -23,10 +25,34 @@ namespace mach
 		std::optional<T> m_value;
 	};
 
+	template <>
+	class Reply<void>
+	{
+	public:
+		using ValueType = void;
+
+		explicit Reply(http::StatusCode statusCode)
+			: m_statusCode(statusCode)
+		{}
+
+		http::StatusCode statusCode() const noexcept
+		{
+			return m_statusCode;
+		}
+
+		bool hasValue() const noexcept
+		{
+			return false;
+		}
+
+	private:
+		http::StatusCode m_statusCode;
+	};
+
 	template <typename T>
 	Reply<T>::Reply(http::StatusCode statusCode, T value) 
 		: m_statusCode(statusCode),
-		m_value(value)
+		m_value(std::move(value))
 	{ }
 
 	template <typename T>

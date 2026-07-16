@@ -1,9 +1,9 @@
-function(add_mach_bench bench_name)
-    add_executable("${bench_name}"
+function(add_mach_bench test_name)
+    add_executable("${test_name}"
         ${ARGN}
     )
 
-    target_link_libraries("${bench_name}"
+    target_link_libraries("${test_name}"
         PRIVATE mach
     )
 endfunction()

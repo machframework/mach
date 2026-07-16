@@ -46,7 +46,7 @@ namespace mach
 		// register preprocessing middleware
 
 		// register routing middleware
-		this->use<detail::routing::RoutingMiddleware, detail::routing::Router>();
+		this->use<detail::routing::RoutingMiddleware, detail::routing::Router>(mach::detail::di::ServiceAccess::Internal);
 	}
 
 	App AppBuilder::build(){
@@ -64,7 +64,9 @@ namespace mach
 			throw;
 		}
 		
-		m_container.addService<detail::binding::BodyBinder>(detail::di::ServiceLifetime::Singleton);
+		m_container.reserveInternal<detail::routing::Router>();
+
+		m_container.addService<detail::binding::BodyBinder>(detail::di::ServiceLifetime::Singleton, detail::di::ServiceAccess::Internal);
 
 		return mach::App(
 			std::move(m_serverOptions),
