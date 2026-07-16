@@ -12,6 +12,7 @@
 
 #include <mach/detail/di/ServiceLifetime.hpp>
 #include <mach/detail/di/ServiceTraits.hpp>
+#include <mach/detail/di/InternalServiceTypes.hpp>
 
 #include "Scope.hpp"
 
@@ -86,7 +87,6 @@ namespace mach::detail::di
         constexpr bool dependenciesAreAllowedTypes =
             ((!std::same_as<Deps, std::string> &&
                 !std::same_as<Deps, std::string_view>) && ...);
-
 
         // Service shape validation
         static_assert(
@@ -270,52 +270,81 @@ namespace mach::detail::di
                             noSelfDependency &&
                             uniqueDependencies
                             ) {
-                            constexpr bool constructibleImplementation =
-                                std::is_constructible_v<T, Deps&...>;
+                            constexpr bool serviceAllowed =
+                                !isForbiddenDIType<T>;
+
+                            constexpr bool dependenciesAllowed =
+                                (!isForbiddenDIType<Deps> && ...);
 
                             static_assert(
-                                constructibleImplementation,
-                                "Mach DI error: service cannot be constructed from the declared dependencies"
+                                serviceAllowed,
+                                "Mach DI error: this Mach framework type cannot be registered as a service"
                                 );
 
-                            if constexpr (constructibleImplementation) {
-                                const std::type_index type = typeid(T);
+                            static_assert(
+                                dependenciesAllowed,
+                                "Mach DI error: user services cannot depend on Mach framework types"
+                                );
 
-                                if (m_reservedTypes.contains(type)) {
-                                    throw std::logic_error(
-                                        std::format(
-											"Mach DI error: service '{}' is reserved for internal use",
-											std::string(type.name())
-										)
+                            if constexpr (
+                                serviceAllowed &&
+                                dependenciesAllowed
+                                )
+                            {
+                                constexpr bool constructibleImplementation =
+                                    std::is_constructible_v<T, Deps&...>;
+
+                                static_assert(
+                                    constructibleImplementation,
+                                    "Mach DI error: service cannot be constructed from the declared dependencies"
                                     );
-                                }
 
-                                ServiceDescriptor descriptor{
-                                    .type = type,
-                                    .lifetime = lifetime,
-                                    .access = access,
-                                    .dependencies = {
-                                        std::type_index(typeid(Deps))...
-                                    },
-                                    .factory = [](Scope& scope) {
-                                        return std::make_shared<T>(
-                                            scope.resolve<Deps>()...
-                                        );
-                                    }
-                                };
+                                if constexpr (constructibleImplementation) {
 
-                                auto [_, inserted] = m_serviceRegistry.emplace(
-                                    type,
-                                    std::move(descriptor)
-                                );
-
-                                if (!inserted) {
-                                    throw std::logic_error(
-                                        std::format(
-                                            "Mach DI error: duplicate service registration: {}",
-                                            type.name()
+                                    if constexpr (
+                                        serviceAllowed &&
+                                        dependenciesAllowed
                                         )
-                                    );
+                                    {
+                                        const std::type_index type = typeid(T);
+
+                                        if (m_reservedTypes.contains(type)) {
+                                            throw std::logic_error(
+                                                std::format(
+                                                    "Mach DI error: service '{}' is reserved for internal use",
+                                                    std::string(type.name())
+                                                )
+                                            );
+                                        }
+
+                                        ServiceDescriptor descriptor{
+                                            .type = type,
+                                            .lifetime = lifetime,
+                                            .access = access,
+                                            .dependencies = {
+                                                std::type_index(typeid(Deps))...
+                                            },
+                                            .factory = [](Scope& scope) {
+                                                return std::make_shared<T>(
+                                                    scope.resolve<Deps>()...
+                                                );
+                                            }
+                                        };
+
+                                        auto [_, inserted] = m_serviceRegistry.emplace(
+                                            type,
+                                            std::move(descriptor)
+                                        );
+
+                                        if (!inserted) {
+                                            throw std::logic_error(
+                                                std::format(
+                                                    "Mach DI error: duplicate service registration: {}",
+                                                    type.name()
+                                                )
+                                            );
+                                        }
+                                    }
                                 }
                             }
                         }
