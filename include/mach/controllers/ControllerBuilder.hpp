@@ -255,6 +255,12 @@ namespace mach
                     "Mach error: route handler must belong to the controller being registered."
                     );
 
+				if (!pattern.empty() && pattern.front() != '/') {
+					throw std::invalid_argument(
+						"Mach error: route pattern must start with a leading slash ('/')."
+					);
+				}
+
                 detail::routing::RouteEndpoint endpoint{
                     .method = method,
                     .pattern = m_route + std::string(pattern),
