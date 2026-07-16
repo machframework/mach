@@ -5,6 +5,8 @@
 #include <mach/results/Reply.hpp>
 #include <mach/AppBuilder.hpp>
 
+#include <mach/diagnostics/TerminateHandler.hpp>
+
 #include "Testing.hpp"
 
 // dependencies
@@ -120,6 +122,8 @@ private:
 // controller
 
 int main() {
+	mach::installTerminateHandler();
+
 	auto builder = mach::AppBuilder(std::move(testing::serverOptions));
 
 	builder.addSingleton<Logger>();

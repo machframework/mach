@@ -34,6 +34,7 @@ add_library(mach
     src/app/AppBuilder.cpp
     src/middleware/MiddlewarePipeline.cpp
     src/routing/RoutingMiddleware.cpp
+    src/diagnostics/TerminateHandler.cpp
 )
 
 target_include_directories(mach
