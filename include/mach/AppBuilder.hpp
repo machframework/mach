@@ -197,9 +197,16 @@ namespace mach
 
 	template <typename T, typename... Deps>
 	AppBuilder& AppBuilder::addController() {
-		constexpr bool isControllerType = mach::detail::controllers::ControllerType<T>;
-		constexpr bool hasRouteField = mach::detail::controllers::HasPublicStaticRouteField<T>;
+		using Controller = std::remove_cvref_t<T>;
+
+		constexpr bool isControllerType = mach::detail::controllers::ControllerType<Controller>;
+		constexpr bool hasRouteField = mach::detail::controllers::HasPublicStaticRouteField<Controller>;
 		
+		static_assert(
+			std::same_as<T, Controller>,
+			"Mach error: controller type must not be const, volatile, or a reference"
+			);
+
 		static_assert(
 			isControllerType,
 			"Mach error: controller must be derived from ControllerBase"
@@ -207,7 +214,7 @@ namespace mach
 
 		static_assert(
 			hasRouteField,
-			"Mach error: controller must expose a public std::string route field"
+			"Mach error: controller must expose a public static route of type std::string, std::string_view, or another type convertible to std::string_view"
 		);
 
 		if constexpr (isControllerType && hasRouteField) {
