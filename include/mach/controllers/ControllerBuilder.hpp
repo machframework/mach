@@ -218,32 +218,53 @@ namespace mach
         THandler&& handler)
     {
         using HandlerType = std::remove_cvref_t<THandler>;
-        using Traits = detail::FunctionTraits<HandlerType>;
 
-        using HandlerControllerType = typename Traits::ClassType;
-        using ReturnType = typename Traits::ReturnType;
-        using ArgsTuple = typename Traits::ArgsTuple;
-
-        using InvokerType =
-            typename detail::dispatching::ControllerActionInvokerFromTuple<
-            TController,
-            ReturnType,
-            ArgsTuple
-            >::Type;
+        constexpr bool isMemberFunction =
+            std::is_member_function_pointer_v<HandlerType>;
 
         static_assert(
-            std::same_as<HandlerControllerType, TController>,
-            "Mach error: route handler must belong to the controller being registered."
+            isMemberFunction,
+            "Mach error: route handler must be a non-static controller member function."
             );
 
-        detail::routing::RouteEndpoint endpoint{
-            .method = method,
-            .pattern = m_route + std::string(pattern),
-            .invoker = std::make_unique<InvokerType>(
-                std::forward<THandler>(handler)
-             )
-        };
+        if constexpr (isMemberFunction) {
+            using Traits = detail::FunctionTraits<HandlerType>;
 
-        m_controllerEndpoints.emplace_back(std::move(endpoint));
+            using HandlerControllerType = typename Traits::ClassType;
+            using ReturnType = typename Traits::ReturnType;
+            using ArgsTuple = typename Traits::ArgsTuple;
+
+			constexpr bool isSameController =
+				std::same_as<HandlerControllerType, TController>;
+
+            static_assert(
+                isSameController,
+                "Mach error: route handler must belong to the controller being registered."
+                );
+
+            if constexpr (isSameController) {
+                using InvokerType =
+                    typename detail::dispatching::ControllerActionInvokerFromTuple<
+                    TController,
+                    ReturnType,
+                    ArgsTuple
+                    >::Type;
+
+                static_assert(
+                    std::same_as<HandlerControllerType, TController>,
+                    "Mach error: route handler must belong to the controller being registered."
+                    );
+
+                detail::routing::RouteEndpoint endpoint{
+                    .method = method,
+                    .pattern = m_route + std::string(pattern),
+                    .invoker = std::make_unique<InvokerType>(
+                        std::forward<THandler>(handler)
+                     )
+                };
+
+                m_controllerEndpoints.emplace_back(std::move(endpoint));
+            }
+        }
     }
 }
