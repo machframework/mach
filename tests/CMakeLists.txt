@@ -146,3 +146,8 @@ add_mach_test(
     GeneralControllerTests
     hardening/controllers/GeneralControllerTests.cpp
 )
+
+add_mach_test(
+    ControllerResolutionTests
+    hardening/controllers/ControllerResolutionTests.cpp
+)

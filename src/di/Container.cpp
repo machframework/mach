@@ -83,7 +83,18 @@ namespace mach::detail::di
 
 	std::optional<std::type_index> Container::findInaccessibleDependency(const ServiceDescriptor& descriptor) const {
 		for (const auto dependencyType : descriptor.dependencies) {
-			const auto& dependency = m_serviceRegistry.at(dependencyType);
+			const auto dependencyIt = m_serviceRegistry.find(dependencyType);
+			if (dependencyIt == m_serviceRegistry.end()) {
+				throw std::logic_error(
+					"Mach error: service '" +
+					std::string(descriptor.type.name()) +
+					"' depends on unregistered service '" +
+					std::string(dependencyType.name()) +
+					"'"
+				);
+			}
+
+			const auto& dependency = dependencyIt->second;
 
 			if (dependency.access == ServiceAccess::Internal) {
 				return dependencyType;
