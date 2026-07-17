@@ -43,30 +43,39 @@ namespace mach::detail::dispatching
         auto& controller = execution.scope.resolve<TController>();
         controller.context = &execution.context;
 
-        TResult res = [&]() -> TResult {
-            if constexpr (sizeof...(TArgs) == 0) {
-                return std::invoke(m_action, controller);
-            }
-            else {
-                // TEMPORARY: body param is always first
-                using BodyType = std::tuple_element_t<0, std::tuple<TArgs...>>;
+        constexpr std::size_t parameterCount = sizeof...(TArgs);
 
-                auto& binder = execution.scope.resolve<binding::BodyBinder>();
-                BodyType body = binder.bind<BodyType>(execution.context.request.body());
+        static_assert(
+            parameterCount <= 1,
+            "Mach error: controller actions may accept at most one parameter, which is bound from the request body."
+            );
 
-                return std::invoke(m_action, controller, std::move(body));
-            }
-            }();
+        if constexpr (parameterCount <= 1) {
+            TResult res = [&]() -> TResult {
+                if constexpr (parameterCount == 0) {
+                    return std::invoke(m_action, controller);
+                }
+                else {
+                    // TEMPORARY: body param is always first
+                    using BodyType = std::tuple_element_t<0, std::tuple<TArgs...>>;
 
-        execution.context.response.status(res.statusCode());
-        
-        using ValueType = typename TResult::ValueType;
+                    auto& binder = execution.scope.resolve<binding::BodyBinder>();
+                    BodyType body = binder.bind<BodyType>(execution.context.request.body());
 
-        if constexpr (!std::same_as<ValueType, void>) {
-            if (res.hasValue()) {
-                execution.context.response.body(
-                    serialization::Serializer::serialize(res.value())
-                );
+                    return std::invoke(m_action, controller, std::move(body));
+                }
+                }();
+
+            execution.context.response.status(res.statusCode());
+
+            using ValueType = typename TResult::ValueType;
+
+            if constexpr (!std::same_as<ValueType, void>) {
+                if (res.hasValue()) {
+                    execution.context.response.body(
+                        serialization::Serializer::serialize(res.value())
+                    );
+                }
             }
         }
     }
