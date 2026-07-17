@@ -1,5 +1,4 @@
 #include <string_view>
-#include <mutex>
 
 #include <mach/AppBuilder.hpp>
 #include <mach/controllers/ControllerBase.hpp>
@@ -23,8 +22,8 @@ class GeneralController : public mach::ControllerBase {
 public:
 	inline static constexpr std::string_view route = "/general";
 
-	mach::Reply<int> getAge(std::mutex& mtx) {
-		return ok(5);
+	int getAge(Person person) {
+		return person.age;
 	}
 
 	static void configure(mach::ControllerBuilder<GeneralController>& routes) {

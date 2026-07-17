@@ -7,6 +7,7 @@
 
 #include <mach/detail/core/FunctionTraits.hpp>
 #include <mach/detail/dispatching/ControllerActionInvoker.hpp>
+#include <mach/detail/dispatching/ReplyTraits.hpp>
 #include <mach/detail/routing/RouteEndpoint.hpp>
 #include <mach/http/Method.hpp>
 
@@ -250,26 +251,32 @@ namespace mach
                     ArgsTuple
                     >::Type;
 
+                constexpr bool isReply =
+                    detail::dispatching::IsReplyV<ReturnType>;
+
                 static_assert(
-                    std::same_as<HandlerControllerType, TController>,
-                    "Mach error: route handler must belong to the controller being registered."
+                    isReply,
+                    "Mach error: controller actions must return mach::Reply<T>."
                     );
 
-				if (!pattern.empty() && pattern.front() != '/') {
-					throw std::invalid_argument(
-						"Mach error: route pattern must start with a leading slash ('/')."
-					);
-				}
+                if constexpr (isReply)
+                {
+                    if (!pattern.empty() && pattern.front() != '/') {
+                        throw std::invalid_argument(
+                            "Mach error: route pattern must start with a leading slash ('/')."
+                        );
+                    }
 
-                detail::routing::RouteEndpoint endpoint{
-                    .method = method,
-                    .pattern = m_route + std::string(pattern),
-                    .invoker = std::make_unique<InvokerType>(
-                        std::forward<THandler>(handler)
-                     )
-                };
+                    detail::routing::RouteEndpoint endpoint{
+                        .method = method,
+                        .pattern = m_route + std::string(pattern),
+                        .invoker = std::make_unique<InvokerType>(
+                            std::forward<THandler>(handler)
+                         )
+                    };
 
-                m_controllerEndpoints.emplace_back(std::move(endpoint));
+                    m_controllerEndpoints.emplace_back(std::move(endpoint));
+                }
             }
         }
     }
