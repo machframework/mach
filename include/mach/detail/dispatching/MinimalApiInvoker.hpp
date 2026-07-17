@@ -7,6 +7,7 @@
 #include <mach/detail/dispatching/IEndpointInvoker.hpp>
 #include <mach/detail/results/ResultTraits.hpp>
 #include <mach/detail/core/TypeTraits.hpp>
+#include <mach/detail/serailization/Serializer.hpp>
 
 namespace mach::detail::dispatching
 {
@@ -36,47 +37,118 @@ namespace mach::detail::dispatching
         typename... TArgs
     >
     void MinimalApiInvoker<THandler, TResult, TArgs...>::invoke(RequestExecution& execution) const {
+        constexpr std::size_t parameterCount = sizeof...(TArgs);
+
+        static_assert(
+            parameterCount <= 2,
+            "Mach error: minimal API handlers currently support at most two parameters."
+            );
+        
         auto handlerCallback = [&]() -> TResult {
             if constexpr (sizeof...(TArgs) == 0) {
                 return std::invoke(m_handler);
             }
             else if constexpr (sizeof...(TArgs) == 1) {
                 using FirstType = std::tuple_element_t<0, std::tuple<TArgs...>>;
+                using ValueType = std::remove_cvref_t<FirstType>;
 
-                if constexpr (std::same_as<std::remove_cvref_t<FirstType>, mach::Context>) {
+                constexpr bool isValidContext =
+                    std::same_as<FirstType, mach::Context&> ||
+                    std::same_as<FirstType, const mach::Context&>;
+
+                constexpr bool isContext =
+                    std::same_as<ValueType, mach::Context>;
+
+                if constexpr (isValidContext) {
                     return std::invoke(m_handler, execution.context);
                 }
                 else {
-                    auto& binder = execution.scope.resolve<binding::BodyBinder>();
-                    FirstType body = binder.bind<FirstType>(execution.context.request.body());
+                    static_assert(
+                        !isContext,
+                        "Mach error: Context parameters must be passed as mach::Context& or const mach::Context&."
+                        );
 
-                    return std::invoke(m_handler, std::move(body));
+                    if constexpr (!isContext) {
+
+                        static_assert(
+                            binding::JsonDeserializable<ValueType>,
+                            "Mach error: minimal API body parameter must be deserializable from JSON."
+                            );
+
+                        if constexpr (binding::JsonDeserializable<ValueType>) {
+                            auto& binder = execution.scope.resolve<binding::BodyBinder>();
+                            ValueType body = binder.bind<ValueType>(execution.context.request.body());
+
+                            return std::invoke(m_handler, std::move(body));
+                        }
+                    }
                 }
             }
             else if constexpr (sizeof...(TArgs) == 2) {
-                using Arg0 = std::tuple_element_t<0, std::tuple<TArgs...>>;
-                using Arg1 = std::tuple_element_t<1, std::tuple<TArgs...>>;
+                using Arguments = std::tuple<TArgs...>;
+                using FirstType = std::tuple_element_t<0, Arguments>;
+                using SecondType = std::tuple_element_t<1, Arguments>;
 
-                // first is context, second is body
-                if constexpr (
-                    std::same_as<std::remove_cvref_t<Arg0>, mach::Context>
-                    && !std::same_as<std::remove_cvref_t<Arg1>, mach::Context>
-                    ) {
-                    auto& binder = execution.scope.resolve<binding::BodyBinder>();
-                    Arg1 body = binder.bind<Arg1>(execution.context.request.body());
-                    return std::invoke(m_handler, execution.context, std::move(body));
+                constexpr bool firstIsValidContext =
+                    std::same_as<FirstType, mach::Context&> ||
+                    std::same_as<FirstType, const mach::Context&>;
+
+                constexpr bool secondIsValidContext =
+                    std::same_as<SecondType, mach::Context&> ||
+                    std::same_as<SecondType, const mach::Context&>;
+
+                constexpr bool firstIsContext =
+                    std::same_as<
+                    std::remove_cvref_t<FirstType>,
+                    mach::Context
+                    >;
+
+                constexpr bool secondIsContext =
+                    std::same_as<
+                    std::remove_cvref_t<SecondType>,
+                    mach::Context
+                    >;
+
+                static_assert(
+                    !firstIsContext || firstIsValidContext,
+                    "Mach error: Context parameters must be passed as mach::Context& or const mach::Context&."
+                    );
+
+                static_assert(
+                    !secondIsContext || secondIsValidContext,
+                    "Mach error: Context parameters must be passed as mach::Context& or const mach::Context&."
+                    );
+
+                static_assert(
+                    firstIsValidContext != secondIsValidContext,
+                    "Mach error: minimal API handlers with two parameters must accept exactly one mach::Context& or const mach::Context&."
+                    );
+
+                if constexpr (firstIsValidContext != secondIsValidContext) {
+                    using BodyType = std::conditional_t<
+                        firstIsValidContext,
+                        std::remove_cvref_t<SecondType>,
+                        std::remove_cvref_t<FirstType>
+                    >;
+
+                    static_assert(
+                        binding::JsonDeserializable<BodyType>,
+                        "Mach error: minimal API body parameter must be deserializable from JSON."
+                        );
+
+                    if constexpr (binding::JsonDeserializable<BodyType>) {
+                        auto& binder = execution.scope.resolve<binding::BodyBinder>();
+
+                        BodyType body = binder.bind<BodyType>(execution.context.request.body());
+
+                        if constexpr (firstIsValidContext) {
+                            return std::invoke(m_handler, execution.context, std::move(body));
+                        }
+                        else {
+                            return std::invoke(m_handler, std::move(body), execution.context);
+                        }
+                    }
                 }
-                else if constexpr (
-                    std::same_as<std::remove_cvref_t<Arg1>, mach::Context>
-                    && !std::same_as<std::remove_cvref_t<Arg0>, mach::Context>
-                    ) {
-                    auto& binder = execution.scope.resolve<binding::BodyBinder>();
-                    Arg0 body = binder.bind<Arg0>(execution.context.request.body());
-                    return std::invoke(m_handler, std::move(body), execution.context);
-                }
-            }
-            else {
-                static_assert(sizeof...(TArgs) <= 2, "Mach error: minimal APIs currently support at most one parameter.");
             }
             };
 

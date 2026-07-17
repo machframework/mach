@@ -5,8 +5,6 @@
 #include <mach/Json.hpp>
 #include <mach/results/Results.hpp>
 
-#include <mutex>
-
 struct CreateUserRequest {
     std::string name;
     int age;
@@ -25,10 +23,6 @@ MACH_DEFINE_JSON(UserProfile, name, age, adult)
 int main() {
     auto builder = mach::AppBuilder("127.0.0.1", 3143, 16);
     auto app = builder.build();
-
-    app.mapGet("/", [](std::mutex mtx) {
-
-        });
 
     app.mapGet("/users/create", [](CreateUserRequest request) {
         const bool adult = request.age >= 18;
