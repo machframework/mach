@@ -111,12 +111,12 @@ namespace mach::detail::dispatching
 
                 static_assert(
                     !firstIsContext || firstIsValidContext,
-                    "Mach error: Context parameters must be passed as mach::Context& or const mach::Context&."
+                    "Mach error: the first parameter must be passed as mach::Context& or const mach::Context&."
                     );
 
                 static_assert(
                     !secondIsContext || secondIsValidContext,
-                    "Mach error: Context parameters must be passed as mach::Context& or const mach::Context&."
+                    "Mach error: the second parameter must be passed as mach::Context& or const mach::Context&."
                     );
 
                 static_assert(
@@ -125,27 +125,48 @@ namespace mach::detail::dispatching
                     );
 
                 if constexpr (firstIsValidContext != secondIsValidContext) {
-                    using BodyType = std::conditional_t<
-                        firstIsValidContext,
-                        std::remove_cvref_t<SecondType>,
-                        std::remove_cvref_t<FirstType>
-                    >;
+                    auto& binder = execution.scope.resolve<binding::BodyBinder>();
 
-                    static_assert(
-                        binding::JsonDeserializable<BodyType>,
-                        "Mach error: minimal API body parameter must be deserializable from JSON."
-                        );
+                    if constexpr (firstIsValidContext) {
+                        using BodyType = std::remove_cvref_t<SecondType>;
 
-                    if constexpr (binding::JsonDeserializable<BodyType>) {
-                        auto& binder = execution.scope.resolve<binding::BodyBinder>();
+                        static_assert(
+                            binding::JsonDeserializable<BodyType>,
+                            "Mach error: the second parameter of a two-parameter minimal API handler must be deserializable from JSON."
+                            );
 
-                        BodyType body = binder.bind<BodyType>(execution.context.request.body());
+                        if constexpr (binding::JsonDeserializable<BodyType>) {
+                            BodyType body =
+                                binder.bind<BodyType>(
+                                    execution.context.request.body()
+                                );
 
-                        if constexpr (firstIsValidContext) {
-                            return std::invoke(m_handler, execution.context, std::move(body));
+                            return std::invoke(
+                                m_handler,
+                                execution.context,
+                                std::move(body)
+                            );
                         }
-                        else {
-                            return std::invoke(m_handler, std::move(body), execution.context);
+                    }
+                    else {
+                        using BodyType = std::remove_cvref_t<FirstType>;
+
+                        static_assert(
+                            binding::JsonDeserializable<BodyType>,
+                            "Mach error: the first parameter of a two-parameter minimal API handler must be deserializable from JSON."
+                            );
+
+                        if constexpr (binding::JsonDeserializable<BodyType>) {
+                            BodyType body =
+                                binder.bind<BodyType>(
+                                    execution.context.request.body()
+                                );
+
+                            return std::invoke(
+                                m_handler,
+                                std::move(body),
+                                execution.context
+                            );
                         }
                     }
                 }
