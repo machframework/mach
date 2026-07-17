@@ -33,4 +33,11 @@ namespace mach::detail::serialization
             return mach::Json(value).dump();
         }
     }
+
+    template <typename T>
+    concept Serializable =
+        requires(const T & value)
+    {
+        { Serializer::serialize(value) } -> std::same_as<std::string>;
+    };
 }

@@ -7,6 +7,7 @@
 #include <utility>
 
 #include <mach/detail/binding/BodyBinder.hpp>
+#include <mach/detail/binding/JsonConcepts.hpp>
 #include <mach/detail/controllers/ControllerTraits.hpp>
 #include <mach/detail/dispatching/IEndpointInvoker.hpp>
 #include <mach/detail/results/ResultTraits.hpp>
@@ -57,12 +58,33 @@ namespace mach::detail::dispatching
                 }
                 else {
                     // TEMPORARY: body param is always first
-                    using BodyType = std::tuple_element_t<0, std::tuple<TArgs...>>;
+                    using DeclaredBodyType =
+                        std::tuple_element_t<0, std::tuple<TArgs...>>;
 
-                    auto& binder = execution.scope.resolve<binding::BodyBinder>();
-                    BodyType body = binder.bind<BodyType>(execution.context.request.body());
+                    using BodyType = std::remove_cvref_t<DeclaredBodyType>;
 
-                    return std::invoke(m_action, controller, std::move(body));
+                    constexpr bool passedByValue =
+                        std::same_as<DeclaredBodyType, BodyType>;
+
+                    constexpr bool jsonDeserializable =
+                        binding::JsonDeserializable<BodyType>;
+
+                    static_assert(
+                        passedByValue,
+                        "Mach error: controller action body parameter must be passed by value."
+                        );
+
+                    static_assert(
+                        jsonDeserializable,
+                        "Mach error: controller action parameter must be deserializable from JSON."
+                        );
+
+                    if constexpr (passedByValue && jsonDeserializable) {
+                        auto& binder = execution.scope.resolve<binding::BodyBinder>();
+                        BodyType body = binder.bind<BodyType>(execution.context.request.body());
+
+                        return std::invoke(m_action, controller, std::move(body));
+                    }
                 }
                 }();
 
