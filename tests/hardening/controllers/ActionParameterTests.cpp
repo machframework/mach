@@ -23,7 +23,7 @@ class GeneralController : public mach::ControllerBase {
 public:
 	inline static constexpr std::string_view route = "/general";
 
-	mach::Reply<int> getAge(std::string name) {
+	mach::Reply<int> getAge(std::mutex& mtx) {
 		return ok(5);
 	}
 

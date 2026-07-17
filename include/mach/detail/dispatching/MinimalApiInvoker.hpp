@@ -128,45 +128,51 @@ namespace mach::detail::dispatching
                     auto& binder = execution.scope.resolve<binding::BodyBinder>();
 
                     if constexpr (firstIsValidContext) {
-                        using BodyType = std::remove_cvref_t<SecondType>;
+                        using DeclaredBodyType =
+                            std::tuple_element_t<0, std::tuple<TArgs...>>;
+
+                        using BodyType = std::remove_cvref_t<DeclaredBodyType>;
+
+                        constexpr bool passedByValue =
+                            std::same_as<DeclaredBodyType, BodyType>;
+
+                        static_assert(
+                            passedByValue,
+                            "Mach error: body parameter must be passed by value."
+                            );
 
                         static_assert(
                             binding::JsonDeserializable<BodyType>,
                             "Mach error: the second parameter of a two-parameter minimal API handler must be deserializable from JSON."
                             );
 
-                        if constexpr (binding::JsonDeserializable<BodyType>) {
-                            BodyType body =
-                                binder.bind<BodyType>(
-                                    execution.context.request.body()
-                                );
-
-                            return std::invoke(
-                                m_handler,
-                                execution.context,
-                                std::move(body)
-                            );
+                        if constexpr (passedByValue && binding::JsonDeserializable<BodyType>) {
+                            BodyType body = binder.bind<BodyType>(execution.context.request.body());
+                            return std::invoke(m_handler, execution.context, std::move(body));
                         }
                     }
                     else {
-                        using BodyType = std::remove_cvref_t<FirstType>;
+                        using DeclaredBodyType =
+                            std::tuple_element_t<0, std::tuple<TArgs...>>;
+
+                        using BodyType = std::remove_cvref_t<DeclaredBodyType>;
+
+                        constexpr bool passedByValue =
+                            std::same_as<DeclaredBodyType, BodyType>;
+
+                        static_assert(
+                            passedByValue,
+                            "Mach error: body parameter must be passed by value."
+                            );
 
                         static_assert(
                             binding::JsonDeserializable<BodyType>,
                             "Mach error: the first parameter of a two-parameter minimal API handler must be deserializable from JSON."
                             );
 
-                        if constexpr (binding::JsonDeserializable<BodyType>) {
-                            BodyType body =
-                                binder.bind<BodyType>(
-                                    execution.context.request.body()
-                                );
-
-                            return std::invoke(
-                                m_handler,
-                                std::move(body),
-                                execution.context
-                            );
+                        if constexpr (passedByValue && binding::JsonDeserializable<BodyType>) {
+                            BodyType body = binder.bind<BodyType>(execution.context.request.body());
+                            return std::invoke(m_handler, std::move(body), execution.context);
                         }
                     }
                 }
