@@ -53,6 +53,18 @@ struct ThrowingController : mach::ControllerBase {
 	FlakyScopedDependency* dependency;
 };
 
+struct Logger {};
+
+struct TestController2 : mach::ControllerBase {
+	explicit TestController2(ScopedService&)
+		: constructorUsed(1) {}
+
+	TestController2(ScopedService&, Logger&)
+		: constructorUsed(2) {}
+
+	int constructorUsed;
+};
+
 namespace di = mach::detail::di;
 
 int main() {
@@ -79,6 +91,17 @@ int main() {
 	container.addService<
 		ThrowingController,
 		FlakyScopedDependency
+	>(
+		di::ServiceLifetime::Transient,
+		di::ServiceAccess::Internal
+	);
+
+	container.addService<Logger>(di::ServiceLifetime::Singleton);
+
+	container.addService<
+		TestController2,
+		ScopedService,
+		Logger
 	>(
 		di::ServiceLifetime::Transient,
 		di::ServiceAccess::Internal
@@ -162,6 +185,18 @@ int main() {
 
 		testing::success(
 			"Scoped dependency is cached after successful retry"
+		);
+	}
+
+	{
+		auto scope = container.createScope();
+
+		auto& controller = scope.resolve<TestController2>();
+
+		assert(controller.constructorUsed == 2);
+
+		testing::success(
+			"Container uses the correct constructor for resolution"
 		);
 	}
 
