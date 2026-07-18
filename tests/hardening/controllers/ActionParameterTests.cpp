@@ -22,8 +22,8 @@ class GeneralController : public mach::ControllerBase {
 public:
 	inline static constexpr std::string_view route = "/general";
 
-	int getAge(Person person) {
-		return person.age;
+	mach::Reply<int> getAge(Person person) {
+		return ok(person.age);
 	}
 
 	static void configure(mach::ControllerBuilder<GeneralController>& routes) {
@@ -38,7 +38,5 @@ int main() {
 	builder.addController<GeneralController>();
 
 	auto app = builder.build();
-	app.mapController<GeneralController>();
-
 	return app.run();
 }

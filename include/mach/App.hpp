@@ -41,6 +41,7 @@ namespace mach
 
 	public:
 		~App();
+		App(App&&) noexcept;
 
 		/**
 		 * Returns the host the application is configured to listen on (e.g. "127.0.0.1").
@@ -218,9 +219,6 @@ namespace mach
 		requires detail::MinimalApiHandler<THandler>
 		void addRoute(http::Method method, std::string_view pattern, THandler&& handler);
 
-		template <detail::controllers::MachController TController>
-		App& mapController();
-
 		/**
 		 * Starts the application and begins accepting incoming HTTP requests.
 		 *
@@ -238,12 +236,14 @@ namespace mach
 		void stop();
 
 	private:
-	
 		App(
 			detail::app::ServerOptions serverOptions,
 			detail::di::Container container,
 			detail::middleware::MiddlewarePipeline middlewarePipeline
 		);
+
+		template <detail::controllers::MachController TController>
+		App& mapController();
 
 		void addRouteImpl(detail::routing::RouteEndpoint route);
 

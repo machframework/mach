@@ -70,6 +70,8 @@ namespace mach
 
 	App::~App() = default;
 
+	App::App(App&&) noexcept = default;
+
 	int App::run() noexcept {
 		return m_impl->run();
 	}

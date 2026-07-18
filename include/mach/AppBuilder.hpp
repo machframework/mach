@@ -1,8 +1,10 @@
 #pragma once
 
+#include <functional>
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <vector>
 
 #include <mach/App.hpp>
 
@@ -152,6 +154,7 @@ namespace mach
 		detail::app::ServerOptions m_serverOptions;
 		detail::di::Container m_container;
 		detail::middleware::MiddlewarePipeline m_middlewarePipeline;
+		std::vector<std::function<void(App&)>> m_controllerMappers;
 
 		template <typename T, typename... Deps>
 		AppBuilder& use(mach::detail::di::ServiceAccess access);
@@ -219,6 +222,10 @@ namespace mach
 
 		if constexpr (isControllerType && hasRouteField) {
 			m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Transient);
+
+			m_controllerMappers.emplace_back([](App& app) {
+				app.mapController<T>();
+				});
 		}
 
 		return *this;
