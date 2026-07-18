@@ -156,3 +156,8 @@ add_mach_test(
     ActionParameterTests
     hardening/controllers/ActionParameterTests.cpp
 )
+
+add_mach_test(
+    ControllerDiscoveryTests
+    hardening/controllers/ControllerDiscoveryTests.cpp
+)
