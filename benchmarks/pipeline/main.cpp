@@ -124,9 +124,5 @@ int main() {
     builder.addController<UsersController, UserService>();
 
     auto app = builder.build();
-
-    app.mapController<HomeController>();
-    app.mapController<UsersController>();
-
     return app.run();
 }

@@ -34,7 +34,5 @@ int main() {
 	builder.addController<GeneralController>();
 
 	auto app = builder.build();
-	app.mapController<GeneralController>();
-
 	return app.run();
 }

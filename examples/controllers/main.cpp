@@ -47,7 +47,5 @@ int main() {
 	builder.addController<HomeController>();
 
 	auto app = builder.build();
-	app.mapController<HomeController>();
-
 	return app.run();
 }
