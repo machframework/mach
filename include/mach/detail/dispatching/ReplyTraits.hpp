@@ -12,6 +12,6 @@ namespace mach::detail::dispatching
 	struct IsReply<mach::Reply<T>> : std::true_type {};
 
 	template <typename T>
-	inline constexpr bool IsReplyV =
+	inline constexpr bool is_reply_v =
 		IsReply<std::remove_cvref_t<T>>::value;
 }

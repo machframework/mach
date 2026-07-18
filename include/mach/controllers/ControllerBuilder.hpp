@@ -5,12 +5,14 @@
 #include <vector>
 #include <utility>
 
+#include <mach/Context.hpp>
+
 #include <mach/detail/core/FunctionTraits.hpp>
+#include <mach/detail/core/TupleTraits.hpp>
 #include <mach/detail/dispatching/ControllerActionInvoker.hpp>
 #include <mach/detail/dispatching/ReplyTraits.hpp>
 #include <mach/detail/routing/RouteEndpoint.hpp>
 #include <mach/http/Method.hpp>
-
 #include <mach/detail/routing/Router.hpp>
 
 namespace mach
@@ -235,12 +237,21 @@ namespace mach
             using ReturnType = typename Traits::ReturnType;
             using ArgsTuple = typename Traits::ArgsTuple;
 
-			constexpr bool isSameController =
-				std::same_as<HandlerControllerType, TController>;
+            constexpr bool containsContextArg =
+                mach::detail::tuple_contains_v<mach::Context, ArgsTuple>;
+
+            constexpr bool isSameController =
+                std::same_as<HandlerControllerType, TController>;
 
             static_assert(
                 isSameController,
                 "Mach error: route handler must belong to the controller being registered."
+                );
+
+            static_assert(
+                !containsContextArg,
+                "Mach error: controller actions must not accept a Context parameter. "
+                "Use the inherited 'context' member instead."
                 );
 
             if constexpr (isSameController) {
@@ -252,7 +263,7 @@ namespace mach
                     >::Type;
 
                 constexpr bool isReply =
-                    detail::dispatching::IsReplyV<ReturnType>;
+                    detail::dispatching::is_reply_v<ReturnType>;
 
                 static_assert(
                     isReply,
