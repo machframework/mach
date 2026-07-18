@@ -161,3 +161,8 @@ add_mach_test(
     ControllerDiscoveryTests
     hardening/controllers/ControllerDiscoveryTests.cpp
 )
+
+add_mach_test(
+    ControllerInvocationTests
+    hardening/controllers/ControllerInvocationTests.cpp
+)
