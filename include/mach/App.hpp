@@ -83,7 +83,7 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		template <typename THandler>
-		requires detail::MinimalApiHandler<THandler>
+		requires detail::traits::MinimalApiHandler<THandler>
 		void mapGet(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Get,
@@ -105,7 +105,7 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		template <typename THandler>
-		requires detail::MinimalApiHandler<THandler>
+		requires detail::traits::MinimalApiHandler<THandler>
 		void mapPost(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Post,
@@ -127,7 +127,7 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		template <typename THandler>
-		requires detail::MinimalApiHandler<THandler>
+		requires detail::traits::MinimalApiHandler<THandler>
 		void mapPut(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Put,
@@ -149,7 +149,7 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		template <typename THandler>
-		requires detail::MinimalApiHandler<THandler>
+		requires detail::traits::MinimalApiHandler<THandler>
 		void mapPatch(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Patch,
@@ -171,7 +171,7 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		template <typename THandler>
-		requires detail::MinimalApiHandler<THandler>
+		requires detail::traits::MinimalApiHandler<THandler>
 		void mapDelete(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Delete,
@@ -193,7 +193,7 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		template <typename THandler>
-			requires detail::MinimalApiHandler<THandler>
+		requires detail::traits::MinimalApiHandler<THandler>
 		void mapHead(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Head,
@@ -216,7 +216,7 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		template <typename THandler>
-		requires detail::MinimalApiHandler<THandler>
+		requires detail::traits::MinimalApiHandler<THandler>
 		void addRoute(http::Method method, std::string_view pattern, THandler&& handler);
 
 		/**
@@ -256,21 +256,16 @@ namespace mach
 	};
 
 	template <typename THandler>
-		requires mach::detail::MinimalApiHandler<THandler>
+	requires detail::traits::MinimalApiHandler<THandler>
 	void mach::App::addRoute(
 		http::Method method,
 		std::string_view pattern,
 		THandler&& handler
 	) {
 		using Handler = std::decay_t<THandler>;
-		using Traits = detail::FunctionTraits<Handler>;
+		using Traits = detail::traits::FunctionTraits<Handler>;
 		using ArgsTuple = typename Traits::ArgsTuple;
 		using Result = typename Traits::ReturnType;
-
-		/*static_assert(
-			detail::results::ReplyResult<Result>,
-			"Mach error: minimal API handlers must return mach::Reply<T>."
-			);*/
 
 		using Invoker = detail::dispatching::MinimalApiInvokerFromTupleT<
 			Handler,

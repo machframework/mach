@@ -231,14 +231,14 @@ namespace mach
             );
 
         if constexpr (isMemberFunction) {
-            using Traits = detail::FunctionTraits<HandlerType>;
+            using Traits = detail::traits::FunctionTraits<HandlerType>;
 
             using HandlerControllerType = typename Traits::ClassType;
             using ReturnType = typename Traits::ReturnType;
             using ArgsTuple = typename Traits::ArgsTuple;
 
             constexpr bool containsContextArg =
-                mach::detail::tuple_contains_v<mach::Context, ArgsTuple>;
+                mach::detail::traits::tuple_contains_v<mach::Context, ArgsTuple>;
 
             constexpr bool isSameController =
                 std::same_as<HandlerControllerType, TController>;
@@ -263,7 +263,7 @@ namespace mach
                     >::Type;
 
                 constexpr bool isReply =
-                    detail::dispatching::is_reply_v<ReturnType>;
+                    detail::traits::dispatching::is_reply_v<ReturnType>;
 
                 static_assert(
                     isReply,

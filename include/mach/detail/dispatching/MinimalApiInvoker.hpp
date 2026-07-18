@@ -182,7 +182,7 @@ namespace mach::detail::dispatching
         if constexpr (std::same_as<TResult, void>) {
             handlerCallback();
         }
-        else if constexpr (results::ReplyResult<TResult>) {
+        else if constexpr (results::traits::ReplyResult<TResult>) {
             TResult res = handlerCallback();
 
             execution.context.response.status(res.statusCode());
@@ -192,7 +192,7 @@ namespace mach::detail::dispatching
         }
         else {
             static_assert(
-                always_false_v<TResult>,
+                detail::traits::always_false_v<TResult>,
                 "Mach error: minimal API handlers must return void or mach::Reply<T>."
             );
         }

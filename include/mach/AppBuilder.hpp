@@ -238,7 +238,7 @@ namespace mach
 
 	template <typename T, typename... Deps>
 	AppBuilder& AppBuilder::use(mach::detail::di::ServiceAccess access) {
-		constexpr bool isMiddlewareType = mach::detail::middleware::MachMiddleware<T>;
+		constexpr bool isMiddlewareType = mach::detail::traits::middleware::MachMiddleware<T>;
 		constexpr bool isController = mach::detail::controllers::ControllerType<T>;
 
 		static_assert(

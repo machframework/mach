@@ -3,7 +3,7 @@
 #include <tuple>
 #include <type_traits>
 
-namespace mach::detail
+namespace mach::detail::traits
 {
     template <typename T, typename Tuple>
     struct tuple_contains;

@@ -5,15 +5,15 @@
 
 #include <mach/results/Reply.hpp>
 
-namespace mach::detail::results
+namespace mach::detail::results::traits
 {
     template <typename T>
-    struct IsReply : std::false_type {};
+    struct is_reply : std::false_type {};
 
     template <typename T>
-    struct IsReply<mach::Reply<T>> : std::true_type {};
+    struct is_reply<mach::Reply<T>> : std::true_type {};
 
     template <typename T>
     concept ReplyResult =
-        IsReply<std::remove_cvref_t<T>>::value;
+        is_reply<std::remove_cvref_t<T>>::value;
 }

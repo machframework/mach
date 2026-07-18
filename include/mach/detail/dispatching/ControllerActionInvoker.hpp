@@ -17,7 +17,7 @@ namespace mach::detail::dispatching
 {
     template <
         mach::detail::controllers::MachController TController,
-        mach::detail::results::ReplyResult TResult,
+        mach::detail::results::traits::ReplyResult TResult,
         typename... TArgs
     >
     class ControllerActionInvoker final : public IEndpointInvoker {
@@ -37,7 +37,7 @@ namespace mach::detail::dispatching
 
     template <
         detail::controllers::MachController TController,
-        detail::results::ReplyResult TResult,
+        detail::results::traits::ReplyResult TResult,
         typename... TArgs
     >
     void ControllerActionInvoker<TController, TResult, TArgs...>::invoke(RequestExecution& execution) const {

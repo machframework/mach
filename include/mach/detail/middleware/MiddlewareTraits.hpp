@@ -6,7 +6,7 @@
 #include <mach/Context.hpp>
 #include <mach/middleware/Next.hpp>
 
-namespace mach::detail::middleware
+namespace mach::detail::traits::middleware
 {
     template <typename T>
     concept MachMiddleware =
