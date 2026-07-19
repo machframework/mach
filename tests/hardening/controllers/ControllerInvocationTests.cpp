@@ -99,7 +99,7 @@ namespace
         mach::Reply<std::string> contextParameter()
         {
             const int id =
-                context->request.routeParam<int>("id");
+                request().routeParam<int>("id");
 
             return ok(
                 "context parameter received: " +
@@ -109,17 +109,13 @@ namespace
 
         mach::Reply<std::string> baseContext()
         {
-            if (context == nullptr) {
-                return mach::results::badRequest<std::string>();
-            }
-
             return ok("controller base context assigned");
         }
 
         mach::Reply<std::string> routeParameter()
         {
             const int id =
-                context->request.routeParam<int>("id");
+                request().routeParam<int>("id");
 
             return ok(
                 "route parameter: " +
