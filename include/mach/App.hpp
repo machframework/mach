@@ -41,6 +41,7 @@ namespace mach
 
 	public:
 		~App();
+		App(App&&) noexcept;
 
 		/**
 		 * Returns the host the application is configured to listen on (e.g. "127.0.0.1").
@@ -82,7 +83,7 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		template <typename THandler>
-		requires detail::MinimalApiHandler<THandler>
+		requires detail::traits::MinimalApiHandler<THandler>
 		void mapGet(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Get,
@@ -104,7 +105,7 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		template <typename THandler>
-		requires detail::MinimalApiHandler<THandler>
+		requires detail::traits::MinimalApiHandler<THandler>
 		void mapPost(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Post,
@@ -126,7 +127,7 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		template <typename THandler>
-		requires detail::MinimalApiHandler<THandler>
+		requires detail::traits::MinimalApiHandler<THandler>
 		void mapPut(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Put,
@@ -148,7 +149,7 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		template <typename THandler>
-		requires detail::MinimalApiHandler<THandler>
+		requires detail::traits::MinimalApiHandler<THandler>
 		void mapPatch(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Patch,
@@ -170,7 +171,7 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		template <typename THandler>
-		requires detail::MinimalApiHandler<THandler>
+		requires detail::traits::MinimalApiHandler<THandler>
 		void mapDelete(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Delete,
@@ -192,7 +193,7 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		template <typename THandler>
-			requires detail::MinimalApiHandler<THandler>
+		requires detail::traits::MinimalApiHandler<THandler>
 		void mapHead(std::string_view pattern, THandler&& handler) {
 			addRoute(
 				http::Method::Head,
@@ -215,11 +216,8 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		template <typename THandler>
-		requires detail::MinimalApiHandler<THandler>
+		requires detail::traits::MinimalApiHandler<THandler>
 		void addRoute(http::Method method, std::string_view pattern, THandler&& handler);
-
-		template <detail::controllers::MachController TController>
-		App& mapController();
 
 		/**
 		 * Starts the application and begins accepting incoming HTTP requests.
@@ -238,16 +236,18 @@ namespace mach
 		void stop();
 
 	private:
-	
 		App(
 			detail::app::ServerOptions serverOptions,
 			detail::di::Container container,
 			detail::middleware::MiddlewarePipeline middlewarePipeline
 		);
 
+		template <detail::controllers::MachController TController>
+		App& mapController();
+
 		void addRouteImpl(detail::routing::RouteEndpoint route);
 
-		void addControllerRoutesImpl(std::vector<detail::routing::RouteEndpoint> routes);
+		void addControllerRoutesImpl(std::vector<detail::routing::RouteEndpoint> routes, std::type_index controllerType);
 
 		class Impl;
 		std::unique_ptr<Impl> m_impl;
@@ -256,21 +256,16 @@ namespace mach
 	};
 
 	template <typename THandler>
-		requires mach::detail::MinimalApiHandler<THandler>
+	requires detail::traits::MinimalApiHandler<THandler>
 	void mach::App::addRoute(
 		http::Method method,
 		std::string_view pattern,
 		THandler&& handler
 	) {
 		using Handler = std::decay_t<THandler>;
-		using Traits = detail::FunctionTraits<Handler>;
+		using Traits = detail::traits::FunctionTraits<Handler>;
 		using ArgsTuple = typename Traits::ArgsTuple;
 		using Result = typename Traits::ReturnType;
-
-		/*static_assert(
-			detail::results::ReplyResult<Result>,
-			"Mach error: minimal API handlers must return mach::Reply<T>."
-			);*/
 
 		using Invoker = detail::dispatching::MinimalApiInvokerFromTupleT<
 			Handler,
@@ -296,7 +291,7 @@ namespace mach
 		ControllerBuilder<TController> builder;
 		TController::configure(builder);
 
-		addControllerRoutesImpl(std::move(builder.m_controllerEndpoints));
+		addControllerRoutesImpl(std::move(builder.m_controllerEndpoints), typeid(TController));
 		return *this;
 	}
 }

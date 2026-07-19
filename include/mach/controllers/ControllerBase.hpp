@@ -8,10 +8,30 @@
 
 namespace mach
 {
+	namespace detail::dispatching
+	{
+		template <
+			typename TController,
+			typename TResult,
+			typename... TArgs
+		>
+		class ControllerActionInvoker;
+	}
+
 	class ControllerBase {
 
 	public:
-		mach::Context* context = nullptr;
+		[[nodiscard]]
+		mach::Request& request() noexcept;
+
+		[[nodiscard]]
+		const mach::Request& request() const noexcept;
+
+		[[nodiscard]]
+		mach::Response& response() noexcept;
+
+		[[nodiscard]]
+		const mach::Response& response() const noexcept;
 
 	protected:
 		template <typename T>
@@ -40,6 +60,20 @@ namespace mach
 
 		template <typename T = void>
 		mach::Reply<T> conflict();
+
+	private:
+		template <
+			typename TController,
+			typename TResult,
+			typename... TArgs
+		>
+		friend class mach::detail::dispatching::ControllerActionInvoker;
+
+		void setContext(mach::Context& context) noexcept {
+			m_context = &context;
+		}
+
+		mach::Context* m_context = nullptr;
 	};
 
 	template <typename T>

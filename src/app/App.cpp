@@ -3,6 +3,8 @@
 #include <iostream>
 #include <string>
 #include <stdexcept>
+#include <typeindex>
+#include <unordered_set>
 
 #include <mach/detail/routing/RouteEndpoint.hpp>
 #include <mach/detail/dispatching/MinimalApiInvoker.hpp>
@@ -22,7 +24,7 @@ namespace mach
 {
 	class App::Impl {
 	
-	public: 
+	public:
 		Impl(
 			detail::app::ServerOptions serverOptions,
 			detail::di::Container container,
@@ -36,7 +38,7 @@ namespace mach
 		std::size_t threadCount() const noexcept;
 
 		void addRoute(detail::routing::RouteEndpoint route);
-		void addControllerRoutes(std::vector<detail::routing::RouteEndpoint> routes);
+		void addControllerRoutes(std::vector<detail::routing::RouteEndpoint> routes, std::type_index controllerType);
 
 		int run();
 		void stop();
@@ -44,9 +46,11 @@ namespace mach
 	private:
 		detail::app::ServerOptions m_serverOptions;
 		AppState m_state = AppState::Ready;
+		std::unordered_set<std::type_index> m_mappedControllers;
 
 		std::mutex m_serverMutex;
 		std::unique_ptr<detail::server::Server> m_server;
+
 		detail::routing::Router m_router;
 		detail::di::Container m_container;
 		detail::middleware::MiddlewarePipeline m_middlewarePipeline;
@@ -65,6 +69,8 @@ namespace mach
 	{ }
 
 	App::~App() = default;
+
+	App::App(App&&) noexcept = default;
 
 	int App::run() noexcept {
 		return m_impl->run();
@@ -92,8 +98,8 @@ namespace mach
 		m_impl->addRoute(std::move(route));
 	}
 
-	void App::addControllerRoutesImpl(std::vector<detail::routing::RouteEndpoint> routes) {
-		m_impl->addControllerRoutes(std::move(routes));
+	void App::addControllerRoutesImpl(std::vector<detail::routing::RouteEndpoint> routes, std::type_index controllerType) {
+		m_impl->addControllerRoutes(std::move(routes), controllerType);
 	}
 
 	App::Impl::Impl(
@@ -178,7 +184,18 @@ namespace mach
 		m_router.addRoute(std::move(route));
 	}
 
-	void App::Impl::addControllerRoutes(std::vector<detail::routing::RouteEndpoint> routes) {
+	void App::Impl::addControllerRoutes(std::vector<detail::routing::RouteEndpoint> routes, std::type_index controllerType) {
+		const auto [_, inserted] =
+			m_mappedControllers.emplace(controllerType);
+
+		if (!inserted) {
+			throw std::logic_error(
+				"Mach error: controller '" +
+				std::string(controllerType.name()) +
+				"' has already been mapped"
+			);
+		}
+
 		for (auto& route : routes) {
 			m_router.addRoute(std::move(route));
 		}

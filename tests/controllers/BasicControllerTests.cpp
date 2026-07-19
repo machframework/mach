@@ -5,6 +5,8 @@
 #include <mach/results/Reply.hpp>
 #include <mach/AppBuilder.hpp>
 
+#include <mach/diagnostics/TerminateHandler.hpp>
+
 #include "Testing.hpp"
 
 // dependencies
@@ -100,7 +102,7 @@ public:
 
 	[[mach::get("/{type:int}")]]
 	mach::Reply<std::string> getByType() {
-		int type = std::stoi(std::string(context->request.routeParam("type")));
+		int type = std::stoi(std::string(request().routeParam("type")));
 
 		auto res = m_userService.serve(type);
 		if (res.size() >= 10) {
@@ -120,6 +122,8 @@ private:
 // controller
 
 int main() {
+	mach::installTerminateHandler();
+
 	auto builder = mach::AppBuilder(std::move(testing::serverOptions));
 
 	builder.addSingleton<Logger>();
@@ -130,9 +134,5 @@ int main() {
 	builder.addController<UserController, UserService>();
 
 	auto app = builder.build();
-	app.mapController<UserController>();
-
-	app.run();
-
-	return 0;
+	return app.run();
 }

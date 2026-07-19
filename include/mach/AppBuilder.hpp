@@ -1,8 +1,10 @@
 #pragma once
 
+#include <functional>
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <vector>
 
 #include <mach/App.hpp>
 
@@ -152,6 +154,7 @@ namespace mach
 		detail::app::ServerOptions m_serverOptions;
 		detail::di::Container m_container;
 		detail::middleware::MiddlewarePipeline m_middlewarePipeline;
+		std::vector<std::function<void(App&)>> m_controllerMappers;
 
 		template <typename T, typename... Deps>
 		AppBuilder& use(mach::detail::di::ServiceAccess access);
@@ -197,9 +200,16 @@ namespace mach
 
 	template <typename T, typename... Deps>
 	AppBuilder& AppBuilder::addController() {
-		constexpr bool isControllerType = mach::detail::controllers::ControllerType<T>;
-		constexpr bool hasRouteField = mach::detail::controllers::HasPublicStaticRouteField<T>;
+		using Controller = std::remove_cvref_t<T>;
+
+		constexpr bool isControllerType = mach::detail::controllers::ControllerType<Controller>;
+		constexpr bool hasRouteField = mach::detail::controllers::HasPublicStaticRouteField<Controller>;
 		
+		static_assert(
+			std::same_as<T, Controller>,
+			"Mach error: controller type must not be const, volatile, or a reference"
+			);
+
 		static_assert(
 			isControllerType,
 			"Mach error: controller must be derived from ControllerBase"
@@ -207,11 +217,15 @@ namespace mach
 
 		static_assert(
 			hasRouteField,
-			"Mach error: controller must expose a public std::string route field"
+			"Mach error: controller must expose a public static route of type std::string, std::string_view, or another type convertible to std::string_view"
 		);
 
 		if constexpr (isControllerType && hasRouteField) {
 			m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Transient);
+
+			m_controllerMappers.emplace_back([](App& app) {
+				app.mapController<T>();
+				});
 		}
 
 		return *this;
@@ -224,7 +238,7 @@ namespace mach
 
 	template <typename T, typename... Deps>
 	AppBuilder& AppBuilder::use(mach::detail::di::ServiceAccess access) {
-		constexpr bool isMiddlewareType = mach::detail::middleware::MachMiddleware<T>;
+		constexpr bool isMiddlewareType = mach::detail::traits::middleware::MachMiddleware<T>;
 		constexpr bool isController = mach::detail::controllers::ControllerType<T>;
 
 		static_assert(

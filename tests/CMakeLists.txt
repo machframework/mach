@@ -141,3 +141,28 @@ add_mach_test(
     DIReservedServiceTests
     hardening/di/DIReservedServiceTests.cpp
 )
+
+add_mach_test(
+    GeneralControllerTests
+    hardening/controllers/GeneralControllerTests.cpp
+)
+
+add_mach_test(
+    ControllerResolutionTests
+    hardening/controllers/ControllerResolutionTests.cpp
+)
+
+add_mach_test(
+    ActionParameterTests
+    hardening/controllers/ActionParameterTests.cpp
+)
+
+add_mach_test(
+    ControllerDiscoveryTests
+    hardening/controllers/ControllerDiscoveryTests.cpp
+)
+
+add_mach_test(
+    ControllerInvocationTests
+    hardening/controllers/ControllerInvocationTests.cpp
+)

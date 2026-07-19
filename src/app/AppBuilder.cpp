@@ -68,10 +68,16 @@ namespace mach
 
 		m_container.addService<detail::binding::BodyBinder>(detail::di::ServiceLifetime::Singleton, detail::di::ServiceAccess::Internal);
 
-		return mach::App(
+		App app(
 			std::move(m_serverOptions),
 			std::move(m_container),
 			std::move(m_middlewarePipeline)
 		);
+
+		for (const auto& mapper : m_controllerMappers) {
+			mapper(app);
+		}
+
+		return app;
 	}
 }

@@ -5,11 +5,14 @@
 #include <vector>
 #include <utility>
 
+#include <mach/Context.hpp>
+
 #include <mach/detail/core/FunctionTraits.hpp>
+#include <mach/detail/core/TupleTraits.hpp>
 #include <mach/detail/dispatching/ControllerActionInvoker.hpp>
+#include <mach/detail/dispatching/ReplyTraits.hpp>
 #include <mach/detail/routing/RouteEndpoint.hpp>
 #include <mach/http/Method.hpp>
-
 #include <mach/detail/routing/Router.hpp>
 
 namespace mach
@@ -218,32 +221,74 @@ namespace mach
         THandler&& handler)
     {
         using HandlerType = std::remove_cvref_t<THandler>;
-        using Traits = detail::FunctionTraits<HandlerType>;
 
-        using HandlerControllerType = typename Traits::ClassType;
-        using ReturnType = typename Traits::ReturnType;
-        using ArgsTuple = typename Traits::ArgsTuple;
-
-        using InvokerType =
-            typename detail::dispatching::ControllerActionInvokerFromTuple<
-            TController,
-            ReturnType,
-            ArgsTuple
-            >::Type;
+        constexpr bool isMemberFunction =
+            std::is_member_function_pointer_v<HandlerType>;
 
         static_assert(
-            std::same_as<HandlerControllerType, TController>,
-            "Mach error: route handler must belong to the controller being registered."
+            isMemberFunction,
+            "Mach error: route handler must be a non-static controller member function."
             );
 
-        detail::routing::RouteEndpoint endpoint{
-            .method = method,
-            .pattern = m_route + std::string(pattern),
-            .invoker = std::make_unique<InvokerType>(
-                std::forward<THandler>(handler)
-             )
-        };
+        if constexpr (isMemberFunction) {
+            using Traits = detail::traits::FunctionTraits<HandlerType>;
 
-        m_controllerEndpoints.emplace_back(std::move(endpoint));
+            using HandlerControllerType = typename Traits::ClassType;
+            using ReturnType = typename Traits::ReturnType;
+            using ArgsTuple = typename Traits::ArgsTuple;
+
+            constexpr bool containsContextArg =
+                mach::detail::traits::tuple_contains_v<mach::Context, ArgsTuple>;
+
+            constexpr bool isSameController =
+                std::same_as<HandlerControllerType, TController>;
+
+            static_assert(
+                isSameController,
+                "Mach error: route handler must belong to the controller being registered."
+                );
+
+            static_assert(
+                !containsContextArg,
+                "Mach error: controller actions must not accept a Context parameter. "
+                "Use the inherited 'context' member instead."
+                );
+
+            if constexpr (isSameController) {
+                using InvokerType =
+                    typename detail::dispatching::ControllerActionInvokerFromTuple<
+                    TController,
+                    ReturnType,
+                    ArgsTuple
+                    >::Type;
+
+                constexpr bool isReply =
+                    detail::traits::dispatching::is_reply_v<ReturnType>;
+
+                static_assert(
+                    isReply,
+                    "Mach error: controller actions must return mach::Reply<T>."
+                    );
+
+                if constexpr (isReply)
+                {
+                    if (!pattern.empty() && pattern.front() != '/') {
+                        throw std::invalid_argument(
+                            "Mach error: route pattern must start with a leading slash ('/')."
+                        );
+                    }
+
+                    detail::routing::RouteEndpoint endpoint{
+                        .method = method,
+                        .pattern = m_route + std::string(pattern),
+                        .invoker = std::make_unique<InvokerType>(
+                            std::forward<THandler>(handler)
+                         )
+                    };
+
+                    m_controllerEndpoints.emplace_back(std::move(endpoint));
+                }
+            }
+        }
     }
 }

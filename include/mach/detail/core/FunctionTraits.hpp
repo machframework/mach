@@ -1,6 +1,6 @@
 #pragma once
 
-namespace mach::detail 
+namespace mach::detail::traits
 {
     template <typename T>
     struct FunctionTraits : FunctionTraits<decltype(&T::operator())> {};
