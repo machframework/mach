@@ -16,11 +16,21 @@
 namespace mach::detail::dispatching 
 {
     template <
-        mach::detail::controllers::MachController TController,
-        mach::detail::results::traits::ReplyResult TResult,
+        typename TController,
+        typename TResult,
         typename... TArgs
     >
     class ControllerActionInvoker final : public IEndpointInvoker {
+        static_assert(
+            mach::detail::controllers::MachController<TController>,
+            "Mach error: ControllerActionInvoker requires a valid controller type."
+            );
+
+        static_assert(
+            mach::detail::results::traits::ReplyResult<TResult>,
+            "Mach error: ControllerActionInvoker requires a Reply result type."
+            );
+
     public:
         using Action = TResult (TController::*)(TArgs...);
         using ArgsTuple = std::tuple<TArgs...>;
@@ -36,13 +46,13 @@ namespace mach::detail::dispatching
     };
 
     template <
-        detail::controllers::MachController TController,
-        detail::results::traits::ReplyResult TResult,
+        typename TController,
+        typename TResult,
         typename... TArgs
     >
     void ControllerActionInvoker<TController, TResult, TArgs...>::invoke(RequestExecution& execution) const {
         auto& controller = execution.scope.resolve<TController>();
-        controller.context = &execution.context;
+        controller.setContext(execution.context);
 
         constexpr std::size_t parameterCount = sizeof...(TArgs);
 
