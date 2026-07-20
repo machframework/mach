@@ -166,3 +166,21 @@ add_mach_test(
     ControllerInvocationTests
     hardening/controllers/ControllerInvocationTests.cpp
 )
+
+add_mach_test(
+    OrderingTests
+    hardening/middleware/OrderingTests.cpp
+)
+
+add_mach_test(
+    MiddlewareRegistrationFirewallTests
+    hardening/middleware/MiddlewareRegistrationFirewallTests.cpp
+)
+
+set(MACH_MIDDLEWARE_COMPILE_FAILURE_TEST 0)
+
+target_compile_definitions(
+    MiddlewareRegistrationFirewallTests
+    PRIVATE
+        MACH_MIDDLEWARE_COMPILE_FAILURE_TEST=${MACH_MIDDLEWARE_COMPILE_FAILURE_TEST}
+)

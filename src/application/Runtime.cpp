@@ -25,10 +25,19 @@ namespace mach::detail::application
 			m_dispatcher.execute(context);
 		}
 		catch (const std::exception& ex) {
-			logging::Logger::error(ex.what());
+			logging::Logger::error(std::format("Request handling failed: {}", ex.what()));
 
 			// error
-			context.response.status(mach::http::StatusCode::InternalServerError);
+			context.response = mach::Response(context.request.version(), mach::http::StatusCode::InternalServerError);
+			context.response.body(
+				std::string(mach::http::reasonPhrase(mach::http::StatusCode::InternalServerError))
+			);
+		}
+		catch (...) {
+			logging::Logger::error("Request handling failed with unknown exception.");
+
+			// error
+			context.response = mach::Response(context.request.version(), mach::http::StatusCode::InternalServerError);
 			context.response.body(
 				std::string(mach::http::reasonPhrase(mach::http::StatusCode::InternalServerError))
 			);

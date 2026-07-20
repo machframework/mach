@@ -128,6 +128,24 @@ namespace mach
 		template <typename T, typename... Deps>
 		AppBuilder& addController();
 
+		/**
+		 * Registers a middleware in the application's request pipeline.
+		 *
+		 * The middleware will be registered as a scoped dependency and executed
+		 * in the order it was registered. Each middleware instance is created
+		 * once per HTTP request.
+		 *
+		 * @tparam T The middleware type being registered.
+		 * @tparam Deps The constructor dependency types required to create T.
+		 *
+		 * @return A reference to the current AppBuilder instance, allowing
+		 *         method chaining.
+		 *
+		 * @throws std::logic_error If the middleware type has already been
+		 *         registered.
+		 *
+		 * @thread_safety This function is not thread-safe.
+		 */
 		template <typename T, typename... Deps>
 		AppBuilder& use();
 
@@ -238,12 +256,19 @@ namespace mach
 
 	template <typename T, typename... Deps>
 	AppBuilder& AppBuilder::use(mach::detail::di::ServiceAccess access) {
-		constexpr bool isMiddlewareType = mach::detail::traits::middleware::MachMiddleware<T>;
+		constexpr bool isValidMiddlewareType = detail::traits::middleware::ValidMiddlewareType<T>;
+		constexpr bool hasValidMiddlewareInvoke = detail::traits::middleware::HasValidMiddlewareInvoke<T>;
 		constexpr bool isController = mach::detail::controllers::ControllerType<T>;
 
 		static_assert(
-			isMiddlewareType,
-			"Mach error: middleware must expose a public method void invoke(mach::Context&, mach::Next)"
+			isValidMiddlewareType,
+			"Mach error: middleware must be a non-cv, non-reference class type."
+			);
+
+		static_assert(
+			hasValidMiddlewareInvoke,
+			"Mach error: middleware must expose "
+			"'void invoke(mach::Context&, const mach::Next&)'."
 			);
 
 		static_assert(
@@ -251,13 +276,11 @@ namespace mach
 			"Mach error: middleware type must not be a controller."
 			);
 
-		if constexpr (isMiddlewareType || !isController) {
+		if constexpr (isValidMiddlewareType && hasValidMiddlewareInvoke && !isController) {
 			m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Scoped, access);
 		}
 
-		// add to middleware pipeline
 		m_middlewarePipeline.add<T>();
-
 		return *this;
 	}
 }

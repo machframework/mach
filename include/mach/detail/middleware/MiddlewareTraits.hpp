@@ -9,12 +9,15 @@
 namespace mach::detail::traits::middleware
 {
     template <typename T>
-    concept MachMiddleware =
+    concept ValidMiddlewareType =
         std::is_class_v<T> &&
-        !std::is_const_v<T> &&
-        !std::is_reference_v<T> &&
-        !std::is_pointer_v<T> &&
-        requires(T middleware, mach::Context & ctx, const mach::Next& next) {
-            { middleware.invoke(ctx, next) } -> std::same_as<void>;
+        std::same_as<T, std::remove_cvref_t<T>>;
+
+    template <typename T>
+    concept HasValidMiddlewareInvoke =
+        requires {
+        static_cast<void (T::*)(mach::Context&, mach::Next&)>(
+            &T::invoke
+            );
     };
 }

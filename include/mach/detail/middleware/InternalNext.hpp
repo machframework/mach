@@ -9,5 +9,5 @@ namespace mach::detail::dispatching
 
 namespace mach::detail::middleware
 {
-	using Next = std::function<void(detail::dispatching::RequestExecution&)>;
+	using InternalNext = std::function<void(detail::dispatching::RequestExecution&)>;
 }
