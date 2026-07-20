@@ -128,6 +128,24 @@ namespace mach
 		template <typename T, typename... Deps>
 		AppBuilder& addController();
 
+		/**
+		 * Registers a middleware in the application's request pipeline.
+		 *
+		 * The middleware will be registered as a scoped dependency and executed
+		 * in the order it was registered. Each middleware instance is created
+		 * once per HTTP request.
+		 *
+		 * @tparam T The middleware type being registered.
+		 * @tparam Deps The constructor dependency types required to create T.
+		 *
+		 * @return A reference to the current AppBuilder instance, allowing
+		 *         method chaining.
+		 *
+		 * @throws std::logic_error If the middleware type has already been
+		 *         registered.
+		 *
+		 * @thread_safety This function is not thread-safe.
+		 */
 		template <typename T, typename... Deps>
 		AppBuilder& use();
 
@@ -262,7 +280,6 @@ namespace mach
 			m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Scoped, access);
 		}
 
-		// add to middleware pipeline
 		m_middlewarePipeline.add<T>();
 		return *this;
 	}
