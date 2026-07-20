@@ -8,9 +8,15 @@
 #include <mach/http/StatusCode.hpp>
 #include <mach/http/Version.hpp>
 
-namespace mach::detail::http::adapter {
+namespace mach::detail::http::adapter
+{
 	class BeastRequestAdapter;
 	class BeastResponseAdapter;
+}
+
+namespace mach::detail::application
+{
+	class Runtime;
 }
 
 namespace mach
@@ -137,5 +143,6 @@ namespace mach
 
 		friend class detail::http::adapter::BeastRequestAdapter;
 		friend class detail::http::adapter::BeastResponseAdapter;
+		friend class detail::application::Runtime;
 	};
 }
