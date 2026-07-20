@@ -9,6 +9,19 @@
 namespace mach::detail::traits::middleware
 {
     template <typename T>
+    concept ValidMiddlewareType =
+        std::is_class_v<T> &&
+        std::same_as<T, std::remove_cvref_t<T>>;
+
+    template <typename T>
+    concept HasValidMiddlewareInvoke =
+        requires {
+        static_cast<void (T::*)(mach::Context&, const mach::Next&)>(
+            &T::invoke
+            );
+    };
+
+    template <typename T>
     concept MachMiddleware =
         std::is_class_v<T> &&
         !std::is_const_v<T> &&

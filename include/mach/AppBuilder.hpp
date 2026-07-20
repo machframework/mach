@@ -238,12 +238,19 @@ namespace mach
 
 	template <typename T, typename... Deps>
 	AppBuilder& AppBuilder::use(mach::detail::di::ServiceAccess access) {
-		constexpr bool isMiddlewareType = mach::detail::traits::middleware::MachMiddleware<T>;
+		constexpr bool isValidMiddlewareType = detail::traits::middleware::ValidMiddlewareType<T>;
+		constexpr bool hasValidMiddlewareInvoke = detail::traits::middleware::HasValidMiddlewareInvoke<T>;
 		constexpr bool isController = mach::detail::controllers::ControllerType<T>;
 
 		static_assert(
-			isMiddlewareType,
-			"Mach error: middleware must expose a public method void invoke(mach::Context&, mach::Next)"
+			isValidMiddlewareType,
+			"Mach error: middleware must be a non-cv, non-reference class type."
+			);
+
+		static_assert(
+			hasValidMiddlewareInvoke,
+			"Mach error: middleware must expose "
+			"'void invoke(mach::Context&, const mach::Next&)'."
 			);
 
 		static_assert(
@@ -251,13 +258,12 @@ namespace mach
 			"Mach error: middleware type must not be a controller."
 			);
 
-		if constexpr (isMiddlewareType || !isController) {
+		if constexpr (isValidMiddlewareType && hasValidMiddlewareInvoke && !isController) {
 			m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Scoped, access);
 		}
 
 		// add to middleware pipeline
 		m_middlewarePipeline.add<T>();
-
 		return *this;
 	}
 }

@@ -1,13 +1,13 @@
 #include <iostream>
 #include <string_view>
 
-#include <mach/controllers/ControllerBase.hpp>
-#include <mach/results/Reply.hpp>
 #include <mach/AppBuilder.hpp>
+#include <mach/controllers/ControllerBase.hpp>
+#include <mach/diagnostics/TerminateHandler.hpp>
+#include <mach/middleware/Next.hpp>
+#include <mach/results/Reply.hpp>
 
 #include "Testing.hpp"
-
-#include <mach/middleware/Next.hpp>
 
 // dependencies
 class Logger {
@@ -96,13 +96,13 @@ class UserController : public mach::ControllerBase {
 public:
 	static inline std::string route = "/users";
 
-	UserController(UserService userService)
+	UserController(UserService& userService)
 		: m_userService(userService)
 	{}
 
 	[[mach::get("/{type:int}")]]
 	mach::Reply<std::string> getByType() {
-		int type = std::stoi(std::string(context->request.routeParam("type")));
+		int type = std::stoi(std::string(request().routeParam("type")));
 
 		auto res = m_userService.serve(type);
 		if (res.size() >= 10) {
@@ -117,7 +117,7 @@ public:
 	}
 
 private:
-	UserService m_userService;
+	UserService& m_userService;
 };
 // controller
 
@@ -141,6 +141,8 @@ private:
 // middleware
 
 int main() {
+	mach::installTerminateHandler();
+
 	auto builder = mach::AppBuilder(std::move(testing::serverOptions));
 
 	builder.addSingleton<Logger>();
@@ -150,6 +152,7 @@ int main() {
 	builder.addScoped<UserService, UserRepo, Initiator, Logger>();
 	builder.addController<UserController, UserService>();
 
+	builder.use<AuthMiddleware, Logger>();
 	builder.use<AuthMiddleware, Logger>();
 
 	auto app = builder.build();
