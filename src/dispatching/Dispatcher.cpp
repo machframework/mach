@@ -2,7 +2,7 @@
 
 #include <mach/Context.hpp>
 
-#include <mach/detail/middleware/Next.hpp>
+#include <mach/detail/middleware/InternalNext.hpp>
 #include <mach/detail/routing/RouteEndpoint.hpp>
 
 namespace mach::detail::dispatching

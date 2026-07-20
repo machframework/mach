@@ -28,14 +28,14 @@ struct UserService {
 };
 
 struct HeaderMiddleware {
-    void invoke(mach::Context& ctx, const mach::Next& next) {
+    void invoke(mach::Context& ctx, mach::Next& next) {
         ctx.response.setHeader("X-Mach-Benchmark", "middleware");
         next();
     }
 };
 
 struct TouchMiddleware {
-    void invoke(mach::Context& ctx, const mach::Next& next) {
+    void invoke(mach::Context& ctx, mach::Next& next) {
         ctx.response.setHeader("X-Touched", "1");
         next();
     }
@@ -89,19 +89,19 @@ public:
     }
 
     mach::Reply<std::string> getUser() {
-        const auto id = context->request.routeParam("id");
+        const auto id = request().routeParam("id");
         return ok(m_users.getUser(id));
     }
 
     mach::Reply<std::string> getUserPost() {
-        const auto userId = context->request.routeParam("userId");
-        const auto postId = context->request.routeParam("postId");
+        const auto userId = request().routeParam("userId");
+        const auto postId = request().routeParam("postId");
 
         return ok(std::string(userId) + ":" + std::string(postId));
     }
 
     mach::Reply<std::string> birthYear() {
-        const auto yearText = context->request.routeParam("year");
+        const auto yearText = request().routeParam("year");
         const int year = std::stoi(std::string(yearText));
 
         return ok(std::to_string(m_users.calculateAge(year)));

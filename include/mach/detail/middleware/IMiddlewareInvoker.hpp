@@ -10,6 +10,6 @@ namespace mach::detail::middleware
 	
 	public:
 		virtual ~IMiddlewareInvoker() = default;
-		virtual void invoke(dispatching::RequestExecution& execution, const middleware::Next& next) = 0;
+		virtual void invoke(dispatching::RequestExecution& execution, const middleware::InternalNext& next) = 0;
 	};
 }

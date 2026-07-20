@@ -10,8 +10,9 @@
 class A {
 public:
 
-	void invoke(mach::Context& context, const mach::Next& next) {
+	void invoke(mach::Context& context, mach::Next& next){
 		std::cout << "Before A\n";
+		next();
 		next();
 		std::cout << "After A\n";
 	}
@@ -20,7 +21,7 @@ public:
 class B {
 public:
 
-	void invoke(mach::Context& context, const mach::Next& next) {
+	void invoke(mach::Context& context, mach::Next& next) {
 		std::cout << "Before B\n";
 		context.response.status(mach::http::StatusCode::Unauthorized);
 		std::cout << "After B\n";
@@ -30,7 +31,7 @@ public:
 class C {
 public:
 
-	void invoke(mach::Context& context, const mach::Next& next) {
+	void invoke(mach::Context& context, mach::Next& next) {
 		std::cout << "Before C\n";
 		next();
 		std::cout << "After C\n";

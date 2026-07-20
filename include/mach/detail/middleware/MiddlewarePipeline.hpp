@@ -4,7 +4,7 @@
 #include <vector>
 
 #include <mach/detail/dispatching/RequestExecution.hpp>
-#include <mach/detail/middleware/Next.hpp>
+#include <mach/detail/middleware/InternalNext.hpp>
 #include <mach/detail/middleware/MiddlewareInvoker.hpp>
 
 namespace mach::detail::middleware
@@ -23,7 +23,7 @@ namespace mach::detail::middleware
 		template <typename TMiddleware>
 		void add();
 
-		void invoke(dispatching::RequestExecution& execution, const middleware::Next& terminal) const;
+		void invoke(dispatching::RequestExecution& execution, const middleware::InternalNext& terminal) const;
 
 	private:
 		std::vector<std::unique_ptr<middleware::IMiddlewareInvoker>> m_middlewares;
