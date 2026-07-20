@@ -20,14 +20,4 @@ namespace mach::detail::traits::middleware
             &T::invoke
             );
     };
-
-    template <typename T>
-    concept MachMiddleware =
-        std::is_class_v<T> &&
-        !std::is_const_v<T> &&
-        !std::is_reference_v<T> &&
-        !std::is_pointer_v<T> &&
-        requires(T middleware, mach::Context & ctx, const mach::Next& next) {
-            { middleware.invoke(ctx, next) } -> std::same_as<void>;
-    };
 }
