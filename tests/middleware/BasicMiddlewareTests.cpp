@@ -153,7 +153,6 @@ int main() {
 	builder.addController<UserController, UserService>();
 
 	builder.use<AuthMiddleware, Logger>();
-	builder.use<AuthMiddleware, Logger>();
 
 	auto app = builder.build();
 	return app.run();

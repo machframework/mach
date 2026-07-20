@@ -166,3 +166,8 @@ add_mach_test(
     ControllerInvocationTests
     hardening/controllers/ControllerInvocationTests.cpp
 )
+
+add_mach_test(
+    OrderingTests
+    hardening/middleware/OrderingTests.cpp
+)
