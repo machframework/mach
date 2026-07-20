@@ -129,7 +129,7 @@ namespace mach::detail::dispatching
 
                     if constexpr (firstIsValidContext) {
                         using DeclaredBodyType =
-                            std::tuple_element_t<0, std::tuple<TArgs...>>;
+                            std::tuple_element_t<1, std::tuple<TArgs...>>;
 
                         using BodyType = std::remove_cvref_t<DeclaredBodyType>;
 

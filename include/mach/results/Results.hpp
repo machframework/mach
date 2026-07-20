@@ -5,8 +5,8 @@
 #include <mach/http/StatusCode.hpp>
 #include <mach/results/Reply.hpp>
 
-namespace mach::results {
-
+namespace mach
+{
     template <typename T>
     Reply<T> ok(T value) {
         return Reply<T>(http::StatusCode::Ok, std::move(value));

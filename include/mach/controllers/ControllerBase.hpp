@@ -78,48 +78,48 @@ namespace mach
 
 	template <typename T>
 	mach::Reply<T> ControllerBase::ok(T value) {
-		return mach::results::ok<T>(value);
+		return mach::ok<T>(value);
 	}
 
 	inline mach::Reply<std::string> ControllerBase::ok(const char* value) {
-		return mach::results::ok(value);
+		return mach::ok(value);
 	}
 
 	template <typename T>
 	mach::Reply<T> ControllerBase::created(T value) {
-		return mach::results::created<T>(value);
+		return mach::created<T>(value);
 	}
 
 	inline mach::Reply<std::string> ControllerBase::created(const char* value) {
-		return mach::results::created(value);
+		return mach::created(value);
 	}
 
 	inline mach::Reply<> ControllerBase::noContent() {
-		return mach::results::noContent();
+		return mach::noContent();
 	}
 
 	template <typename T>
 	mach::Reply<T> ControllerBase::badRequest() {
-		return mach::results::badRequest<T>();
+		return mach::badRequest<T>();
 	}
 
 	template <typename T>
 	mach::Reply<T> ControllerBase::unauthorized() {
-		return mach::results::unauthorized<T>();
+		return mach::unauthorized<T>();
 	}
 
 	template <typename T>
 	mach::Reply<T> ControllerBase::forbidden() {
-		return mach::results::forbidden<T>();
+		return mach::forbidden<T>();
 	}
 
 	template <typename T>
 	mach::Reply<T> ControllerBase::notFound() {
-		return mach::results::notFound<T>();
+		return mach::notFound<T>();
 	}
 
 	template <typename T>
 	mach::Reply<T> ControllerBase::conflict() {
-		return mach::results::conflict<T>();
+		return mach::conflict<T>();
 	}
 }

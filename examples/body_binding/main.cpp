@@ -30,7 +30,7 @@ int main() {
         std::cout << "Creating user: "
             << request.name << ", age " << request.age << "\n";
 
-        return mach::results::ok(UserProfile{
+        return mach::ok(UserProfile{
             .name = request.name,
             .age = request.age,
             .adult = adult
@@ -40,21 +40,21 @@ int main() {
     app.mapGet("/debug/context", [](mach::Context& context) {
         context.response.setHeader("X-Mach-Example", "body-binding");
 
-        return mach::results::ok("Context reached");
+        return mach::ok("Context reached");
         });
 
     app.mapGet("/debug/context/request", [](mach::Context& context, CreateUserRequest request) {
         context.response.setHeader("X-Age", std::to_string(request.age));
         context.response.setHeader("X-Name", request.name);
 
-        return mach::results::ok("Context + DTO reached");
+        return mach::ok("Context + DTO reached");
         });
 
     app.mapGet("/debug/request/context", [](CreateUserRequest request, mach::Context& context) {
         context.response.setHeader("X-Age", std::to_string(request.age));
         context.response.setHeader("X-Name", request.name);
 
-        return mach::results::ok("DTO + Context reached");
+        return mach::ok("DTO + Context reached");
         });
 
     return app.run();;
