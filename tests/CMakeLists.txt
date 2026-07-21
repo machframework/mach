@@ -177,10 +177,16 @@ add_mach_test(
     hardening/middleware/MiddlewareRegistrationFirewallTests.cpp
 )
 
+
 set(MACH_MIDDLEWARE_COMPILE_FAILURE_TEST 0)
 
 target_compile_definitions(
     MiddlewareRegistrationFirewallTests
     PRIVATE
         MACH_MIDDLEWARE_COMPILE_FAILURE_TEST=${MACH_MIDDLEWARE_COMPILE_FAILURE_TEST}
+)
+
+add_mach_test(
+    CompileTimeRegistrationTests
+    hardening/minimal-api/CompileTimeRegistrationTests.cpp
 )
