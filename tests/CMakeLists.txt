@@ -190,3 +190,8 @@ add_mach_test(
     CompileTimeRegistrationTests
     hardening/minimal-api/CompileTimeRegistrationTests.cpp
 )
+
+add_mach_test(
+    NestedObjectBinding
+    hardening/binding/NestedObjectBinding.cpp
+)
