@@ -4,8 +4,8 @@
 #include <mach/App.hpp>
 #include <mach/AppBuilder.hpp>
 #include <mach/Context.hpp>
-
 #include <mach/results/Reply.hpp>
+#include <mach/results/Results.hpp>
 
 int main() {
 
@@ -24,7 +24,7 @@ int main() {
 				<< " and my age is: " << context.request.routeParam("age") << std::endl;
 		});
 
-		app.run();
+		return app.run();
 	}
 	catch (const std::exception& ex) {
 		std::cerr << ex.what() << std::endl;

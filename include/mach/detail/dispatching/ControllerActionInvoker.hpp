@@ -39,7 +39,7 @@ namespace mach::detail::dispatching
             : m_action(action) {
         }
 
-        void invoke(RequestExecution& execution) const override;
+        void invoke(RequestExecution& execution) override;
 
     private:
         Action m_action;
@@ -50,7 +50,7 @@ namespace mach::detail::dispatching
         typename TResult,
         typename... TArgs
     >
-    void ControllerActionInvoker<TController, TResult, TArgs...>::invoke(RequestExecution& execution) const {
+    void ControllerActionInvoker<TController, TResult, TArgs...>::invoke(RequestExecution& execution) {
         auto& controller = execution.scope.resolve<TController>();
         controller.setContext(execution.context);
 

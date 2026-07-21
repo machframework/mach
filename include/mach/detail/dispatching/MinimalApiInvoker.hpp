@@ -25,7 +25,7 @@ namespace mach::detail::dispatching
             : m_handler(std::move(handler))
         { }
 
-        void invoke(RequestExecution& execution) const override;
+        void invoke(RequestExecution& execution) override;
 
     private:
         THandler m_handler;
@@ -36,14 +36,14 @@ namespace mach::detail::dispatching
         typename TResult,
         typename... TArgs
     >
-    void MinimalApiInvoker<THandler, TResult, TArgs...>::invoke(RequestExecution& execution) const {
+    void MinimalApiInvoker<THandler, TResult, TArgs...>::invoke(RequestExecution& execution) {
         constexpr std::size_t parameterCount = sizeof...(TArgs);
 
         static_assert(
             parameterCount <= 2,
             "Mach error: minimal API handlers currently support at most two parameters."
             );
-        
+
         auto handlerCallback = [&]() -> TResult {
             if constexpr (sizeof...(TArgs) == 0) {
                 return std::invoke(m_handler);
@@ -186,8 +186,15 @@ namespace mach::detail::dispatching
             TResult res = handlerCallback();
 
             execution.context.response.status(res.statusCode());
-            if (res.hasValue()) {
-                execution.context.response.body(std::move(serialization::Serializer::serialize(res.value())));
+
+            using ValueType = typename TResult::ValueType;
+
+            if constexpr (!std::same_as<ValueType, void>) {
+                if (res.hasValue()) {
+                    execution.context.response.body(
+                        serialization::Serializer::serialize(res.value())
+                    );
+                }
             }
         }
         else {
