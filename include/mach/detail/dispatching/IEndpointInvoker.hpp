@@ -8,6 +8,6 @@ namespace mach::detail::dispatching
 		
 	public:
 		virtual ~IEndpointInvoker() = default;
-		virtual void invoke(RequestExecution& execution) const = 0;
+		virtual void invoke(RequestExecution& execution) = 0;
 	};
 }

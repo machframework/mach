@@ -11,8 +11,10 @@ int main() {
 	mach::AppBuilder builder(std::move(testing::serverOptions));
 	auto app = builder.build();
 
-	app.mapGet("/noexcept", []() noexcept {
+	int count = 0;
 
+	app.mapGet("/noexcept", [count]() mutable noexcept {
+		count++;
 		});
 	
 	app.mapGet("/free-function", doNothing);

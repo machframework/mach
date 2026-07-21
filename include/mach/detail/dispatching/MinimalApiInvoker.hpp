@@ -25,7 +25,7 @@ namespace mach::detail::dispatching
             : m_handler(std::move(handler))
         { }
 
-        void invoke(RequestExecution& execution) const override;
+        void invoke(RequestExecution& execution) override;
 
     private:
         THandler m_handler;
@@ -36,7 +36,7 @@ namespace mach::detail::dispatching
         typename TResult,
         typename... TArgs
     >
-    void MinimalApiInvoker<THandler, TResult, TArgs...>::invoke(RequestExecution& execution) const {
+    void MinimalApiInvoker<THandler, TResult, TArgs...>::invoke(RequestExecution& execution) {
         constexpr std::size_t parameterCount = sizeof...(TArgs);
 
         static_assert(
