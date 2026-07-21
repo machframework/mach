@@ -186,8 +186,15 @@ namespace mach::detail::dispatching
             TResult res = handlerCallback();
 
             execution.context.response.status(res.statusCode());
-            if (res.hasValue()) {
-                execution.context.response.body(std::move(serialization::Serializer::serialize(res.value())));
+
+            using ValueType = typename TResult::ValueType;
+
+            if constexpr (!std::same_as<ValueType, void>) {
+                if (res.hasValue()) {
+                    execution.context.response.body(
+                        serialization::Serializer::serialize(res.value())
+                    );
+                }
             }
         }
         else {
