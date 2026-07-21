@@ -3,8 +3,8 @@
 
 #include "Testing.hpp"
 
-static void doNothing() {
-
+static void doNothing(mach::Context& context) {
+	context.response.setHeader("X-Arrived", "1");
 }
 
 int main() {
@@ -15,10 +15,6 @@ int main() {
 
 	app.mapGet("/noexcept", [count]() mutable noexcept {
 		count++;
-		});
-
-	app.mapGet("/generic", [](auto value) {
-
 		});
 	
 	app.mapGet("/free-function", doNothing);
