@@ -192,6 +192,6 @@ add_mach_test(
 )
 
 add_mach_test(
-    NestedObjectBinding
-    hardening/binding/NestedObjectBinding.cpp
+    ObjectBindingTests
+    hardening/binding/ObjectBindingTests.cpp
 )
