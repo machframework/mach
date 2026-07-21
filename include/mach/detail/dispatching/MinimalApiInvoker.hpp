@@ -43,7 +43,7 @@ namespace mach::detail::dispatching
             parameterCount <= 2,
             "Mach error: minimal API handlers currently support at most two parameters."
             );
-        
+
         auto handlerCallback = [&]() -> TResult {
             if constexpr (sizeof...(TArgs) == 0) {
                 return std::invoke(m_handler);

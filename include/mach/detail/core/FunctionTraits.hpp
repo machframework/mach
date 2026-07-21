@@ -1,17 +1,27 @@
 #pragma once
 
+#include <concepts>
 #include <tuple>
 #include <type_traits>
 
 namespace mach::detail::traits
 {
     template <typename T>
+    concept HasSingleConcreteCallOperator =
+        requires {
+        &std::remove_cvref_t<T>::operator();
+    };
+
+    template <typename T>
     struct FunctionTraits;
 
-    // Functors and lambdas with a single, non-generic operator().
+    // Functors and lambdas with a single, concrete operator().
     template <typename T>
-    struct FunctionTraits
-        : FunctionTraits<decltype(&std::remove_cvref_t<T>::operator())> {};
+        requires HasSingleConcreteCallOperator<T>
+    struct FunctionTraits<T>
+        : FunctionTraits<
+        decltype(&std::remove_cvref_t<T>::operator())
+        > {};
 
     // Free-function types.
     template <typename Return, typename... Args>
@@ -33,24 +43,6 @@ namespace mach::detail::traits
     // noexcept function pointers.
     template <typename Return, typename... Args>
     struct FunctionTraits<Return(*)(Args...) noexcept>
-        : FunctionTraits<Return(Args...)> {};
-
-    // Function references.
-    template <typename Return, typename... Args>
-    struct FunctionTraits<Return(&)(Args...)>
-        : FunctionTraits<Return(Args...)> {};
-
-    template <typename Return, typename... Args>
-    struct FunctionTraits<Return(&&)(Args...)>
-        : FunctionTraits<Return(Args...)> {};
-
-    // noexcept function references.
-    template <typename Return, typename... Args>
-    struct FunctionTraits<Return(&)(Args...) noexcept>
-        : FunctionTraits<Return(Args...)> {};
-
-    template <typename Return, typename... Args>
-    struct FunctionTraits<Return(&&)(Args...) noexcept>
         : FunctionTraits<Return(Args...)> {};
 
     // Non-const call operators, including mutable lambdas.
@@ -82,7 +74,12 @@ namespace mach::detail::traits
     template <typename T>
     concept MinimalApiHandler =
         requires {
-        typename FunctionTraits<std::remove_cvref_t<T>>::ReturnType;
-        typename FunctionTraits<std::remove_cvref_t<T>>::ArgsTuple;
+        typename FunctionTraits<
+            std::remove_cvref_t<T>
+        >::ReturnType;
+
+        typename FunctionTraits<
+            std::remove_cvref_t<T>
+        >::ArgsTuple;
     };
 }

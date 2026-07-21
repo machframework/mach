@@ -16,6 +16,10 @@ int main() {
 	app.mapGet("/noexcept", [count]() mutable noexcept {
 		count++;
 		});
+
+	app.mapGet("/generic", [](auto value) {
+
+		});
 	
 	app.mapGet("/free-function", doNothing);
 
