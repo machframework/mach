@@ -11,6 +11,30 @@
 
 namespace mach::detail::dispatching
 {
+    template <typename Tuple>
+    consteval bool expectsBody()
+    {
+        constexpr std::size_t parameterCount =
+            std::tuple_size_v<Tuple>;
+
+        if constexpr (parameterCount == 0) {
+            return false;
+        }
+        else if constexpr (parameterCount == 1) {
+            using Arg = std::tuple_element_t<0, Tuple>;
+
+            constexpr bool isValidContext =
+                std::same_as<Arg, mach::Context&> ||
+                std::same_as<Arg, const mach::Context&>;
+
+            return !isValidContext;
+        }
+        else {
+            return true;
+        }
+    }
+        
+
     template <
         typename THandler,
         typename TResult,
@@ -38,7 +62,9 @@ namespace mach::detail::dispatching
     >
     void MinimalApiInvoker<THandler, TResult, TArgs...>::invoke(RequestExecution& execution) {
         constexpr std::size_t parameterCount = sizeof...(TArgs);
-        constexpr bool expectsBody = parameterCount != 0;
+
+        constexpr bool handlerExpectsBody =
+            expectsBody<ArgsTuple>();
 
         auto& context = execution.context;
 
@@ -50,7 +76,7 @@ namespace mach::detail::dispatching
         const auto& stringBody = context.request.body();
         const auto contentType = context.request.header("content-type");
 
-        if (expectsBody &&
+        if (handlerExpectsBody &&
             !contentType &&
             !stringBody.empty())
         {
@@ -58,7 +84,7 @@ namespace mach::detail::dispatching
             context.response.status(mach::http::StatusCode::UnsupportedMediaType);
             return;
         }
-        if (expectsBody &&
+        if (handlerExpectsBody &&
             !stringBody.empty() &&
             contentType.has_value() &&
             !contentType->starts_with("application/json"))
@@ -93,7 +119,6 @@ namespace mach::detail::dispatching
                         );
 
                     if constexpr (!isContext) {
-
                         static_assert(
                             binding::JsonDeserializable<ValueType>,
                             "Mach error: minimal API body parameter must be deserializable from JSON."
