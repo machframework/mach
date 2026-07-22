@@ -70,10 +70,10 @@ namespace mach::detail::dispatching
 
         if (!contentType && !stringBody.empty()) {
             context.response = mach::Response{};
-            mach.response.status(mach::http::StatusCode::UnsupportedMediaType);
+            context.response.status(mach::http::StatusCode::UnsupportedMediaType);
             return;
         }
-        if (contentType.has_value() && !contentType->starts_with("application/json")) {
+        if (contentType.has_value() && !stringBody.empty() && !contentType->starts_with("application/json")) {
             context.response = mach::Response{};
             context.response.status(mach::http::StatusCode::UnsupportedMediaType);
             return;

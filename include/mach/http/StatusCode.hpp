@@ -134,6 +134,7 @@ namespace mach::http
 		case StatusCode::Conflict:
 		case StatusCode::PayloadTooLarge:
 		case StatusCode::UriTooLong:
+		case StatusCode::UnsupportedMediaType:
 		case StatusCode::RequestHeaderFieldsTooLarge:
 
 		case StatusCode::InternalServerError:

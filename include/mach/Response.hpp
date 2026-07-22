@@ -25,6 +25,13 @@ namespace mach::detail::dispatching
 		typename... TArgs
 	>
 	class ControllerActionInvoker;
+
+	template <
+		typename THandler,
+		typename TResult,
+		typename... TArgs
+	>
+	class MinimalApiInvoker;
 }
 
 namespace mach
@@ -152,5 +159,19 @@ namespace mach
 		friend class detail::http::adapter::BeastRequestAdapter;
 		friend class detail::http::adapter::BeastResponseAdapter;
 		friend class detail::application::Runtime;
+
+		template <
+			typename TController,
+			typename TResult,
+			typename... TArgs
+		>
+		friend class detail::dispatching::ControllerActionInvoker;
+
+		template <
+			typename THandler,
+			typename TResult,
+			typename... TArgs
+		>
+		friend class detail::dispatching::MinimalApiInvoker;
 	};
 }
