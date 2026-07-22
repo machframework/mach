@@ -200,3 +200,8 @@ add_mach_test(
     MoveOnlyTypeBindingTests
     hardening/binding/MoveOnlyTypeBindingTests.cpp
 )
+
+add_mach_test(
+    ContentTypeValidationRuntimeTests
+    hardening/binding/ContentTypeValidationRuntimeTests.cpp
+)
