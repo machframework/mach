@@ -195,3 +195,8 @@ add_mach_test(
     ObjectBindingTests
     hardening/binding/ObjectBindingTests.cpp
 )
+
+add_mach_test(
+    MoveOnlyTypeBindingTests
+    hardening/binding/MoveOnlyTypeBindingTests.cpp
+)

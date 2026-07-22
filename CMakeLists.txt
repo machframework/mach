@@ -37,7 +37,8 @@ add_library(mach
     src/diagnostics/TerminateHandler.cpp
     src/controllers/ControllerBase.cpp
     src/middleware/Next.cpp
- "src/exceptions/ExceptionMiddleware.cpp")
+    src/exceptions/ExceptionMiddleware.cpp
+)
 
 target_include_directories(mach
     PUBLIC
