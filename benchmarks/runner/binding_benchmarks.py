@@ -13,10 +13,10 @@ CONNECTIONS = 100
 DURATION = "30s"
 
 BENCHMARKS = [
-    ("baseline", "/benchmark/baseline", "baseline.lua"),
-    ("small", "/benchmark/binding/small", "small.lua"),
-    ("large", "/benchmark/binding/large", "large.lua"),
-    ("malformed", "/benchmark/binding/failure", "malformed.lua"),
+    ("baseline", "/benchmark/baseline", "wrk-baseline.lua"),
+    ("small", "/benchmark/binding/small", "wrk-small.lua"),
+    ("large", "/benchmark/binding/large", "wrk-large.lua"),
+    ("malformed", "/benchmark/binding/failure", "wrk-malformed.lua"),
 ]
 
 RPS_RE = re.compile(r"Requests/sec:\s+([0-9.]+)")
@@ -45,11 +45,12 @@ def run_wrk(route: str, script: Path):
     )
 
     output = result.stdout
+    print(output)
 
     rps = RPS_RE.search(output)
     latency = LAT_RE.search(output)
     transfer = TRANSFER_RE.search(output)
-
+    
     return {
         "raw_output": output,
         "requests_per_sec": rps.group(1) if rps else "",

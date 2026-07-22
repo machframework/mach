@@ -1,4 +1,4 @@
-local file = assert(io.open("../../binding-large.json", "rb"))
+local file = assert(io.open("../../payloads/binding/binding-large.json", "rb"))
 wrk.body = file:read("*all")
 file:close()
 

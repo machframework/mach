@@ -1,1 +1,10 @@
 Benchmark,Threads,Connections,Duration,Latency,Requests/sec,Transfer/sec
+baseline,16,100,30s,345.22us,276479.71,22.68MB
+small,16,100,30s,344.50us,276836,22.70MB
+large,16,100,30s,2.10ms,45492.38,3.73MB
+malformed,16,100,30s,0.85ms,114966.71,13.92MB
+,,,,,,
+baseline,16,100,30s,347.98us,274320.64,22.50MB
+small,16,100,30s,347.90us,274162.2,22.49MB
+large,16,100,30s,2.14ms,44842.93,3.68MB
+malformed,16,100,30s,0.89ms,109646.76,13.28MB
