@@ -205,3 +205,8 @@ add_mach_test(
     ContentTypeValidationRuntimeTests
     hardening/binding/ContentTypeValidationRuntimeTests.cpp
 )
+
+add_mach_test(
+    ContentTypeValidationControllerTests
+    hardening/binding/ContentTypeValidationControllerTests.cpp
+)
