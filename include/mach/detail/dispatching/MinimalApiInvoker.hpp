@@ -38,6 +38,7 @@ namespace mach::detail::dispatching
     >
     void MinimalApiInvoker<THandler, TResult, TArgs...>::invoke(RequestExecution& execution) {
         constexpr std::size_t parameterCount = sizeof...(TArgs);
+        constexpr bool expectsBody = parameterCount != 0;
 
         auto& context = execution.context;
 
@@ -49,12 +50,19 @@ namespace mach::detail::dispatching
         const auto& stringBody = context.request.body();
         const auto contentType = context.request.header("content-type");
 
-        if (!contentType && !stringBody.empty()) {
+        if (expectsBody &&
+            !contentType &&
+            !stringBody.empty())
+        {
             context.response = mach::Response{};
             context.response.status(mach::http::StatusCode::UnsupportedMediaType);
             return;
         }
-        if (contentType.has_value() && !stringBody.empty() && !contentType->starts_with("application/json")) {
+        if (expectsBody &&
+            !stringBody.empty() &&
+            contentType.has_value() &&
+            !contentType->starts_with("application/json"))
+        {
             context.response = mach::Response{};
             context.response.status(mach::http::StatusCode::UnsupportedMediaType);
             return;
