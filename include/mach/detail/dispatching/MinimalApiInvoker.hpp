@@ -4,13 +4,38 @@
 #include <tuple>
 #include <type_traits>
 
-#include <mach/detail/dispatching/IEndpointInvoker.hpp>
-#include <mach/detail/results/ResultTraits.hpp>
 #include <mach/detail/core/TypeTraits.hpp>
+#include <mach/detail/dispatching/IEndpointInvoker.hpp>
+#include <mach/detail/http/ContentType.hpp>
+#include <mach/detail/results/ResultTraits.hpp>
 #include <mach/detail/serailization/Serializer.hpp>
 
 namespace mach::detail::dispatching
 {
+    template <typename Tuple>
+    consteval bool expectsBody()
+    {
+        constexpr std::size_t parameterCount =
+            std::tuple_size_v<Tuple>;
+
+        if constexpr (parameterCount == 0) {
+            return false;
+        }
+        else if constexpr (parameterCount == 1) {
+            using Arg = std::tuple_element_t<0, Tuple>;
+
+            constexpr bool isValidContext =
+                std::same_as<Arg, mach::Context&> ||
+                std::same_as<Arg, const mach::Context&>;
+
+            return !isValidContext;
+        }
+        else {
+            return true;
+        }
+    }
+        
+
     template <
         typename THandler,
         typename TResult,
@@ -39,16 +64,38 @@ namespace mach::detail::dispatching
     void MinimalApiInvoker<THandler, TResult, TArgs...>::invoke(RequestExecution& execution) {
         constexpr std::size_t parameterCount = sizeof...(TArgs);
 
+        constexpr bool handlerExpectsBody =
+            expectsBody<ArgsTuple>();
+
+        auto& context = execution.context;
+
         static_assert(
             parameterCount <= 2,
             "Mach error: minimal API handlers currently support at most two parameters."
             );
 
+        const auto& stringBody = context.request.body();
+        const auto contentType = context.request.header("content-type");
+
+        if (handlerExpectsBody &&
+            !stringBody.empty() &&
+            (!contentType ||
+                !mach::detail::http::matchesMediaType(
+                    *contentType,
+                    "application/json"
+                ) ||
+                mach::detail::http::hasUnsupportedCharset(*contentType)))
+        {
+            context.response = mach::Response{ context.request.version() };
+            context.response.status(mach::http::StatusCode::UnsupportedMediaType);
+            return;
+        }
+
         auto handlerCallback = [&]() -> TResult {
-            if constexpr (sizeof...(TArgs) == 0) {
+            if constexpr (parameterCount == 0) {
                 return std::invoke(m_handler);
             }
-            else if constexpr (sizeof...(TArgs) == 1) {
+            else if constexpr (parameterCount == 1) {
                 using FirstType = std::tuple_element_t<0, std::tuple<TArgs...>>;
                 using ValueType = std::remove_cvref_t<FirstType>;
 
@@ -60,7 +107,7 @@ namespace mach::detail::dispatching
                     std::same_as<ValueType, mach::Context>;
 
                 if constexpr (isValidContext) {
-                    return std::invoke(m_handler, execution.context);
+                    return std::invoke(m_handler, context);
                 }
                 else {
                     static_assert(
@@ -69,7 +116,6 @@ namespace mach::detail::dispatching
                         );
 
                     if constexpr (!isContext) {
-
                         static_assert(
                             binding::JsonDeserializable<ValueType>,
                             "Mach error: minimal API body parameter must be deserializable from JSON."
@@ -77,7 +123,7 @@ namespace mach::detail::dispatching
 
                         if constexpr (binding::JsonDeserializable<ValueType>) {
                             auto& binder = execution.scope.resolve<binding::BodyBinder>();
-                            ValueType body = binder.bind<ValueType>(execution.context.request.body());
+                            ValueType body = binder.bind<ValueType>(context.request.body());
 
                             return std::invoke(m_handler, std::move(body));
                         }
@@ -147,8 +193,8 @@ namespace mach::detail::dispatching
                             );
 
                         if constexpr (passedByValue && binding::JsonDeserializable<BodyType>) {
-                            BodyType body = binder.bind<BodyType>(execution.context.request.body());
-                            return std::invoke(m_handler, execution.context, std::move(body));
+                            BodyType body = binder.bind<BodyType>(context.request.body());
+                            return std::invoke(m_handler, context, std::move(body));
                         }
                     }
                     else {
@@ -171,8 +217,8 @@ namespace mach::detail::dispatching
                             );
 
                         if constexpr (passedByValue && binding::JsonDeserializable<BodyType>) {
-                            BodyType body = binder.bind<BodyType>(execution.context.request.body());
-                            return std::invoke(m_handler, std::move(body), execution.context);
+                            BodyType body = binder.bind<BodyType>(context.request.body());
+                            return std::invoke(m_handler, std::move(body), context);
                         }
                     }
                 }

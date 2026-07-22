@@ -8,6 +8,7 @@
 #include <mach/detail/binding/BodyBinder.hpp>
 #include <mach/detail/routing/Router.hpp>
 #include <mach/detail/routing/RoutingMiddleware.hpp>
+#include <mach/detail/exceptions/ExceptionMiddleware.hpp>
 
 namespace
 {
@@ -46,6 +47,7 @@ namespace mach
 		// register preprocessing middleware
 
 		// register routing middleware
+		this->use<detail::exceptions::ExceptionMiddleware>(mach::detail::di::ServiceAccess::Internal);
 		this->use<detail::routing::RoutingMiddleware, detail::routing::Router>(mach::detail::di::ServiceAccess::Internal);
 	}
 

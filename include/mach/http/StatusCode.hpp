@@ -26,6 +26,7 @@ namespace mach::http
 		Conflict = 409,
 		PayloadTooLarge = 413,
 		UriTooLong = 414,
+		UnsupportedMediaType = 415,
 		RequestHeaderFieldsTooLarge = 431,
 
 		InternalServerError = 500,
@@ -133,6 +134,7 @@ namespace mach::http
 		case StatusCode::Conflict:
 		case StatusCode::PayloadTooLarge:
 		case StatusCode::UriTooLong:
+		case StatusCode::UnsupportedMediaType:
 		case StatusCode::RequestHeaderFieldsTooLarge:
 
 		case StatusCode::InternalServerError:

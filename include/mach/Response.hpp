@@ -13,10 +13,25 @@ namespace mach::detail::http::adapter
 	class BeastRequestAdapter;
 	class BeastResponseAdapter;
 }
-
 namespace mach::detail::application
 {
 	class Runtime;
+}
+namespace mach::detail::dispatching
+{
+	template <
+		typename TController,
+		typename TResult,
+		typename... TArgs
+	>
+	class ControllerActionInvoker;
+
+	template <
+		typename THandler,
+		typename TResult,
+		typename... TArgs
+	>
+	class MinimalApiInvoker;
 }
 
 namespace mach
@@ -144,5 +159,19 @@ namespace mach
 		friend class detail::http::adapter::BeastRequestAdapter;
 		friend class detail::http::adapter::BeastResponseAdapter;
 		friend class detail::application::Runtime;
+
+		template <
+			typename TController,
+			typename TResult,
+			typename... TArgs
+		>
+		friend class detail::dispatching::ControllerActionInvoker;
+
+		template <
+			typename THandler,
+			typename TResult,
+			typename... TArgs
+		>
+		friend class detail::dispatching::MinimalApiInvoker;
 	};
 }

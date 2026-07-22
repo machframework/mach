@@ -190,3 +190,23 @@ add_mach_test(
     CompileTimeRegistrationTests
     hardening/minimal-api/CompileTimeRegistrationTests.cpp
 )
+
+add_mach_test(
+    ObjectBindingTests
+    hardening/binding/ObjectBindingTests.cpp
+)
+
+add_mach_test(
+    MoveOnlyTypeBindingTests
+    hardening/binding/MoveOnlyTypeBindingTests.cpp
+)
+
+add_mach_test(
+    ContentTypeValidationRuntimeTests
+    hardening/binding/ContentTypeValidationRuntimeTests.cpp
+)
+
+add_mach_test(
+    ContentTypeValidationControllerTests
+    hardening/binding/ContentTypeValidationControllerTests.cpp
+)

@@ -6,10 +6,13 @@
 #include <typeindex>
 #include <utility>
 
+#include <mach/Response.hpp>
+
 #include <mach/detail/binding/BodyBinder.hpp>
 #include <mach/detail/binding/JsonConcepts.hpp>
 #include <mach/detail/controllers/ControllerTraits.hpp>
 #include <mach/detail/dispatching/IEndpointInvoker.hpp>
+#include <mach/detail/http/ContentType.hpp>
 #include <mach/detail/results/ResultTraits.hpp>
 #include <mach/detail/serailization/Serializer.hpp>
 
@@ -51,15 +54,34 @@ namespace mach::detail::dispatching
         typename... TArgs
     >
     void ControllerActionInvoker<TController, TResult, TArgs...>::invoke(RequestExecution& execution) {
+        auto& context = execution.context;
+        
         auto& controller = execution.scope.resolve<TController>();
-        controller.setContext(execution.context);
+        controller.setContext(context);
 
         constexpr std::size_t parameterCount = sizeof...(TArgs);
+        constexpr bool expectsBody = parameterCount != 0;
 
         static_assert(
             parameterCount <= 1,
             "Mach error: controller actions may accept at most one parameter, which is bound from the request body."
             );
+
+        const auto& stringBody = context.request.body();
+        const auto contentType = context.request.header("content-type");
+
+        if (!stringBody.empty() &&
+            (!contentType ||
+                !mach::detail::http::matchesMediaType(
+                    *contentType,
+                    "application/json"
+                ) ||
+                mach::detail::http::hasUnsupportedCharset(*contentType)))
+        {
+            context.response = mach::Response{ context.request.version() };
+            context.response.status(mach::http::StatusCode::UnsupportedMediaType);
+            return;
+        }
 
         if constexpr (parameterCount <= 1) {
             TResult res = [&]() -> TResult {
@@ -91,20 +113,20 @@ namespace mach::detail::dispatching
 
                     if constexpr (passedByValue && jsonDeserializable) {
                         auto& binder = execution.scope.resolve<binding::BodyBinder>();
-                        BodyType body = binder.bind<BodyType>(execution.context.request.body());
+                        BodyType body = binder.bind<BodyType>(stringBody);
 
                         return std::invoke(m_action, controller, std::move(body));
                     }
                 }
                 }();
 
-            execution.context.response.status(res.statusCode());
+            context.response.status(res.statusCode());
 
             using ValueType = typename TResult::ValueType;
 
             if constexpr (!std::same_as<ValueType, void>) {
                 if (res.hasValue()) {
-                    execution.context.response.body(
+                    context.response.body(
                         serialization::Serializer::serialize(res.value())
                     );
                 }
