@@ -18,7 +18,13 @@ add_mach_bench(
     pipeline/main.cpp
 )
 
+
 target_include_directories(PipelineBenchmarks
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src
+)
+
+add_mach_bench(
+    BindingPerformanceBenchmark
+    binding/BindingPerformanceBenchmark.cpp
 )
