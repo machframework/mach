@@ -38,6 +38,7 @@ add_library(mach
     src/controllers/ControllerBase.cpp
     src/middleware/Next.cpp
     src/exceptions/ExceptionMiddleware.cpp
+    src/http/ContentType.cpp
 )
 
 target_include_directories(mach

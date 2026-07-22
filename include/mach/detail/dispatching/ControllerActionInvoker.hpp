@@ -12,6 +12,7 @@
 #include <mach/detail/binding/JsonConcepts.hpp>
 #include <mach/detail/controllers/ControllerTraits.hpp>
 #include <mach/detail/dispatching/IEndpointInvoker.hpp>
+#include <mach/detail/http/ContentType.hpp>
 #include <mach/detail/results/ResultTraits.hpp>
 #include <mach/detail/serailization/Serializer.hpp>
 
@@ -69,18 +70,13 @@ namespace mach::detail::dispatching
         const auto& stringBody = context.request.body();
         const auto contentType = context.request.header("content-type");
 
-        if (expectsBody &&
-            !contentType &&
-            !stringBody.empty())
-        {
-            context.response = mach::Response{ context.request.version() };
-            context.response.status(mach::http::StatusCode::UnsupportedMediaType);
-            return;
-        }
-        if (expectsBody &&
-            !stringBody.empty() &&
-            contentType.has_value() &&
-            !contentType->starts_with("application/json"))
+        if (!stringBody.empty() &&
+            (!contentType ||
+                !mach::detail::http::matchesMediaType(
+                    *contentType,
+                    "application/json"
+                ) ||
+                mach::detail::http::hasUnsupportedCharset(*contentType)))
         {
             context.response = mach::Response{ context.request.version() };
             context.response.status(mach::http::StatusCode::UnsupportedMediaType);

@@ -4,9 +4,10 @@
 #include <tuple>
 #include <type_traits>
 
-#include <mach/detail/dispatching/IEndpointInvoker.hpp>
-#include <mach/detail/results/ResultTraits.hpp>
 #include <mach/detail/core/TypeTraits.hpp>
+#include <mach/detail/dispatching/IEndpointInvoker.hpp>
+#include <mach/detail/http/ContentType.hpp>
+#include <mach/detail/results/ResultTraits.hpp>
 #include <mach/detail/serailization/Serializer.hpp>
 
 namespace mach::detail::dispatching
@@ -77,17 +78,13 @@ namespace mach::detail::dispatching
         const auto contentType = context.request.header("content-type");
 
         if (handlerExpectsBody &&
-            !contentType &&
-            !stringBody.empty())
-        {
-            context.response = mach::Response{ context.request.version() };
-            context.response.status(mach::http::StatusCode::UnsupportedMediaType);
-            return;
-        }
-        if (handlerExpectsBody &&
             !stringBody.empty() &&
-            contentType.has_value() &&
-            !contentType->starts_with("application/json"))
+            (!contentType ||
+                !mach::detail::http::matchesMediaType(
+                    *contentType,
+                    "application/json"
+                ) ||
+                mach::detail::http::hasUnsupportedCharset(*contentType)))
         {
             context.response = mach::Response{ context.request.version() };
             context.response.status(mach::http::StatusCode::UnsupportedMediaType);
