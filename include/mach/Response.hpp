@@ -13,10 +13,18 @@ namespace mach::detail::http::adapter
 	class BeastRequestAdapter;
 	class BeastResponseAdapter;
 }
-
 namespace mach::detail::application
 {
 	class Runtime;
+}
+namespace mach::detail::dispatching
+{
+	template <
+		typename TController,
+		typename TResult,
+		typename... TArgs
+	>
+	class ControllerActionInvoker;
 }
 
 namespace mach

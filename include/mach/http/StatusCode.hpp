@@ -26,6 +26,7 @@ namespace mach::http
 		Conflict = 409,
 		PayloadTooLarge = 413,
 		UriTooLong = 414,
+		UnsupportedMediaType = 415,
 		RequestHeaderFieldsTooLarge = 431,
 
 		InternalServerError = 500,
