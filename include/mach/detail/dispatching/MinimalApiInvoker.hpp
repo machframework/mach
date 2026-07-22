@@ -80,7 +80,7 @@ namespace mach::detail::dispatching
             !contentType &&
             !stringBody.empty())
         {
-            context.response = mach::Response{};
+            context.response = mach::Response{ context.request.version() };
             context.response.status(mach::http::StatusCode::UnsupportedMediaType);
             return;
         }
@@ -89,7 +89,7 @@ namespace mach::detail::dispatching
             contentType.has_value() &&
             !contentType->starts_with("application/json"))
         {
-            context.response = mach::Response{};
+            context.response = mach::Response{ context.request.version() };
             context.response.status(mach::http::StatusCode::UnsupportedMediaType);
             return;
         }
