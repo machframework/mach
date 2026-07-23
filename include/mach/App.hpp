@@ -11,7 +11,7 @@
 #include <mach/controllers/ControllerBuilder.hpp>
 #include <mach/http/Method.hpp>
 
-#include <mach/detail/app/ServerOptions.hpp>
+#include <mach/ServerOptions.hpp>
 #include <mach/detail/controllers/ControllerTraits.hpp>
 #include <mach/detail/di/Container.hpp>
 #include <mach/detail/dispatching/MinimalApiInvoker.hpp>

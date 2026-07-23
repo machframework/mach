@@ -3,7 +3,7 @@
 #include <iostream>
 #include <thread>
 
-#include <mach/detail/app/ServerOptions.hpp>
+#include <mach/ServerOptions.hpp>
 
 namespace testing
 {
@@ -14,7 +14,7 @@ namespace testing
     inline unsigned int THREADS = std::thread::hardware_concurrency();
 
     inline auto serverOptions =
-        mach::detail::app::ServerOptions{.host = "127.0.0.1", .port = 3143, .threads = THREADS};
+        mach::ServerOptions{.host = "127.0.0.1", .port = 3143, .threads = THREADS};
 
     inline void fail(std::string_view testName, std::string_view message) {
         std::cerr << testing::RED << "[FAIL] " << testName << ": " << message << testing::RESET

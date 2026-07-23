@@ -3,7 +3,7 @@
 #include <string>
 #include <string_view>
 
-namespace mach::detail::app
+namespace mach
 {
     struct ServerOptions {
         std::string host;
