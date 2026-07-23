@@ -4,7 +4,11 @@
 
 namespace mach::http
 {
+	/**
+	 * Represents an HTTP response status code.
+	 */
 	enum class StatusCode {
+		// 2xx Success
 		Ok = 200,
 		Created = 201,
 		Accepted = 202,
@@ -12,11 +16,13 @@ namespace mach::http
 		NoContent = 204,
 		PartialContent = 206,
 
+		// 3xx Redirection
 		MovedPermanently = 301,
 		Found = 302,
 		TemporaryRedirect = 307,
 		PermanentRedirect = 308,
-
+		
+		// 4xx Client Errors
 		BadRequest = 400,
 		Unauthorized = 401,
 		Forbidden = 403,
@@ -29,11 +35,19 @@ namespace mach::http
 		UnsupportedMediaType = 415,
 		RequestHeaderFieldsTooLarge = 431,
 
+		// 5xx Server Errors
 		InternalServerError = 500,
 		NotImplemented = 501,
 		HttpVersionNotSupported = 505
 	};
 
+	/**
+	 * Returns the standard HTTP reason phrase for a status code.
+	 *
+	 * @param status The HTTP status code.
+	 * @return The corresponding HTTP reason phrase, or "Unknown Status" if the
+	 *         status code is not recognized by Mach.
+	 */
 	constexpr std::string_view reasonPhrase(StatusCode status)
 	{
 		switch (status) {
@@ -110,6 +124,12 @@ namespace mach::http
 		return "Unknown Status";
 	}
 
+	/**
+	 * Determines whether a status code is recognized by Mach.
+	 *
+	 * @param code The status code to validate.
+	 * @return True if the status code is recognized; otherwise, false.
+	 */
 	constexpr bool isValidStatusCode(StatusCode code)
 	{
 		switch (static_cast<StatusCode>(code)) {
