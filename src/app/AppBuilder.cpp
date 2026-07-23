@@ -38,12 +38,10 @@ namespace
 
 namespace mach
 {
-    AppBuilder::AppBuilder(std::string_view host, std::int32_t port, std::int64_t threadCount) {
-        m_serverOptions = detail::app::ServerOptions{std::string(host), port, threadCount};
+    AppBuilder::AppBuilder(ServerOptions options) {
+        m_serverOptions = std::move(options);
 
         // register preprocessing middleware
-
-        // register routing middleware
         this->use<detail::exceptions::ExceptionMiddleware>(
             mach::detail::di::ServiceAccess::Internal);
         this->use<detail::routing::RoutingMiddleware, detail::routing::Router>(

@@ -26,7 +26,7 @@ namespace mach
 
     public:
         Impl(
-            detail::app::ServerOptions serverOptions,
+            ServerOptions serverOptions,
             detail::di::Container container,
             detail::middleware::MiddlewarePipeline middlewarePipeline);
 
@@ -45,7 +45,7 @@ namespace mach
         void stop();
 
     private:
-        detail::app::ServerOptions m_serverOptions;
+        ServerOptions m_serverOptions;
         AppState m_state = AppState::Ready;
         std::unordered_set<std::type_index> m_mappedControllers;
 
@@ -58,7 +58,7 @@ namespace mach
     };
 
     App::App(
-        detail::app::ServerOptions serverOptions,
+        ServerOptions serverOptions,
         detail::di::Container container,
         detail::middleware::MiddlewarePipeline middlewarePipeline)
         : m_impl(
@@ -102,7 +102,7 @@ namespace mach
     }
 
     App::Impl::Impl(
-        detail::app::ServerOptions serverOptions,
+        ServerOptions serverOptions,
         detail::di::Container container,
         detail::middleware::MiddlewarePipeline middlewarePipeline)
         : m_serverOptions(std::move(serverOptions)), m_container(std::move(container)),

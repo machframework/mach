@@ -1,13 +1,10 @@
-#include <mach/App.hpp>
-#include <mach/AppBuilder.hpp>
-#include <mach/Json.hpp>
-#include <mach/results/Results.hpp>
-
 #include <cstddef>
 #include <cstdint>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <mach/mach.hpp>
 
 struct SmallBindingRequest {
     std::string name;
@@ -34,7 +31,13 @@ struct LargeBindingRequest {
 MACH_DEFINE_JSON(LargeBindingRequest, batchName, items)
 
 int main() {
-    auto app = mach::AppBuilder("127.0.0.1", 3143, 16).build();
+    auto builder = mach::AppBuilder(
+        mach::ServerOptions{
+            .host = "127.0.0.1",
+            .port = 3143,
+            .threads = std::thread::hardware_concurrency()});
+
+    auto app = builder.build();
 
     /*
      * Baseline route:

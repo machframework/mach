@@ -15,7 +15,7 @@
 namespace mach::detail::server
 {
     Server::Server(
-        app::ServerOptions serverOptions,
+        ServerOptions serverOptions,
         di::Container container,
         middleware::MiddlewarePipeline middlewarePipeline)
         : m_threadCount(serverOptions.threads),

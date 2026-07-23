@@ -224,7 +224,7 @@ namespace mach
         void stop();
 
     private:
-        App(detail::app::ServerOptions serverOptions,
+        App(ServerOptions serverOptions,
             detail::di::Container container,
             detail::middleware::MiddlewarePipeline middlewarePipeline);
 

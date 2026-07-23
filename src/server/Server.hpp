@@ -7,7 +7,7 @@
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/address.hpp>
 
-#include <mach/detail/app/ServerOptions.hpp>
+#include <mach/ServerOptions.hpp>
 #include <mach/detail/di/Container.hpp>
 #include <mach/detail/middleware/MiddlewarePipeline.hpp>
 #include <mach/detail/routing/Router.hpp>
@@ -25,7 +25,7 @@ namespace mach::detail::server
 
     public:
         Server(
-            app::ServerOptions serverOptions,
+            ServerOptions serverOptions,
             di::Container container,
             middleware::MiddlewarePipeline middlewarePipeline);
 

@@ -3,11 +3,7 @@
 #include <string_view>
 #include <thread>
 
-#include <mach/AppBuilder.hpp>
-#include <mach/Context.hpp>
-#include <mach/Reply.hpp>
-#include <mach/controllers/ControllerBase.hpp>
-#include <mach/controllers/ControllerBuilder.hpp>
+#include <mach/controllers.hpp>
 
 #include "server/BeastSession.hpp"
 
@@ -110,7 +106,11 @@ private:
 };
 
 int main() {
-    auto builder = mach::AppBuilder("127.0.0.1", 3143, 12);
+    auto builder = mach::AppBuilder(
+        mach::ServerOptions{
+            .host = "127.0.0.1",
+            .port = 3143,
+            .threads = std::thread::hardware_concurrency()});
 
     builder.addSingleton<RequestIdService>();
     builder.addScoped<UserService>();

@@ -7,8 +7,8 @@
 #include <vector>
 
 #include <mach/App.hpp>
+#include <mach/ServerOptions.hpp>
 
-#include <mach/detail/app/ServerOptions.hpp>
 #include <mach/detail/controllers/ControllerTraits.hpp>
 #include <mach/detail/di/Container.hpp>
 #include <mach/detail/di/ServiceDescriptor.hpp>
@@ -37,21 +37,15 @@ namespace mach
     class AppBuilder {
 
     public:
+
         /**
          * Creates a new application builder instance.
          *
-         * @param host The network interface to bind to.
-         * @param port The port to listen on.
-         * @param threadCount The number of worker threads used to process requests.
+         * @param options The server configuration to use for the application.
          *
          * @throws std::invalid_argument If the supplied configuration is invalid.
          */
-        AppBuilder(std::string_view host, std::int32_t port = 3143, std::int64_t threadCount = 1);
-
-        // testing
-        AppBuilder(detail::app::ServerOptions options)
-            : AppBuilder(options.host, options.port, options.threads) {}
-        // testing
+        explicit AppBuilder(ServerOptions options);
 
         /**
          * Registers a scoped service in the dependency injection container.
@@ -168,7 +162,7 @@ namespace mach
         App build();
 
     private:
-        detail::app::ServerOptions m_serverOptions;
+        ServerOptions m_serverOptions;
         detail::di::Container m_container;
         detail::middleware::MiddlewarePipeline m_middlewarePipeline;
         std::vector<std::function<void(App&)>> m_controllerMappers;

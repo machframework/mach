@@ -1,13 +1,16 @@
-#include <mach/App.hpp>
-#include <mach/AppBuilder.hpp>
-#include <mach/Context.hpp>
+#include <mach/mach.hpp>
 
 #include "Testing.hpp"
 
 #include <iostream>
 
 int main() {
-    auto builder = mach::AppBuilder("127.0.0.1", 3143, testing::THREADS);
+    auto builder = mach::AppBuilder(
+        mach::ServerOptions{
+            .host = "127.0.0.1",
+            .port = 3143,
+            .threads = std::thread::hardware_concurrency()});
+
     auto app = builder.build();
 
     // -------------------------

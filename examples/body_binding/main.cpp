@@ -20,8 +20,13 @@ struct UserProfile {
 MACH_DEFINE_JSON(UserProfile, name, age, adult)
 
 int main() {
-    const auto hardwareThreads = std::thread::hardware_concurrency();
-    auto builder = mach::AppBuilder("127.0.0.1", 3143, hardwareThreads);
+    auto builder = mach::AppBuilder(
+        mach::ServerOptions{
+            .host = "127.0.0.1",
+            .port = 3143,
+            .threads = std::thread::hardware_concurrency()
+        }
+    );
 
     auto app = builder.build();
 
