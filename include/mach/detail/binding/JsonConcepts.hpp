@@ -6,9 +6,7 @@
 namespace mach::detail::binding
 {
     template <typename T>
-    concept JsonDeserializable =
-        requires(const nlohmann::json & json)
-    {
+    concept JsonDeserializable = requires(const nlohmann::json& json) {
         { json.template get<T>() } -> std::same_as<T>;
     };
 }

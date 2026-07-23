@@ -9,30 +9,30 @@
 
 namespace mach::detail::middleware
 {
-	class MiddlewarePipeline {
-		
-	public:
-		MiddlewarePipeline() = default;
+    class MiddlewarePipeline {
 
-		MiddlewarePipeline(const MiddlewarePipeline&) = delete;
-		MiddlewarePipeline& operator=(const MiddlewarePipeline&) = delete;
+    public:
+        MiddlewarePipeline() = default;
 
-		MiddlewarePipeline(MiddlewarePipeline&&) noexcept = default;
-		MiddlewarePipeline& operator=(MiddlewarePipeline&&) noexcept = default;
+        MiddlewarePipeline(const MiddlewarePipeline&) = delete;
+        MiddlewarePipeline& operator=(const MiddlewarePipeline&) = delete;
 
-		template <typename TMiddleware>
-		void add();
+        MiddlewarePipeline(MiddlewarePipeline&&) noexcept = default;
+        MiddlewarePipeline& operator=(MiddlewarePipeline&&) noexcept = default;
 
-		void invoke(dispatching::RequestExecution& execution, const middleware::InternalNext& terminal) const;
+        template <typename TMiddleware>
+        void add();
 
-	private:
-		std::vector<std::unique_ptr<middleware::IMiddlewareInvoker>> m_middlewares;
-	};
+        void invoke(
+            dispatching::RequestExecution& execution,
+            const middleware::InternalNext& terminal) const;
 
-	template <typename TMiddleware>
-	void MiddlewarePipeline::add() {
-		m_middlewares.emplace_back(
-			std::make_unique<MiddlewareInvoker<TMiddleware>>()
-		);
-	}
+    private:
+        std::vector<std::unique_ptr<middleware::IMiddlewareInvoker>> m_middlewares;
+    };
+
+    template <typename TMiddleware>
+    void MiddlewarePipeline::add() {
+        m_middlewares.emplace_back(std::make_unique<MiddlewareInvoker<TMiddleware>>());
+    }
 }

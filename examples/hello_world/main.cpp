@@ -4,8 +4,7 @@
 
 #include <mach/mach.hpp>
 
-int main()
-{
+int main() {
     const auto hardwareThreads = std::thread::hardware_concurrency();
 
     auto builder = mach::AppBuilder("127.0.0.1", 3143, hardwareThreads);
@@ -13,7 +12,7 @@ int main()
 
     app.mapGet("/", [] {
         return mach::ok("Hello, world!");
-        });
+    });
 
     return app.run();
 }

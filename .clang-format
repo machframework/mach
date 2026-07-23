@@ -1,0 +1,69 @@
+BasedOnStyle: Microsoft
+Language: Cpp
+Standard: c++20
+
+ColumnLimit: 100
+IndentWidth: 4
+ContinuationIndentWidth: 4
+BracedInitializerIndentWidth: 4
+TabWidth: 4
+UseTab: Never
+
+# Keep namespace contents indented.
+NamespaceIndentation: All
+FixNamespaceComments: false
+
+# Keep access modifiers aligned with the class declaration.
+IndentAccessModifiers: false
+AccessModifierOffset: -4
+
+# Attach braces everywhere except namespaces.
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterNamespace: true
+  AfterClass: false
+  AfterStruct: false
+  AfterUnion: false
+  AfterEnum: false
+  AfterFunction: false
+  AfterControlStatement: Never
+  BeforeCatch: false
+  BeforeElse: false
+  BeforeWhile: false
+  IndentBraces: false
+
+# Prevent short lambdas and non-empty functions from collapsing.
+AllowShortLambdasOnASingleLine: None
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortBlocksOnASingleLine: Never
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+
+# Format long calls and function signatures vertically.
+BinPackArguments: false
+BinPackParameters: OnePerLine
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+BreakAfterOpenBracketFunction: true
+BreakBeforeCloseBracketFunction: false
+
+# Format long initializer lists vertically.
+BinPackLongBracedList: false
+BreakAfterOpenBracketBracedList: true
+BreakBeforeCloseBracketBracedList: false
+
+# Indentation after opening parentheses and brackets.
+AlignAfterOpenBracket: BlockIndent
+
+# Conventional pointer and reference placement.
+PointerAlignment: Left
+ReferenceAlignment: Pointer
+
+# Preserve readable template declarations.
+BreakTemplateDeclarations: Yes
+BreakBeforeConceptDeclarations: Always
+
+# Includes and comments.
+SortIncludes: CaseSensitive
+IncludeBlocks: Preserve
+ReflowComments: true

@@ -4,7 +4,7 @@
 
 namespace mach
 {
-	using Json = nlohmann::json;
+    using Json = nlohmann::json;
 }
 
 /**
@@ -17,5 +17,4 @@ namespace mach
  * @param Type The type to serialize.
  * @param ...  The members to serialize and deserialize.
  */
-#define MACH_DEFINE_JSON(Type, ...) \
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Type, __VA_ARGS__)
+#define MACH_DEFINE_JSON(Type, ...) NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Type, __VA_ARGS__)

@@ -1,18 +1,18 @@
 #include <string_view>
 
 #include <mach/AppBuilder.hpp>
+#include <mach/Json.hpp>
+#include <mach/Reply.hpp>
 #include <mach/controllers/ControllerBase.hpp>
 #include <mach/controllers/ControllerBuilder.hpp>
 #include <mach/diagnostics/TerminateHandler.hpp>
-#include <mach/Json.hpp>
-#include <mach/Reply.hpp>
 
 #include "Testing.hpp"
 
 struct Person {
-	std::string name;
-	int age;
-	bool male;
+    std::string name;
+    int age;
+    bool male;
 };
 
 MACH_DEFINE_JSON(Person, name, age, male);
@@ -20,23 +20,23 @@ MACH_DEFINE_JSON(Person, name, age, male);
 class GeneralController : public mach::ControllerBase {
 
 public:
-	inline static constexpr std::string_view route = "/general";
+    inline static constexpr std::string_view route = "/general";
 
-	mach::Reply<int> getAge(Person person) {
-		return ok(person.age);
-	}
+    mach::Reply<int> getAge(Person person) {
+        return ok(person.age);
+    }
 
-	static void configure(mach::ControllerBuilder<GeneralController>& routes) {
-		routes.mapGet("/age", &GeneralController::getAge);
-	}
+    static void configure(mach::ControllerBuilder<GeneralController>& routes) {
+        routes.mapGet("/age", &GeneralController::getAge);
+    }
 };
 
 int main() {
-	mach::installTerminateHandler();
+    mach::installTerminateHandler();
 
-	auto builder = mach::AppBuilder(std::move(testing::serverOptions));
-	builder.addController<GeneralController>();
+    auto builder = mach::AppBuilder(std::move(testing::serverOptions));
+    builder.addController<GeneralController>();
 
-	auto app = builder.build();
-	return app.run();
+    auto app = builder.build();
+    return app.run();
 }

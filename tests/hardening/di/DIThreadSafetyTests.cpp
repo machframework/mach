@@ -15,17 +15,13 @@
 #include <mach/detail/di/Scope.hpp>
 #include <mach/detail/di/ServiceLifetime.hpp>
 
-
 namespace
 {
     namespace di = mach::detail::di;
 
-
-    class ConcurrentSingleton
-    {
+    class ConcurrentSingleton {
     public:
-        ConcurrentSingleton()
-        {
+        ConcurrentSingleton() {
             ++s_constructionCount;
 
             // Increase the chance that several threads reach
@@ -33,14 +29,12 @@ namespace
             std::this_thread::yield();
         }
 
-        static void reset() noexcept
-        {
+        static void reset() noexcept {
             s_constructionCount = 0;
         }
 
         [[nodiscard]]
-        static int constructionCount() noexcept
-        {
+        static int constructionCount() noexcept {
             return s_constructionCount.load();
         }
 
@@ -48,31 +42,24 @@ namespace
         inline static std::atomic<int> s_constructionCount = 0;
     };
 
-
-    class ConcurrentScopedService
-    {
+    class ConcurrentScopedService {
     public:
-        ConcurrentScopedService()
-            : m_id(++s_nextId)
-        {
+        ConcurrentScopedService() : m_id(++s_nextId) {
             ++s_constructionCount;
         }
 
-        static void reset() noexcept
-        {
+        static void reset() noexcept {
             s_nextId = 0;
             s_constructionCount = 0;
         }
 
         [[nodiscard]]
-        int id() const noexcept
-        {
+        int id() const noexcept {
             return m_id;
         }
 
         [[nodiscard]]
-        static int constructionCount() noexcept
-        {
+        static int constructionCount() noexcept {
             return s_constructionCount.load();
         }
 
@@ -83,12 +70,9 @@ namespace
         inline static std::atomic<int> s_constructionCount = 0;
     };
 
-
-    class FirstIndependentSingleton
-    {
+    class FirstIndependentSingleton {
     public:
-        FirstIndependentSingleton()
-        {
+        FirstIndependentSingleton() {
             s_constructorEntered = true;
 
             while (!s_otherConstructorEntered->load()) {
@@ -96,33 +80,25 @@ namespace
             }
         }
 
-        static void configure(
-            std::atomic<bool>& otherConstructorEntered
-        ) noexcept
-        {
+        static void configure(std::atomic<bool>& otherConstructorEntered) noexcept {
             s_constructorEntered = false;
             s_otherConstructorEntered = &otherConstructorEntered;
         }
 
         [[nodiscard]]
-        static std::atomic<bool>& constructorEntered() noexcept
-        {
+        static std::atomic<bool>& constructorEntered() noexcept {
             return s_constructorEntered;
         }
 
     private:
         inline static std::atomic<bool> s_constructorEntered = false;
 
-        inline static std::atomic<bool>* s_otherConstructorEntered =
-            nullptr;
+        inline static std::atomic<bool>* s_otherConstructorEntered = nullptr;
     };
 
-
-    class SecondIndependentSingleton
-    {
+    class SecondIndependentSingleton {
     public:
-        SecondIndependentSingleton()
-        {
+        SecondIndependentSingleton() {
             s_constructorEntered = true;
 
             while (!s_otherConstructorEntered->load()) {
@@ -130,59 +106,46 @@ namespace
             }
         }
 
-        static void configure(
-            std::atomic<bool>& otherConstructorEntered
-        ) noexcept
-        {
+        static void configure(std::atomic<bool>& otherConstructorEntered) noexcept {
             s_constructorEntered = false;
             s_otherConstructorEntered = &otherConstructorEntered;
         }
 
         [[nodiscard]]
-        static std::atomic<bool>& constructorEntered() noexcept
-        {
+        static std::atomic<bool>& constructorEntered() noexcept {
             return s_constructorEntered;
         }
 
     private:
         inline static std::atomic<bool> s_constructorEntered = false;
 
-        inline static std::atomic<bool>* s_otherConstructorEntered =
-            nullptr;
+        inline static std::atomic<bool>* s_otherConstructorEntered = nullptr;
     };
 
-
-    class FailingConcurrentSingleton
-    {
+    class FailingConcurrentSingleton {
     public:
-        FailingConcurrentSingleton()
-        {
+        FailingConcurrentSingleton() {
             const int attempt = ++s_constructionAttempts;
 
             if (attempt == 1) {
-                throw std::runtime_error(
-                    "Intentional singleton construction failure"
-                );
+                throw std::runtime_error("Intentional singleton construction failure");
             }
 
             ++s_successfulConstructions;
         }
 
-        static void reset() noexcept
-        {
+        static void reset() noexcept {
             s_constructionAttempts = 0;
             s_successfulConstructions = 0;
         }
 
         [[nodiscard]]
-        static int constructionAttempts() noexcept
-        {
+        static int constructionAttempts() noexcept {
             return s_constructionAttempts.load();
         }
 
         [[nodiscard]]
-        static int successfulConstructions() noexcept
-        {
+        static int successfulConstructions() noexcept {
             return s_successfulConstructions.load();
         }
 
@@ -191,32 +154,22 @@ namespace
         inline static std::atomic<int> s_successfulConstructions = 0;
     };
 
-
-    void testConcurrentSingletonConstructedOnce()
-    {
-        constexpr std::string_view testName =
-            "Concurrent singleton is constructed exactly once";
+    void testConcurrentSingletonConstructedOnce() {
+        constexpr std::string_view testName = "Concurrent singleton is constructed exactly once";
 
         ConcurrentSingleton::reset();
 
         di::Container container;
 
-        container.addService<ConcurrentSingleton>(
-            di::ServiceLifetime::Singleton
-        );
+        container.addService<ConcurrentSingleton>(di::ServiceLifetime::Singleton);
 
         container.finalizeRegistrations();
 
         constexpr std::size_t threadCount = 32;
 
-        std::barrier startBarrier(
-            static_cast<std::ptrdiff_t>(threadCount)
-        );
+        std::barrier startBarrier(static_cast<std::ptrdiff_t>(threadCount));
 
-        std::vector<const ConcurrentSingleton*> instances(
-            threadCount,
-            nullptr
-        );
+        std::vector<const ConcurrentSingleton*> instances(threadCount, nullptr);
 
         std::vector<std::thread> threads;
         threads.reserve(threadCount);
@@ -231,17 +184,15 @@ namespace
 
                     startBarrier.arrive_and_wait();
 
-                    instances[i] =
-                        &scope.resolve<ConcurrentSingleton>();
-                }
-                catch (...) {
+                    instances[i] = &scope.resolve<ConcurrentSingleton>();
+                } catch (...) {
                     std::lock_guard lock(exceptionMutex);
 
                     if (!threadException) {
                         threadException = std::current_exception();
                     }
                 }
-                });
+            });
         }
 
         for (auto& thread : threads) {
@@ -251,8 +202,7 @@ namespace
         if (threadException) {
             try {
                 std::rethrow_exception(threadException);
-            }
-            catch (const std::exception& exception) {
+            } catch (const std::exception& exception) {
                 testing::fail(testName, exception.what());
             }
 
@@ -260,10 +210,7 @@ namespace
         }
 
         if (ConcurrentSingleton::constructionCount() != 1) {
-            testing::fail(
-                testName,
-                "Singleton constructor ran more than once"
-            );
+            testing::fail(testName, "Singleton constructor ran more than once");
 
             return;
         }
@@ -271,10 +218,7 @@ namespace
         const auto* expectedInstance = instances.front();
 
         if (expectedInstance == nullptr) {
-            testing::fail(
-                testName,
-                "Singleton resolution returned a null address"
-            );
+            testing::fail(testName, "Singleton resolution returned a null address");
 
             return;
         }
@@ -283,8 +227,7 @@ namespace
             if (instance != expectedInstance) {
                 testing::fail(
                     testName,
-                    "Concurrent resolutions returned different singleton instances"
-                );
+                    "Concurrent resolutions returned different singleton instances");
 
                 return;
             }
@@ -293,9 +236,7 @@ namespace
         testing::success(testName);
     }
 
-
-    void testSeparateScopesResolveConcurrently()
-    {
+    void testSeparateScopesResolveConcurrently() {
         constexpr std::string_view testName =
             "Separate scopes resolve scoped services concurrently";
 
@@ -303,22 +244,15 @@ namespace
 
         di::Container container;
 
-        container.addService<ConcurrentScopedService>(
-            di::ServiceLifetime::Scoped
-        );
+        container.addService<ConcurrentScopedService>(di::ServiceLifetime::Scoped);
 
         container.finalizeRegistrations();
 
         constexpr std::size_t threadCount = 32;
 
-        std::barrier startBarrier(
-            static_cast<std::ptrdiff_t>(threadCount)
-        );
+        std::barrier startBarrier(static_cast<std::ptrdiff_t>(threadCount));
 
-        std::vector<int> instanceIds(
-            threadCount,
-            0
-        );
+        std::vector<int> instanceIds(threadCount, 0);
 
         std::vector<std::thread> threads;
         threads.reserve(threadCount);
@@ -333,19 +267,17 @@ namespace
 
                     startBarrier.arrive_and_wait();
 
-                    const auto& instance =
-                        scope.resolve<ConcurrentScopedService>();
+                    const auto& instance = scope.resolve<ConcurrentScopedService>();
 
                     instanceIds[i] = instance.id();
-                }
-                catch (...) {
+                } catch (...) {
                     std::lock_guard lock(exceptionMutex);
 
                     if (!threadException) {
                         threadException = std::current_exception();
                     }
                 }
-                });
+            });
         }
 
         for (auto& thread : threads) {
@@ -355,46 +287,31 @@ namespace
         if (threadException) {
             try {
                 std::rethrow_exception(threadException);
-            }
-            catch (const std::exception& exception) {
+            } catch (const std::exception& exception) {
                 testing::fail(testName, exception.what());
             }
 
             return;
         }
 
-        if (
-            ConcurrentScopedService::constructionCount() !=
-            static_cast<int>(threadCount)
-            ) {
-            testing::fail(
-                testName,
-                "Scoped service was not constructed once per scope"
-            );
+        if (ConcurrentScopedService::constructionCount() != static_cast<int>(threadCount)) {
+            testing::fail(testName, "Scoped service was not constructed once per scope");
 
             return;
         }
 
         for (std::size_t i = 0; i < instanceIds.size(); ++i) {
             if (instanceIds[i] == 0) {
-                testing::fail(
-                    testName,
-                    "A scoped service was not resolved"
-                );
+                testing::fail(testName, "A scoped service was not resolved");
 
                 return;
             }
 
-            for (
-                std::size_t j = i + 1;
-                j < instanceIds.size();
-                ++j
-                ) {
+            for (std::size_t j = i + 1; j < instanceIds.size(); ++j) {
                 if (instanceIds[i] == instanceIds[j]) {
                     testing::fail(
                         testName,
-                        "Different scopes received the same scoped instance ID"
-                    );
+                        "Different scopes received the same scoped instance ID");
 
                     return;
                 }
@@ -404,30 +321,18 @@ namespace
         testing::success(testName);
     }
 
+    void testIndependentSingletonsInitializeConcurrently() {
+        constexpr std::string_view testName = "Independent singletons initialize concurrently";
 
+        FirstIndependentSingleton::configure(SecondIndependentSingleton::constructorEntered());
 
-    void testIndependentSingletonsInitializeConcurrently()
-    {
-        constexpr std::string_view testName =
-            "Independent singletons initialize concurrently";
-
-        FirstIndependentSingleton::configure(
-            SecondIndependentSingleton::constructorEntered()
-        );
-
-        SecondIndependentSingleton::configure(
-            FirstIndependentSingleton::constructorEntered()
-        );
+        SecondIndependentSingleton::configure(FirstIndependentSingleton::constructorEntered());
 
         di::Container container;
 
-        container.addService<FirstIndependentSingleton>(
-            di::ServiceLifetime::Singleton
-        );
+        container.addService<FirstIndependentSingleton>(di::ServiceLifetime::Singleton);
 
-        container.addService<SecondIndependentSingleton>(
-            di::ServiceLifetime::Singleton
-        );
+        container.addService<SecondIndependentSingleton>(di::ServiceLifetime::Singleton);
 
         container.finalizeRegistrations();
 
@@ -443,13 +348,11 @@ namespace
                 startBarrier.arrive_and_wait();
 
                 [[maybe_unused]]
-                auto& instance =
-                    scope.resolve<FirstIndependentSingleton>();
-            }
-            catch (...) {
+                auto& instance = scope.resolve<FirstIndependentSingleton>();
+            } catch (...) {
                 firstException = std::current_exception();
             }
-            });
+        });
 
         std::thread secondThread([&] {
             try {
@@ -458,13 +361,11 @@ namespace
                 startBarrier.arrive_and_wait();
 
                 [[maybe_unused]]
-                auto& instance =
-                    scope.resolve<SecondIndependentSingleton>();
-            }
-            catch (...) {
+                auto& instance = scope.resolve<SecondIndependentSingleton>();
+            } catch (...) {
                 secondException = std::current_exception();
             }
-            });
+        });
 
         firstThread.join();
         secondThread.join();
@@ -472,8 +373,7 @@ namespace
         if (firstException) {
             try {
                 std::rethrow_exception(firstException);
-            }
-            catch (const std::exception& exception) {
+            } catch (const std::exception& exception) {
                 testing::fail(testName, exception.what());
             }
 
@@ -483,22 +383,16 @@ namespace
         if (secondException) {
             try {
                 std::rethrow_exception(secondException);
-            }
-            catch (const std::exception& exception) {
+            } catch (const std::exception& exception) {
                 testing::fail(testName, exception.what());
             }
 
             return;
         }
 
-        if (
-            !FirstIndependentSingleton::constructorEntered().load() ||
-            !SecondIndependentSingleton::constructorEntered().load()
-            ) {
-            testing::fail(
-                testName,
-                "Both singleton constructors did not begin"
-            );
+        if (!FirstIndependentSingleton::constructorEntered().load() ||
+            !SecondIndependentSingleton::constructorEntered().load()) {
+            testing::fail(testName, "Both singleton constructors did not begin");
 
             return;
         }
@@ -506,32 +400,22 @@ namespace
         testing::success(testName);
     }
 
-
-    void testConcurrentSingletonFailureCanRetry()
-    {
-        constexpr std::string_view testName =
-            "Concurrent singleton construction failure can retry";
+    void testConcurrentSingletonFailureCanRetry() {
+        constexpr std::string_view testName = "Concurrent singleton construction failure can retry";
 
         FailingConcurrentSingleton::reset();
 
         di::Container container;
 
-        container.addService<FailingConcurrentSingleton>(
-            di::ServiceLifetime::Singleton
-        );
+        container.addService<FailingConcurrentSingleton>(di::ServiceLifetime::Singleton);
 
         container.finalizeRegistrations();
 
         constexpr std::size_t threadCount = 16;
 
-        std::barrier startBarrier(
-            static_cast<std::ptrdiff_t>(threadCount)
-        );
+        std::barrier startBarrier(static_cast<std::ptrdiff_t>(threadCount));
 
-        std::vector<const FailingConcurrentSingleton*> instances(
-            threadCount,
-            nullptr
-        );
+        std::vector<const FailingConcurrentSingleton*> instances(threadCount, nullptr);
 
         std::vector<std::thread> threads;
         threads.reserve(threadCount);
@@ -548,21 +432,17 @@ namespace
 
                     startBarrier.arrive_and_wait();
 
-                    instances[i] =
-                        &scope.resolve<FailingConcurrentSingleton>();
-                }
-                catch (const std::runtime_error&) {
+                    instances[i] = &scope.resolve<FailingConcurrentSingleton>();
+                } catch (const std::runtime_error&) {
                     ++failureCount;
-                }
-                catch (...) {
+                } catch (...) {
                     std::lock_guard lock(exceptionMutex);
 
                     if (!unexpectedException) {
-                        unexpectedException =
-                            std::current_exception();
+                        unexpectedException = std::current_exception();
                     }
                 }
-                });
+            });
         }
 
         for (auto& thread : threads) {
@@ -572,8 +452,7 @@ namespace
         if (unexpectedException) {
             try {
                 std::rethrow_exception(unexpectedException);
-            }
-            catch (const std::exception& exception) {
+            } catch (const std::exception& exception) {
                 testing::fail(testName, exception.what());
             }
 
@@ -581,38 +460,26 @@ namespace
         }
 
         if (failureCount.load() != 1) {
-            testing::fail(
-                testName,
-                "Expected exactly one failed initialization attempt"
-            );
+            testing::fail(testName, "Expected exactly one failed initialization attempt");
 
             return;
         }
 
-        if (
-            FailingConcurrentSingleton::constructionAttempts() != 2
-            ) {
+        if (FailingConcurrentSingleton::constructionAttempts() != 2) {
             testing::fail(
                 testName,
-                "Singleton construction was attempted an unexpected number of times"
-            );
+                "Singleton construction was attempted an unexpected number of times");
 
             return;
         }
 
-        if (
-            FailingConcurrentSingleton::successfulConstructions() != 1
-            ) {
-            testing::fail(
-                testName,
-                "Singleton was successfully constructed more than once"
-            );
+        if (FailingConcurrentSingleton::successfulConstructions() != 1) {
+            testing::fail(testName, "Singleton was successfully constructed more than once");
 
             return;
         }
 
-        const FailingConcurrentSingleton* successfulInstance =
-            nullptr;
+        const FailingConcurrentSingleton* successfulInstance = nullptr;
 
         for (const auto* instance : instances) {
             if (instance == nullptr) {
@@ -627,18 +494,14 @@ namespace
             if (instance != successfulInstance) {
                 testing::fail(
                     testName,
-                    "Successful threads received different singleton instances"
-                );
+                    "Successful threads received different singleton instances");
 
                 return;
             }
         }
 
         if (successfulInstance == nullptr) {
-            testing::fail(
-                testName,
-                "No thread successfully resolved the singleton"
-            );
+            testing::fail(testName, "No thread successfully resolved the singleton");
 
             return;
         }
@@ -647,9 +510,7 @@ namespace
     }
 }
 
-
-int main()
-{
+int main() {
     testConcurrentSingletonConstructedOnce();
     testSeparateScopesResolveConcurrently();
     testIndependentSingletonsInitializeConcurrently();

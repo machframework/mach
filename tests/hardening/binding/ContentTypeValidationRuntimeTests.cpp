@@ -9,57 +9,35 @@
 
 #include "Testing.hpp"
 
-struct CreateUserRequest
-{
+struct CreateUserRequest {
     std::string name;
     int age;
 };
 
 MACH_DEFINE_JSON(CreateUserRequest, name, age);
 
-struct UpdateScoreRequest
-{
+struct UpdateScoreRequest {
     int score;
 };
 
 MACH_DEFINE_JSON(UpdateScoreRequest, score);
 
-void registerContentTypeTestingEndpoints(mach::App& app)
-{
+void registerContentTypeTestingEndpoints(mach::App& app) {
     // Content-Type must not be required when no body binding occurs.
-    app.mapGet(
-        "/testing/content-type/no-body",
-        []() {
-            return mach::ok(
-                "Request succeeded without body binding."
-            );
-        }
-    );
+    app.mapGet("/testing/content-type/no-body", []() {
+        return mach::ok("Request succeeded without body binding.");
+    });
 
     // DTO JSON body binding.
-    app.mapPost(
-        "/testing/content-type/user",
-        [](CreateUserRequest request) {
-            return mach::ok(
-                "Created user '" +
-                request.name +
-                "' with age " +
-                std::to_string(request.age) +
-                "."
-            );
-        }
-    );
+    app.mapPost("/testing/content-type/user", [](CreateUserRequest request) {
+        return mach::ok(
+            "Created user '" + request.name + "' with age " + std::to_string(request.age) + ".");
+    });
 
     // Primitive JSON body binding.
-    app.mapPost(
-        "/testing/content-type/integer",
-        [](int value) {
-            return mach::ok(
-                "Received integer: " +
-                std::to_string(value)
-            );
-        }
-    );
+    app.mapPost("/testing/content-type/integer", [](int value) {
+        return mach::ok("Received integer: " + std::to_string(value));
+    });
 
     // JSON string body binding.
     //
@@ -68,34 +46,21 @@ void registerContentTypeTestingEndpoints(mach::App& app)
     //
     // Invalid JSON body:
     //     hello
-    app.mapPost(
-        "/testing/content-type/string",
-        [](std::string value) {
-            return mach::ok(
-                "Received string: " + value
-            );
-        }
-    );
+    app.mapPost("/testing/content-type/string", [](std::string value) {
+        return mach::ok("Received string: " + value);
+    });
 
     // Context + DTO JSON body binding.
     app.mapPut(
         "/testing/content-type/score",
         [](mach::Context& context, UpdateScoreRequest request) {
-            context.response.setHeader(
-                "X-Testing-Endpoint",
-                "content-type"
-            );
+            context.response.setHeader("X-Testing-Endpoint", "content-type");
 
-            return mach::ok(
-                "Received score: " +
-                std::to_string(request.score)
-            );
-        }
-    );
+            return mach::ok("Received score: " + std::to_string(request.score));
+        });
 }
 
-void printTestingInstructions()
-{
+void printTestingInstructions() {
     std::cout << R"(
 
     ============================================================
@@ -218,8 +183,7 @@ void printTestingInstructions()
     )";
 }
 
-int main()
-{
+int main() {
     mach::AppBuilder builder(std::move(testing::serverOptions));
 
     auto app = builder.build();

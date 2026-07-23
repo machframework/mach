@@ -6,20 +6,20 @@
 
 namespace mach
 {
-	class Context;
+    class Context;
 }
 
 namespace mach::detail::dispatching
 {
-	class Dispatcher {
-		
-	public:
-		Dispatcher(di::Container& container, middleware::MiddlewarePipeline&& middlewarePipeline);
+    class Dispatcher {
 
-		void execute(mach::Context& context);
+    public:
+        Dispatcher(di::Container& container, middleware::MiddlewarePipeline&& middlewarePipeline);
 
-	private:
-		di::Container& m_container;
-		middleware::MiddlewarePipeline m_middlewarePipeline;
-	};
+        void execute(mach::Context& context);
+
+    private:
+        di::Container& m_container;
+        middleware::MiddlewarePipeline m_middlewarePipeline;
+    };
 }

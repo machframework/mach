@@ -78,8 +78,7 @@ namespace mach
      * Represents an HTTP response without a response body.
      */
     template <>
-    class Reply<void>
-    {
+    class Reply<void> {
     public:
         /// The response body type.
         using ValueType = void;
@@ -121,44 +120,33 @@ namespace mach
 
     template <typename T>
     Reply<T>::Reply(http::StatusCode statusCode, T value)
-        : m_statusCode(statusCode),
-        m_value(std::move(value))
-    {}
+        : m_statusCode(statusCode), m_value(std::move(value)) {}
 
     template <typename T>
-    Reply<T>::Reply(http::StatusCode statusCode)
-        : m_statusCode(statusCode)
-    {}
+    Reply<T>::Reply(http::StatusCode statusCode) : m_statusCode(statusCode) {}
 
     template <typename T>
-    http::StatusCode Reply<T>::statusCode() const noexcept
-    {
+    http::StatusCode Reply<T>::statusCode() const noexcept {
         return m_statusCode;
     }
 
     template <typename T>
-    const T& Reply<T>::value() const
-    {
+    const T& Reply<T>::value() const {
         return m_value.value();
     }
 
     template <typename T>
-    bool Reply<T>::hasValue() const noexcept
-    {
+    bool Reply<T>::hasValue() const noexcept {
         return m_value.has_value();
     }
 
-    inline Reply<void>::Reply(http::StatusCode statusCode)
-        : m_statusCode(statusCode)
-    {}
+    inline Reply<void>::Reply(http::StatusCode statusCode) : m_statusCode(statusCode) {}
 
-    inline http::StatusCode Reply<void>::statusCode() const noexcept
-    {
+    inline http::StatusCode Reply<void>::statusCode() const noexcept {
         return m_statusCode;
     }
 
-    inline bool Reply<void>::hasValue() const noexcept
-    {
+    inline bool Reply<void>::hasValue() const noexcept {
         return false;
     }
 }

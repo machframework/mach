@@ -10,15 +10,14 @@
 
 namespace mach::detail::routing
 {
-	class RoutingMiddleware {
+    class RoutingMiddleware {
 
-	public:
-		explicit RoutingMiddleware(Router& router)
-			: m_router(router)
-		{ }
+    public:
+        explicit RoutingMiddleware(Router& router) : m_router(router) {}
 
-		void invoke(mach::Context& context, mach::Next& next);
-	private:
-		Router& m_router;
-	};
+        void invoke(mach::Context& context, mach::Next& next);
+
+    private:
+        Router& m_router;
+    };
 }

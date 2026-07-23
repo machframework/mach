@@ -8,8 +8,7 @@ namespace mach::http
     /**
      * Represents an HTTP request method.
      */
-    enum class Method
-    {
+    enum class Method {
         Get,
         Post,
         Put,
@@ -30,14 +29,22 @@ namespace mach::http
      */
     constexpr std::string_view toString(Method method) {
         switch (method) {
-        case Method::Get: return "GET";
-        case Method::Post: return "POST";
-        case Method::Put: return "PUT";
-        case Method::Patch: return "PATCH";
-        case Method::Delete: return "DELETE";
-        case Method::Head: return "HEAD";
-        case Method::Options: return "OPTIONS";
-        default: return "UNKNOWN";
+        case Method::Get:
+            return "GET";
+        case Method::Post:
+            return "POST";
+        case Method::Put:
+            return "PUT";
+        case Method::Patch:
+            return "PATCH";
+        case Method::Delete:
+            return "DELETE";
+        case Method::Head:
+            return "HEAD";
+        case Method::Options:
+            return "OPTIONS";
+        default:
+            return "UNKNOWN";
         }
     }
 
@@ -51,6 +58,5 @@ namespace mach::http
         Method::Put,
         Method::Patch,
         Method::Delete,
-        Method::Options
-    };
+        Method::Options};
 }

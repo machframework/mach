@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include <mach/http/StatusCode.hpp>
 #include <mach/Reply.hpp>
+#include <mach/http/StatusCode.hpp>
 
 namespace mach
 {

@@ -12,35 +12,34 @@
 
 namespace mach::detail::routing
 {
-	struct RouteEndpoint {
-		mach::http::Method method;
-		std::string pattern;
-		std::vector<std::string> parameterNames;
+    struct RouteEndpoint {
+        mach::http::Method method;
+        std::string pattern;
+        std::vector<std::string> parameterNames;
 
-		std::unique_ptr<dispatching::IEndpointInvoker> invoker;
+        std::unique_ptr<dispatching::IEndpointInvoker> invoker;
 
-		bool operator==(const RouteEndpoint& other) const {
-			return method == other.method
-				&& pattern == other.pattern;
-		}
-	};
+        bool operator==(const RouteEndpoint& other) const {
+            return method == other.method && pattern == other.pattern;
+        }
+    };
 
-	static inline void hash_combine(size_t& seed, size_t value) {
-		seed ^= value + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-	}
+    static inline void hash_combine(size_t& seed, size_t value) {
+        seed ^= value + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    }
 }
 
-namespace std 
+namespace std
 {
-	template <>
-	struct hash<mach::detail::routing::RouteEndpoint> {
-		size_t operator()(const mach::detail::routing::RouteEndpoint& e) const noexcept {
-			size_t seed = 0;
+    template <>
+    struct hash<mach::detail::routing::RouteEndpoint> {
+        size_t operator()(const mach::detail::routing::RouteEndpoint& e) const noexcept {
+            size_t seed = 0;
 
-			mach::detail::routing::hash_combine(seed, std::hash<mach::http::Method>{}(e.method));
-			mach::detail::routing::hash_combine(seed, std::hash<std::string>{}(e.pattern));
+            mach::detail::routing::hash_combine(seed, std::hash<mach::http::Method>{}(e.method));
+            mach::detail::routing::hash_combine(seed, std::hash<std::string>{}(e.pattern));
 
-			return seed;
-		}
-	};
+            return seed;
+        }
+    };
 }

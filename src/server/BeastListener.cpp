@@ -27,21 +27,16 @@
 
 namespace mach::detail::server
 {
-	using detail::logging::Logger;
+    using detail::logging::Logger;
 
     BeastListener::BeastListener(
         net::io_context& ioc,
         tcp::endpoint endpoint,
         detail::application::Runtime& runtime,
         detail::http::adapter::BeastRequestAdapter& requestAdapter,
-        detail::http::adapter::BeastResponseAdapter& responseAdapter
-    )
-        : m_ioc(ioc),
-        m_acceptor(net::make_strand(ioc)),
-        m_runtime(runtime),
-        m_requestAdapter(requestAdapter),
-        m_responseAdapter(responseAdapter)
-    {
+        detail::http::adapter::BeastResponseAdapter& responseAdapter)
+        : m_ioc(ioc), m_acceptor(net::make_strand(ioc)), m_runtime(runtime),
+          m_requestAdapter(requestAdapter), m_responseAdapter(responseAdapter) {
         beast::error_code ec;
 
         // Open the acceptor
@@ -55,17 +50,12 @@ namespace mach::detail::server
         BOOL exclusiveAddressUse = TRUE;
 
         if (::setsockopt(
-            m_acceptor.native_handle(),
-            SOL_SOCKET,
-            SO_EXCLUSIVEADDRUSE,
-            reinterpret_cast<const char*>(&exclusiveAddressUse),
-            sizeof(exclusiveAddressUse)
-        ) == SOCKET_ERROR)
-        {
-            ec.assign(
-                ::WSAGetLastError(),
-                boost::system::system_category()
-            );
+                m_acceptor.native_handle(),
+                SOL_SOCKET,
+                SO_EXCLUSIVEADDRUSE,
+                reinterpret_cast<const char*>(&exclusiveAddressUse),
+                sizeof(exclusiveAddressUse)) == SOCKET_ERROR) {
+            ec.assign(::WSAGetLastError(), boost::system::system_category());
         }
 
 #else
@@ -75,25 +65,25 @@ namespace mach::detail::server
 #endif
 
         if (ec) {
-            throw std::runtime_error(
-                "Failed to configure socket options: " + ec.message()
-            );
+            throw std::runtime_error("Failed to configure socket options: " + ec.message());
         }
 
         // Bind to the server address
         m_acceptor.bind(endpoint, ec);
         if (ec) {
             throw std::runtime_error(
-                std::format("Failed to bind to {}:{}: {}", endpoint.address().to_string(), endpoint.port(), ec.message())
-            );
+                std::format(
+                    "Failed to bind to {}:{}: {}",
+                    endpoint.address().to_string(),
+                    endpoint.port(),
+                    ec.message()));
         }
 
         // Start listening for connections
         m_acceptor.listen(net::socket_base::max_listen_connections, ec);
         if (ec) {
             throw std::runtime_error(
-                "Failed to start listening for incoming requests: " + ec.message()
-            );
+                "Failed to start listening for incoming requests: " + ec.message());
         }
     }
 
@@ -116,13 +106,10 @@ namespace mach::detail::server
 
             tcp::socket socket = co_await m_acceptor.async_accept(
                 net::make_strand(m_ioc),
-                net::redirect_error(net::use_awaitable, ec)
-            );
+                net::redirect_error(net::use_awaitable, ec));
 
-            if (ec == net::error::operation_aborted ||
-                ec == net::error::bad_descriptor ||
-                ec == net::error::not_socket) 
-            {
+            if (ec == net::error::operation_aborted || ec == net::error::bad_descriptor ||
+                ec == net::error::not_socket) {
                 co_return;
             }
 
@@ -137,16 +124,14 @@ namespace mach::detail::server
                 std::move(socket),
                 m_runtime,
                 m_requestAdapter,
-                m_responseAdapter
-            );
+                m_responseAdapter);
 
             net::co_spawn(
                 m_ioc,
                 [session]() -> net::awaitable<void> {
                     co_await session->run();
                 },
-                net::detached
-            );
+                net::detached);
         }
     }
 }

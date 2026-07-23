@@ -2,39 +2,39 @@
 
 namespace mach::detail::routing
 {
-	void RoutingMiddleware::invoke(mach::Context& context, mach::Next& next) {
-		auto plan = m_router.route(context.request);
+    void RoutingMiddleware::invoke(mach::Context& context, mach::Next& next) {
+        auto plan = m_router.route(context.request);
 
-		if (!plan.found()) {
-			auto statusCode = routing::toStatusCode(plan.status);
+        if (!plan.found()) {
+            auto statusCode = routing::toStatusCode(plan.status);
 
-			context.response.status(statusCode);
-			context.response.body(std::string(mach::http::reasonPhrase(statusCode)));
+            context.response.status(statusCode);
+            context.response.body(std::string(mach::http::reasonPhrase(statusCode)));
 
-			std::string allow = "";
+            std::string allow = "";
 
-			for (const mach::http::Method method : mach::http::allMethods) {
-				if (!plan.allowedMethods.contains(method)) {
-					continue;
-				}
+            for (const mach::http::Method method : mach::http::allMethods) {
+                if (!plan.allowedMethods.contains(method)) {
+                    continue;
+                }
 
-				if (!allow.empty()) {
-					allow += ", ";
-				}
+                if (!allow.empty()) {
+                    allow += ", ";
+                }
 
-				allow += toString(method);
-			}
+                allow += toString(method);
+            }
 
-			if (!allow.empty()) {
-				context.response.setHeader("allow", allow);
-			}
+            if (!allow.empty()) {
+                context.response.setHeader("allow", allow);
+            }
 
-			return;
-		}
+            return;
+        }
 
-		context.request.setRouteParams(std::move(plan.params));
-		context.executionPlan = std::move(plan);
+        context.request.setRouteParams(std::move(plan.params));
+        context.executionPlan = std::move(plan);
 
-		next();
-	}
+        next();
+    }
 }

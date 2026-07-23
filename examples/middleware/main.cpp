@@ -17,8 +17,7 @@ public:
     }
 };
 
-int main()
-{
+int main() {
     const auto hardwareThreads = std::thread::hardware_concurrency();
 
     auto builder = mach::AppBuilder("127.0.0.1", 3143, hardwareThreads);
@@ -30,7 +29,7 @@ int main()
     app.mapGet("/test", [] {
         std::cout << "Inside handler\n";
         return mach::ok("Reached");
-        });
+    });
 
     return app.run();
 }

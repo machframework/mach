@@ -4,10 +4,10 @@
 #include <thread>
 
 #include <mach/AppBuilder.hpp>
-#include <mach/controllers/ControllerBase.hpp>
-#include <mach/controllers/ControllerBuilder.hpp>
 #include <mach/Context.hpp>
 #include <mach/Reply.hpp>
+#include <mach/controllers/ControllerBase.hpp>
+#include <mach/controllers/ControllerBuilder.hpp>
 
 #include "server/BeastSession.hpp"
 
@@ -45,8 +45,7 @@ class HomeController : public mach::ControllerBase {
 public:
     inline static std::string route = "/runtime";
 
-    explicit HomeController(RequestIdService& requestIds)
-        : m_requestIds(requestIds) {}
+    explicit HomeController(RequestIdService& requestIds) : m_requestIds(requestIds) {}
 
     static void configure(mach::ControllerBuilder<HomeController>& builder) {
         builder.mapGet("/controller/static", &HomeController::staticLookup);
@@ -79,8 +78,7 @@ class UsersController : public mach::ControllerBase {
 public:
     inline static std::string route = "/runtime/users";
 
-    explicit UsersController(UserService& users)
-        : m_users(users) {}
+    explicit UsersController(UserService& users) : m_users(users) {}
 
     static void configure(mach::ControllerBuilder<UsersController>& builder) {
         builder.mapGet("/{id}", &UsersController::getUser);

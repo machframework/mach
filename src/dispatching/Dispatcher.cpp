@@ -7,20 +7,20 @@
 
 namespace mach::detail::dispatching
 {
-	Dispatcher::Dispatcher(di::Container& container, middleware::MiddlewarePipeline&& middlewarePipeline)
-		: m_container(container),
-		m_middlewarePipeline(std::move(middlewarePipeline))
-	{ }
+    Dispatcher::Dispatcher(
+        di::Container& container,
+        middleware::MiddlewarePipeline&& middlewarePipeline)
+        : m_container(container), m_middlewarePipeline(std::move(middlewarePipeline)) {}
 
-	void Dispatcher::execute(mach::Context& context) {
-		auto scope = m_container.createScope();
+    void Dispatcher::execute(mach::Context& context) {
+        auto scope = m_container.createScope();
 
-		RequestExecution execution(context, scope);
+        RequestExecution execution(context, scope);
 
-		auto terminal = [](RequestExecution& execution) {
-			execution.context.executionPlan.endpoint->invoker->invoke(execution);
-		};
+        auto terminal = [](RequestExecution& execution) {
+            execution.context.executionPlan.endpoint->invoker->invoke(execution);
+        };
 
-		m_middlewarePipeline.invoke(execution, terminal);
-	}
+        m_middlewarePipeline.invoke(execution, terminal);
+    }
 }

@@ -1,238 +1,216 @@
 #include <mach/App.hpp>
 
 #include <iostream>
-#include <string>
 #include <stdexcept>
+#include <string>
 #include <typeindex>
 #include <unordered_set>
 
-#include <mach/detail/routing/RouteEndpoint.hpp>
 #include <mach/detail/dispatching/MinimalApiInvoker.hpp>
+#include <mach/detail/routing/RouteEndpoint.hpp>
 
 #include "server/Server.hpp"
 
 namespace
 {
-	enum class AppState {
-		Ready,
-		Running,
-		Stopped
-	};
+    enum class AppState {
+        Ready,
+        Running,
+        Stopped
+    };
 }
 
 namespace mach
 {
-	class App::Impl {
-	
-	public:
-		Impl(
-			detail::app::ServerOptions serverOptions,
-			detail::di::Container container,
-			detail::middleware::MiddlewarePipeline middlewarePipeline
-		);
+    class App::Impl {
 
-		~Impl() = default;
+    public:
+        Impl(
+            detail::app::ServerOptions serverOptions,
+            detail::di::Container container,
+            detail::middleware::MiddlewarePipeline middlewarePipeline);
 
-		std::string host() const noexcept;
-		std::uint16_t port() const noexcept;
-		std::size_t threadCount() const noexcept;
+        ~Impl() = default;
 
-		void addRoute(detail::routing::RouteEndpoint route);
-		void addControllerRoutes(std::vector<detail::routing::RouteEndpoint> routes, std::type_index controllerType);
+        std::string host() const noexcept;
+        std::uint16_t port() const noexcept;
+        std::size_t threadCount() const noexcept;
 
-		int run();
-		void stop();
+        void addRoute(detail::routing::RouteEndpoint route);
+        void addControllerRoutes(
+            std::vector<detail::routing::RouteEndpoint> routes,
+            std::type_index controllerType);
 
-	private:
-		detail::app::ServerOptions m_serverOptions;
-		AppState m_state = AppState::Ready;
-		std::unordered_set<std::type_index> m_mappedControllers;
+        int run();
+        void stop();
 
-		std::mutex m_serverMutex;
-		std::unique_ptr<detail::server::Server> m_server;
+    private:
+        detail::app::ServerOptions m_serverOptions;
+        AppState m_state = AppState::Ready;
+        std::unordered_set<std::type_index> m_mappedControllers;
 
-		detail::routing::Router m_router;
-		detail::di::Container m_container;
-		detail::middleware::MiddlewarePipeline m_middlewarePipeline;
-	};
+        std::mutex m_serverMutex;
+        std::unique_ptr<detail::server::Server> m_server;
 
-	App::App(
-		detail::app::ServerOptions serverOptions,
-		detail::di::Container container,
-		detail::middleware::MiddlewarePipeline middlewarePipeline
-	)
-		: m_impl(std::make_unique<Impl>(
-			std::move(serverOptions),
-			std::move(container),
-			std::move(middlewarePipeline)
-		))
-	{ }
+        detail::routing::Router m_router;
+        detail::di::Container m_container;
+        detail::middleware::MiddlewarePipeline m_middlewarePipeline;
+    };
 
-	App::~App() = default;
+    App::App(
+        detail::app::ServerOptions serverOptions,
+        detail::di::Container container,
+        detail::middleware::MiddlewarePipeline middlewarePipeline)
+        : m_impl(
+              std::make_unique<Impl>(
+                  std::move(serverOptions),
+                  std::move(container),
+                  std::move(middlewarePipeline))) {}
 
-	App::App(App&&) noexcept = default;
+    App::~App() = default;
 
-	int App::run() {
-		return m_impl->run();
-	}
+    App::App(App&&) noexcept = default;
 
-	void App::stop() {
-		m_impl->stop();
-	}
+    int App::run() {
+        return m_impl->run();
+    }
 
-	std::string App::host() const noexcept {
-		return m_impl->host();
-	}
+    void App::stop() {
+        m_impl->stop();
+    }
 
-	std::uint16_t App::port() const noexcept {
-		return m_impl->port();
-	}
+    std::string App::host() const noexcept {
+        return m_impl->host();
+    }
 
-	std::size_t App::threadCount() const noexcept {
-		return m_impl->threadCount();
-	}
+    std::uint16_t App::port() const noexcept {
+        return m_impl->port();
+    }
 
-	void App::addRouteImpl(
-		detail::routing::RouteEndpoint route
-	) {
-		m_impl->addRoute(std::move(route));
-	}
+    std::size_t App::threadCount() const noexcept {
+        return m_impl->threadCount();
+    }
 
-	void App::addControllerRoutesImpl(std::vector<detail::routing::RouteEndpoint> routes, std::type_index controllerType) {
-		m_impl->addControllerRoutes(std::move(routes), controllerType);
-	}
+    void App::addRouteImpl(detail::routing::RouteEndpoint route) {
+        m_impl->addRoute(std::move(route));
+    }
 
-	App::Impl::Impl(
-		detail::app::ServerOptions serverOptions,
-		detail::di::Container container,
-		detail::middleware::MiddlewarePipeline middlewarePipeline
-	)
-		: m_serverOptions(std::move(serverOptions)),
-		m_container(std::move(container)),
-		m_middlewarePipeline(std::move(middlewarePipeline))
-	{ }
+    void App::addControllerRoutesImpl(
+        std::vector<detail::routing::RouteEndpoint> routes,
+        std::type_index controllerType) {
+        m_impl->addControllerRoutes(std::move(routes), controllerType);
+    }
 
-	int App::Impl::run()
-	{
-		detail::server::Server* server = nullptr;
+    App::Impl::Impl(
+        detail::app::ServerOptions serverOptions,
+        detail::di::Container container,
+        detail::middleware::MiddlewarePipeline middlewarePipeline)
+        : m_serverOptions(std::move(serverOptions)), m_container(std::move(container)),
+          m_middlewarePipeline(std::move(middlewarePipeline)) {}
 
-		{
-			std::lock_guard lock(m_serverMutex);
+    int App::Impl::run() {
+        detail::server::Server* server = nullptr;
 
-			if (m_state == AppState::Running) {
-				throw std::logic_error(
-					"The application is already running"
-				);
-			}
+        {
+            std::lock_guard lock(m_serverMutex);
 
-			if (m_state != AppState::Ready) {
-				throw std::logic_error(
-					"The application has already run"
-				);
-			}
+            if (m_state == AppState::Running) {
+                throw std::logic_error("The application is already running");
+            }
 
-			// This is redundant if state is authoritative.
-			if (m_server) {
-				throw std::logic_error(
-					"The application is already running"
-				);
-			}
+            if (m_state != AppState::Ready) {
+                throw std::logic_error("The application has already run");
+            }
 
-			m_container.addSingletonInstance<detail::routing::Router>(
-				std::move(m_router)
-			);
+            // This is redundant if state is authoritative.
+            if (m_server) {
+                throw std::logic_error("The application is already running");
+            }
 
-			m_container.finalizeRegistrations();
+            m_container.addSingletonInstance<detail::routing::Router>(std::move(m_router));
 
-			m_server =
-				std::make_unique<detail::server::Server>(
-					std::move(m_serverOptions),
-					std::move(m_container),
-					std::move(m_middlewarePipeline)
-				);
+            m_container.finalizeRegistrations();
 
-			server = m_server.get();
-			m_state = AppState::Running;
-		}
+            m_server = std::make_unique<detail::server::Server>(
+                std::move(m_serverOptions),
+                std::move(m_container),
+                std::move(m_middlewarePipeline));
 
-		int result = 0;
+            server = m_server.get();
+            m_state = AppState::Running;
+        }
 
-		try {
-			server->run();
-		}
-		catch (const std::exception& exception) {
-			std::cout
-				<< "Mach error: "
-				<< exception.what()
-				<< '\n';
+        int result = 0;
 
-			result = 1;
-		}
-		catch (...) {
-			std::cout
-				<< "Mach error: unknown server failure\n";
+        try {
+            server->run();
+        } catch (const std::exception& exception) {
+            std::cout << "Mach error: " << exception.what() << '\n';
 
-			result = 1;
-		}
+            result = 1;
+        } catch (...) {
+            std::cout << "Mach error: unknown server failure\n";
 
-		{
-			std::lock_guard lock(m_serverMutex);
+            result = 1;
+        }
 
-			m_server.reset();
-			m_state = AppState::Stopped;
-		}
+        {
+            std::lock_guard lock(m_serverMutex);
 
-		return result;
-	}
+            m_server.reset();
+            m_state = AppState::Stopped;
+        }
 
-	void App::Impl::stop() {
-		detail::server::Server* server = nullptr;
-		
-		{
-			std::lock_guard lock(m_serverMutex);
-			server = m_server.get();
+        return result;
+    }
 
-			if (server && m_state == AppState::Running) {
-				server->stop();
-				m_state = AppState::Stopped;
-			}
-		}
-	}
+    void App::Impl::stop() {
+        detail::server::Server* server = nullptr;
 
-	void App::Impl::addRoute(detail::routing::RouteEndpoint route) {
-		if (!route.invoker) {
-			throw std::invalid_argument("Route handler cannot be empty");
-		}
+        {
+            std::lock_guard lock(m_serverMutex);
+            server = m_server.get();
 
-		m_router.addRoute(std::move(route));
-	}
+            if (server && m_state == AppState::Running) {
+                server->stop();
+                m_state = AppState::Stopped;
+            }
+        }
+    }
 
-	void App::Impl::addControllerRoutes(std::vector<detail::routing::RouteEndpoint> routes, std::type_index controllerType) {
-		const auto [_, inserted] =
-			m_mappedControllers.emplace(controllerType);
+    void App::Impl::addRoute(detail::routing::RouteEndpoint route) {
+        if (!route.invoker) {
+            throw std::invalid_argument("Route handler cannot be empty");
+        }
 
-		if (!inserted) {
-			throw std::logic_error(
-				"Mach error: controller '" +
-				std::string(controllerType.name()) +
-				"' has already been mapped"
-			);
-		}
+        m_router.addRoute(std::move(route));
+    }
 
-		for (auto& route : routes) {
-			m_router.addRoute(std::move(route));
-		}
-	}
+    void App::Impl::addControllerRoutes(
+        std::vector<detail::routing::RouteEndpoint> routes,
+        std::type_index controllerType) {
+        const auto [_, inserted] = m_mappedControllers.emplace(controllerType);
 
-	std::string App::Impl::host() const noexcept {
-		return m_serverOptions.host;
-	}
+        if (!inserted) {
+            throw std::logic_error(
+                "Mach error: controller '" + std::string(controllerType.name()) +
+                "' has already been mapped");
+        }
 
-	std::uint16_t App::Impl::port() const noexcept {
-		return m_serverOptions.port;
-	}
+        for (auto& route : routes) {
+            m_router.addRoute(std::move(route));
+        }
+    }
 
-	std::size_t App::Impl::threadCount() const noexcept {
-		return m_serverOptions.threads;
-	}
+    std::string App::Impl::host() const noexcept {
+        return m_serverOptions.host;
+    }
+
+    std::uint16_t App::Impl::port() const noexcept {
+        return m_serverOptions.port;
+    }
+
+    std::size_t App::Impl::threadCount() const noexcept {
+        return m_serverOptions.threads;
+    }
 }

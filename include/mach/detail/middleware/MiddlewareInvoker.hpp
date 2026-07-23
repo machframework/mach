@@ -6,26 +6,24 @@
 
 namespace mach::detail::middleware
 {
-	template <typename TMiddleware>
-	class MiddlewareInvoker final : public IMiddlewareInvoker {
+    template <typename TMiddleware>
+    class MiddlewareInvoker final : public IMiddlewareInvoker {
 
-	public:
-		void invoke(dispatching::RequestExecution& execution, const middleware::InternalNext& next) override;
-	};
+    public:
+        void invoke(dispatching::RequestExecution& execution, const middleware::InternalNext& next)
+            override;
+    };
 
-	template <typename TMiddleware>
-	void MiddlewareInvoker<TMiddleware>::invoke(dispatching::RequestExecution& execution, const middleware::InternalNext& next) {
-		auto& middleware = execution.scope.resolve<TMiddleware>();
-		
-		mach::Next publicNext(
-			[&execution, next = std::move(next)]() {
-				next(execution);
-			}
-		);
+    template <typename TMiddleware>
+    void MiddlewareInvoker<TMiddleware>::invoke(
+        dispatching::RequestExecution& execution,
+        const middleware::InternalNext& next) {
+        auto& middleware = execution.scope.resolve<TMiddleware>();
 
-		middleware.invoke(
-			execution.context,
-			publicNext
-		);
-	}
+        mach::Next publicNext([&execution, next = std::move(next)]() {
+            next(execution);
+        });
+
+        middleware.invoke(execution.context, publicNext);
+    }
 }

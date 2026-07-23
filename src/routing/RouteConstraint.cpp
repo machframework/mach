@@ -4,22 +4,16 @@
 
 namespace
 {
-    bool isInt(std::string_view value)
-    {
+    bool isInt(std::string_view value) {
         if (value.empty()) {
             return false;
         }
 
         int result;
 
-        auto [ptr, ec] = std::from_chars(
-            value.data(),
-            value.data() + value.size(),
-            result
-        );
+        auto [ptr, ec] = std::from_chars(value.data(), value.data() + value.size(), result);
 
-        return ec == std::errc{} &&
-            ptr == value.data() + value.size();
+        return ec == std::errc{} && ptr == value.data() + value.size();
     }
 }
 
@@ -34,24 +28,24 @@ namespace mach::detail::routing
         return "string";
     }
 
-	std::optional<RouteConstraint> toRouteConstraint(std::string_view value) {
-		if (value == "int") {
-			return RouteConstraint::Int;
-		}
+    std::optional<RouteConstraint> toRouteConstraint(std::string_view value) {
+        if (value == "int") {
+            return RouteConstraint::Int;
+        }
 
         if (value == "string") {
             return RouteConstraint::String;
         }
 
-		return std::nullopt;
-	}
+        return std::nullopt;
+    }
 
-	bool satisfiesConstraint(std::string_view value, RouteConstraint constraint) {
+    bool satisfiesConstraint(std::string_view value, RouteConstraint constraint) {
         switch (constraint) {
         case RouteConstraint::Int:
             return isInt(value);
         }
 
         return false;
-	}
+    }
 }

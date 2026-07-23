@@ -5,8 +5,7 @@ namespace mach::http
     /**
      * Represents an HTTP protocol version.
      */
-    enum class Version
-    {
+    enum class Version {
         Http10,
         Http11,
         Http2,

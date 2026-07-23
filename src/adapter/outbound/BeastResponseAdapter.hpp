@@ -10,14 +10,14 @@
 
 namespace mach::detail::http::adapter
 {
-	namespace beast = boost::beast;
+    namespace beast = boost::beast;
 
-	class BeastResponseAdapter {
+    class BeastResponseAdapter {
 
-	public:
-		beast::http::response<beast::http::string_body> adapt(mach::Context&& context);
+    public:
+        beast::http::response<beast::http::string_body> adapt(mach::Context&& context);
 
-	private:
-		static unsigned int fromMachVersion(mach::http::Version version);
-	};
+    private:
+        static unsigned int fromMachVersion(mach::http::Version version);
+    };
 }

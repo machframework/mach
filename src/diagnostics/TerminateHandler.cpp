@@ -17,23 +17,17 @@ namespace
         const auto exception = std::current_exception();
 
         if (exception == nullptr) {
-            logFatalError(
-                "std::terminate was called without an active exception"
-            );
+            logFatalError("std::terminate was called without an active exception");
 
             std::abort();
         }
 
         try {
             std::rethrow_exception(exception);
-        }
-        catch (const std::exception& error) {
+        } catch (const std::exception& error) {
             logFatalError(error.what());
-        }
-        catch (...) {
-            logFatalError(
-                "Unhandled exception not derived from std::exception"
-            );
+        } catch (...) {
+            logFatalError("Unhandled exception not derived from std::exception");
         }
 
         std::abort();

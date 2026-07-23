@@ -8,45 +8,44 @@
 #include <boost/asio/ip/address.hpp>
 
 #include <mach/detail/app/ServerOptions.hpp>
-#include <mach/detail/routing/Router.hpp>
 #include <mach/detail/di/Container.hpp>
 #include <mach/detail/middleware/MiddlewarePipeline.hpp>
+#include <mach/detail/routing/Router.hpp>
 
-#include "adapter/inbound/BeastRequestAdapter.hpp"
-#include "adapter/outbound/BeastResponseAdapter.hpp"
 #include "BeastListener.hpp"
 #include "BeastSession.hpp"
+#include "adapter/inbound/BeastRequestAdapter.hpp"
+#include "adapter/outbound/BeastResponseAdapter.hpp"
 
 namespace mach::detail::server
 {
-	namespace net = boost::asio;
+    namespace net = boost::asio;
 
-	class Server {
+    class Server {
 
-	public:
-		Server(
-			app::ServerOptions serverOptions,
-			di::Container container,
-			middleware::MiddlewarePipeline middlewarePipeline
-		);
+    public:
+        Server(
+            app::ServerOptions serverOptions,
+            di::Container container,
+            middleware::MiddlewarePipeline middlewarePipeline);
 
-		~Server() = default;
-		
-		std::string host() const noexcept;
-		std::uint16_t port() const noexcept;
-		std::size_t threadCount() const noexcept;
+        ~Server() = default;
 
-		void run();
-		void stop();
+        std::string host() const noexcept;
+        std::uint16_t port() const noexcept;
+        std::size_t threadCount() const noexcept;
 
-	private:
-		boost::asio::ip::tcp::endpoint m_endpoint;
-		boost::asio::io_context m_ioc;
-		std::shared_ptr<BeastListener> m_listener;
-		std::size_t m_threadCount;
+        void run();
+        void stop();
 
-		detail::application::Runtime m_runtime;
-		detail::http::adapter::BeastRequestAdapter m_requestAdapter;
-		detail::http::adapter::BeastResponseAdapter m_responseAdapter;
-	};
+    private:
+        boost::asio::ip::tcp::endpoint m_endpoint;
+        boost::asio::io_context m_ioc;
+        std::shared_ptr<BeastListener> m_listener;
+        std::size_t m_threadCount;
+
+        detail::application::Runtime m_runtime;
+        detail::http::adapter::BeastRequestAdapter m_requestAdapter;
+        detail::http::adapter::BeastResponseAdapter m_responseAdapter;
+    };
 }

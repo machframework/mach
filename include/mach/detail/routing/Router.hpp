@@ -15,16 +15,16 @@
 
 namespace mach::detail::routing
 {
-	class Router {
+    class Router {
 
-	public:
-		application::ExecutionPlan route(const mach::Request& request) const;
-		void addRoute(RouteEndpoint&& endpoint);
+    public:
+        application::ExecutionPlan route(const mach::Request& request) const;
+        void addRoute(RouteEndpoint&& endpoint);
 
-	private:
-		routing::RouteMatch matchRoute(const mach::Request& request) const;
+    private:
+        routing::RouteMatch matchRoute(const mach::Request& request) const;
 
-		std::deque<routing::RouteEndpoint> m_endpoints;
-		routing::RouteTrie m_routes;
-	};
+        std::deque<routing::RouteEndpoint> m_endpoints;
+        routing::RouteTrie m_routes;
+    };
 }

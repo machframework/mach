@@ -17,270 +17,263 @@
 
 namespace mach
 {
-	/**
-	 * Represents the configuration entry point for building a Mach application.
-	 *
-	 * Used to register services, middleware, controllers, and other
-	 * application-level configuration before creating an App instance.
-	 *
-	 * Ownership:
-	 * - Owns the application's configuration state before build().
-	 * - Transfers the configured runtime state to App when build() is called.
-	 * - Should not be used for further configuration after build().
-	 *
-	 * Thread safety:
-	 * - Not thread-safe. Application configuration should be performed from one thread.
-	 *
-	 * Stability:
-	 * - This API is still experimental and may change before Mach's first stable release.
-	 */
-	class AppBuilder {
+    /**
+     * Represents the configuration entry point for building a Mach application.
+     *
+     * Used to register services, middleware, controllers, and other
+     * application-level configuration before creating an App instance.
+     *
+     * Ownership:
+     * - Owns the application's configuration state before build().
+     * - Transfers the configured runtime state to App when build() is called.
+     * - Should not be used for further configuration after build().
+     *
+     * Thread safety:
+     * - Not thread-safe. Application configuration should be performed from one thread.
+     *
+     * Stability:
+     * - This API is still experimental and may change before Mach's first stable release.
+     */
+    class AppBuilder {
 
-	public:
-		/**
-		 * Creates a new application builder instance.
-		 *
-		 * @param host The network interface to bind to.
-		 * @param port The port to listen on.
-		 * @param threadCount The number of worker threads used to process requests.
-		 *
-		 * @throws std::invalid_argument If the supplied configuration is invalid.
-		 */
-		AppBuilder(std::string_view host, std::int32_t port = 3143, std::int64_t threadCount = 1);
+    public:
+        /**
+         * Creates a new application builder instance.
+         *
+         * @param host The network interface to bind to.
+         * @param port The port to listen on.
+         * @param threadCount The number of worker threads used to process requests.
+         *
+         * @throws std::invalid_argument If the supplied configuration is invalid.
+         */
+        AppBuilder(std::string_view host, std::int32_t port = 3143, std::int64_t threadCount = 1);
 
-		// testing 
-		AppBuilder(detail::app::ServerOptions options)
-			: AppBuilder(options.host, options.port, options.threads)
-		{ }
-		// testing
+        // testing
+        AppBuilder(detail::app::ServerOptions options)
+            : AppBuilder(options.host, options.port, options.threads) {}
+        // testing
 
-		/**
-		 * Registers a scoped service in the dependency injection container.
-		 *
-		 * A scoped service is created once per scope and reused for all
-		 * resolutions of the same service type within that scope.
-		 *
-		 * @tparam T The service type being registered.
-		 * @tparam Deps The constructor dependency types required to create T.
-		 *
-		 * @return A reference to the current AppBuilder instance, allowing
-		 *         method chaining.
-		 *
-		 * @throws std::logic_error If the service type has already been registered.
-		 *
-		 * @thread_safety This function is not thread-safe.
-		 */
-		template <typename T, typename... Deps>
-		AppBuilder& addScoped();
+        /**
+         * Registers a scoped service in the dependency injection container.
+         *
+         * A scoped service is created once per scope and reused for all
+         * resolutions of the same service type within that scope.
+         *
+         * @tparam T The service type being registered.
+         * @tparam Deps The constructor dependency types required to create T.
+         *
+         * @return A reference to the current AppBuilder instance, allowing
+         *         method chaining.
+         *
+         * @throws std::logic_error If the service type has already been registered.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        template <typename T, typename... Deps>
+        AppBuilder& addScoped();
 
-		/**
-		 * Registers a singleton service in the dependency injection container.
-		 *
-		 * A singleton service is created once per application and is 
-		 * reused across all resolutions of the same service type.
-		 *
-		 * @tparam T The service type being registered.
-		 * @tparam Deps The constructor dependency types required to create T.
-		 *
-		 * @return A reference to the current AppBuilder instance, allowing
-		 *         method chaining.
-		 *
-		 * @throws std::logic_error If the service type has already been registered.
-		 *
-		 * @thread_safety This function is not thread-safe.
-		 */
-		template <typename T, typename... Deps>
-		AppBuilder& addSingleton();
+        /**
+         * Registers a singleton service in the dependency injection container.
+         *
+         * A singleton service is created once per application and is
+         * reused across all resolutions of the same service type.
+         *
+         * @tparam T The service type being registered.
+         * @tparam Deps The constructor dependency types required to create T.
+         *
+         * @return A reference to the current AppBuilder instance, allowing
+         *         method chaining.
+         *
+         * @throws std::logic_error If the service type has already been registered.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        template <typename T, typename... Deps>
+        AppBuilder& addSingleton();
 
-		/**
-		 * Registers a transient service in the dependency injection container.
-		 *
-		 * A transient service is created every time a resolution of its type is required.
-		 *
-		 * @tparam T The service type being registered.
-		 * @tparam Deps The constructor dependency types required to create T.
-		 *
-		 * @return A reference to the current AppBuilder instance, allowing
-		 *         method chaining.
-		 *
-		 * @throws std::logic_error If the service type has already been registered.
-		 *
-		 * @thread_safety This function is not thread-safe.
-		 */
-		template <typename T, typename... Deps>
-		AppBuilder& addTransient();
+        /**
+         * Registers a transient service in the dependency injection container.
+         *
+         * A transient service is created every time a resolution of its type is required.
+         *
+         * @tparam T The service type being registered.
+         * @tparam Deps The constructor dependency types required to create T.
+         *
+         * @return A reference to the current AppBuilder instance, allowing
+         *         method chaining.
+         *
+         * @throws std::logic_error If the service type has already been registered.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        template <typename T, typename... Deps>
+        AppBuilder& addTransient();
 
-		/**
-		 * Registers a HTTP controller in the dependency injection container.
-		 *
-		 * Controllers will be registered as transient dependencies.
-		 *
-		 * @tparam T The service type being registered.
-		 * @tparam Deps The constructor dependency types required to create T.
-		 *
-		 * @return A reference to the current AppBuilder instance, allowing
-		 *         method chaining.
-		 *
-		 * @throws std::logic_error If the service type has already been registered.
-		 *
-		 * @thread_safety This function is not thread-safe.
-		 */
-		template <typename T, typename... Deps>
-		AppBuilder& addController();
+        /**
+         * Registers a HTTP controller in the dependency injection container.
+         *
+         * Controllers will be registered as transient dependencies.
+         *
+         * @tparam T The service type being registered.
+         * @tparam Deps The constructor dependency types required to create T.
+         *
+         * @return A reference to the current AppBuilder instance, allowing
+         *         method chaining.
+         *
+         * @throws std::logic_error If the service type has already been registered.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        template <typename T, typename... Deps>
+        AppBuilder& addController();
 
-		/**
-		 * Registers a middleware in the application's request pipeline.
-		 *
-		 * The middleware will be registered as a scoped dependency and executed
-		 * in the order it was registered. Each middleware instance is created
-		 * once per HTTP request.
-		 *
-		 * @tparam T The middleware type being registered.
-		 * @tparam Deps The constructor dependency types required to create T.
-		 *
-		 * @return A reference to the current AppBuilder instance, allowing
-		 *         method chaining.
-		 *
-		 * @throws std::logic_error If the middleware type has already been
-		 *         registered.
-		 *
-		 * @thread_safety This function is not thread-safe.
-		 */
-		template <typename T, typename... Deps>
-		AppBuilder& use();
+        /**
+         * Registers a middleware in the application's request pipeline.
+         *
+         * The middleware will be registered as a scoped dependency and executed
+         * in the order it was registered. Each middleware instance is created
+         * once per HTTP request.
+         *
+         * @tparam T The middleware type being registered.
+         * @tparam Deps The constructor dependency types required to create T.
+         *
+         * @return A reference to the current AppBuilder instance, allowing
+         *         method chaining.
+         *
+         * @throws std::logic_error If the middleware type has already been
+         *         registered.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        template <typename T, typename... Deps>
+        AppBuilder& use();
 
-		/**
-		 * Builds and returns the application instance.
-		 *
-		 * Finalizes the application configuration, including all registered
-		 * services, middleware, controllers, and transfers
-		 * ownership of the configured state to the returned App.
-		 *
-		 * After calling this function, the AppBuilder should not be used
-		 * to perform further configuration.
-		 *
-		 * @return A fully configured App instance.
-		 *
-		 * @throws std::logic_error If the application configuration is invalid
-		 *         or incomplete.
-		 *
-		 * @thread_safety This function is not thread-safe.
-		 */
-		App build();
+        /**
+         * Builds and returns the application instance.
+         *
+         * Finalizes the application configuration, including all registered
+         * services, middleware, controllers, and transfers
+         * ownership of the configured state to the returned App.
+         *
+         * After calling this function, the AppBuilder should not be used
+         * to perform further configuration.
+         *
+         * @return A fully configured App instance.
+         *
+         * @throws std::logic_error If the application configuration is invalid
+         *         or incomplete.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        App build();
 
-	private:
-		detail::app::ServerOptions m_serverOptions;
-		detail::di::Container m_container;
-		detail::middleware::MiddlewarePipeline m_middlewarePipeline;
-		std::vector<std::function<void(App&)>> m_controllerMappers;
+    private:
+        detail::app::ServerOptions m_serverOptions;
+        detail::di::Container m_container;
+        detail::middleware::MiddlewarePipeline m_middlewarePipeline;
+        std::vector<std::function<void(App&)>> m_controllerMappers;
 
-		template <typename T, typename... Deps>
-		AppBuilder& use(mach::detail::di::ServiceAccess access);
-	};
+        template <typename T, typename... Deps>
+        AppBuilder& use(mach::detail::di::ServiceAccess access);
+    };
 
-	template <typename T, typename... Deps>
-	AppBuilder& AppBuilder::addScoped() {
-		static_assert(
-			!mach::detail::controllers::ValidController<T>,
-			"Mach error: Controllers must be registered using addController<T>(), not addScoped<T>()."
-		);
+    template <typename T, typename... Deps>
+    AppBuilder& AppBuilder::addScoped() {
+        static_assert(
+            !mach::detail::controllers::ValidController<T>,
+            "Mach error: Controllers must be registered using addController<T>(), not "
+            "addScoped<T>().");
 
-		static_assert(
-			(!mach::detail::controllers::ValidController<Deps> && ...),
-			"Mach error: services must not depend on controllers."
-		);
+        static_assert(
+            (!mach::detail::controllers::ValidController<Deps> && ...),
+            "Mach error: services must not depend on controllers.");
 
-		m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Scoped);
-		return *this;
-	}
+        m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Scoped);
+        return *this;
+    }
 
-	template <typename T, typename... Deps>
-	AppBuilder& AppBuilder::addSingleton() {
-		static_assert(
-			!mach::detail::controllers::ValidController<T>,
-			"Mach error: controllers must be registered using addController<T>(), not addSingleton<T>()."
-		);
+    template <typename T, typename... Deps>
+    AppBuilder& AppBuilder::addSingleton() {
+        static_assert(
+            !mach::detail::controllers::ValidController<T>,
+            "Mach error: controllers must be registered using addController<T>(), not "
+            "addSingleton<T>().");
 
-		m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Singleton);
-		return *this;
-	}
+        m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Singleton);
+        return *this;
+    }
 
-	template <typename T, typename... Deps>
-	AppBuilder& AppBuilder::addTransient() {
-		static_assert(
-			!mach::detail::controllers::ValidController<T>,
-			"Mach error: controllers must be registered using addController<T>(), not addTransient<T>()."
-		);
+    template <typename T, typename... Deps>
+    AppBuilder& AppBuilder::addTransient() {
+        static_assert(
+            !mach::detail::controllers::ValidController<T>,
+            "Mach error: controllers must be registered using addController<T>(), not "
+            "addTransient<T>().");
 
-		m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Transient);
-		return *this;
-	}
+        m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Transient);
+        return *this;
+    }
 
-	template <typename T, typename... Deps>
-	AppBuilder& AppBuilder::addController() {
-		using Controller = std::remove_cvref_t<T>;
+    template <typename T, typename... Deps>
+    AppBuilder& AppBuilder::addController() {
+        using Controller = std::remove_cvref_t<T>;
 
-		constexpr bool isControllerType = mach::detail::controllers::ControllerType<Controller>;
-		constexpr bool hasRouteField = mach::detail::controllers::HasPublicStaticRouteField<Controller>;
-		
-		static_assert(
-			std::same_as<T, Controller>,
-			"Mach error: controller type must not be const, volatile, or a reference"
-			);
+        constexpr bool isControllerType = mach::detail::controllers::ControllerType<Controller>;
+        constexpr bool hasRouteField =
+            mach::detail::controllers::HasPublicStaticRouteField<Controller>;
 
-		static_assert(
-			isControllerType,
-			"Mach error: controller must be derived from ControllerBase"
-		);
+        static_assert(
+            std::same_as<T, Controller>,
+            "Mach error: controller type must not be const, volatile, or a reference");
 
-		static_assert(
-			hasRouteField,
-			"Mach error: controller must expose a public static route of type std::string, std::string_view, or another type convertible to std::string_view"
-		);
+        static_assert(
+            isControllerType,
+            "Mach error: controller must be derived from ControllerBase");
 
-		if constexpr (isControllerType && hasRouteField) {
-			m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Transient);
+        static_assert(
+            hasRouteField,
+            "Mach error: controller must expose a public static route of type std::string, "
+            "std::string_view, or another type convertible to std::string_view");
 
-			m_controllerMappers.emplace_back([](App& app) {
-				app.mapController<T>();
-				});
-		}
+        if constexpr (isControllerType && hasRouteField) {
+            m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Transient);
 
-		return *this;
-	}
+            m_controllerMappers.emplace_back([](App& app) {
+                app.mapController<T>();
+            });
+        }
 
-	template <typename T, typename... Deps>
-	AppBuilder& AppBuilder::use() {
-		return this->use<T, Deps...>(mach::detail::di::ServiceAccess::User);
-	}
+        return *this;
+    }
 
-	template <typename T, typename... Deps>
-	AppBuilder& AppBuilder::use(mach::detail::di::ServiceAccess access) {
-		constexpr bool isValidMiddlewareType = detail::traits::middleware::ValidMiddlewareType<T>;
-		constexpr bool hasValidMiddlewareInvoke = detail::traits::middleware::HasValidMiddlewareInvoke<T>;
-		constexpr bool isController = mach::detail::controllers::ControllerType<T>;
+    template <typename T, typename... Deps>
+    AppBuilder& AppBuilder::use() {
+        return this->use<T, Deps...>(mach::detail::di::ServiceAccess::User);
+    }
 
-		static_assert(
-			isValidMiddlewareType,
-			"Mach error: middleware must be a non-cv, non-reference class type."
-			);
+    template <typename T, typename... Deps>
+    AppBuilder& AppBuilder::use(mach::detail::di::ServiceAccess access) {
+        constexpr bool isValidMiddlewareType = detail::traits::middleware::ValidMiddlewareType<T>;
+        constexpr bool hasValidMiddlewareInvoke =
+            detail::traits::middleware::HasValidMiddlewareInvoke<T>;
+        constexpr bool isController = mach::detail::controllers::ControllerType<T>;
 
-		static_assert(
-			hasValidMiddlewareInvoke,
-			"Mach error: middleware must expose "
-			"'void invoke(mach::Context&, const mach::Next&)'."
-			);
+        static_assert(
+            isValidMiddlewareType,
+            "Mach error: middleware must be a non-cv, non-reference class type.");
 
-		static_assert(
-			!isController,
-			"Mach error: middleware type must not be a controller."
-			);
+        static_assert(
+            hasValidMiddlewareInvoke,
+            "Mach error: middleware must expose "
+            "'void invoke(mach::Context&, const mach::Next&)'.");
 
-		if constexpr (isValidMiddlewareType && hasValidMiddlewareInvoke && !isController) {
-			m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Scoped, access);
-		}
+        static_assert(!isController, "Mach error: middleware type must not be a controller.");
 
-		m_middlewarePipeline.add<T>();
-		return *this;
-	}
+        if constexpr (isValidMiddlewareType && hasValidMiddlewareInvoke && !isController) {
+            m_container.addService<T, Deps...>(detail::di::ServiceLifetime::Scoped, access);
+        }
+
+        m_middlewarePipeline.add<T>();
+        return *this;
+    }
 }

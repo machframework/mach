@@ -4,10 +4,10 @@
 
 namespace mach::detail::dispatching
 {
-	class IEndpointInvoker {
-		
-	public:
-		virtual ~IEndpointInvoker() = default;
-		virtual void invoke(RequestExecution& execution) = 0;
-	};
+    class IEndpointInvoker {
+
+    public:
+        virtual ~IEndpointInvoker() = default;
+        virtual void invoke(RequestExecution& execution) = 0;
+    };
 }

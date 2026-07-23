@@ -12,63 +12,37 @@
 
 #include "Testing.hpp"
 
-struct CreateControllerUserRequest
-{
+struct CreateControllerUserRequest {
     std::string name;
     int age;
 };
 
 MACH_DEFINE_JSON(CreateControllerUserRequest, name, age);
 
-class ContentTypeController : public mach::ControllerBase
-{
+class ContentTypeController : public mach::ControllerBase {
 public:
-    inline static constexpr std::string_view route =
-        "/testing/controllers/content-type";
+    inline static constexpr std::string_view route = "/testing/controllers/content-type";
 
-    static void configure(
-        mach::ControllerBuilder<ContentTypeController>& builder
-    )
-    {
-        builder.mapGet(
-            "/no-body",
-            &ContentTypeController::noBody
-        );
+    static void configure(mach::ControllerBuilder<ContentTypeController>& builder) {
+        builder.mapGet("/no-body", &ContentTypeController::noBody);
 
-        builder.mapPost(
-            "/user",
-            &ContentTypeController::createUser
-        );
+        builder.mapPost("/user", &ContentTypeController::createUser);
     }
 
-    mach::Reply<std::string> noBody()
-    {
-        return ok(
-            "Controller request succeeded without body binding."
-        );
+    mach::Reply<std::string> noBody() {
+        return ok("Controller request succeeded without body binding.");
     }
 
-    mach::Reply<std::string> createUser(
-        CreateControllerUserRequest request
-    )
-    {
-        response().setHeader(
-            "X-Testing-Controller",
-            "content-type"
-        );
+    mach::Reply<std::string> createUser(CreateControllerUserRequest request) {
+        response().setHeader("X-Testing-Controller", "content-type");
 
         return ok(
-            "Created controller user '" +
-            request.name +
-            "' with age " +
-            std::to_string(request.age) +
-            "."
-        );
+            "Created controller user '" + request.name + "' with age " +
+            std::to_string(request.age) + ".");
     }
 };
 
-void printTestingInstructions()
-{
+void printTestingInstructions() {
     std::cout << R"(
 
 ============================================================
@@ -130,8 +104,7 @@ curl.exe --% -i -X POST -H "Content-Type: application/json" --data-binary "{\"na
 )";
 }
 
-int main()
-{
+int main() {
     mach::AppBuilder builder(std::move(testing::serverOptions));
 
     builder.addController<ContentTypeController>();

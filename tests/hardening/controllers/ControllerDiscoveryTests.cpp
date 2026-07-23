@@ -10,37 +10,26 @@
 
 namespace
 {
-    class FirstController final : public mach::ControllerBase
-    {
+    class FirstController final : public mach::ControllerBase {
     public:
-        inline static constexpr std::string_view route =
-            "/first";
+        inline static constexpr std::string_view route = "/first";
 
-        static void reset() noexcept
-        {
+        static void reset() noexcept {
             s_configurationCount = 0;
         }
 
         [[nodiscard]]
-        static int configurationCount() noexcept
-        {
+        static int configurationCount() noexcept {
             return s_configurationCount;
         }
 
-        static void configure(
-            mach::ControllerBuilder<FirstController>& builder
-        )
-        {
+        static void configure(mach::ControllerBuilder<FirstController>& builder) {
             ++s_configurationCount;
 
-            builder.mapGet(
-                "/",
-                &FirstController::index
-            );
+            builder.mapGet("/", &FirstController::index);
         }
 
-        mach::Reply<> index()
-        {
+        mach::Reply<> index() {
             return noContent();
         }
 
@@ -48,48 +37,32 @@ namespace
         inline static int s_configurationCount = 0;
     };
 
-
-    class SecondController final : public mach::ControllerBase
-    {
+    class SecondController final : public mach::ControllerBase {
     public:
-        inline static constexpr std::string_view route =
-            "/second";
+        inline static constexpr std::string_view route = "/second";
 
-        static void reset() noexcept
-        {
+        static void reset() noexcept {
             s_configurationCount = 0;
         }
 
         [[nodiscard]]
-        static int configurationCount() noexcept
-        {
+        static int configurationCount() noexcept {
             return s_configurationCount;
         }
 
-        static void configure(
-            mach::ControllerBuilder<SecondController>& builder
-        )
-        {
+        static void configure(mach::ControllerBuilder<SecondController>& builder) {
             ++s_configurationCount;
 
-            builder.mapGet(
-                "/",
-                &SecondController::index
-            );
+            builder.mapGet("/", &SecondController::index);
 
-            builder.mapGet(
-                "/details",
-                &SecondController::details
-            );
+            builder.mapGet("/details", &SecondController::details);
         }
 
-        mach::Reply<> index()
-        {
+        mach::Reply<> index() {
             return noContent();
         }
 
-        mach::Reply<> details()
-        {
+        mach::Reply<> details() {
             return noContent();
         }
 
@@ -97,38 +70,26 @@ namespace
         inline static int s_configurationCount = 0;
     };
 
-
-    class UnregisteredController final : public mach::ControllerBase
-    {
+    class UnregisteredController final : public mach::ControllerBase {
     public:
-        inline static constexpr std::string_view route =
-            "/unregistered";
+        inline static constexpr std::string_view route = "/unregistered";
 
-        static void reset() noexcept
-        {
+        static void reset() noexcept {
             s_configurationCount = 0;
         }
 
         [[nodiscard]]
-        static int configurationCount() noexcept
-        {
+        static int configurationCount() noexcept {
             return s_configurationCount;
         }
 
-        static void configure(
-            mach::ControllerBuilder<UnregisteredController>& builder
-        )
-        {
+        static void configure(mach::ControllerBuilder<UnregisteredController>& builder) {
             ++s_configurationCount;
 
-            builder.mapGet(
-                "/",
-                &UnregisteredController::index
-            );
+            builder.mapGet("/", &UnregisteredController::index);
         }
 
-        mach::Reply<> index()
-        {
+        mach::Reply<> index() {
             return noContent();
         }
 
@@ -136,19 +97,14 @@ namespace
         inline static int s_configurationCount = 0;
     };
 
-
-    void resetControllers() noexcept
-    {
+    void resetControllers() noexcept {
         FirstController::reset();
         SecondController::reset();
         UnregisteredController::reset();
     }
 
-
-    void testControllerIsNotMappedDuringRegistration()
-    {
-        constexpr std::string_view testName =
-            "Controller is not mapped before application build";
+    void testControllerIsNotMappedDuringRegistration() {
+        constexpr std::string_view testName = "Controller is not mapped before application build";
 
         resetControllers();
 
@@ -158,24 +114,18 @@ namespace
             builder.addController<FirstController>();
 
             if (FirstController::configurationCount() != 0) {
-                testing::fail(
-                    testName,
-                    "Controller configure was called during registration"
-                );
+                testing::fail(testName, "Controller configure was called during registration");
 
                 return;
             }
 
             testing::success(testName);
-        }
-        catch (const std::exception& exception) {
+        } catch (const std::exception& exception) {
             testing::fail(testName, exception.what());
         }
     }
 
-
-    void testRegisteredControllerIsMappedDuringBuild()
-    {
+    void testRegisteredControllerIsMappedDuringBuild() {
         constexpr std::string_view testName =
             "Registered controller is mapped during application build";
 
@@ -190,24 +140,18 @@ namespace
             mach::App app = builder.build();
 
             if (FirstController::configurationCount() != 1) {
-                testing::fail(
-                    testName,
-                    "Registered controller was not configured exactly once"
-                );
+                testing::fail(testName, "Registered controller was not configured exactly once");
 
                 return;
             }
 
             testing::success(testName);
-        }
-        catch (const std::exception& exception) {
+        } catch (const std::exception& exception) {
             testing::fail(testName, exception.what());
         }
     }
 
-
-    void testMultipleRegisteredControllersAreMapped()
-    {
+    void testMultipleRegisteredControllersAreMapped() {
         constexpr std::string_view testName =
             "Multiple registered controllers are mapped during build";
 
@@ -225,8 +169,7 @@ namespace
             if (FirstController::configurationCount() != 1) {
                 testing::fail(
                     testName,
-                    "First registered controller was not configured exactly once"
-                );
+                    "First registered controller was not configured exactly once");
 
                 return;
             }
@@ -234,24 +177,19 @@ namespace
             if (SecondController::configurationCount() != 1) {
                 testing::fail(
                     testName,
-                    "Second registered controller was not configured exactly once"
-                );
+                    "Second registered controller was not configured exactly once");
 
                 return;
             }
 
             testing::success(testName);
-        }
-        catch (const std::exception& exception) {
+        } catch (const std::exception& exception) {
             testing::fail(testName, exception.what());
         }
     }
 
-
-    void testUnregisteredControllerIsNotMapped()
-    {
-        constexpr std::string_view testName =
-            "Unregistered controller is not mapped during build";
+    void testUnregisteredControllerIsNotMapped() {
+        constexpr std::string_view testName = "Unregistered controller is not mapped during build";
 
         resetControllers();
 
@@ -265,24 +203,18 @@ namespace
             mach::App app = builder.build();
 
             if (UnregisteredController::configurationCount() != 0) {
-                testing::fail(
-                    testName,
-                    "Unregistered controller was unexpectedly configured"
-                );
+                testing::fail(testName, "Unregistered controller was unexpectedly configured");
 
                 return;
             }
 
             testing::success(testName);
-        }
-        catch (const std::exception& exception) {
+        } catch (const std::exception& exception) {
             testing::fail(testName, exception.what());
         }
     }
 
-
-    void testControllerWithMultipleActionsIsDiscovered()
-    {
+    void testControllerWithMultipleActionsIsDiscovered() {
         constexpr std::string_view testName =
             "Controller with multiple actions is discovered successfully";
 
@@ -299,23 +231,19 @@ namespace
             if (SecondController::configurationCount() != 1) {
                 testing::fail(
                     testName,
-                    "Controller with multiple actions was not configured exactly once"
-                );
+                    "Controller with multiple actions was not configured exactly once");
 
                 return;
             }
 
             testing::success(testName);
-        }
-        catch (const std::exception& exception) {
+        } catch (const std::exception& exception) {
             testing::fail(testName, exception.what());
         }
     }
 }
 
-
-int main()
-{
+int main() {
     testControllerIsNotMappedDuringRegistration();
     testRegisteredControllerIsMappedDuringBuild();
     testMultipleRegisteredControllersAreMapped();

@@ -9,28 +9,22 @@ namespace
 {
     namespace di = mach::detail::di;
 
-
-    class TrackedSingleton
-    {
+    class TrackedSingleton {
     public:
-        TrackedSingleton()
-        {
+        TrackedSingleton() {
             ++s_aliveCount;
         }
 
-        ~TrackedSingleton()
-        {
+        ~TrackedSingleton() {
             --s_aliveCount;
         }
 
-        static void reset() noexcept
-        {
+        static void reset() noexcept {
             s_aliveCount = 0;
         }
 
         [[nodiscard]]
-        static int aliveCount() noexcept
-        {
+        static int aliveCount() noexcept {
             return s_aliveCount;
         }
 
@@ -38,44 +32,32 @@ namespace
         inline static int s_aliveCount = 0;
     };
 
-
-    void testSingletonDestroyedWithContainer()
-    {
-        constexpr std::string_view testName =
-            "Singleton instance destroyed with container";
+    void testSingletonDestroyedWithContainer() {
+        constexpr std::string_view testName = "Singleton instance destroyed with container";
 
         TrackedSingleton::reset();
 
         {
             di::Container container;
 
-            container.addService<TrackedSingleton>(
-                di::ServiceLifetime::Singleton
-            );
+            container.addService<TrackedSingleton>(di::ServiceLifetime::Singleton);
 
             container.finalizeRegistrations();
 
             auto scope = container.createScope();
 
             [[maybe_unused]]
-            auto& singleton =
-                scope.resolve<TrackedSingleton>();
+            auto& singleton = scope.resolve<TrackedSingleton>();
 
             if (TrackedSingleton::aliveCount() != 1) {
-                testing::fail(
-                    testName,
-                    "Singleton was not alive after resolution"
-                );
+                testing::fail(testName, "Singleton was not alive after resolution");
 
                 return;
             }
         }
 
         if (TrackedSingleton::aliveCount() != 0) {
-            testing::fail(
-                testName,
-                "Singleton survived container destruction"
-            );
+            testing::fail(testName, "Singleton survived container destruction");
 
             return;
         }
@@ -84,9 +66,7 @@ namespace
     }
 }
 
-
-int main()
-{
+int main() {
     testSingletonDestroyedWithContainer();
 
     return 0;

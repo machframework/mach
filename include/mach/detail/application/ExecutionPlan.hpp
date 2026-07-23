@@ -11,14 +11,14 @@
 
 namespace mach::detail::application
 {
-	struct ExecutionPlan {
-		routing::RoutingStatus status = routing::RoutingStatus::NotFound;
-		routing::RouteEndpoint* endpoint = nullptr;
-		std::unordered_map<std::string, std::string> params;
-		std::unordered_set<mach::http::Method> allowedMethods;
+    struct ExecutionPlan {
+        routing::RoutingStatus status = routing::RoutingStatus::NotFound;
+        routing::RouteEndpoint* endpoint = nullptr;
+        std::unordered_map<std::string, std::string> params;
+        std::unordered_set<mach::http::Method> allowedMethods;
 
-		bool found() const noexcept {
-			return status == routing::RoutingStatus::Found;
-		}
-	};
+        bool found() const noexcept {
+            return status == routing::RoutingStatus::Found;
+        }
+    };
 }

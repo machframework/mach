@@ -7,192 +7,167 @@
 #include <mach/detail/di/Scope.hpp>
 #include <mach/detail/di/ServiceLifetime.hpp>
 
-
 class Logger {
 public:
-	void Log(const std::string& value) {
-		std::cout << value << std::endl;
-	}
+    void Log(const std::string& value) {
+        std::cout << value << std::endl;
+    }
 };
 
 class Db {
 public:
-	Db(Logger logger) {
-		m_logger = logger;
-	}
+    Db(Logger logger) {
+        m_logger = logger;
+    }
 
-	int query() {
-		return 40;
-	}
+    int query() {
+        return 40;
+    }
 
 private:
-	Logger m_logger;
+    Logger m_logger;
 };
 
 class UserService {
 public:
-	UserService(Db userDb)
-		: m_userDb(userDb)
-	{
-	}
+    UserService(Db userDb) : m_userDb(userDb) {}
 
 private:
-	Db m_userDb;
+    Db m_userDb;
 };
 
 namespace di = mach::detail::di;
 
 int main() {
-	// setup
-	di::Container container;
+    // setup
+    di::Container container;
 
-	container.addService<Logger>(di::ServiceLifetime::Scoped);
+    container.addService<Logger>(di::ServiceLifetime::Scoped);
 
-	{
-		// same scope, should be the same object
-		const std::string testName = "Objects from same scope test";
+    {
+        // same scope, should be the same object
+        const std::string testName = "Objects from same scope test";
 
-		auto s = container.createScope();
+        auto s = container.createScope();
 
-		auto& logger1 = s.resolve<Logger>();
-		auto& logger2 = s.resolve<Logger>();
+        auto& logger1 = s.resolve<Logger>();
+        auto& logger2 = s.resolve<Logger>();
 
-		if (&logger1 != &logger2) {
-			testing::fail(testName, "Ojbects are supposed to be the same");
-			return 1;
-		}
+        if (&logger1 != &logger2) {
+            testing::fail(testName, "Ojbects are supposed to be the same");
+            return 1;
+        }
 
-		std::cout
-			<< testing::GREEN
-			<< "[SUCCESS] " << testName << " passed!"
-			<< testing::RESET
-			<< std::endl;
-	}
-	
-	{
-		// different scopes, should be different objects
-		const std::string testName = "Objects from different scopes test";
+        std::cout << testing::GREEN << "[SUCCESS] " << testName << " passed!" << testing::RESET
+                  << std::endl;
+    }
 
-		auto s1 = container.createScope();
-		auto s2 = container.createScope();
+    {
+        // different scopes, should be different objects
+        const std::string testName = "Objects from different scopes test";
 
-		auto& logger1 = s1.resolve<Logger>();
-		auto& logger2 = s2.resolve<Logger>();
+        auto s1 = container.createScope();
+        auto s2 = container.createScope();
 
-		if (&logger1 == &logger2) {
-			testing::fail(testName, "Objects were supposed to be different");
-			return 1;
-		}
+        auto& logger1 = s1.resolve<Logger>();
+        auto& logger2 = s2.resolve<Logger>();
 
-		std::cout
-			<< testing::GREEN
-			<< "[SUCCESS] " << testName << " passed!"
-			<< testing::RESET
-			<< std::endl;
-	}
+        if (&logger1 == &logger2) {
+            testing::fail(testName, "Objects were supposed to be different");
+            return 1;
+        }
 
-	{
-		// singleton, same scope, same object
-		const std::string testName = "Singleton objects in the same scope test";
+        std::cout << testing::GREEN << "[SUCCESS] " << testName << " passed!" << testing::RESET
+                  << std::endl;
+    }
 
-		di::Container container;
-		container.addService<Logger>(di::ServiceLifetime::Singleton);
+    {
+        // singleton, same scope, same object
+        const std::string testName = "Singleton objects in the same scope test";
 
-		auto s = container.createScope();
-		auto& logger1 = s.resolve<Logger>();
-		auto& logger2 = s.resolve<Logger>();
+        di::Container container;
+        container.addService<Logger>(di::ServiceLifetime::Singleton);
 
-		if (&logger1 != &logger2) {
-			testing::fail(testName, "Should've been the same object");
-			return 1;
-		}
+        auto s = container.createScope();
+        auto& logger1 = s.resolve<Logger>();
+        auto& logger2 = s.resolve<Logger>();
 
-		std::cout
-			<< testing::GREEN
-			<< "[SUCCESS] " << testName << " passed!"
-			<< testing::RESET
-			<< std::endl;
-	}
+        if (&logger1 != &logger2) {
+            testing::fail(testName, "Should've been the same object");
+            return 1;
+        }
 
-	{
-		// singleton, different scopes, same object
-		const std::string testName = "Singleton objects in different scopes test";
+        std::cout << testing::GREEN << "[SUCCESS] " << testName << " passed!" << testing::RESET
+                  << std::endl;
+    }
 
-		di::Container container;
-		container.addService<Logger>(di::ServiceLifetime::Singleton);
+    {
+        // singleton, different scopes, same object
+        const std::string testName = "Singleton objects in different scopes test";
 
-		auto s1 = container.createScope();
-		auto s2 = container.createScope();
+        di::Container container;
+        container.addService<Logger>(di::ServiceLifetime::Singleton);
 
-		auto& logger1 = s1.resolve<Logger>();
-		auto& logger2 = s2.resolve<Logger>();
+        auto s1 = container.createScope();
+        auto s2 = container.createScope();
 
-		if (&logger1 != &logger2) {
-			testing::fail(testName, "Should've been the same object");
-			return 1;
-		}
+        auto& logger1 = s1.resolve<Logger>();
+        auto& logger2 = s2.resolve<Logger>();
 
-		std::cout
-			<< testing::GREEN
-			<< "[SUCCESS] " << testName << " passed!"
-			<< testing::RESET
-			<< std::endl;
-	}
+        if (&logger1 != &logger2) {
+            testing::fail(testName, "Should've been the same object");
+            return 1;
+        }
 
-	{
-		// transient, same scope, different objects
-		const std::string testName = "Transient objects in the same scope test";
+        std::cout << testing::GREEN << "[SUCCESS] " << testName << " passed!" << testing::RESET
+                  << std::endl;
+    }
 
-		di::Container container;
-		container.addService<Logger>(di::ServiceLifetime::Transient);
+    {
+        // transient, same scope, different objects
+        const std::string testName = "Transient objects in the same scope test";
 
-		auto s = container.createScope();
+        di::Container container;
+        container.addService<Logger>(di::ServiceLifetime::Transient);
 
-		auto& logger1 = s.resolve<Logger>();
-		auto& logger2 = s.resolve<Logger>();
+        auto s = container.createScope();
 
-		if (&logger1 == &logger2) {
-			testing::fail(testName, "Should've been different objects");
-			return 1;
-		}
+        auto& logger1 = s.resolve<Logger>();
+        auto& logger2 = s.resolve<Logger>();
 
-		std::cout
-			<< testing::GREEN
-			<< "[SUCCESS] " << testName << " passed!"
-			<< testing::RESET
-			<< std::endl;
-	}
+        if (&logger1 == &logger2) {
+            testing::fail(testName, "Should've been different objects");
+            return 1;
+        }
 
-	{
-		// transient, different scopes, different objects
-		const std::string testName = "Transient objects in different scopes";
+        std::cout << testing::GREEN << "[SUCCESS] " << testName << " passed!" << testing::RESET
+                  << std::endl;
+    }
 
-		di::Container container;
-		container.addService<Logger>(di::ServiceLifetime::Transient);
+    {
+        // transient, different scopes, different objects
+        const std::string testName = "Transient objects in different scopes";
 
-		auto s1 = container.createScope();
-		auto s2 = container.createScope();
+        di::Container container;
+        container.addService<Logger>(di::ServiceLifetime::Transient);
 
-		auto& logger1 = s1.resolve<Logger>();
-		auto& logger2 = s2.resolve<Logger>();
+        auto s1 = container.createScope();
+        auto s2 = container.createScope();
 
-		if (&logger1 == &logger2) {
-			testing::fail(testName, "Should've been different objects");
-			return 1;
-		}
+        auto& logger1 = s1.resolve<Logger>();
+        auto& logger2 = s2.resolve<Logger>();
 
-		std::cout
-			<< testing::GREEN
-			<< "[SUCCESS] " << testName << " passed!"
-			<< testing::RESET
-			<< std::endl;
-	}
-	
-	std::cout
-		<< testing::GREEN
-		<< "\n[SUCCESS] DI Lifetime tests passed!"
-		<< testing::RESET
-		<< std::endl;
+        if (&logger1 == &logger2) {
+            testing::fail(testName, "Should've been different objects");
+            return 1;
+        }
 
-	return 0;
+        std::cout << testing::GREEN << "[SUCCESS] " << testName << " passed!" << testing::RESET
+                  << std::endl;
+    }
+
+    std::cout << testing::GREEN << "\n[SUCCESS] DI Lifetime tests passed!" << testing::RESET
+              << std::endl;
+
+    return 0;
 }
