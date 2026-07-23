@@ -1,47 +1,44 @@
+#include <exception>
 #include <iostream>
-#include <string>
+#include <string_view>
+#include <thread>
 
 #include <mach/controllers.hpp>
-
-struct Person {
-	std::string name;
-	int age;
-};
-
-MACH_DEFINE_JSON(Person, name, age)
 
 class HomeController : public mach::ControllerBase {
 
 public:
-	inline static std::string route = "/home";
+    inline static constexpr std::string_view route = "/home";
 
-	[[mach::get]]
-	mach::Reply<int> calculateAge() {
-		constexpr int currentYear = 2026;
-		
-		int birthYear = request().routeParam<int>("birth");
-		int age = currentYear - birthYear;
+    mach::Reply<int> calculateAge()
+    {
+        constexpr int currentYear = 2026;
 
-		std::cout << "I am " << age << "\n";
+        const int birthYear = request().routeParam<int>("birth");
+        const int age = currentYear - birthYear;
 
-		return ok(age);
-	}
+        return ok(age);
+    }
 
-	[[mach::get("/hi")]]
-	mach::Reply<std::string> sayHi() {
-		return ok("Hi");
-	}
-	
-	static void configure(mach::ControllerBuilder<HomeController>& routes) {
-		routes.mapGet("/{birth:int}", &HomeController::calculateAge);
-		routes.mapGet("/hi" ,& HomeController::sayHi);
-	}
+    mach::Reply<std::string> sayHi()
+    {
+        return ok("Hi");
+    }
+
+    static void configure(mach::ControllerBuilder<HomeController>& routes)
+    {
+        routes.mapGet("/{birth:int}", &HomeController::calculateAge);
+        routes.mapGet("/hi", &HomeController::sayHi);
+    }
 };
 
-int main() {
-	auto builder = mach::AppBuilder("127.0.0.1", 3143, 12);
-	builder.addController<HomeController>();
+int main()
+{
+    const auto hardwareThreads = std::thread::hardware_concurrency();
+    auto builder = mach::AppBuilder("127.0.0.1", 3143, hardwareThreads);
 
-	auto app = builder.build();
-	return app.run();
+    builder.addController<HomeController>();
+    auto app = builder.build();
+
+    return app.run();
 }
