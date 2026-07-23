@@ -47,12 +47,33 @@ namespace mach::detail::server
         // Open the acceptor
         m_acceptor.open(endpoint.protocol(), ec);
         if (ec) {
-            Logger::error("Failed to open acceptor");
             throw std::runtime_error("Failed to open acceptor: " + ec.message());
         }
 
-        // Allow address reuse
+#ifdef _WIN32
+
+        BOOL exclusiveAddressUse = TRUE;
+
+        if (::setsockopt(
+            m_acceptor.native_handle(),
+            SOL_SOCKET,
+            SO_EXCLUSIVEADDRUSE,
+            reinterpret_cast<const char*>(&exclusiveAddressUse),
+            sizeof(exclusiveAddressUse)
+        ) == SOCKET_ERROR)
+        {
+            ec.assign(
+                ::WSAGetLastError(),
+                boost::system::system_category()
+            );
+        }
+
+#else
+
         m_acceptor.set_option(net::socket_base::reuse_address(true), ec);
+
+#endif
+
         if (ec) {
             throw std::runtime_error(
                 "Failed to configure socket options: " + ec.message()

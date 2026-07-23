@@ -112,53 +112,77 @@ namespace mach
 		m_middlewarePipeline(std::move(middlewarePipeline))
 	{ }
 
-	int App::Impl::run() {
+	int App::Impl::run()
+	{
 		detail::server::Server* server = nullptr;
 
 		{
 			std::lock_guard lock(m_serverMutex);
 
+			if (m_state == AppState::Running) {
+				throw std::logic_error(
+					"The application is already running"
+				);
+			}
+
 			if (m_state != AppState::Ready) {
-				if (m_state == AppState::Running) {
-					throw std::logic_error("The application is already running");
-				}
-				else {
-					throw std::logic_error("The application has already run");
-				}
+				throw std::logic_error(
+					"The application has already run"
+				);
 			}
 
+			// This is redundant if state is authoritative.
 			if (m_server) {
-				throw std::logic_error("The application is already running");
+				throw std::logic_error(
+					"The application is already running"
+				);
 			}
 
-			// add router to container
-			m_container.addSingletonInstance<detail::routing::Router>(std::move(m_router));
+			m_container.addSingletonInstance<detail::routing::Router>(
+				std::move(m_router)
+			);
+
 			m_container.finalizeRegistrations();
 
-			m_server = std::make_unique<detail::server::Server>(
-				std::move(m_serverOptions),
-				std::move(m_container),
-				std::move(m_middlewarePipeline)
-			);
+			m_server =
+				std::make_unique<detail::server::Server>(
+					std::move(m_serverOptions),
+					std::move(m_container),
+					std::move(m_middlewarePipeline)
+				);
 
 			server = m_server.get();
 			m_state = AppState::Running;
 		}
 
+		int result = 0;
+
 		try {
 			server->run();
-
-			{
-				std::lock_guard lock(m_serverMutex);
-				m_server.reset();
-			}
-
-			return 0;
 		}
-		catch (const std::exception& ex) {
-			std::cout << "Mach error: " << ex.what() << std::endl;
-			return 1;
+		catch (const std::exception& exception) {
+			std::cout
+				<< "Mach error: "
+				<< exception.what()
+				<< '\n';
+
+			result = 1;
 		}
+		catch (...) {
+			std::cout
+				<< "Mach error: unknown server failure\n";
+
+			result = 1;
+		}
+
+		{
+			std::lock_guard lock(m_serverMutex);
+
+			m_server.reset();
+			m_state = AppState::Stopped;
+		}
+
+		return result;
 	}
 
 	void App::Impl::stop() {
@@ -167,11 +191,11 @@ namespace mach
 		{
 			std::lock_guard lock(m_serverMutex);
 			server = m_server.get();
-		}
 
-		if (server && m_state == AppState::Running) {
-			server->stop();
-			m_state = AppState::Stopped;
+			if (server && m_state == AppState::Running) {
+				server->stop();
+				m_state = AppState::Stopped;
+			}
 		}
 	}
 
