@@ -17,6 +17,23 @@
 
 namespace mach
 {
+    /**
+     * Configures routes for a controller.
+     *
+     * Used to associate HTTP routes with member functions of a controller before
+     * the application is built.
+     *
+     * ControllerBuilder is obtained from AppBuilder and is not intended to be
+     * instantiated directly.
+     *
+     * @tparam TController The controller type being configured.
+     *
+     * Thread safety:
+     * - Not thread-safe. Controller configuration should be performed from one thread.
+     *
+     * Stability:
+     * - This API is still experimental and may change before Mach's first stable release.
+     */
     template <typename TController>
     class ControllerBuilder {
 
@@ -27,39 +44,129 @@ namespace mach
         ControllerBuilder(ControllerBuilder&&) = delete;
         ControllerBuilder& operator=(ControllerBuilder&&) = delete;
 
+        /**
+         * Maps an HTTP GET route to a controller action.
+         *
+         * @tparam THandler The type of the controller action.
+         * @param pattern The route pattern, relative to the controller's base route.
+         * @param handler The controller action to invoke.
+         * @return A reference to this builder.
+         */
         template <typename THandler>
         ControllerBuilder<TController>& mapGet(std::string_view pattern, THandler&& handler);
 
+        /**
+         * Maps the controller's base route to an HTTP GET controller action.
+         *
+         * @tparam THandler The type of the controller action.
+         * @param handler The controller action to invoke.
+         * @return A reference to this builder.
+         */
         template <typename THandler>
         ControllerBuilder<TController>& mapGet(THandler&& handler);
 
+        /**
+         * Maps an HTTP POST route to a controller action.
+         *
+         * @tparam THandler The type of the controller action.
+         * @param pattern The route pattern, relative to the controller's base route.
+         * @param handler The controller action to invoke.
+         * @return A reference to this builder.
+         */
         template <typename THandler>
         ControllerBuilder<TController>& mapPost(std::string_view pattern, THandler&& handler);
 
+        /**
+         * Maps the controller's base route to an HTTP POST controller action.
+         *
+         * @tparam THandler The type of the controller action.
+         * @param handler The controller action to invoke.
+         * @return A reference to this builder.
+         */
         template <typename THandler>
         ControllerBuilder<TController>& mapPost(THandler&& handler);
 
+        /**
+         * Maps an HTTP PUT route to a controller action.
+         *
+         * @tparam THandler The type of the controller action.
+         * @param pattern The route pattern, relative to the controller's base route.
+         * @param handler The controller action to invoke.
+         * @return A reference to this builder.
+         */
         template <typename THandler>
         ControllerBuilder<TController>& mapPut(std::string_view pattern, THandler&& handler);
 
+        /**
+         * Maps the controller's base route to an HTTP PUT controller action.
+         *
+         * @tparam THandler The type of the controller action.
+         * @param handler The controller action to invoke.
+         * @return A reference to this builder.
+         */
         template <typename THandler>
         ControllerBuilder<TController>& mapPut(THandler&& handler);
 
+        /**
+         * Maps an HTTP PATCH route to a controller action.
+         *
+         * @tparam THandler The type of the controller action.
+         * @param pattern The route pattern, relative to the controller's base route.
+         * @param handler The controller action to invoke.
+         * @return A reference to this builder.
+         */
         template <typename THandler>
         ControllerBuilder<TController>& mapPatch(std::string_view pattern, THandler&& handler);
 
+        /**
+         * Maps the controller's base route to an HTTP PATCH controller action.
+         *
+         * @tparam THandler The type of the controller action.
+         * @param handler The controller action to invoke.
+         * @return A reference to this builder.
+         */
         template <typename THandler>
         ControllerBuilder<TController>& mapPatch(THandler&& handler);
 
+        /**
+         * Maps an HTTP DELETE route to a controller action.
+         *
+         * @tparam THandler The type of the controller action.
+         * @param pattern The route pattern, relative to the controller's base route.
+         * @param handler The controller action to invoke.
+         * @return A reference to this builder.
+         */
         template <typename THandler>
         ControllerBuilder<TController>& mapDelete(std::string_view pattern, THandler&& handler);
 
+        /**
+         * Maps the controller's base route to an HTTP DELETE controller action.
+         *
+         * @tparam THandler The type of the controller action.
+         * @param handler The controller action to invoke.
+         * @return A reference to this builder.
+         */
         template <typename THandler>
         ControllerBuilder<TController>& mapDelete(THandler&& handler);
 
+        /**
+         * Maps an HTTP HEAD route to a controller action.
+         *
+         * @tparam THandler The type of the controller action.
+         * @param pattern The route pattern, relative to the controller's base route.
+         * @param handler The controller action to invoke.
+         * @return A reference to this builder.
+         */
         template <typename THandler>
         ControllerBuilder<TController>& mapHead(std::string_view pattern, THandler&& handler);
 
+        /**
+         * Maps the controller's base route to an HTTP HEAD controller action.
+         *
+         * @tparam THandler The type of the controller action.
+         * @param handler The controller action to invoke.
+         * @return A reference to this builder.
+         */
         template <typename THandler>
         ControllerBuilder<TController>& mapHead(THandler&& handler);
 
