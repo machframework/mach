@@ -17,9 +17,9 @@
 
 #include <boost/asio/awaitable.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/beast/core/tcp_stream.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/core/flat_buffer.hpp>
+#include <boost/beast/core/tcp_stream.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/http/message.hpp>
 #include <boost/beast/http/parser.hpp>
@@ -33,10 +33,10 @@
 
 namespace mach::detail::server
 {
-    namespace beast = boost::beast;         // from <boost/beast.hpp>
-    namespace http = beast::http;           // from <boost/beast/http.hpp>
-    namespace net = boost::asio;            // from <boost/asio.hpp>
-    using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
+    namespace beast = boost::beast;   // from <boost/beast.hpp>
+    namespace http = beast::http;     // from <boost/beast/http.hpp>
+    namespace net = boost::asio;      // from <boost/asio.hpp>
+    using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
 
     using mach::detail::logging::Logger;
 
@@ -50,8 +50,7 @@ namespace mach::detail::server
             tcp::socket socket,
             detail::application::Runtime& runtime,
             detail::http::adapter::BeastRequestAdapter& requestAdapter,
-            detail::http::adapter::BeastResponseAdapter& responseAdapter
-        );
+            detail::http::adapter::BeastResponseAdapter& responseAdapter);
 
         // Start the asynchronous operation
         net::awaitable<void> run();
@@ -79,16 +78,15 @@ namespace mach::detail::server
 
     template <typename Body, typename Allocator>
     http::message_generator BeastSession::handle_request(
-        http::request<Body, http::basic_fields<Allocator>>&& req)
-    {
+        http::request<Body, http::basic_fields<Allocator>>&& req) {
         bool keepAlive = req.keep_alive();
         auto version = req.version();
 
         bool adapterRejectedRequest = false;
-        
+
         try {
             auto context = m_requestAdapter.adapt(std::move(req), adapterRejectedRequest);
-			auto method = context.request.method();
+            auto method = context.request.method();
 
 #ifndef NDEBUG
             Logger::info(std::format("Received request: {}", context.request.target()));
@@ -104,27 +102,25 @@ namespace mach::detail::server
             res.set(http::field::content_type, "text/plain");
             res.keep_alive(keepAlive);
 
-            if (res.result() == http::status::no_content
-                || res.result() == http::status::not_modified) {
-				res.body().clear();
+            if (res.result() == http::status::no_content ||
+                res.result() == http::status::not_modified) {
+                res.body().clear();
             }
 
             res.prepare_payload();
 
-			if (method == mach::http::Method::Head) {
+            if (method == mach::http::Method::Head) {
                 const auto bodySize = res.body().size();
 
                 res.body().clear();
                 res.content_length(bodySize);
-			}
+            }
 
             return res;
-        }
-        catch (const std::exception& ex) {
+        } catch (const std::exception& ex) {
             Logger::error(std::format("Request handling failed: {}", ex.what()));
             return makeReadErrorResponse(mach::http::StatusCode::InternalServerError);
-        }
-        catch (...) {
+        } catch (...) {
             Logger::error("Request handling failed with unknown exception.");
             return makeReadErrorResponse(mach::http::StatusCode::InternalServerError);
         }

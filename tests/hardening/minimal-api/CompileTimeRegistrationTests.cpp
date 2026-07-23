@@ -4,22 +4,22 @@
 #include "Testing.hpp"
 
 static void doNothing(mach::Context& context) {
-	context.response.setHeader("X-Arrived", "1");
+    context.response.setHeader("X-Arrived", "1");
 }
 
 int main() {
-	mach::AppBuilder builder(std::move(testing::serverOptions));
-	auto app = builder.build();
+    mach::AppBuilder builder(std::move(testing::serverOptions));
+    auto app = builder.build();
 
-	int count = 0;
+    int count = 0;
 
-	app.mapGet("/noexcept", [count]() mutable noexcept {
-		count++;
-		});
-	
-	app.mapGet("/free-function", doNothing);
+    app.mapGet("/noexcept", [count]() mutable noexcept {
+        count++;
+    });
 
-	app.mapGet("/pointer", &doNothing);
+    app.mapGet("/free-function", doNothing);
 
-	return app.run();
+    app.mapGet("/pointer", &doNothing);
+
+    return app.run();
 }

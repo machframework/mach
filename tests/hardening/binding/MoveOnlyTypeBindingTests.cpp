@@ -7,8 +7,7 @@
 
 #include <mach/detail/binding/BodyBinder.hpp>
 
-struct MoveOnlyDto
-{
+struct MoveOnlyDto {
     std::string name;
     int age;
 

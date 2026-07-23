@@ -1,9 +1,8 @@
-#include <iostream>
 #include <string>
+#include <thread>
+#include <utility>
 
-#include <mach/AppBuilder.hpp>
-#include <mach/Json.hpp>
-#include <mach/results/Results.hpp>
+#include <mach/mach.hpp>
 
 struct CreateUserRequest {
     std::string name;
@@ -21,41 +20,28 @@ struct UserProfile {
 MACH_DEFINE_JSON(UserProfile, name, age, adult)
 
 int main() {
-    auto builder = mach::AppBuilder("127.0.0.1", 3143, 16);
+    const auto hardwareThreads = std::thread::hardware_concurrency();
+    auto builder = mach::AppBuilder("127.0.0.1", 3143, hardwareThreads);
+
     auto app = builder.build();
 
-    app.mapGet("/users/create", [](CreateUserRequest request) {
-        const bool adult = request.age >= 18;
+    app.mapPost("/users", [](CreateUserRequest request) {
+        return mach::ok(
+            UserProfile{
+                .name = std::move(request.name),
+                .age = request.age,
+                .adult = request.age >= 18});
+    });
 
-        std::cout << "Creating user: "
-            << request.name << ", age " << request.age << "\n";
+    app.mapPost("/users/debug", [](mach::Context& context, CreateUserRequest request) {
+        context.response.setHeader("X-User-Age", std::to_string(request.age));
 
-        return mach::ok(UserProfile{
-            .name = request.name,
-            .age = request.age,
-            .adult = adult
-            });
-        });
+        return mach::ok(
+            UserProfile{
+                .name = std::move(request.name),
+                .age = request.age,
+                .adult = request.age >= 18});
+    });
 
-    app.mapGet("/debug/context", [](mach::Context& context) {
-        context.response.setHeader("X-Mach-Example", "body-binding");
-
-        return mach::ok("Context reached");
-        });
-
-    app.mapGet("/debug/context/request", [](mach::Context& context, CreateUserRequest request) {
-        context.response.setHeader("X-Age", std::to_string(request.age));
-        context.response.setHeader("X-Name", request.name);
-
-        return mach::ok("Context + DTO reached");
-        });
-
-    app.mapGet("/debug/request/context", [](CreateUserRequest request, mach::Context& context) {
-        context.response.setHeader("X-Age", std::to_string(request.age));
-        context.response.setHeader("X-Name", request.name);
-
-        return mach::ok("DTO + Context reached");
-        });
-
-    return app.run();;
+    return app.run();
 }

@@ -1,22 +1,20 @@
 #include <string>
 
- #include <mach/detail/di/Container.hpp>
+#include <mach/detail/di/Container.hpp>
 
-namespace test_compile_di {
+namespace test_compile_di
+{
 
     struct Logger {};
 
     struct Repository {
-        explicit Repository(Logger& logger)
-            : logger(logger) {}
+        explicit Repository(Logger& logger) : logger(logger) {}
 
         Logger& logger;
     };
 
     struct Service {
-        Service(Repository& repository, Logger& logger)
-            : repository(repository),
-            logger(logger) {}
+        Service(Repository& repository, Logger& logger) : repository(repository), logger(logger) {}
 
         Repository& repository;
         Logger& logger;
@@ -50,7 +48,7 @@ static void runDiRegistrationCompileTests() {
     //    di::Container container;
     //    container.addService<int>(di::ServiceLifetime::Scoped);
     //}
-    
+
     //{
     //    const std::string testName = "Invalid string service registration fails to compile";
 

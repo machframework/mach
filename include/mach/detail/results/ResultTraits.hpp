@@ -3,7 +3,7 @@
 #include <concepts>
 #include <type_traits>
 
-#include <mach/results/Reply.hpp>
+#include <mach/Reply.hpp>
 
 namespace mach::detail::results::traits
 {
@@ -14,6 +14,5 @@ namespace mach::detail::results::traits
     struct is_reply<mach::Reply<T>> : std::true_type {};
 
     template <typename T>
-    concept ReplyResult =
-        is_reply<std::remove_cvref_t<T>>::value;
+    concept ReplyResult = is_reply<std::remove_cvref_t<T>>::value;
 }

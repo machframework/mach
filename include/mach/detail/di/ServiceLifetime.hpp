@@ -2,9 +2,9 @@
 
 namespace mach::detail::di
 {
-	enum class ServiceLifetime {
-		Scoped,
-		Singleton,
-		Transient
-	};
+    enum class ServiceLifetime {
+        Scoped,
+        Singleton,
+        Transient
+    };
 }

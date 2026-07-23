@@ -25,8 +25,7 @@ class Dependency {};
 class MiddlewareWithDependency {
 
 public:
-    explicit MiddlewareWithDependency(Dependency&)
-    {}
+    explicit MiddlewareWithDependency(Dependency&) {}
 
     void invoke(mach::Context&, mach::Next& next) {
         next();
@@ -52,46 +51,39 @@ public:
 class ContextByValueMiddleware {
 
 public:
-    void invoke(mach::Context, mach::Next&)
-    {}
+    void invoke(mach::Context, mach::Next&) {}
 };
 
 class ConstContextMiddleware {
 
 public:
-    void invoke(const mach::Context&, mach::Next&)
-    {}
+    void invoke(const mach::Context&, mach::Next&) {}
 };
 
 class NextByValueMiddleware {
 
 public:
-    void invoke(mach::Context&, mach::Next)
-    {}
+    void invoke(mach::Context&, mach::Next) {}
 };
 
 class ConstNextMiddleware {
 
 public:
-    void invoke(mach::Context&, const mach::Next&)
-    {}
+    void invoke(mach::Context&, const mach::Next&) {}
 };
 
 class ExtraParameterMiddleware {
 
 public:
-    void invoke(mach::Context&, mach::Next&, int)
-    {}
+    void invoke(mach::Context&, mach::Next&, int) {}
 };
 
 class WrongOverloadedMiddleware {
 
 public:
-    void invoke(mach::Context&)
-    {}
+    void invoke(mach::Context&) {}
 
-    void invoke(mach::Context&, const mach::Next&)
-    {}
+    void invoke(mach::Context&, const mach::Next&) {}
 };
 
 class ControllerMiddleware final : public mach::ControllerBase {
@@ -99,8 +91,7 @@ class ControllerMiddleware final : public mach::ControllerBase {
 public:
     static inline constexpr std::string_view route = "/firewall";
 
-    void invoke(mach::Context&, mach::Next&)
-    {}
+    void invoke(mach::Context&, mach::Next&) {}
 };
 
 // ============================================================
@@ -127,115 +118,80 @@ public:
 #endif
 
 int main() {
-    auto builder =
-        mach::AppBuilder(std::move(testing::serverOptions));
+    auto builder = mach::AppBuilder(std::move(testing::serverOptions));
 
 #if MACH_MIDDLEWARE_COMPILE_FAILURE_TEST == 0
 
     builder.use<ValidMiddleware>();
 
-    testing::success(
-        "Valid middleware registration passed!"
-    );
+    testing::success("Valid middleware registration passed!");
 
 #elif MACH_MIDDLEWARE_COMPILE_FAILURE_TEST == 1
 
     builder.addScoped<Dependency>();
     builder.use<MiddlewareWithDependency, Dependency>();
 
-    testing::success(
-        "Middleware constructor injection registration passed!"
-    );
+    testing::success("Middleware constructor injection registration passed!");
 
 #elif MACH_MIDDLEWARE_COMPILE_FAILURE_TEST == 2
 
     builder.use<NonClassMiddleware>();
 
-    testing::fail(
-        "Non-class middleware registration",
-        "Should've been rejected"
-    );
+    testing::fail("Non-class middleware registration", "Should've been rejected");
 
 #elif MACH_MIDDLEWARE_COMPILE_FAILURE_TEST == 3
 
     builder.use<MissingInvokeMiddleware>();
 
-    testing::fail(
-        "Middleware without invoke()",
-        "Should've been rejected"
-    );
+    testing::fail("Middleware without invoke()", "Should've been rejected");
 
 #elif MACH_MIDDLEWARE_COMPILE_FAILURE_TEST == 4
 
     builder.use<NonVoidInvokeMiddleware>();
 
-    testing::fail(
-        "Middleware with a non-void invoke()",
-        "Should've been rejected"
-    );
+    testing::fail("Middleware with a non-void invoke()", "Should've been rejected");
 
 #elif MACH_MIDDLEWARE_COMPILE_FAILURE_TEST == 5
 
     builder.use<ContextByValueMiddleware>();
 
-    testing::fail(
-        "Middleware accepting Context by value",
-        "Should've been rejected"
-    );
+    testing::fail("Middleware accepting Context by value", "Should've been rejected");
 
 #elif MACH_MIDDLEWARE_COMPILE_FAILURE_TEST == 6
 
     builder.use<ConstContextMiddleware>();
 
-    testing::fail(
-        "Middleware accepting const Context&",
-        "Should've been rejected"
-    );
+    testing::fail("Middleware accepting const Context&", "Should've been rejected");
 
 #elif MACH_MIDDLEWARE_COMPILE_FAILURE_TEST == 7
 
     builder.use<NextByValueMiddleware>();
 
-    testing::fail(
-        "Middleware accepting Next by value",
-        "Should've been rejected"
-    );
+    testing::fail("Middleware accepting Next by value", "Should've been rejected");
 
 #elif MACH_MIDDLEWARE_COMPILE_FAILURE_TEST == 8
 
     builder.use<ConstNextMiddleware>();
 
-    testing::fail(
-        "Middleware accepting const Next&",
-        "Should've been rejected"
-    );
+    testing::fail("Middleware accepting const Next&", "Should've been rejected");
 
 #elif MACH_MIDDLEWARE_COMPILE_FAILURE_TEST == 9
 
     builder.use<ExtraParameterMiddleware>();
 
-    testing::fail(
-        "Middleware invoke() with an extra parameter",
-        "Should've been rejected"
-    );
+    testing::fail("Middleware invoke() with an extra parameter", "Should've been rejected");
 
 #elif MACH_MIDDLEWARE_COMPILE_FAILURE_TEST == 10
 
     builder.use<WrongOverloadedMiddleware>();
 
-    testing::fail(
-        "Middleware with invalid invoke() overloads",
-        "Should've been rejected"
-    );
+    testing::fail("Middleware with invalid invoke() overloads", "Should've been rejected");
 
 #elif MACH_MIDDLEWARE_COMPILE_FAILURE_TEST == 11
 
     builder.use<ControllerMiddleware>();
 
-    testing::fail(
-        "Controller registration as middleware",
-        "Should've been rejected"
-    );
+    testing::fail("Controller registration as middleware", "Should've been rejected");
 
 #else
 

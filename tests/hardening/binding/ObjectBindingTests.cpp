@@ -6,8 +6,7 @@
 
 #include <mach/detail/binding/BodyBinder.hpp>
 
-struct AddressDto
-{
+struct AddressDto {
     std::string city;
     std::string street;
 
@@ -16,8 +15,7 @@ struct AddressDto
 
 MACH_DEFINE_JSON(AddressDto, city, street);
 
-struct UserDto
-{
+struct UserDto {
     std::string name;
     AddressDto address;
 };

@@ -8,11 +8,11 @@
 
 namespace mach::detail::exceptions
 {
-	class ExceptionMiddleware {
+    class ExceptionMiddleware {
 
-	public:
-		explicit ExceptionMiddleware() = default;
+    public:
+        explicit ExceptionMiddleware() = default;
 
-		void invoke(mach::Context& context, mach::Next& next);
-	};
+        void invoke(mach::Context& context, mach::Next& next);
+    };
 }

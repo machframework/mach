@@ -10,6 +10,5 @@ namespace mach::detail::http
         std::string_view expectedMediaType) noexcept;
 
     [[nodiscard]]
-    bool hasUnsupportedCharset(
-        std::string_view contentType) noexcept;
+    bool hasUnsupportedCharset(std::string_view contentType) noexcept;
 }

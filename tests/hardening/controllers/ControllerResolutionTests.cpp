@@ -3,10 +3,10 @@
 #include <string>
 #include <string_view>
 
+#include <mach/Reply.hpp>
 #include <mach/controllers/ControllerBase.hpp>
 #include <mach/controllers/ControllerBuilder.hpp>
 #include <mach/diagnostics/TerminateHandler.hpp>
-#include <mach/results/Reply.hpp>
 
 #include <mach/detail/di/Container.hpp>
 #include <mach/detail/di/Scope.hpp>
@@ -16,189 +16,144 @@
 struct ScopedService {};
 
 struct TestController : mach::ControllerBase {
-	static inline std::string route = "/test";
+    static inline std::string route = "/test";
 
-	explicit TestController(ScopedService& service)
-		: service(&service) {}
+    explicit TestController(ScopedService& service) : service(&service) {}
 
-	static void configure(
-		mach::ControllerBuilder<TestController>& routes
-	) {}
+    static void configure(mach::ControllerBuilder<TestController>& routes) {}
 
-	ScopedService* service;
+    ScopedService* service;
 };
 
 struct FlakyScopedDependency {
-	inline static int constructionAttempts = 0;
+    inline static int constructionAttempts = 0;
 
-	FlakyScopedDependency() {
-		++constructionAttempts;
+    FlakyScopedDependency() {
+        ++constructionAttempts;
 
-		if (constructionAttempts == 1) {
-			throw std::runtime_error("boom");
-		}
-	}
+        if (constructionAttempts == 1) {
+            throw std::runtime_error("boom");
+        }
+    }
 };
 
 struct ThrowingController : mach::ControllerBase {
-	static inline std::string route = "/throwing";
+    static inline std::string route = "/throwing";
 
-	explicit ThrowingController(FlakyScopedDependency& dependency)
-		: dependency(&dependency) {}
+    explicit ThrowingController(FlakyScopedDependency& dependency) : dependency(&dependency) {}
 
-	static void configure(
-		mach::ControllerBuilder<ThrowingController>& routes
-	) {}
+    static void configure(mach::ControllerBuilder<ThrowingController>& routes) {}
 
-	FlakyScopedDependency* dependency;
+    FlakyScopedDependency* dependency;
 };
 
 struct Logger {};
 
 struct TestController2 : mach::ControllerBase {
-	explicit TestController2(ScopedService&)
-		: constructorUsed(1) {}
+    explicit TestController2(ScopedService&) : constructorUsed(1) {}
 
-	TestController2(ScopedService&, Logger&)
-		: constructorUsed(2) {}
+    TestController2(ScopedService&, Logger&) : constructorUsed(2) {}
 
-	int constructorUsed;
+    int constructorUsed;
 };
 
 namespace di = mach::detail::di;
 
 int main() {
-	mach::installTerminateHandler();
+    mach::installTerminateHandler();
 
-	di::Container container;
+    di::Container container;
 
-	container.addService<ScopedService>(
-		di::ServiceLifetime::Scoped
-	);
+    container.addService<ScopedService>(di::ServiceLifetime::Scoped);
 
-	container.addService<
-		TestController,
-		ScopedService
-	>(
-		di::ServiceLifetime::Transient,
-		di::ServiceAccess::Internal
-	);
+    container.addService<TestController, ScopedService>(
+        di::ServiceLifetime::Transient,
+        di::ServiceAccess::Internal);
 
-	container.addService<FlakyScopedDependency>(
-		di::ServiceLifetime::Scoped
-	);
+    container.addService<FlakyScopedDependency>(di::ServiceLifetime::Scoped);
 
-	container.addService<
-		ThrowingController,
-		FlakyScopedDependency
-	>(
-		di::ServiceLifetime::Transient,
-		di::ServiceAccess::Internal
-	);
+    container.addService<ThrowingController, FlakyScopedDependency>(
+        di::ServiceLifetime::Transient,
+        di::ServiceAccess::Internal);
 
-	container.addService<Logger>(di::ServiceLifetime::Singleton);
+    container.addService<Logger>(di::ServiceLifetime::Singleton);
 
-	container.addService<
-		TestController2,
-		ScopedService,
-		Logger
-	>(
-		di::ServiceLifetime::Transient,
-		di::ServiceAccess::Internal
-	);
+    container.addService<TestController2, ScopedService, Logger>(
+        di::ServiceLifetime::Transient,
+        di::ServiceAccess::Internal);
 
-	container.finalizeRegistrations();
+    container.finalizeRegistrations();
 
-	{
-		auto scope = container.createScope();
+    {
+        auto scope = container.createScope();
 
-		auto& controller1 = scope.resolve<TestController>();
-		auto& controller2 = scope.resolve<TestController>();
+        auto& controller1 = scope.resolve<TestController>();
+        auto& controller2 = scope.resolve<TestController>();
 
-		assert(&controller1 != &controller2);
-		assert(controller1.service == controller2.service);
+        assert(&controller1 != &controller2);
+        assert(controller1.service == controller2.service);
 
-		testing::success(
-			"Transient controllers differ within the same scope"
-		);
+        testing::success("Transient controllers differ within the same scope");
 
-		testing::success(
-			"Scoped controller dependency is shared within the same scope"
-		);
-	}
+        testing::success("Scoped controller dependency is shared within the same scope");
+    }
 
-	{
-		auto scope1 = container.createScope();
-		auto scope2 = container.createScope();
+    {
+        auto scope1 = container.createScope();
+        auto scope2 = container.createScope();
 
-		auto& controller1 = scope1.resolve<TestController>();
-		auto& controller2 = scope2.resolve<TestController>();
+        auto& controller1 = scope1.resolve<TestController>();
+        auto& controller2 = scope2.resolve<TestController>();
 
-		assert(controller1.service != controller2.service);
+        assert(controller1.service != controller2.service);
 
-		testing::success(
-			"Scoped controller dependency differs between scopes"
-		);
-	}
+        testing::success("Scoped controller dependency differs between scopes");
+    }
 
-	{
-		FlakyScopedDependency::constructionAttempts = 0;
+    {
+        FlakyScopedDependency::constructionAttempts = 0;
 
-		auto scope = container.createScope();
+        auto scope = container.createScope();
 
-		bool exceptionThrown = false;
+        bool exceptionThrown = false;
 
-		try {
-			scope.resolve<ThrowingController>();
-		}
-		catch (const std::runtime_error& exception) {
-			exceptionThrown =
-				std::string_view(exception.what()) == "boom";
-		}
+        try {
+            scope.resolve<ThrowingController>();
+        } catch (const std::runtime_error& exception) {
+            exceptionThrown = std::string_view(exception.what()) == "boom";
+        }
 
-		assert(exceptionThrown);
-		assert(FlakyScopedDependency::constructionAttempts == 1);
+        assert(exceptionThrown);
+        assert(FlakyScopedDependency::constructionAttempts == 1);
 
-		auto& controller = scope.resolve<ThrowingController>();
+        auto& controller = scope.resolve<ThrowingController>();
 
-		assert(controller.dependency != nullptr);
-		assert(FlakyScopedDependency::constructionAttempts == 2);
+        assert(controller.dependency != nullptr);
+        assert(FlakyScopedDependency::constructionAttempts == 2);
 
-		auto& secondController =
-			scope.resolve<ThrowingController>();
+        auto& secondController = scope.resolve<ThrowingController>();
 
-		assert(&controller != &secondController);
-		assert(
-			controller.dependency ==
-			secondController.dependency
-		);
+        assert(&controller != &secondController);
+        assert(controller.dependency == secondController.dependency);
 
-		assert(FlakyScopedDependency::constructionAttempts == 2);
+        assert(FlakyScopedDependency::constructionAttempts == 2);
 
-		testing::success(
-			"Controller construction exception propagates"
-		);
+        testing::success("Controller construction exception propagates");
 
-		testing::success(
-			"Failed scoped dependency construction does not poison the scope cache"
-		);
+        testing::success("Failed scoped dependency construction does not poison the scope cache");
 
-		testing::success(
-			"Scoped dependency is cached after successful retry"
-		);
-	}
+        testing::success("Scoped dependency is cached after successful retry");
+    }
 
-	{
-		auto scope = container.createScope();
+    {
+        auto scope = container.createScope();
 
-		auto& controller = scope.resolve<TestController2>();
+        auto& controller = scope.resolve<TestController2>();
 
-		assert(controller.constructorUsed == 2);
+        assert(controller.constructorUsed == 2);
 
-		testing::success(
-			"Container uses the correct constructor for resolution"
-		);
-	}
+        testing::success("Container uses the correct constructor for resolution");
+    }
 
-	return 0;
+    return 0;
 }

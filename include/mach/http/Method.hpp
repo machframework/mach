@@ -5,38 +5,58 @@
 
 namespace mach::http
 {
-	enum class Method
-	{
-		Get,
-		Post,
-		Put,
-		Patch,
-		Delete,
-		Head,
-		Options,
-		Unknown
-	};
+    /**
+     * Represents an HTTP request method.
+     */
+    enum class Method {
+        Get,
+        Post,
+        Put,
+        Patch,
+        Delete,
+        Head,
+        Options,
 
-	constexpr std::string_view toString(Method method) {
-		switch (method) {
-		case Method::Get: return "GET";
-		case Method::Post: return "POST";
-		case Method::Put: return "PUT";
-		case Method::Patch: return "PATCH";
-		case Method::Delete: return "DELETE";
-		case Method::Head: return "HEAD";
-		case Method::Options: return "OPTIONS";
-		default: return "UNKNOWN";
-		}
-	}
+        /// Represents an unrecognized or unsupported HTTP method.
+        Unknown
+    };
 
-	inline constexpr std::array allMethods{
-	Method::Get,
-	Method::Head,
-	Method::Post,
-	Method::Put,
-	Method::Patch,
-	Method::Delete,
-	Method::Options
-	};
+    /**
+     * Returns the string representation of an HTTP method.
+     *
+     * @param method The HTTP method.
+     * @return The corresponding HTTP method name.
+     */
+    constexpr std::string_view toString(Method method) {
+        switch (method) {
+        case Method::Get:
+            return "GET";
+        case Method::Post:
+            return "POST";
+        case Method::Put:
+            return "PUT";
+        case Method::Patch:
+            return "PATCH";
+        case Method::Delete:
+            return "DELETE";
+        case Method::Head:
+            return "HEAD";
+        case Method::Options:
+            return "OPTIONS";
+        default:
+            return "UNKNOWN";
+        }
+    }
+
+    /**
+     * Contains all HTTP methods supported by Mach.
+     */
+    inline constexpr std::array<Method, 7> allMethods{
+        Method::Get,
+        Method::Head,
+        Method::Post,
+        Method::Put,
+        Method::Patch,
+        Method::Delete,
+        Method::Options};
 }

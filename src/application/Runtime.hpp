@@ -10,23 +10,20 @@
 
 namespace mach::detail::application
 {
-	class Runtime {
+    class Runtime {
 
-	public:
-		Runtime(const Runtime&) = delete;
-		Runtime& operator=(const Runtime&) = delete;
-		Runtime(Runtime&&) = delete;
-		Runtime& operator=(Runtime&&) = delete;
+    public:
+        Runtime(const Runtime&) = delete;
+        Runtime& operator=(const Runtime&) = delete;
+        Runtime(Runtime&&) = delete;
+        Runtime& operator=(Runtime&&) = delete;
 
-		Runtime(
-			di::Container container,
-			middleware::MiddlewarePipeline middlewarePipeline
-		);
+        Runtime(di::Container container, middleware::MiddlewarePipeline middlewarePipeline);
 
-		void handle(mach::Context& context);
+        void handle(mach::Context& context);
 
-	private:
-		di::Container m_container;
-		dispatching::Dispatcher m_dispatcher;
-	};
+    private:
+        di::Container m_container;
+        dispatching::Dispatcher m_dispatcher;
+    };
 }

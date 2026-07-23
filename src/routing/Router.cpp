@@ -16,10 +16,7 @@ namespace
         for (std::size_t i = 0; i < pattern.size(); ++i) {
             if (pattern[i] == delimiter) {
                 if (i > segmentStart) {
-                    segments.emplace_back(
-                        pattern.data() + segmentStart,
-                        i - segmentStart
-                    );
+                    segments.emplace_back(pattern.data() + segmentStart, i - segmentStart);
                 }
 
                 segmentStart = i + 1;
@@ -27,27 +24,24 @@ namespace
         }
 
         if (segmentStart < pattern.size()) {
-            segments.emplace_back(
-                pattern.data() + segmentStart,
-                pattern.size() - segmentStart
-            );
+            segments.emplace_back(pattern.data() + segmentStart, pattern.size() - segmentStart);
         }
 
         return segments;
     }
 
-    //bool isParameter(std::string_view segment) {
-    //    return segment.front() == '{'
-    //        && segment.back() == '}';
-    //}
+    // bool isParameter(std::string_view segment) {
+    //     return segment.front() == '{'
+    //         && segment.back() == '}';
+    // }
 
     bool isParameter(std::string_view segment) {
-        return segment.find('{') != std::string_view::npos
-            && segment.find('}') != std::string_view::npos
-            && segment.find('{') < segment.find('}');
+        return segment.find('{') != std::string_view::npos &&
+               segment.find('}') != std::string_view::npos && segment.find('{') < segment.find('}');
     }
 
-    std::vector<std::string_view> extractParameterSegments(const std::vector<std::string_view>& segments) {
+    std::vector<std::string_view> extractParameterSegments(
+        const std::vector<std::string_view>& segments) {
         std::vector<std::string_view> parameters;
 
         for (const auto& segment : segments) {
@@ -59,7 +53,9 @@ namespace
         return parameters;
     }
 
-    bool containsDuplicateParameters(const std::vector<std::string_view>& parameters, std::string_view& duplicate) {
+    bool containsDuplicateParameters(
+        const std::vector<std::string_view>& parameters,
+        std::string_view& duplicate) {
         std::unordered_set<std::string_view> seen;
 
         for (const auto& param : parameters) {
@@ -89,16 +85,14 @@ namespace
         return std::string(segment);
     }
 
-    bool hasBalancedBracesPerSegment(const std::vector<std::string_view>& segments)
-    {
+    bool hasBalancedBracesPerSegment(const std::vector<std::string_view>& segments) {
         for (const auto segment : segments) {
             int depth = 0;
 
             for (const char ch : segment) {
                 if (ch == '{') {
                     ++depth;
-                }
-                else if (ch == '}') {
+                } else if (ch == '}') {
                     --depth;
 
                     if (depth < 0) {
@@ -115,8 +109,7 @@ namespace
         return true;
     }
 
-    bool hasNestedBraces(const std::vector<std::string_view>& segments)
-    {
+    bool hasNestedBraces(const std::vector<std::string_view>& segments) {
         for (const auto segment : segments) {
             int depth = 0;
 
@@ -127,8 +120,7 @@ namespace
                     if (depth > 1) {
                         return true;
                     }
-                }
-                else if (ch == '}') {
+                } else if (ch == '}') {
                     --depth;
                 }
             }
@@ -161,30 +153,29 @@ namespace
         return false;
     }
 
-    bool parameterOccupiesEntireSegment(std::string_view segment)
-    {
-        return segment.size() >= 2 &&
-            segment.front() == '{' &&
-            segment.find('}') == segment.length() - 1;
+    bool parameterOccupiesEntireSegment(std::string_view segment) {
+        return segment.size() >= 2 && segment.front() == '{' &&
+               segment.find('}') == segment.length() - 1;
     }
 
-	bool parametersOccupyEntireSegments(const std::vector<std::string_view>& segments, std::string_view& invalid)
-	{
-		for (const auto& segment : segments) {
-			if (isParameter(segment) && !parameterOccupiesEntireSegment(segment)) {
-				invalid = segment;
-				return false;
-			}
-		}
-		return true;
-	}
+    bool parametersOccupyEntireSegments(
+        const std::vector<std::string_view>& segments,
+        std::string_view& invalid) {
+        for (const auto& segment : segments) {
+            if (isParameter(segment) && !parameterOccupiesEntireSegment(segment)) {
+                invalid = segment;
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
 namespace mach::detail::routing
 {
-	application::ExecutionPlan Router::route(const mach::Request& request) const {		
+    application::ExecutionPlan Router::route(const mach::Request& request) const {
         application::ExecutionPlan plan{};
-        
+
         auto match = matchRoute(request);
 
         plan.status = match.status;
@@ -195,57 +186,63 @@ namespace mach::detail::routing
         return plan;
     }
 
-	void Router::addRoute(RouteEndpoint&& endpoint) {
+    void Router::addRoute(RouteEndpoint&& endpoint) {
         // enforce syntax
         auto& pattern = endpoint.pattern;
         std::string_view invalid;
 
         if (pattern.empty()) {
             throw std::invalid_argument(
-                std::format("Invalid route definition: Route cannot be empty")
-            );
+                std::format("Invalid route definition: Route cannot be empty"));
         }
         if (pattern.front() != '/') {
             throw std::invalid_argument(
-                std::format("Invalid route definition '{}': Route must begin with '/'", pattern)
-            );
+                std::format("Invalid route definition '{}': Route must begin with '/'", pattern));
         }
         if (containsRepeatedSlash(pattern)) {
             throw std::invalid_argument(
-                std::format("Invalid route definition '{}': Route must not contain consecutive  '/' characters", pattern)
-            );
+                std::format(
+                    "Invalid route definition '{}': Route must not contain consecutive  '/' "
+                    "characters",
+                    pattern));
         }
         if (pattern.length() != 1 && pattern.back() == '/') {
-			// remove trailing slash
+            // remove trailing slash
             pattern.pop_back();
         }
         if (pattern.find('#') != std::string::npos || pattern.find('?') != std::string::npos) {
             throw std::invalid_argument(
-                std::format("Invalid route definition '{}': Route must not contain '?' or '#'", pattern)
-            );
+                std::format(
+                    "Invalid route definition '{}': Route must not contain '?' or '#'",
+                    pattern));
         }
 
-        auto segments = splitToSegments(pattern); 
+        auto segments = splitToSegments(pattern);
 
         if (containsSpaces(segments)) {
             throw std::invalid_argument(
-                std::format("Invalid route definition '{}': Route must not contain whitespace", pattern)
-            );
+                std::format(
+                    "Invalid route definition '{}': Route must not contain whitespace",
+                    pattern));
         }
         if (!hasBalancedBracesPerSegment(segments)) {
             throw std::invalid_argument(
-                std::format("Invalid route definition '{}': Route must contain balanced braces", pattern)
-            );
+                std::format(
+                    "Invalid route definition '{}': Route must contain balanced braces",
+                    pattern));
         }
         if (hasNestedBraces(segments)) {
-			throw std::invalid_argument(
-				std::format("Invalid route definition '{}': Route must not contain nested braces", pattern)
-			);
+            throw std::invalid_argument(
+                std::format(
+                    "Invalid route definition '{}': Route must not contain nested braces",
+                    pattern));
         }
         if (!parametersOccupyEntireSegments(segments, invalid)) {
             throw std::invalid_argument(
-                std::format("Invalid route definition '{}': Route parameters must occupy an entire path segment", pattern)
-            );
+                std::format(
+                    "Invalid route definition '{}': Route parameters must occupy an entire path "
+                    "segment",
+                    pattern));
         }
 
         const auto parameters = extractParameterSegments(segments);
@@ -254,9 +251,7 @@ namespace mach::detail::routing
             throw std::invalid_argument(
                 std::format(
                     "Invalid route definition '{}': Route parameter name cannot be empty",
-                    endpoint.pattern
-                )
-            );
+                    endpoint.pattern));
         }
 
         if (containsDuplicateParameters(parameters, invalid)) {
@@ -264,9 +259,7 @@ namespace mach::detail::routing
                 std::format(
                     "Invalid route definition '{}': Duplicate route parameter '{}'",
                     endpoint.pattern,
-                    extractParameter(invalid)
-                )
-            );
+                    extractParameter(invalid)));
         }
 
         m_endpoints.push_back(std::move(endpoint));
@@ -275,8 +268,8 @@ namespace mach::detail::routing
         m_routes.addRoute(std::move(segments), stored);
     }
 
-	routing::RouteMatch Router::matchRoute(const mach::Request& request) const {
+    routing::RouteMatch Router::matchRoute(const mach::Request& request) const {
         auto segments = splitToSegments(request.target());
         return m_routes.matchRoute(request.method(), std::move(segments));
-	}
+    }
 }

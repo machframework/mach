@@ -7,10 +7,9 @@
 namespace http = boost::beast::http;
 
 static http::request<http::string_body> makeRequest(
-	http::verb method = http::verb::get,
-	std::string target = "/",
-	std::string body = ""
-);
+    http::verb method = http::verb::get,
+    std::string target = "/",
+    std::string body = "");
 
 #include <boost/beast/http.hpp>
 
@@ -33,7 +32,7 @@ static void validRequestAdaptsCorrectly() {
     raw.set("X-Custom-Header", "SomeValue");
 
     bool rejected = false;
-	mach::detail::http::adapter::BeastRequestAdapter adapter;
+    mach::detail::http::adapter::BeastRequestAdapter adapter;
     auto context = adapter.adapt(std::move(raw), rejected);
 
     if (rejected) {
@@ -385,27 +384,25 @@ int main() {
     bodyIsPreservedWhenEmpty();
     bodyIsPreservedExactly();
 
-	testing::success("All tests completed");
+    testing::success("All tests completed");
 
     return 0;
 }
 
 http::request<http::string_body> makeRequest(
-	http::verb method,
-	std::string target,
-	std::string body
-)
-{
-	http::request<http::string_body> req;
+    http::verb method,
+    std::string target,
+    std::string body) {
+    http::request<http::string_body> req;
 
-	req.version(11);
-	req.method(method);
-	req.target(std::move(target));
-	req.body() = std::move(body);
+    req.version(11);
+    req.method(method);
+    req.target(std::move(target));
+    req.body() = std::move(body);
 
-	req.set(http::field::host, "localhost");
-	req.set(http::field::content_type, "application/json");
+    req.set(http::field::host, "localhost");
+    req.set(http::field::content_type, "application/json");
 
-	req.prepare_payload();
-	return req;
+    req.prepare_payload();
+    return req;
 }

@@ -7,57 +7,51 @@
 #include <unordered_map>
 #include <vector>
 
-#include <mach/http/Method.hpp>
-#include <mach/detail/routing/RouteMatch.hpp>
 #include <mach/detail/routing/RouteConstraint.hpp>
+#include <mach/detail/routing/RouteMatch.hpp>
+#include <mach/http/Method.hpp>
 
 namespace mach::detail::routing
 {
-	class RouteTrie {
+    class RouteTrie {
 
-	public:
-		RouteTrie() = default;
+    public:
+        RouteTrie() = default;
 
-		void addRoute(
-			std::vector<std::string_view>&& segments,
-			routing::RouteEndpoint* endpoint
-		);
+        void addRoute(std::vector<std::string_view>&& segments, routing::RouteEndpoint* endpoint);
 
-		routing::RouteMatch matchRoute(
-			mach::http::Method method,
-			std::vector<std::string_view>&& segments
-		) const;
+        routing::RouteMatch matchRoute(
+            mach::http::Method method,
+            std::vector<std::string_view>&& segments) const;
 
-		void debugDump() const;
+        void debugDump() const;
 
-	private:
-		struct RouteNode {
-			std::string segmentKey;
-			std::unordered_map<mach::http::Method, routing::RouteEndpoint*> endpointsByMethod;
+    private:
+        struct RouteNode {
+            std::string segmentKey;
+            std::unordered_map<mach::http::Method, routing::RouteEndpoint*> endpointsByMethod;
 
-			std::unordered_map<std::string, std::unique_ptr<RouteNode>> childrenByStaticSegment;
-			std::unordered_map<std::optional<routing::RouteConstraint>, std::unique_ptr<RouteNode>> constrainedParameterChildren;
+            std::unordered_map<std::string, std::unique_ptr<RouteNode>> childrenByStaticSegment;
+            std::unordered_map<std::optional<routing::RouteConstraint>, std::unique_ptr<RouteNode>>
+                constrainedParameterChildren;
 
-			explicit RouteNode(std::string_view segmentKey = "")
-				: segmentKey(segmentKey)
-			{ }
+            explicit RouteNode(std::string_view segmentKey = "") : segmentKey(segmentKey) {}
 
-			RouteNode(const RouteNode&) = delete;
-			RouteNode& operator=(const RouteNode&) = delete;
+            RouteNode(const RouteNode&) = delete;
+            RouteNode& operator=(const RouteNode&) = delete;
 
-			RouteNode(RouteNode&&) noexcept = default;
-			RouteNode& operator=(RouteNode&&) noexcept = default;
-		};
+            RouteNode(RouteNode&&) noexcept = default;
+            RouteNode& operator=(RouteNode&&) noexcept = default;
+        };
 
-		routing::RouteMatch matchRoute(
-			mach::http::Method method,
-			const std::vector<std::string_view>& segments,
-			std::size_t index,
-			std::vector<std::string>& capturedValues,
-			std::unordered_set<mach::http::Method>& allowedMethods,
-			const RouteNode* curr
-		) const;
+        routing::RouteMatch matchRoute(
+            mach::http::Method method,
+            const std::vector<std::string_view>& segments,
+            std::size_t index,
+            std::vector<std::string>& capturedValues,
+            std::unordered_set<mach::http::Method>& allowedMethods,
+            const RouteNode* curr) const;
 
-		RouteNode m_root;
-	};
+        RouteNode m_root;
+    };
 }

@@ -7,37 +7,30 @@
 
 namespace mach::detail::serialization
 {
-	class Serializer {
+    class Serializer {
 
-	public:
-		template <typename T>
-		static std::string serialize(const T& value);
-	};
-	
+    public:
+        template <typename T>
+        static std::string serialize(const T& value);
+    };
+
     template <typename T>
-    std::string Serializer::serialize(const T& value)
-    {
+    std::string Serializer::serialize(const T& value) {
         if constexpr (std::same_as<std::remove_cvref_t<T>, std::string>) {
             return value;
-        }
-        else if constexpr (std::same_as<std::remove_cvref_t<T>, mach::Json>) {
+        } else if constexpr (std::same_as<std::remove_cvref_t<T>, mach::Json>) {
             return value.dump();
-        }
-        else if constexpr (
-            std::integral<std::remove_cvref_t<T>> ||
-            std::floating_point<std::remove_cvref_t<T>>
-            ) {
+        } else if constexpr (
+            std::integral<std::remove_cvref_t<T>> || std::floating_point<std::remove_cvref_t<T>>
+        ) {
             return std::to_string(value);
-        }
-        else {
+        } else {
             return mach::Json(value).dump();
         }
     }
 
     template <typename T>
-    concept Serializable =
-        requires(const T & value)
-    {
+    concept Serializable = requires(const T& value) {
         { Serializer::serialize(value) } -> std::same_as<std::string>;
     };
 }
