@@ -233,6 +233,18 @@ namespace mach
 		[[nodiscard]]
 		int run();
 
+		/**
+		 * Stops the application and shuts down the HTTP server.
+		 *
+		 * If the application is currently running, this function requests a graceful
+		 * shutdown and causes run() to return once all shutdown operations have
+		 * completed.
+		 *
+		 * Calling this function before run(), after the application has already
+		 * stopped, or multiple times is safe and has no effect.
+		 *
+		 * @thread_safety This function is thread-safe.
+		 */
 		void stop();
 
 	private:
