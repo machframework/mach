@@ -3,7 +3,7 @@
 #include <string>
 
 #include <mach/http/StatusCode.hpp>
-#include <mach/results/Reply.hpp>
+#include <mach/Reply.hpp>
 
 namespace mach
 {

@@ -4,7 +4,7 @@
 #include <mach/App.hpp>
 #include <mach/AppBuilder.hpp>
 #include <mach/Context.hpp>
-#include <mach/results/Reply.hpp>
+#include <mach/Reply.hpp>
 #include <mach/results/Results.hpp>
 
 int main() {

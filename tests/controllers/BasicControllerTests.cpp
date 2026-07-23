@@ -2,7 +2,7 @@
 #include <string_view>
 
 #include <mach/controllers/ControllerBase.hpp>
-#include <mach/results/Reply.hpp>
+#include <mach/Reply.hpp>
 #include <mach/AppBuilder.hpp>
 
 #include <mach/diagnostics/TerminateHandler.hpp>

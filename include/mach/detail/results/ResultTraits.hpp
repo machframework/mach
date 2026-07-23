@@ -3,7 +3,7 @@
 #include <concepts>
 #include <type_traits>
 
-#include <mach/results/Reply.hpp>
+#include <mach/Reply.hpp>
 
 namespace mach::detail::results::traits
 {

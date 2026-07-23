@@ -4,7 +4,7 @@
 
 #include <mach/Context.hpp>
 #include <mach/results/Results.hpp>
-#include <mach/results/Reply.hpp>
+#include <mach/Reply.hpp>
 
 namespace mach
 {

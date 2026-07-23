@@ -4,7 +4,7 @@
 #include <mach/controllers/ControllerBase.hpp>
 #include <mach/controllers/ControllerBuilder.hpp>
 #include <mach/diagnostics/TerminateHandler.hpp>
-#include <mach/results/Reply.hpp>
+#include <mach/Reply.hpp>
 
 #include "Testing.hpp"
 

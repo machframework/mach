@@ -6,7 +6,7 @@
 #include <mach/App.hpp>
 #include <mach/AppBuilder.hpp>
 #include <mach/Json.hpp>
-#include <mach/results/Reply.hpp>
+#include <mach/Reply.hpp>
 #include <mach/controllers/ControllerBase.hpp>
 #include <mach/controllers/ControllerBuilder.hpp>
 

@@ -7,7 +7,7 @@
 #include <mach/controllers/ControllerBase.hpp>
 #include <mach/controllers/ControllerBuilder.hpp>
 #include <mach/Context.hpp>
-#include <mach/results/Reply.hpp>
+#include <mach/Reply.hpp>
 
 #include "server/BeastSession.hpp"
 
