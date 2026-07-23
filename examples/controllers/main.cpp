@@ -5,7 +5,6 @@
 #include <mach/controllers/ControllerBase.hpp>
 #include <mach/Json.hpp>
 #include <mach/Reply.hpp>
-#include <mach/StringConversion.hpp>
 
 struct Person {
 	std::string name;

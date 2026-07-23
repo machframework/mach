@@ -7,7 +7,8 @@
 
 #include <mach/http/Method.hpp>
 #include <mach/http/Version.hpp>
-#include <mach/StringConversion.hpp>
+
+#include <mach/detail/serailization/StringConversion.hpp>
 
 namespace mach::detail
 {
