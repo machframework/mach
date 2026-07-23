@@ -39,6 +39,11 @@ namespace mach
     public:
 
         /**
+         * Creates a new application builder instance using the default server configuration.
+         */
+        explicit AppBuilder();
+
+        /**
          * Creates a new application builder instance.
          *
          * @param options The server configuration to use for the application.

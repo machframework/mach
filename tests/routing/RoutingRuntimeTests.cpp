@@ -9,7 +9,7 @@ int main() {
         mach::ServerOptions{
             .host = "127.0.0.1",
             .port = 3143,
-            .threads = std::thread::hardware_concurrency()});
+            .threadCount = std::thread::hardware_concurrency()});
 
     auto app = builder.build();
 

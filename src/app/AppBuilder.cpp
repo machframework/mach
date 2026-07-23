@@ -38,6 +38,8 @@ namespace
 
 namespace mach
 {
+    AppBuilder::AppBuilder() : AppBuilder(ServerOptions{}) {}
+
     AppBuilder::AppBuilder(ServerOptions options) {
         m_serverOptions = std::move(options);
 
@@ -52,7 +54,7 @@ namespace mach
         try {
             validateHost(m_serverOptions.host);
             validatePort(m_serverOptions.port);
-            validateThreadCount(m_serverOptions.threads);
+            validateThreadCount(m_serverOptions.threadCount);
         } catch (const std::exception& ex) {
             mach::detail::logging::Logger::error(
                 "Failed to build Mach application: " + std::string(ex.what()) + "\n");

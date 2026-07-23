@@ -211,6 +211,6 @@ namespace mach
     }
 
     std::size_t App::Impl::threadCount() const noexcept {
-        return m_serverOptions.threads;
+        return m_serverOptions.threadCount;
     }
 }
