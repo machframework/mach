@@ -72,7 +72,7 @@ namespace mach
 
 	App::App(App&&) noexcept = default;
 
-	int App::run() noexcept {
+	int App::run() {
 		return m_impl->run();
 	}
 
@@ -113,40 +113,39 @@ namespace mach
 	{ }
 
 	int App::Impl::run() {
-		// add router to container
-		m_container.addSingletonInstance<detail::routing::Router>(std::move(m_router));
-		m_container.finalizeRegistrations();
+		detail::server::Server* server = nullptr;
 
-		try {
+		{
+			std::lock_guard lock(m_serverMutex);
 
-			detail::server::Server* server = nullptr;
-
-			{
-				std::lock_guard lock(m_serverMutex);
-
-				if (m_state != AppState::Ready) {
-					if (m_state == AppState::Running) {
-						throw std::logic_error("The application is already running");
-					}
-					else {
-						throw std::logic_error("The application has already run");
-					}
-				}
-
-				if (m_server) {
+			if (m_state != AppState::Ready) {
+				if (m_state == AppState::Running) {
 					throw std::logic_error("The application is already running");
 				}
-
-				m_server = std::make_unique<detail::server::Server>(
-					std::move(m_serverOptions),
-					std::move(m_container),
-					std::move(m_middlewarePipeline)
-				);
-
-				server = m_server.get();
+				else {
+					throw std::logic_error("The application has already run");
+				}
 			}
 
+			if (m_server) {
+				throw std::logic_error("The application is already running");
+			}
+
+			// add router to container
+			m_container.addSingletonInstance<detail::routing::Router>(std::move(m_router));
+			m_container.finalizeRegistrations();
+
+			m_server = std::make_unique<detail::server::Server>(
+				std::move(m_serverOptions),
+				std::move(m_container),
+				std::move(m_middlewarePipeline)
+			);
+
+			server = m_server.get();
 			m_state = AppState::Running;
+		}
+
+		try {
 			server->run();
 
 			{

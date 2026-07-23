@@ -231,7 +231,7 @@ namespace mach
 		 * @thread_safety This function is not thread-safe.
 		 */
 		[[nodiscard]]
-		int run() noexcept;
+		int run();
 
 		void stop();
 

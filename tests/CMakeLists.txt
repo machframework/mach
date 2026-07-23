@@ -210,3 +210,8 @@ add_mach_test(
     ContentTypeValidationControllerTests
     hardening/binding/ContentTypeValidationControllerTests.cpp
 )
+
+add_mach_test(
+    AppStopMethodTests
+    hardening/general/AppStopMethodTests.cpp
+)

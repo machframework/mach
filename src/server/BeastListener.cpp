@@ -98,7 +98,10 @@ namespace mach::detail::server
                 net::redirect_error(net::use_awaitable, ec)
             );
 
-            if (ec == net::error::operation_aborted) {
+            if (ec == net::error::operation_aborted ||
+                ec == net::error::bad_descriptor ||
+                ec == net::error::not_socket) 
+            {
                 co_return;
             }
 
