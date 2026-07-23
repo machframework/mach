@@ -1,11 +1,7 @@
 #include <iostream>
 #include <thread>
 
-#include <mach/App.hpp>
-#include <mach/AppBuilder.hpp>
-#include <mach/Context.hpp>
-#include <mach/Reply.hpp>
-#include <mach/results/Results.hpp>
+#include <mach/mach.hpp>
 
 int main() {
 

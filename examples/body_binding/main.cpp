@@ -1,9 +1,7 @@
 #include <iostream>
 #include <string>
 
-#include <mach/AppBuilder.hpp>
-#include <mach/Json.hpp>
-#include <mach/results/Results.hpp>
+#include <mach/mach.hpp>
 
 struct CreateUserRequest {
     std::string name;

@@ -1,10 +1,7 @@
 #include <iostream>
 #include <string>
 
-#include <mach/AppBuilder.hpp>
-#include <mach/controllers/ControllerBase.hpp>
-#include <mach/Json.hpp>
-#include <mach/Reply.hpp>
+#include <mach/controllers.hpp>
 
 struct Person {
 	std::string name;
