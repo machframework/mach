@@ -40,6 +40,7 @@ add_library(mach
     src/middleware/Next.cpp
     src/exceptions/ExceptionMiddleware.cpp
     src/http/ContentType.cpp
+    src/logging/Logger.cpp
 )
 
 target_include_directories(mach
