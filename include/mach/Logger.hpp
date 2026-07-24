@@ -6,16 +6,21 @@
 
 #include <fmt/format.h>
 
+namespace mach::detail::di
+{
+    class Container;
+}
+
 namespace mach
 {
+    class AppBuilder;
+
     class Logger {
 
     public:
-        Logger();
         ~Logger();
 
         Logger(Logger&&) noexcept;
-        Logger& operator=(Logger&&) noexcept;
 
         Logger(const Logger&) = delete;
         Logger& operator=(const Logger&) = delete;
@@ -57,6 +62,10 @@ namespace mach
         }
 
     private:
+        Logger();
+
+        Logger& operator=(Logger&&) noexcept;
+
         enum class LogLevel {
             Debug,
             Info,
@@ -71,5 +80,7 @@ namespace mach
 
         class Impl;
         std::unique_ptr<Impl> m_impl;
+
+        friend class AppBuilder;
     };
 }

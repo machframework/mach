@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stdexcept>
 
+#include <mach/Logger.hpp>
 #include <mach/logging/Logging.hpp>
 
 #include <mach/detail/binding/BodyBinder.hpp>
@@ -66,6 +67,8 @@ namespace mach
         }
 
         m_container.reserveInternal<detail::routing::Router>();
+
+        m_container.addSingletonInstance(Logger{}, detail::di::ServiceAccess::User);
 
         m_container.addService<detail::binding::BodyBinder>(
             detail::di::ServiceLifetime::Singleton,

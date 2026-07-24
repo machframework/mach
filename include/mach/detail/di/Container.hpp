@@ -25,7 +25,7 @@ namespace mach::detail::di
         void addService(ServiceLifetime lifetime, ServiceAccess access = ServiceAccess::User);
 
         template <typename T>
-        void addSingletonInstance(T&& instance);
+        void addSingletonInstance(T&& instance, ServiceAccess access = ServiceAccess::Internal);
 
         const ServiceDescriptor* getDescriptor(std::type_index type) const;
         std::shared_ptr<void> getOrCreateSingleton(std::type_index type, Scope& container);
@@ -269,7 +269,7 @@ namespace mach::detail::di
     }
 
     template <typename T>
-    void Container::addSingletonInstance(T&& instance) {
+    void Container::addSingletonInstance(T&& instance, ServiceAccess access) {
         const std::type_index type = typeid(T);
 
         if (m_serviceRegistry.contains(type) || m_singletonEntries.contains(type)) {
@@ -279,7 +279,7 @@ namespace mach::detail::di
         ServiceDescriptor descriptor{
             .type = type,
             .lifetime = ServiceLifetime::Singleton,
-            .access = ServiceAccess::Internal};
+            .access = access};
 
         auto sharedInstance = std::make_shared<T>(std::move(instance));
 
