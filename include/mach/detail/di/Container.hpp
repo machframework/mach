@@ -25,7 +25,7 @@ namespace mach::detail::di
         void addService(ServiceLifetime lifetime, ServiceAccess access = ServiceAccess::User);
 
         template <typename T>
-        void addSingletonInstance(T&& instance, ServiceAccess access = ServiceAccess::Internal);
+        T& addSingletonInstance(T&& instance, ServiceAccess access = ServiceAccess::Internal);
 
         const ServiceDescriptor* getDescriptor(std::type_index type) const;
         std::shared_ptr<void> getOrCreateSingleton(std::type_index type, Scope& container);
@@ -40,6 +40,7 @@ namespace mach::detail::di
     private:
         std::optional<std::type_index> findScopedDependency(
             const ServiceDescriptor& descriptor) const;
+
         std::optional<std::type_index> findInaccessibleDependency(
             const ServiceDescriptor& descriptor) const;
 
@@ -269,7 +270,7 @@ namespace mach::detail::di
     }
 
     template <typename T>
-    void Container::addSingletonInstance(T&& instance, ServiceAccess access) {
+    T& Container::addSingletonInstance(T&& instance, ServiceAccess access) {
         const std::type_index type = typeid(T);
 
         if (m_serviceRegistry.contains(type) || m_singletonEntries.contains(type)) {
@@ -282,6 +283,7 @@ namespace mach::detail::di
             .access = access};
 
         auto sharedInstance = std::make_shared<T>(std::move(instance));
+        T& reference = *sharedInstance;
 
         auto [it, inserted] =
             m_singletonEntries.try_emplace(type, std::make_unique<SingletonEntry>());
@@ -299,6 +301,8 @@ namespace mach::detail::di
             });
 
         m_serviceRegistry.emplace(type, std::move(descriptor));
+
+        return reference;
     }
 
     template <typename T>

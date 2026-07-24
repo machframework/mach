@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mach/Context.hpp>
+#include <mach/Logger.hpp>
 
 #include <mach/detail/di/Container.hpp>
 #include <mach/detail/dispatching/Dispatcher.hpp>
@@ -13,17 +14,19 @@ namespace mach::detail::application
     class Runtime {
 
     public:
+        Runtime(di::Container container, middleware::MiddlewarePipeline middlewarePipeline, const Logger& logger);
+
         Runtime(const Runtime&) = delete;
         Runtime& operator=(const Runtime&) = delete;
         Runtime(Runtime&&) = delete;
         Runtime& operator=(Runtime&&) = delete;
-
-        Runtime(di::Container container, middleware::MiddlewarePipeline middlewarePipeline);
 
         void handle(mach::Context& context);
 
     private:
         di::Container m_container;
         dispatching::Dispatcher m_dispatcher;
+
+        const Logger& m_logger;
     };
 }

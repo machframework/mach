@@ -10,20 +10,21 @@
 #include <boost/asio/detached.hpp>
 #include <boost/asio/signal_set.hpp>
 
-#include <mach/logging/Logging.hpp>
+#include <mach/Logger.hpp>
 
 namespace mach::detail::server
 {
     Server::Server(
         ServerOptions serverOptions,
         di::Container container,
-        middleware::MiddlewarePipeline middlewarePipeline)
+        middleware::MiddlewarePipeline middlewarePipeline,
+        const mach::Logger& logger)
         : m_threadCount(serverOptions.threadCount),
           m_endpoint(
               boost::asio::ip::make_address(serverOptions.host),
               static_cast<std::uint16_t>(serverOptions.port)),
-          m_ioc(static_cast<int>(serverOptions.threadCount)),
-          m_runtime(std::move(container), std::move(middlewarePipeline)) {}
+          m_ioc(static_cast<int>(serverOptions.threadCount)), m_logger(logger),
+          m_runtime(std::move(container), std::move(middlewarePipeline), logger) {}
 
     std::string Server::host() const noexcept {
         return m_endpoint.address().to_string();
@@ -43,7 +44,8 @@ namespace mach::detail::server
             m_endpoint,
             m_runtime,
             m_requestAdapter,
-            m_responseAdapter);
+            m_responseAdapter,
+            m_logger);
 
         // configure signals
         net::signal_set signals(m_ioc, SIGINT, SIGTERM);
@@ -59,12 +61,8 @@ namespace mach::detail::server
         std::vector<std::thread> threads;
         threads.reserve(m_threadCount - 1);
 
-        detail::logging::Logger::info(
-            std::format(
-                "Starting Mach server on {}:{} with {} threads",
-                host(),
-                port(),
-                m_threadCount));
+        m_logger
+            .info("Starting Mach server on {}:{} with {} threads", host(), port(), threadCount());
 
         std::mutex exceptionMutex;
         std::exception_ptr iocException = nullptr;

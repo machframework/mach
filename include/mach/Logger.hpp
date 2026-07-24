@@ -6,11 +6,6 @@
 
 #include <fmt/format.h>
 
-namespace mach::detail::di
-{
-    class Container;
-}
-
 namespace mach
 {
     class AppBuilder;

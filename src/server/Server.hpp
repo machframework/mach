@@ -7,7 +7,9 @@
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/address.hpp>
 
+#include <mach/Logger.hpp>
 #include <mach/ServerOptions.hpp>
+
 #include <mach/detail/di/Container.hpp>
 #include <mach/detail/middleware/MiddlewarePipeline.hpp>
 #include <mach/detail/routing/Router.hpp>
@@ -27,7 +29,8 @@ namespace mach::detail::server
         Server(
             ServerOptions serverOptions,
             di::Container container,
-            middleware::MiddlewarePipeline middlewarePipeline);
+            middleware::MiddlewarePipeline middlewarePipeline,
+            const mach::Logger& logger);
 
         ~Server() = default;
 
@@ -47,5 +50,7 @@ namespace mach::detail::server
         detail::application::Runtime m_runtime;
         detail::http::adapter::BeastRequestAdapter m_requestAdapter;
         detail::http::adapter::BeastResponseAdapter m_responseAdapter;
+
+        const mach::Logger& m_logger;
     };
 }

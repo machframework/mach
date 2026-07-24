@@ -18,7 +18,7 @@ find_package(spdlog CONFIG REQUIRED)
 add_library(mach
     src/server/BeastListener.cpp
     src/server/BeastSession.cpp
-    src/logging/Logging.cpp
+    
     src/server/Server.cpp
     src/http/Request.cpp
     src/http/Response.cpp

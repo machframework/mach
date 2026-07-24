@@ -28,7 +28,8 @@ namespace mach
         Impl(
             ServerOptions serverOptions,
             detail::di::Container container,
-            detail::middleware::MiddlewarePipeline middlewarePipeline);
+            detail::middleware::MiddlewarePipeline middlewarePipeline,
+            const Logger& logger);
 
         ~Impl() = default;
 
@@ -55,17 +56,21 @@ namespace mach
         detail::routing::Router m_router;
         detail::di::Container m_container;
         detail::middleware::MiddlewarePipeline m_middlewarePipeline;
+
+        const Logger& m_logger;
     };
 
     App::App(
         ServerOptions serverOptions,
         detail::di::Container container,
-        detail::middleware::MiddlewarePipeline middlewarePipeline)
+        detail::middleware::MiddlewarePipeline middlewarePipeline,
+        const Logger& logger)
         : m_impl(
               std::make_unique<Impl>(
                   std::move(serverOptions),
                   std::move(container),
-                  std::move(middlewarePipeline))) {}
+                  std::move(middlewarePipeline),
+                  logger)) {}
 
     App::~App() = default;
 
@@ -104,9 +109,10 @@ namespace mach
     App::Impl::Impl(
         ServerOptions serverOptions,
         detail::di::Container container,
-        detail::middleware::MiddlewarePipeline middlewarePipeline)
+        detail::middleware::MiddlewarePipeline middlewarePipeline,
+        const Logger& logger)
         : m_serverOptions(std::move(serverOptions)), m_container(std::move(container)),
-          m_middlewarePipeline(std::move(middlewarePipeline)) {}
+          m_middlewarePipeline(std::move(middlewarePipeline)), m_logger(logger) {}
 
     int App::Impl::run() {
         detail::server::Server* server = nullptr;
@@ -134,7 +140,8 @@ namespace mach
             m_server = std::make_unique<detail::server::Server>(
                 std::move(m_serverOptions),
                 std::move(m_container),
-                std::move(m_middlewarePipeline));
+                std::move(m_middlewarePipeline),
+                m_logger);
 
             server = m_server.get();
             m_state = AppState::Running;

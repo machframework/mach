@@ -10,6 +10,7 @@
 #include <mach/Context.hpp>
 #include <mach/controllers/ControllerBuilder.hpp>
 #include <mach/http/Method.hpp>
+#include <mach/Logger.hpp>
 
 #include <mach/ServerOptions.hpp>
 #include <mach/detail/controllers/ControllerTraits.hpp>
@@ -226,7 +227,8 @@ namespace mach
     private:
         App(ServerOptions serverOptions,
             detail::di::Container container,
-            detail::middleware::MiddlewarePipeline middlewarePipeline);
+            detail::middleware::MiddlewarePipeline middlewarePipeline,
+            const Logger& logger);
 
         template <detail::controllers::MachController TController>
         App& mapController();
