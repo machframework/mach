@@ -153,8 +153,8 @@ namespace mach
          * Configures the application's logging options.
          *
          * The provided callback is invoked immediately and receives a mutable
-         * reference to the application's logger configuration. Any changes made
-         * to the options take effect when the application is built.
+         * reference to the application's logger configuration. The configured
+         * options are used when the application's logger is constructed during build().
          *
          * @tparam TConfigure A callable invocable with `LoggerOptions&`.
          * @param configure The callback used to configure the logger options.
