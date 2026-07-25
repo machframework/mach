@@ -33,6 +33,7 @@ private:
 
 int main() {
     const auto hardwareThreads = std::thread::hardware_concurrency();
+
     auto builder = mach::AppBuilder(
         mach::ServerOptions{
             .host = "127.0.0.1",
@@ -42,6 +43,5 @@ int main() {
     builder.addController<HomeController, mach::Logger>();
 
     auto app = builder.build();
-
     return app.run();
 }

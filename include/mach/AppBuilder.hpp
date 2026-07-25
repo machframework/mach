@@ -149,6 +149,20 @@ namespace mach
         template <typename T, typename... Deps>
         AppBuilder& use();
 
+        /**
+         * Configures the application's logging options.
+         *
+         * The provided callback is invoked immediately and receives a mutable
+         * reference to the application's logger configuration. Any changes made
+         * to the options take effect when the application is built.
+         *
+         * @tparam TConfigure A callable invocable with `LoggerOptions&`.
+         * @param configure The callback used to configure the logger options.
+         *
+         * @return A reference to this builder.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
         template <typename TConfigure>
             requires std::invocable<TConfigure, LoggerOptions&>
         AppBuilder& configureLogging(TConfigure&& configure);
