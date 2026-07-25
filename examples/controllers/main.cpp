@@ -40,6 +40,7 @@ int main() {
             .threadCount = std::thread::hardware_concurrency()});
 
     builder.addController<HomeController, mach::Logger>();
+
     auto app = builder.build();
 
     return app.run();

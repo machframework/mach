@@ -51,7 +51,7 @@ namespace mach
     }
 
     App AppBuilder::build() {
-        mach::Logger loggerInstance;
+        mach::Logger loggerInstance(std::move(m_loggerOptions));
 
         try {
             validateHost(m_serverOptions.host);

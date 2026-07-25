@@ -6,6 +6,9 @@
 
 #include <fmt/format.h>
 
+#include <mach/LoggerOptions.hpp>
+#include <mach/LogLevel.hpp>
+
 namespace mach
 {
     class AppBuilder;
@@ -57,16 +60,9 @@ namespace mach
         }
 
     private:
-        Logger();
+        Logger(mach::LoggerOptions&& options);
 
         Logger& operator=(Logger&&) noexcept;
-
-        enum class LogLevel {
-            Debug,
-            Info,
-            Warning,
-            Error
-        };
 
         [[nodiscard]]
         bool shouldLog(LogLevel level) const noexcept;

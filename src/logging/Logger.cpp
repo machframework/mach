@@ -5,6 +5,28 @@
 
 #include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/stdout_sinks.h>
+
+namespace
+{
+    spdlog::level::level_enum toSpdlogLevel(mach::LogLevel level) {
+        switch (level) {
+        case mach::LogLevel::Debug:
+            return spdlog::level::debug;
+
+        case mach::LogLevel::Info:
+            return spdlog::level::info;
+
+        case mach::LogLevel::Warning:
+            return spdlog::level::warn;
+
+        case mach::LogLevel::Error:
+            return spdlog::level::err;
+
+        return spdlog::level::off;
+        }
+    }
+}
 
 namespace mach
 {
@@ -16,14 +38,20 @@ namespace mach
         std::shared_ptr<spdlog::logger> logger;
     };
 
-    Logger::Logger() {
-        auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    Logger::Logger(mach::LoggerOptions&& options) {
+        std::shared_ptr<spdlog::sinks::sink> consoleSink;
 
-        consoleSink->set_pattern("[%H:%M:%S] [%^%l%$] %v");
+        if (options.enableColors) {
+            consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+        } else {
+            consoleSink = std::make_shared<spdlog::sinks::stdout_sink_mt>();
+        }
+
+        consoleSink->set_pattern(options.pattern);
 
         auto logger = std::make_shared<spdlog::logger>("mach", std::move(consoleSink));
 
-        logger->set_level(spdlog::level::info);
+        logger->set_level(toSpdlogLevel(options.level));
         logger->flush_on(spdlog::level::err);
 
         m_impl = std::make_unique<Impl>(std::move(logger));

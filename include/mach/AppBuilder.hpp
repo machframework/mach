@@ -4,9 +4,11 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #include <mach/App.hpp>
+#include <mach/LoggerOptions.hpp>
 #include <mach/ServerOptions.hpp>
 
 #include <mach/detail/controllers/ControllerTraits.hpp>
@@ -147,6 +149,10 @@ namespace mach
         template <typename T, typename... Deps>
         AppBuilder& use();
 
+        template <typename TConfigure>
+            requires std::invocable<TConfigure, LoggerOptions&>
+        AppBuilder& configureLogging(TConfigure&& configure);
+
         /**
          * Builds and returns the application instance.
          *
@@ -167,10 +173,12 @@ namespace mach
         App build();
 
     private:
-        ServerOptions m_serverOptions;
         detail::di::Container m_container;
         detail::middleware::MiddlewarePipeline m_middlewarePipeline;
         std::vector<std::function<void(App&)>> m_controllerMappers;
+
+        ServerOptions m_serverOptions;
+        LoggerOptions m_loggerOptions;
 
         template <typename T, typename... Deps>
         AppBuilder& use(mach::detail::di::ServiceAccess access);
@@ -273,6 +281,13 @@ namespace mach
         }
 
         m_middlewarePipeline.add<T>();
+        return *this;
+    }
+
+    template <typename TConfigure>
+        requires std::invocable<TConfigure, LoggerOptions&>
+    AppBuilder& AppBuilder::configureLogging(TConfigure&& configure) {
+        std::invoke(std::forward<TConfigure>(configure), m_loggerOptions);
         return *this;
     }
 }
