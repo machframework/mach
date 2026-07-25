@@ -8,25 +8,27 @@
 class HomeController : public mach::ControllerBase {
 
 public:
+    HomeController(mach::Logger& logger) : m_logger(logger) {}
+
     inline static constexpr std::string_view route = "/home";
 
-    mach::Reply<int> calculateAge() {
-        constexpr int currentYear = 2026;
-
-        const int birthYear = request().routeParam<int>("birth");
-        const int age = currentYear - birthYear;
-
-        return ok(age);
+    mach::Reply<int> doubleNumber() {
+        const int number = request().routeParam<int>("number");
+        return ok(number * 2);
     }
 
     mach::Reply<std::string> sayHi() {
+        m_logger.info("Handling GET /home/hi");
         return ok("Hi");
     }
 
     static void configure(mach::ControllerBuilder<HomeController>& routes) {
-        routes.mapGet("/{birth:int}", &HomeController::calculateAge);
+        routes.mapGet("/{number:int}", &HomeController::doubleNumber);
         routes.mapGet("/hi", &HomeController::sayHi);
     }
+
+private:
+    mach::Logger& m_logger;
 };
 
 int main() {
@@ -37,7 +39,7 @@ int main() {
             .port = 3143,
             .threadCount = std::thread::hardware_concurrency()});
 
-    builder.addController<HomeController>();
+    builder.addController<HomeController, mach::Logger>();
     auto app = builder.build();
 
     return app.run();
