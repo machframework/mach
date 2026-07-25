@@ -7,14 +7,19 @@
 class LoggingMiddleware {
 
 public:
+    LoggingMiddleware(mach::Logger& logger) : m_logger(logger) {}
+
     void invoke(mach::Context& context, mach::Next& next) {
-        std::cout << "Before handler\n";
+        m_logger.info("Before handler");
 
         context.response.setHeader("X-Middleware", "Logging");
         next();
 
-        std::cout << "After handler\n";
+        m_logger.info("After handler");
     }
+
+private:
+    mach::Logger& m_logger;
 };
 
 int main() {

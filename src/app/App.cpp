@@ -152,12 +152,10 @@ namespace mach
         try {
             server->run();
         } catch (const std::exception& exception) {
-            std::cout << "Mach error: " << exception.what() << '\n';
-
+            m_logger.error("Mach error: {}", exception.what());
             result = 1;
         } catch (...) {
-            std::cout << "Mach error: unknown server failure\n";
-
+            m_logger.error("Mach error: unknown server failure");
             result = 1;
         }
 
