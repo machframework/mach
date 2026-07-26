@@ -40,7 +40,7 @@ bool testDuplicateParameterNamesAreRejected() {
     auto app = mach::AppBuilder(testing::serverOptions).build();
 
     try {
-        app.addRoute(mach::http::Method::Get, "/users/{age}/{age}", [](mach::Context&) {
+        app.mapRoute(mach::http::Method::Get, "/users/{age}/{age}", [](mach::Context&) {
         });
 
         fail(testName, "expected std::invalid_argument, but no exception was thrown");
@@ -69,7 +69,7 @@ int main() {
 
     auto app = mach::AppBuilder(testing::serverOptions).build();
 
-    app.addRoute(mach::http::Method::Get, "/users/{name}/{age}", [](mach::Context& context) {
+    app.mapRoute(mach::http::Method::Get, "/users/{name}/{age}", [](mach::Context& context) {
         constexpr auto testName = "Extract multiple route parameters";
 
         bool nameOk = requireEqual(
@@ -90,7 +90,7 @@ int main() {
         }
     });
 
-    app.addRoute(mach::http::Method::Get, "/users/{name}", [](mach::Context& context) {
+    app.mapRoute(mach::http::Method::Get, "/users/{name}", [](mach::Context& context) {
         constexpr auto testName = "Extract single route parameter";
 
         (void)requireEqual(
@@ -100,7 +100,7 @@ int main() {
             "route parameter 'name'");
     });
 
-    app.addRoute(mach::http::Method::Get, "/users/me", [](mach::Context&) {
+    app.mapRoute(mach::http::Method::Get, "/users/me", [](mach::Context&) {
         std::cout << testing::GREEN
                   << "[SUCCESS] Static route precedence: /users/me hit static route"
                   << testing::RESET << std::endl;

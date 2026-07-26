@@ -24,40 +24,16 @@ namespace mach
         Logger& operator=(const Logger&) = delete;
 
         template <typename... Args>
-        void debug(fmt::format_string<Args...> format, Args&&... args) const {
-            if (!shouldLog(LogLevel::Debug)) {
-                return;
-            }
-
-            log(LogLevel::Debug, fmt::format(format, std::forward<Args>(args)...));
-        }
+        void debug(fmt::format_string<Args...> format, Args&&... args) const;
 
         template <typename... Args>
-        void info(fmt::format_string<Args...> format, Args&&... args) const {
-            if (!shouldLog(LogLevel::Info)) {
-                return;
-            }
-
-            log(LogLevel::Info, fmt::format(format, std::forward<Args>(args)...));
-        }
+        void info(fmt::format_string<Args...> format, Args&&... args) const;
 
         template <typename... Args>
-        void warning(fmt::format_string<Args...> format, Args&&... args) const {
-            if (!shouldLog(LogLevel::Warning)) {
-                return;
-            }
-
-            log(LogLevel::Warning, fmt::format(format, std::forward<Args>(args)...));
-        }
+        void warning(fmt::format_string<Args...> format, Args&&... args) const;
 
         template <typename... Args>
-        void error(fmt::format_string<Args...> format, Args&&... args) const {
-            if (!shouldLog(LogLevel::Error)) {
-                return;
-            }
-
-            log(LogLevel::Error, fmt::format(format, std::forward<Args>(args)...));
-        }
+        void error(fmt::format_string<Args...> format, Args&&... args) const;
 
     private:
         Logger(mach::LoggerOptions&& options);
@@ -74,4 +50,40 @@ namespace mach
 
         friend class AppBuilder;
     };
+
+    template <typename... Args>
+    void Logger::debug(fmt::format_string<Args...> format, Args&&... args) const {
+        if (!shouldLog(LogLevel::Debug)) {
+            return;
+        }
+
+        log(LogLevel::Debug, fmt::format(format, std::forward<Args>(args)...));
+    }
+
+    template <typename... Args>
+    void Logger::info(fmt::format_string<Args...> format, Args&&... args) const {
+        if (!shouldLog(LogLevel::Info)) {
+            return;
+        }
+
+        log(LogLevel::Info, fmt::format(format, std::forward<Args>(args)...));
+    }
+
+    template <typename... Args>
+    void Logger::warning(fmt::format_string<Args...> format, Args&&... args) const {
+        if (!shouldLog(LogLevel::Warning)) {
+            return;
+        }
+
+        log(LogLevel::Warning, fmt::format(format, std::forward<Args>(args)...));
+    }
+
+    template <typename... Args>
+    void Logger::error(fmt::format_string<Args...> format, Args&&... args) const {
+        if (!shouldLog(LogLevel::Error)) {
+            return;
+        }
+
+        log(LogLevel::Error, fmt::format(format, std::forward<Args>(args)...));
+    }
 }

@@ -22,9 +22,9 @@ namespace
 
         case mach::LogLevel::Error:
             return spdlog::level::err;
+        }
 
         return spdlog::level::off;
-        }
     }
 }
 

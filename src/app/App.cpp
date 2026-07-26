@@ -37,7 +37,7 @@ namespace mach
         std::uint16_t port() const noexcept;
         std::size_t threadCount() const noexcept;
 
-        void addRoute(detail::routing::RouteEndpoint route);
+        void mapRoute(detail::routing::RouteEndpoint route);
         void addControllerRoutes(
             std::vector<detail::routing::RouteEndpoint> routes,
             std::type_index controllerType);
@@ -97,7 +97,7 @@ namespace mach
     }
 
     void App::addRouteImpl(detail::routing::RouteEndpoint route) {
-        m_impl->addRoute(std::move(route));
+        m_impl->mapRoute(std::move(route));
     }
 
     void App::addControllerRoutesImpl(
@@ -183,12 +183,12 @@ namespace mach
         }
     }
 
-    void App::Impl::addRoute(detail::routing::RouteEndpoint route) {
+    void App::Impl::mapRoute(detail::routing::RouteEndpoint route) {
         if (!route.invoker) {
             throw std::invalid_argument("Route handler cannot be empty");
         }
 
-        m_router.addRoute(std::move(route));
+        m_router.mapRoute(std::move(route));
     }
 
     void App::Impl::addControllerRoutes(
@@ -203,7 +203,7 @@ namespace mach
         }
 
         for (auto& route : routes) {
-            m_router.addRoute(std::move(route));
+            m_router.mapRoute(std::move(route));
         }
     }
 

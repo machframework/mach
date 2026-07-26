@@ -80,7 +80,7 @@ namespace
 
 namespace mach::detail::routing
 {
-    void RouteTrie::addRoute(
+    void RouteTrie::mapRoute(
         std::vector<std::string_view>&& segments,
         routing::RouteEndpoint* endpoint) {
         RouteNode* curr = &m_root;

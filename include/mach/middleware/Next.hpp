@@ -17,6 +17,7 @@ namespace mach
     class Next {
 
     public:
+        // TODO: make private
         /**
          * Constructs a Next object wrapping the next pipeline step.
          *

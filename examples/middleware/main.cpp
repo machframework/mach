@@ -31,7 +31,7 @@ int main() {
             .port = 3143,
             .threadCount = std::thread::hardware_concurrency()});
 
-    builder.use<LoggingMiddleware>();
+    builder.use<LoggingMiddleware, mach::Logger>();
 
     auto app = builder.build();
 

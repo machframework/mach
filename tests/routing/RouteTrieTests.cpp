@@ -14,31 +14,31 @@ int main() {
     mach::detail::routing::RouteTrie t;
 
     auto endpoint1 = mach::detail::routing::RouteEndpoint{.method = mach::http::Method::Get};
-    t.addRoute({"users"}, &endpoint1);
+    t.mapRoute({"users"}, &endpoint1);
 
     auto endpoint2 = mach::detail::routing::RouteEndpoint{.method = mach::http::Method::Get};
-    t.addRoute({"users", "names"}, &endpoint2);
+    t.mapRoute({"users", "names"}, &endpoint2);
 
     auto endpoint3 = mach::detail::routing::RouteEndpoint{.method = mach::http::Method::Get};
-    t.addRoute({"users", "names", "desc"}, &endpoint3);
+    t.mapRoute({"users", "names", "desc"}, &endpoint3);
 
     auto endpoint4 = mach::detail::routing::RouteEndpoint{.method = mach::http::Method::Post};
-    t.addRoute({"users"}, &endpoint4);
+    t.mapRoute({"users"}, &endpoint4);
 
     auto endpoint5 = mach::detail::routing::RouteEndpoint{.method = mach::http::Method::Get};
-    t.addRoute({"api", "v1", "users"}, &endpoint5);
+    t.mapRoute({"api", "v1", "users"}, &endpoint5);
 
     auto endpoint6 = mach::detail::routing::RouteEndpoint{.method = mach::http::Method::Get};
-    t.addRoute({"api", "v1", "posts"}, &endpoint6);
+    t.mapRoute({"api", "v1", "posts"}, &endpoint6);
 
     auto endpoint7 = mach::detail::routing::RouteEndpoint{.method = mach::http::Method::Get};
-    t.addRoute({"health"}, &endpoint7);
+    t.mapRoute({"health"}, &endpoint7);
 
     auto endpoint8 = mach::detail::routing::RouteEndpoint{.method = mach::http::Method::Delete};
-    t.addRoute({"api", "v1", "users"}, &endpoint8);
+    t.mapRoute({"api", "v1", "users"}, &endpoint8);
 
     auto endpoint9 = mach::detail::routing::RouteEndpoint{.method = mach::http::Method::Get};
-    t.addRoute({"users", "{age}"}, &endpoint9);
+    t.mapRoute({"users", "{age}"}, &endpoint9);
 
     t.debugDump();
     return 0;
@@ -50,7 +50,7 @@ int main() {
     try {
         auto endpoint9 = mach::detail::routing::RouteEndpoint{.method = mach::http::Method::Delete};
 
-        t.addRoute({"api", "v1", "users"}, &endpoint9);
+        t.mapRoute({"api", "v1", "users"}, &endpoint9);
 
         std::cerr << testing::RED << "[FAIL] Expected std::logic_error" << testing::RESET
                   << std::endl;

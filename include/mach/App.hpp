@@ -86,7 +86,7 @@ namespace mach
         template <typename THandler>
             requires detail::traits::MinimalApiHandler<THandler>
         void mapGet(std::string_view pattern, THandler&& handler) {
-            addRoute(http::Method::Get, pattern, std::forward<THandler>(handler));
+            mapRoute(http::Method::Get, pattern, std::forward<THandler>(handler));
         }
 
         /**
@@ -104,7 +104,7 @@ namespace mach
         template <typename THandler>
             requires detail::traits::MinimalApiHandler<THandler>
         void mapPost(std::string_view pattern, THandler&& handler) {
-            addRoute(http::Method::Post, pattern, std::forward<THandler>(handler));
+            mapRoute(http::Method::Post, pattern, std::forward<THandler>(handler));
         }
 
         /**
@@ -122,7 +122,7 @@ namespace mach
         template <typename THandler>
             requires detail::traits::MinimalApiHandler<THandler>
         void mapPut(std::string_view pattern, THandler&& handler) {
-            addRoute(http::Method::Put, pattern, std::forward<THandler>(handler));
+            mapRoute(http::Method::Put, pattern, std::forward<THandler>(handler));
         }
 
         /**
@@ -140,7 +140,7 @@ namespace mach
         template <typename THandler>
             requires detail::traits::MinimalApiHandler<THandler>
         void mapPatch(std::string_view pattern, THandler&& handler) {
-            addRoute(http::Method::Patch, pattern, std::forward<THandler>(handler));
+            mapRoute(http::Method::Patch, pattern, std::forward<THandler>(handler));
         }
 
         /**
@@ -158,7 +158,7 @@ namespace mach
         template <typename THandler>
             requires detail::traits::MinimalApiHandler<THandler>
         void mapDelete(std::string_view pattern, THandler&& handler) {
-            addRoute(http::Method::Delete, pattern, std::forward<THandler>(handler));
+            mapRoute(http::Method::Delete, pattern, std::forward<THandler>(handler));
         }
 
         /**
@@ -176,11 +176,11 @@ namespace mach
         template <typename THandler>
             requires detail::traits::MinimalApiHandler<THandler>
         void mapHead(std::string_view pattern, THandler&& handler) {
-            addRoute(http::Method::Head, pattern, std::forward<THandler>(handler));
+            mapRoute(http::Method::Head, pattern, std::forward<THandler>(handler));
         }
 
         /**
-         * Registers a route handler.
+         * Registers a route request handler.
          *
          * @param method The HTTP method to match (e.g. GET, POST).
          * @param pattern The route pattern to match (e.g. "/api/users").
@@ -194,7 +194,7 @@ namespace mach
          */
         template <typename THandler>
             requires detail::traits::MinimalApiHandler<THandler>
-        void addRoute(http::Method method, std::string_view pattern, THandler&& handler);
+        void mapRoute(http::Method method, std::string_view pattern, THandler&& handler);
 
         /**
          * Starts the application and begins accepting incoming HTTP requests.
@@ -247,7 +247,7 @@ namespace mach
 
     template <typename THandler>
         requires detail::traits::MinimalApiHandler<THandler>
-    void mach::App::addRoute(http::Method method, std::string_view pattern, THandler&& handler) {
+    void mach::App::mapRoute(http::Method method, std::string_view pattern, THandler&& handler) {
         using Handler = std::decay_t<THandler>;
         using Traits = detail::traits::FunctionTraits<Handler>;
         using ArgsTuple = typename Traits::ArgsTuple;
