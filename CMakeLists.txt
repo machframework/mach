@@ -8,8 +8,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Boost REQUIRED)
-
 find_package(nlohmann_json CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 
 # -------------------------
 # Core library
@@ -17,7 +18,7 @@ find_package(nlohmann_json CONFIG REQUIRED)
 add_library(mach
     src/server/BeastListener.cpp
     src/server/BeastSession.cpp
-    src/logging/Logging.cpp
+    
     src/server/Server.cpp
     src/http/Request.cpp
     src/http/Response.cpp
@@ -27,7 +28,7 @@ add_library(mach
     src/routing/Router.cpp
     src/routing/RouteTrie.cpp
     src/app/App.cpp
-    src/dispatching/Dispatcher.cpp 
+    src/dispatching/Dispatcher.cpp
     src/routing/RouteConstraint.cpp
     src/di/Scope.cpp
     src/di/Container.cpp
@@ -39,6 +40,7 @@ add_library(mach
     src/middleware/Next.cpp
     src/exceptions/ExceptionMiddleware.cpp
     src/http/ContentType.cpp
+    src/logging/Logger.cpp
 )
 
 target_include_directories(mach
@@ -51,11 +53,10 @@ target_include_directories(mach
 target_link_libraries(mach
     PUBLIC
         Boost::headers
-)
-
-target_link_libraries(mach
-    PUBLIC
         nlohmann_json::nlohmann_json
+        fmt::fmt
+    PRIVATE
+        spdlog::spdlog
 )
 
 option(MACH_BUILD_EXAMPLES "Build Mach examples" ON)

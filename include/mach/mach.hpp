@@ -15,3 +15,5 @@
 
 #include <mach/Reply.hpp>
 #include <mach/results/Results.hpp>
+
+#include <mach/Logger.hpp>

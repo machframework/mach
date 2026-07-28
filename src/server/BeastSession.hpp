@@ -25,7 +25,7 @@
 #include <boost/beast/http/parser.hpp>
 
 #include <mach/Context.hpp>
-#include <mach/logging/Logging.hpp>
+#include <mach/Logger.hpp>
 
 #include "adapter/inbound/BeastRequestAdapter.hpp"
 #include "adapter/outbound/BeastResponseAdapter.hpp"
@@ -38,8 +38,6 @@ namespace mach::detail::server
     namespace net = boost::asio;      // from <boost/asio.hpp>
     using tcp = boost::asio::ip::tcp; // from <boost/asio/ip/tcp.hpp>
 
-    using mach::detail::logging::Logger;
-
     // Handles an HTTP server connection
     class BeastSession : public std::enable_shared_from_this<BeastSession> {
         beast::tcp_stream m_stream;
@@ -50,7 +48,8 @@ namespace mach::detail::server
             tcp::socket socket,
             detail::application::Runtime& runtime,
             detail::http::adapter::BeastRequestAdapter& requestAdapter,
-            detail::http::adapter::BeastResponseAdapter& responseAdapter);
+            detail::http::adapter::BeastResponseAdapter& responseAdapter,
+            const mach::Logger& logger);
 
         // Start the asynchronous operation
         net::awaitable<void> run();
@@ -74,6 +73,8 @@ namespace mach::detail::server
         detail::application::Runtime& m_runtime;
         detail::http::adapter::BeastRequestAdapter& m_requestAdapter;
         detail::http::adapter::BeastResponseAdapter& m_responseAdapter;
+
+        const mach::Logger& m_logger;
     };
 
     template <typename Body, typename Allocator>
@@ -89,7 +90,7 @@ namespace mach::detail::server
             auto method = context.request.method();
 
 #ifndef NDEBUG
-            Logger::info(std::format("Received request: {}", context.request.target()));
+            m_logger.info("Received request: {}", context.request.target());
 #endif
 
             if (!adapterRejectedRequest) {
@@ -118,10 +119,10 @@ namespace mach::detail::server
 
             return res;
         } catch (const std::exception& ex) {
-            Logger::error(std::format("Request handling failed: {}", ex.what()));
+            m_logger.error("Request handling failed: {}", ex.what());
             return makeReadErrorResponse(mach::http::StatusCode::InternalServerError);
         } catch (...) {
-            Logger::error("Request handling failed with unknown exception.");
+            m_logger.error("Request handling failed with unknown exception");
             return makeReadErrorResponse(mach::http::StatusCode::InternalServerError);
         }
     }

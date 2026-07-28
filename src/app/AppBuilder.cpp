@@ -3,7 +3,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#include <mach/logging/Logging.hpp>
+#include <mach/Logger.hpp>
 
 #include <mach/detail/binding/BodyBinder.hpp>
 #include <mach/detail/exceptions/ExceptionMiddleware.hpp>
@@ -44,28 +44,30 @@ namespace mach
         m_serverOptions = std::move(options);
 
         // register preprocessing middleware
-        this->use<detail::exceptions::ExceptionMiddleware>(
+        this->use<detail::exceptions::ExceptionMiddleware, mach::Logger>(
             mach::detail::di::ServiceAccess::Internal);
         this->use<detail::routing::RoutingMiddleware, detail::routing::Router>(
             mach::detail::di::ServiceAccess::Internal);
     }
 
     App AppBuilder::build() {
+        mach::Logger loggerInstance(std::move(m_loggerOptions));
+
         try {
             validateHost(m_serverOptions.host);
             validatePort(m_serverOptions.port);
             validateThreadCount(m_serverOptions.threadCount);
         } catch (const std::exception& ex) {
-            mach::detail::logging::Logger::error(
-                "Failed to build Mach application: " + std::string(ex.what()) + "\n");
+            loggerInstance.error("Failed to build Mach application: {}", ex.what());
             throw;
         } catch (...) {
-            mach::detail::logging::Logger::error(
-                "Failed to build Mach application: Unknown exception\n");
+            loggerInstance.error("Failed to build Mach application: Unknown exception");
             throw;
         }
 
         m_container.reserveInternal<detail::routing::Router>();
+
+        const auto& logger = m_container.addSingletonInstance(std::move(loggerInstance), detail::di::ServiceAccess::User);
 
         m_container.addService<detail::binding::BodyBinder>(
             detail::di::ServiceLifetime::Singleton,
@@ -74,7 +76,8 @@ namespace mach
         App app(
             std::move(m_serverOptions),
             std::move(m_container),
-            std::move(m_middlewarePipeline));
+            std::move(m_middlewarePipeline),
+            logger);
 
         for (const auto& mapper : m_controllerMappers) {
             mapper(app);

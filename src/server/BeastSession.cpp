@@ -34,9 +34,10 @@ namespace mach::detail::server
         tcp::socket socket,
         detail::application::Runtime& runtime,
         detail::http::adapter::BeastRequestAdapter& requestAdapter,
-        detail::http::adapter::BeastResponseAdapter& responseAdapter)
+        detail::http::adapter::BeastResponseAdapter& responseAdapter,
+        const mach::Logger& logger)
         : m_stream(std::move(socket)), m_runtime(runtime), m_requestAdapter(requestAdapter),
-          m_responseAdapter(responseAdapter) {}
+          m_responseAdapter(responseAdapter), m_logger(logger) {}
 
     // Start the asynchronous operation
     net::awaitable<void> BeastSession::run() {
@@ -87,7 +88,7 @@ namespace mach::detail::server
             co_return co_await send_response(
                 makeReadErrorResponse(mach::http::StatusCode::RequestHeaderFieldsTooLarge));
         } else if (ec) {
-            Logger::warning(std::format("Failed to read request: {}", ec.message()));
+            m_logger.warning("Failed to read request: {}", ec.message());
             co_return false;
         }
 
@@ -116,7 +117,7 @@ namespace mach::detail::server
             net::redirect_error(net::use_awaitable, ec));
 
         if (ec) {
-            Logger::warning(std::format("Failed to write response: {}", ec.message()));
+            m_logger.warning("Failed to write response: {}", ec.message());
             co_return false;
         }
 

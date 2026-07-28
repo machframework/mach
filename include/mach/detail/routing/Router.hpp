@@ -19,7 +19,7 @@ namespace mach::detail::routing
 
     public:
         application::ExecutionPlan route(const mach::Request& request) const;
-        void addRoute(RouteEndpoint&& endpoint);
+        void mapRoute(RouteEndpoint&& endpoint);
 
     private:
         routing::RouteMatch matchRoute(const mach::Request& request) const;

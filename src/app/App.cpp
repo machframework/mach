@@ -28,7 +28,8 @@ namespace mach
         Impl(
             ServerOptions serverOptions,
             detail::di::Container container,
-            detail::middleware::MiddlewarePipeline middlewarePipeline);
+            detail::middleware::MiddlewarePipeline middlewarePipeline,
+            const Logger& logger);
 
         ~Impl() = default;
 
@@ -36,7 +37,7 @@ namespace mach
         std::uint16_t port() const noexcept;
         std::size_t threadCount() const noexcept;
 
-        void addRoute(detail::routing::RouteEndpoint route);
+        void mapRoute(detail::routing::RouteEndpoint route);
         void addControllerRoutes(
             std::vector<detail::routing::RouteEndpoint> routes,
             std::type_index controllerType);
@@ -55,17 +56,21 @@ namespace mach
         detail::routing::Router m_router;
         detail::di::Container m_container;
         detail::middleware::MiddlewarePipeline m_middlewarePipeline;
+
+        const Logger& m_logger;
     };
 
     App::App(
         ServerOptions serverOptions,
         detail::di::Container container,
-        detail::middleware::MiddlewarePipeline middlewarePipeline)
+        detail::middleware::MiddlewarePipeline middlewarePipeline,
+        const Logger& logger)
         : m_impl(
               std::make_unique<Impl>(
                   std::move(serverOptions),
                   std::move(container),
-                  std::move(middlewarePipeline))) {}
+                  std::move(middlewarePipeline),
+                  logger)) {}
 
     App::~App() = default;
 
@@ -92,7 +97,7 @@ namespace mach
     }
 
     void App::addRouteImpl(detail::routing::RouteEndpoint route) {
-        m_impl->addRoute(std::move(route));
+        m_impl->mapRoute(std::move(route));
     }
 
     void App::addControllerRoutesImpl(
@@ -104,9 +109,10 @@ namespace mach
     App::Impl::Impl(
         ServerOptions serverOptions,
         detail::di::Container container,
-        detail::middleware::MiddlewarePipeline middlewarePipeline)
+        detail::middleware::MiddlewarePipeline middlewarePipeline,
+        const Logger& logger)
         : m_serverOptions(std::move(serverOptions)), m_container(std::move(container)),
-          m_middlewarePipeline(std::move(middlewarePipeline)) {}
+          m_middlewarePipeline(std::move(middlewarePipeline)), m_logger(logger) {}
 
     int App::Impl::run() {
         detail::server::Server* server = nullptr;
@@ -134,7 +140,8 @@ namespace mach
             m_server = std::make_unique<detail::server::Server>(
                 std::move(m_serverOptions),
                 std::move(m_container),
-                std::move(m_middlewarePipeline));
+                std::move(m_middlewarePipeline),
+                m_logger);
 
             server = m_server.get();
             m_state = AppState::Running;
@@ -145,12 +152,10 @@ namespace mach
         try {
             server->run();
         } catch (const std::exception& exception) {
-            std::cout << "Mach error: " << exception.what() << '\n';
-
+            m_logger.error("Mach error: {}", exception.what());
             result = 1;
         } catch (...) {
-            std::cout << "Mach error: unknown server failure\n";
-
+            m_logger.error("Mach error: unknown server failure");
             result = 1;
         }
 
@@ -178,12 +183,12 @@ namespace mach
         }
     }
 
-    void App::Impl::addRoute(detail::routing::RouteEndpoint route) {
+    void App::Impl::mapRoute(detail::routing::RouteEndpoint route) {
         if (!route.invoker) {
             throw std::invalid_argument("Route handler cannot be empty");
         }
 
-        m_router.addRoute(std::move(route));
+        m_router.mapRoute(std::move(route));
     }
 
     void App::Impl::addControllerRoutes(
@@ -198,7 +203,7 @@ namespace mach
         }
 
         for (auto& route : routes) {
-            m_router.addRoute(std::move(route));
+            m_router.mapRoute(std::move(route));
         }
     }
 

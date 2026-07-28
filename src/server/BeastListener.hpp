@@ -17,6 +17,8 @@
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 
+#include <mach/Logger.hpp>
+
 #include "adapter/inbound/BeastRequestAdapter.hpp"
 #include "application/Runtime.hpp"
 
@@ -38,7 +40,8 @@ namespace mach::detail::server
             tcp::endpoint endpoint,
             detail::application::Runtime& runtime,
             detail::http::adapter::BeastRequestAdapter& requestAdapter,
-            detail::http::adapter::BeastResponseAdapter& responseAdapter);
+            detail::http::adapter::BeastResponseAdapter& responseAdapter,
+            const mach::Logger& logger);
 
         // Start accepting incoming connections
         net::awaitable<void> run();
@@ -50,5 +53,7 @@ namespace mach::detail::server
         detail::application::Runtime& m_runtime;
         detail::http::adapter::BeastRequestAdapter& m_requestAdapter;
         detail::http::adapter::BeastResponseAdapter& m_responseAdapter;
+
+        const mach::Logger& m_logger;
     };
 }

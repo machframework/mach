@@ -18,7 +18,7 @@ namespace mach::detail::routing
     public:
         RouteTrie() = default;
 
-        void addRoute(std::vector<std::string_view>&& segments, routing::RouteEndpoint* endpoint);
+        void mapRoute(std::vector<std::string_view>&& segments, routing::RouteEndpoint* endpoint);
 
         routing::RouteMatch matchRoute(
             mach::http::Method method,
