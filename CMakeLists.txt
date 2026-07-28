@@ -60,6 +60,10 @@ add_library(mach
     src/logging/Logger.cpp
 )
 
+set_target_properties(mach PROPERTIES
+    DEBUG_POSTFIX "d"
+)
+
 add_library(Mach::Mach ALIAS mach)
 
 set_target_properties(mach PROPERTIES
