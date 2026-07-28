@@ -1,0 +1,11 @@
+{
+  "name": "mach",
+  "version": "0.7.0",
+  "dependencies": [
+    "boost-asio",
+    "boost-beast",
+    "fmt",
+    "nlohmann-json",
+    "spdlog"
+  ]
+}

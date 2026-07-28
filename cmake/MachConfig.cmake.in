@@ -2,7 +2,7 @@
 
 include(CMakeFindDependencyMacro)
 
-find_dependency(Boost REQUIRED)
+find_dependency(Boost CONFIG REQUIRED)
 find_dependency(nlohmann_json CONFIG REQUIRED)
 find_dependency(fmt CONFIG REQUIRED)
 find_dependency(spdlog CONFIG REQUIRED)
