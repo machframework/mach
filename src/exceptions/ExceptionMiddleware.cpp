@@ -2,8 +2,10 @@
 
 #include <stdexcept>
 
+
 #include <mach/exceptions/HttpException.hpp>
 #include <mach/http/StatusCode.hpp>
+#include <mach/Response.hpp>
 
 #include <mach/detail/exceptions/BodyBindingException.hpp>
 
@@ -17,29 +19,28 @@ namespace mach::detail::exceptions
         } catch (const BodyBindingException& ex) {
             m_logger.error("{}", ex.what());
 
-            // later, initialize a new response inside context
+            context.response = Response{};
             context.response.status(mach::http::StatusCode::BadRequest);
             context.response.body(ex.what());
-        } catch(const HttpException& ex){
+        } catch (const HttpException& ex) {
             m_logger.error("{}", ex.what());
 
-            // later, initialize a new response inside context
+            context.response = Response{};
             context.response.status(ex.status());
             context.response.body(ex.what());
         } catch (const std::exception& ex) {
             m_logger.error("{}", ex.what());
 
-            // later, initialize a new response inside context
+            context.response = Response{};
             context.response.status(mach::http::StatusCode::InternalServerError);
             context.response.body(ex.what());
         } catch (...) {
             m_logger.error("Request handling failed with unknown exception");
 
-            // later, initialize a new response inside context
+            context.response = Response{};
             context.response.status(mach::http::StatusCode::InternalServerError);
             context.response.body(
-                std::string(mach::http::reasonPhrase(mach::http::StatusCode::InternalServerError))
-            );
+                std::string(mach::http::reasonPhrase(mach::http::StatusCode::InternalServerError)));
         }
     }
 }

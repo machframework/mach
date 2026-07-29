@@ -25,6 +25,10 @@ namespace mach::detail::dispatching
     template <typename THandler, typename TResult, typename... TArgs>
     class MinimalApiInvoker;
 }
+namespace mach::detail::exceptions
+{
+    class ExceptionMiddleware;
+}
 
 namespace mach
 {
@@ -149,6 +153,7 @@ namespace mach
         friend class detail::http::adapter::BeastRequestAdapter;
         friend class detail::http::adapter::BeastResponseAdapter;
         friend class detail::application::Runtime;
+        friend class detail::exceptions::ExceptionMiddleware;
 
         template <typename TController, typename TResult, typename... TArgs>
         friend class detail::dispatching::ControllerActionInvoker;
