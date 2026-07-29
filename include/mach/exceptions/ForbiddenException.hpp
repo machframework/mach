@@ -13,7 +13,7 @@ namespace mach
      * permission to perform the requested operation. This exception is typically
      * thrown when authorization fails or access to a resource is denied.
      */
-    class ForbiddenException : public HttpException {
+    class ForbiddenException final : public HttpException {
 
     public:
         /**

@@ -14,7 +14,7 @@ namespace mach
      * when a client attempts to access a protected resource without successfully
      * authenticating.
      */
-    class UnauthorizedException : public HttpException {
+    class UnauthorizedException final : public HttpException {
 
     public:
         /**

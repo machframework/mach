@@ -14,7 +14,7 @@ namespace mach
      * thrown when attempting to create or modify a resource in a way that
      * violates application rules or resource state.
      */
-    class ConflictException : public HttpException {
+    class ConflictException final : public HttpException {
 
     public:
         /**

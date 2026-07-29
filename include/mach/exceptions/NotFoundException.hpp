@@ -12,7 +12,7 @@ namespace mach
      * Indicates that the requested resource could not be found. This exception
      * is typically thrown when a requested entity or endpoint does not exist.
      */
-    class NotFoundException : public HttpException {
+    class NotFoundException final : public HttpException {
 
     public:
         /**
