@@ -13,7 +13,7 @@ namespace mach
      * This exception is typically thrown when a request is syntactically correct
      * but contains invalid or inconsistent data.
      */
-    class BadRequestException : public HttpException {
+    class BadRequestException final : public HttpException {
 
     public:
         /**
