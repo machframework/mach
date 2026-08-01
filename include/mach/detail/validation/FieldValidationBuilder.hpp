@@ -1,11 +1,17 @@
 #pragma once
 
+#include <concepts>
+#include <cstddef>
 #include <optional>
+#include <string>
 #include <string_view>
+#include <utility>
 
-#include <mach/detail/validation/rules/StringRules.hpp>
+#include <mach/detail/core/TypeTraits.hpp>
 #include <mach/detail/validation/ValidationResult.hpp>
 #include <mach/detail/validation/Validator.hpp>
+#include <mach/detail/validation/rules/NumericRules.hpp>
+#include <mach/detail/validation/rules/StringRules.hpp>
 
 namespace mach
 {
@@ -17,70 +23,176 @@ namespace mach::detail::validation
 {
     template <typename T, typename Field>
     class FieldValidationBuilder {
-        
     public:
         FieldValidationBuilder& email();
         FieldValidationBuilder& url();
 
         FieldValidationBuilder& length(std::size_t minLength, std::size_t maxLength);
+
         FieldValidationBuilder& minLength(std::size_t minLength);
         FieldValidationBuilder& maxLength(std::size_t maxLength);
 
+        template <traits::Numeric Number>
+        FieldValidationBuilder& range(Number min, Number max);
+
+        template <traits::Numeric Number>
+        FieldValidationBuilder& min(Number min);
+
+        template <traits::Numeric Number>
+        FieldValidationBuilder& max(Number max);
+
+        template <traits::Numeric Number>
+        FieldValidationBuilder& multipleOf(Number factor);
+
+        template <traits::Numeric Number>
+        FieldValidationBuilder& equals(Number value);
+
+        template <traits::Numeric Number>
+        FieldValidationBuilder& notEquals(Number value);
 
     private:
-        FieldValidationBuilder(ValidationBuilder<T>& validationBuilder, Field T::* field)
+        FieldValidationBuilder(mach::ValidationBuilder<T>& validationBuilder, Field T::* field)
             : m_validationBuilder(validationBuilder), m_field(field) {}
 
-        template <typename Rule>
-        void addRule(const Rule& rule, std::string_view errorMessage);
+        template <bool Negate = false, typename Rule>
+        FieldValidationBuilder& addRule(Rule rule, std::string_view errorMessage);
 
-        ValidationBuilder<T>& m_validationBuilder;
+        template <traits::Numeric Number>
+        static consteval void validateNumericRuleType();
+
+        mach::ValidationBuilder<T>& m_validationBuilder;
         Field T::* m_field;
 
-        template <typename T>
-        friend class ValidationBuilder;
+        friend class mach::ValidationBuilder<T>;
     };
 
     template <typename T, typename Field>
     FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::email() {
-        addRule(EmailRule{}, "Invalid email format");
-        return *this;
+        return addRule(EmailRule{}, "Invalid email format");
     }
 
     template <typename T, typename Field>
     FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::url() {
-        addRule(UrlRule{}, "Invalid URL format");
-        return *this;
+        return addRule(UrlRule{}, "Invalid URL format");
     }
 
     template <typename T, typename Field>
-    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::length(std::size_t minLength, std::size_t maxLength) {
-        addRule(LengthRule{minLength, maxLength}, "Value is not within the specified length range");
-        return *this;
+    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::length(
+        std::size_t minLength,
+        std::size_t maxLength) {
+        return addRule(
+            LengthRule{.minLength = minLength, .maxLength = maxLength},
+            "Value is not within the specified length range");
     }
 
     template <typename T, typename Field>
-    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::minLength(std::size_t minLength) {
-        addRule(LengthRule{minLength, std::nullopt}, "Value is too short");
-        return *this;
+    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::minLength(
+        std::size_t minLength) {
+        return addRule(
+            LengthRule{.minLength = minLength, .maxLength = std::nullopt},
+            "Value is too short");
     }
 
     template <typename T, typename Field>
-    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::maxLength(std::size_t maxLength) {
-        addRule(LengthRule{std::nullopt, maxLength}, "Value is too long");
-        return *this;
+    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::maxLength(
+        std::size_t maxLength) {
+        return addRule(
+            LengthRule{.minLength = std::nullopt, .maxLength = maxLength},
+            "Value is too long");
     }
 
     template <typename T, typename Field>
-    template <typename Rule>
-    void FieldValidationBuilder<T, Field>::addRule(
-        const Rule& rule,
+    template <traits::Numeric Number>
+    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::range(
+        Number min,
+        Number max) {
+        validateNumericRuleType<Number>();
+
+        return addRule(
+            RangeRule<Number>{.min = min, .max = max},
+            "Value is not within the specified range");
+    }
+
+    template <typename T, typename Field>
+    template <traits::Numeric Number>
+    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::min(Number min) {
+        validateNumericRuleType<Number>();
+
+        return addRule(
+            RangeRule<Number>{.min = min, .max = std::nullopt},
+            "Value is below the specified minimum");
+    }
+
+    template <typename T, typename Field>
+    template <traits::Numeric Number>
+    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::max(Number max) {
+        validateNumericRuleType<Number>();
+
+        return addRule(
+            RangeRule<Number>{.min = std::nullopt, .max = max},
+            "Value exceeds the specified maximum");
+    }
+
+    template <typename T, typename Field>
+    template <traits::Numeric Number>
+    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::multipleOf(Number factor) {
+        validateNumericRuleType<Number>();
+
+        return addRule(
+            MultipleOfRule<Number>{.factor = factor},
+            "Value is not a multiple of the specified factor");
+    }
+
+    template <typename T, typename Field>
+    template <traits::Numeric Number>
+    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::equals(Number value) {
+        validateNumericRuleType<Number>();
+
+        return addRule(
+            EqualRule<Number>{.value = value},
+            "Value is not equal to the specified value");
+    }
+
+    template <typename T, typename Field>
+    template <traits::Numeric Number>
+    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::notEquals(Number value) {
+        validateNumericRuleType<Number>();
+
+        return addRule<true>(
+            EqualRule<Number>{.value = value},
+            "Value is equal to the forbidden value");
+    }
+
+    template <typename T, typename Field>
+    template <bool Negate, typename Rule>
+    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::addRule(
+        Rule rule,
         std::string_view errorMessage) {
-        m_validationBuilder.m_validators.push_back(
-            [field = m_field, rule, errorMessage](const T& instance, ValidationResult& result) {
-                if (!validate(instance.*field, rule)) {
-                    result.addError(std::string(errorMessage));
+        m_validationBuilder.m_validators.emplace_back(
+            [field = m_field, rule = std::move(rule), errorMessage = std::string(errorMessage)](
+                const T& instance,
+                ValidationResult& result) {
+                const bool isValid = validate(instance.*field, rule);
+
+                if (isValid == Negate) {
+                    result.addError(errorMessage);
                 }
             });
+
+        return *this;
+    }
+
+    template <typename T, typename Field>
+    template <traits::Numeric Number>
+    consteval void FieldValidationBuilder<T, Field>::validateNumericRuleType() {
+        static_assert(
+            traits::Numeric<Field>,
+            "Numeric validation rules can only be applied "
+            "to numeric fields.");
+
+        static_assert(
+            std::same_as<Number, Field>,
+            "Numeric validation arguments must have the same "
+            "type as the validated field.");
     }
 }
