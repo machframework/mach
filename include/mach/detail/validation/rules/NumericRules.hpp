@@ -18,14 +18,4 @@ namespace mach::detail::validation
     struct MultipleOfRule {
         Number factor;
     };
-
-    template <traits::Numeric Number>
-    struct EqualRule {
-        Number value;
-    };
-
-    template <traits::Numeric Number>
-    struct NotEqualRule {
-        Number value;
-    };
 }

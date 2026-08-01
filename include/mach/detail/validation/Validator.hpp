@@ -2,6 +2,7 @@
 
 #include <string_view>
 
+#include <mach/detail/validation/rules/GeneralRules.hpp>
 #include <mach/detail/validation/rules/NumericRules.hpp>
 #include <mach/detail/validation/rules/StringRules.hpp>
 
@@ -23,11 +24,11 @@ namespace mach::detail::validation
     template <traits::Numeric Number>
     bool validate(const Number& value, const MultipleOfRule<Number>& rule);
 
-    template <traits::Numeric Number>
-    bool validate(const Number& value, const EqualRule<Number>& rule);
+    template <typename U>
+    bool validate(const U& value, const EqualRule<U>& rule);
 
-    template <traits::Numeric Number>
-    bool validate(const Number& value, const NotEqualRule<Number>& rule);
+    template <typename U>
+    bool validate(const U& value, const NotEqualRule<U>& rule);
 
     //----------------------------------------------------------------
     // Implementation
@@ -64,13 +65,13 @@ namespace mach::detail::validation
         return value % rule.factor == 0;
     }
 
-    template <traits::Numeric Number>
-    bool validate(const Number& value, const EqualRule<Number>& rule) {
+    template <typename U>
+    bool validate(const U& value, const EqualRule<U>& rule) {
         return value == rule.value;
     }
 
-    template <traits::Numeric Number>
-    bool validate(const Number& value, const NotEqualRule<Number>& rule) {
+    template <typename U>
+    bool validate(const U& value, const NotEqualRule<U>& rule) {
         return value != rule.value;
     }
 }

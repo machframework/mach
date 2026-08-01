@@ -8,10 +8,11 @@
 #include <utility>
 
 #include <mach/detail/core/TypeTraits.hpp>
-#include <mach/detail/validation/ValidationResult.hpp>
-#include <mach/detail/validation/Validator.hpp>
+#include <mach/detail/validation/rules/GeneralRules.hpp>
 #include <mach/detail/validation/rules/NumericRules.hpp>
 #include <mach/detail/validation/rules/StringRules.hpp>
+#include <mach/detail/validation/ValidationResult.hpp>
+#include <mach/detail/validation/Validator.hpp>
 
 namespace mach
 {
@@ -44,11 +45,13 @@ namespace mach::detail::validation
         template <traits::Numeric Number>
         FieldValidationBuilder& multipleOf(Number factor);
 
-        template <traits::Numeric Number>
-        FieldValidationBuilder& equals(Number value);
+        template <typename U>
+            requires std::constructible_from<Field, U>
+        FieldValidationBuilder& equals(U&& value);
 
-        template <traits::Numeric Number>
-        FieldValidationBuilder& notEquals(Number value);
+        template <typename U>
+            requires std::constructible_from<Field, U>
+        FieldValidationBuilder& notEquals(U&& value);
 
     private:
         FieldValidationBuilder(mach::ValidationBuilder<T>& validationBuilder, Field T::* field)
@@ -139,28 +142,26 @@ namespace mach::detail::validation
         validateNumericRuleType<Number>();
 
         return addRule(
-            MultipleOfRule<Number>{.factor = factor},
+            MultipleOfRule{.factor = factor},
             "Value is not a multiple of the specified factor");
     }
 
     template <typename T, typename Field>
-    template <traits::Numeric Number>
-    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::equals(Number value) {
-        validateNumericRuleType<Number>();
-
+    template <typename U>
+        requires std::constructible_from<Field, U>
+    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::equals(U&& value) {
         return addRule(
-            EqualRule<Number>{.value = value},
+            EqualRule<Field>{.value = Field(std::forward<U>(value))},
             "Value is not equal to the specified value");
     }
 
     template <typename T, typename Field>
-    template <traits::Numeric Number>
-    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::notEquals(Number value) {
-        validateNumericRuleType<Number>();
-
-        return addRule<true>(
-            EqualRule<Number>{.value = value},
-            "Value is equal to the forbidden value");
+    template <typename U>
+        requires std::constructible_from<Field, U>
+    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::notEquals(U&& value) {
+        return addRule(
+            NotEqualRule<Field>{.value = Field(std::forward<U>(value))},
+            "Value is equal to the specified value");
     }
 
     template <typename T, typename Field>
