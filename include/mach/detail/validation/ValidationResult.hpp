@@ -9,6 +9,7 @@ namespace mach::detail::validation
     public:
         void addError(const std::string& error);
         bool hasErrors() const;
+        const std::vector<std::string>& errors() const;
 
     private:
         std::vector<std::string> m_errors;

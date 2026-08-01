@@ -9,4 +9,8 @@ namespace mach::detail::validation
     bool ValidationResult::hasErrors() const {
         return !m_errors.empty();
     }
+
+    const std::vector<std::string>& ValidationResult::errors() const {
+        return m_errors;
+    }
 }

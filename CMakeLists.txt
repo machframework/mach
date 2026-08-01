@@ -65,7 +65,7 @@ add_library(mach
     src/exceptions/ForbiddenException.cpp
     src/exceptions/ConflictException.cpp
     src/exceptions/BadRequestException.cpp
- "src/validation/ValidationResult.cpp")
+ "src/validation/ValidationResult.cpp" "src/validation/ValidationUtils.cpp" "src/validation/Validator.cpp")
 
 set_target_properties(mach PROPERTIES
     DEBUG_POSTFIX "d"
