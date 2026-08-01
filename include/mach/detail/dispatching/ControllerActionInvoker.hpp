@@ -101,12 +101,12 @@ namespace mach::detail::dispatching
                         BodyType body = binder.bind<BodyType>(stringBody);
 
                         if constexpr (requires(mach::ValidationBuilder<BodyType>& builder) {
-                                          { BodyType::validate(builder) } -> std::same_as<void>;
+                                          { body.validate(builder) } -> std::same_as<void>;
                                       }) {
                             mach::ValidationBuilder<BodyType> validationBuilder;
                             mach::detail::validation::ValidationResult validationResult;
 
-                            BodyType::validate(validationBuilder);
+                            body.validate(validationBuilder);
                             validationBuilder.validate(body, validationResult);
 
                             if (validationResult.hasErrors()) {

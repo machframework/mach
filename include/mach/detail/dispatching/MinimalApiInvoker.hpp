@@ -105,13 +105,13 @@ namespace mach::detail::dispatching
 
                             if constexpr (requires(mach::ValidationBuilder<ValueType>& builder) {
                                               {
-                                                  ValueType::validate(builder)
+                                                  body.validate(builder)
                                               } -> std::same_as<void>;
                                           }) {
                                 mach::ValidationBuilder<ValueType> validationBuilder;
                                 mach::detail::validation::ValidationResult validationResult;
 
-                                ValueType::validate(validationBuilder);
+                                body.validate(validationBuilder);
                                 validationBuilder.validate(body, validationResult);
 
                                 if (validationResult.hasErrors()) {

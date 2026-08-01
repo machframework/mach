@@ -7,6 +7,11 @@
 struct CreateUserRequest {
     std::string name;
     int age;
+
+    void validate(
+        mach::ValidationBuilder<CreateUserRequest>& builder) {
+        builder.field(&CreateUserRequest::name).email().maxLength(20);
+    }
 };
 
 MACH_DEFINE_JSON(CreateUserRequest, name, age)

@@ -2,15 +2,34 @@
 
 namespace mach::detail::validation
 {
-    bool validate(std::string_view value, const EmailRule& rule) {
-        // Simple email validation logic (for demonstration purposes)
-        auto atPos = value.find('@');
-        auto dotPos = value.rfind('.');
-        return atPos != std::string_view::npos && dotPos != std::string_view::npos &&
-               atPos < dotPos;
+    bool validate(std::string_view value, const EmailRule&) {
+        const auto at = value.find('@');
+        if (at == std::string_view::npos || at == 0 || at == value.size() - 1) {
+            return false;
+        }
+
+        if (value.find('@', at + 1) != std::string_view::npos) {
+            return false;
+        }
+
+        const auto dot = value.rfind('.');
+        if (dot == std::string_view::npos || dot <= at + 1 || dot == value.size() - 1) {
+            return false;
+        }
+
+        return true;
     }
-    bool validate(std::string_view value, const UrlRule& rule) {
-        // Simple URL validation logic (for demonstration purposes)
-        return value.starts_with("http://") || value.starts_with("https://");
+
+    bool validate(std::string_view value, const UrlRule&) {
+        if (value.starts_with("http://")) {
+            value.remove_prefix(7);
+        } else if (value.starts_with("https://")) {
+            value.remove_prefix(8);
+        } else {
+            return false;
+        }
+
+        const auto dot = value.find('.');
+        return dot != std::string_view::npos && dot != 0 && dot != value.size() - 1;
     }
 }
