@@ -5,6 +5,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 
 #include <mach/detail/core/TypeTraits.hpp>
@@ -71,37 +72,62 @@ namespace mach::detail::validation
 
     template <typename T, typename Field>
     FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::email() {
-        return addRule(EmailRule{}, "Invalid email format");
+        constexpr auto isString = std::same_as<std::remove_cvref_t<Field>, std::string>;
+        static_assert(isString, "FileValidationBuild::email() can only be used with std::string fields.");
+
+        if constexpr (isString) {
+            return addRule(EmailRule{}, "Invalid email format");
+        }
     }
 
     template <typename T, typename Field>
     FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::url() {
-        return addRule(UrlRule{}, "Invalid URL format");
+        constexpr auto isString = std::same_as<std::remove_cvref_t<Field>, std::string>;
+        static_assert(isString, "FileValidationBuild::url() can only be used with std::string fields.");
+
+        if constexpr (isString) {
+            return addRule(UrlRule{}, "Invalid URL format");
+        }
     }
 
     template <typename T, typename Field>
     FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::length(
         std::size_t minLength,
         std::size_t maxLength) {
-        return addRule(
-            LengthRule{.minLength = minLength, .maxLength = maxLength},
-            "Value is not within the specified length range");
+        constexpr auto isString = std::same_as<std::remove_cvref_t<Field>, std::string>;
+        static_assert(isString, "FileValidationBuild::length() can only be used with std::string fields.");
+
+        if constexpr (isString) {
+            return addRule(
+                LengthRule{.minLength = minLength, .maxLength = maxLength},
+                "Value is not within the specified length range");
+        }
     }
 
     template <typename T, typename Field>
     FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::minLength(
         std::size_t minLength) {
-        return addRule(
-            LengthRule{.minLength = minLength, .maxLength = std::nullopt},
-            "Value is too short");
+        constexpr auto isString = std::same_as<std::remove_cvref_t<Field>, std::string>;
+        static_assert(isString, "This validation rule can only be used with std::string fields.");
+
+        if constexpr (isString) {
+            return addRule(
+                LengthRule{.minLength = minLength, .maxLength = std::nullopt},
+                "Value is too short");
+        }
     }
 
     template <typename T, typename Field>
     FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::maxLength(
         std::size_t maxLength) {
-        return addRule(
-            LengthRule{.minLength = std::nullopt, .maxLength = maxLength},
-            "Value is too long");
+        constexpr auto isString = std::same_as<std::remove_cvref_t<Field>, std::string>;
+        static_assert(isString, "This validation rule can only be used with std::string fields.");
+
+        if constexpr (isString) {
+            return addRule(
+                LengthRule{.minLength = std::nullopt, .maxLength = maxLength},
+                "Value is too long");
+        }
     }
 
     template <typename T, typename Field>

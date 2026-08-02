@@ -210,3 +210,8 @@ add_mach_test(
     AppStopMethodTests
     hardening/general/AppStopMethodTests.cpp
 )
+
+add_mach_test(
+    CompileTimeValidationGuards
+    validation/CompileTimeValidationGuards.cpp
+)
