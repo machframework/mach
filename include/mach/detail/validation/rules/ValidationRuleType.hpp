@@ -6,6 +6,7 @@ namespace mach::detail::validation
         Email,
         Url,
         Length,
+        Regex,
         Range,
         MultipleOf,
         Equal,

@@ -18,6 +18,8 @@ namespace mach::detail::validation
         }
     bool validate(const T& value, const LengthRule& rule);
 
+    bool validate(std::string_view value, const RegexRule& rule);
+
     template <traits::Numeric Number>
     bool validate(const Number& value, const RangeRule<Number>& rule);
 

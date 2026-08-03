@@ -32,4 +32,8 @@ namespace mach::detail::validation
         const auto dot = value.find('.');
         return dot != std::string_view::npos && dot != 0 && dot != value.size() - 1;
     }
+
+    bool validate(std::string_view value, const RegexRule& rule) {
+        return std::regex_match(value.begin(), value.end(), rule.pattern);
+    }
 }

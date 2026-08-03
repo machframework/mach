@@ -37,6 +37,8 @@ namespace mach::detail::validation
         FieldValidationBuilder& minLength(std::size_t minLength);
         FieldValidationBuilder& maxLength(std::size_t maxLength);
 
+        FieldValidationBuilder& regex(std::string_view pattern);
+
         template <traits::Numeric Number>
         FieldValidationBuilder& range(Number min, Number max);
 
@@ -77,7 +79,9 @@ namespace mach::detail::validation
     template <typename T, typename Field>
     FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::email() {
         constexpr auto isString = std::same_as<std::remove_cvref_t<Field>, std::string>;
-        static_assert(isString, "FileValidationBuild::email() can only be used with std::string fields.");
+        static_assert(
+            isString,
+            "FileValidationBuild::email() can only be used with std::string fields.");
 
         if constexpr (isString) {
             return addRule(EmailRule{}, "Invalid email format");
@@ -87,7 +91,9 @@ namespace mach::detail::validation
     template <typename T, typename Field>
     FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::url() {
         constexpr auto isString = std::same_as<std::remove_cvref_t<Field>, std::string>;
-        static_assert(isString, "FileValidationBuild::url() can only be used with std::string fields.");
+        static_assert(
+            isString,
+            "FileValidationBuild::url() can only be used with std::string fields.");
 
         if constexpr (isString) {
             return addRule(UrlRule{}, "Invalid URL format");
@@ -99,7 +105,9 @@ namespace mach::detail::validation
         std::size_t minLength,
         std::size_t maxLength) {
         constexpr auto isString = std::same_as<std::remove_cvref_t<Field>, std::string>;
-        static_assert(isString, "FileValidationBuild::length() can only be used with std::string fields.");
+        static_assert(
+            isString,
+            "FileValidationBuild::length() can only be used with std::string fields.");
 
         if constexpr (isString) {
             return addRule(
@@ -131,6 +139,21 @@ namespace mach::detail::validation
             return addRule(
                 LengthRule{.minLength = std::nullopt, .maxLength = maxLength},
                 "Value is too long");
+        }
+    }
+
+    template <typename T, typename Field>
+    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::regex(
+        std::string_view pattern) {
+        constexpr auto isString = std::same_as<std::remove_cvref_t<Field>, std::string>;
+        static_assert(
+            isString,
+            "FileValidationBuild::regex() can only be used with std::string fields.");
+
+        if constexpr (isString) {
+            return addRule(
+                RegexRule{.pattern = std::regex(pattern)},
+                "Value does not match the specified regex pattern");
         }
     }
 

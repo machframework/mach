@@ -1,6 +1,7 @@
 #pragma once
 
 #include <optional>
+#include <regex>
 
 #include <mach/detail/validation/rules/ValidationRuleType.hpp>
 
@@ -18,5 +19,10 @@ namespace mach::detail::validation
 
     struct UrlRule {
         static constexpr ValidationRuleType Type = ValidationRuleType::Url;
+    };
+
+    struct RegexRule {
+        static constexpr ValidationRuleType Type = ValidationRuleType::Regex;
+        std::regex pattern;
     };
 }
