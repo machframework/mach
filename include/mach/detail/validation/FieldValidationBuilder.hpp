@@ -3,14 +3,17 @@
 #include <concepts>
 #include <cstddef>
 #include <optional>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <unordered_set>
 #include <utility>
 
 #include <mach/detail/core/TypeTraits.hpp>
 #include <mach/detail/validation/rules/GeneralRules.hpp>
 #include <mach/detail/validation/rules/NumericRules.hpp>
+#include <mach/detail/validation/rules/ValidationRuleType.hpp>
 #include <mach/detail/validation/rules/StringRules.hpp>
 #include <mach/detail/validation/ValidationResult.hpp>
 #include <mach/detail/validation/Validator.hpp>
@@ -66,6 +69,7 @@ namespace mach::detail::validation
 
         mach::ValidationBuilder<T>& m_validationBuilder;
         Field T::* m_field;
+        std::unordered_set<ValidationRuleType> m_ruleTypes;
 
         friend class mach::ValidationBuilder<T>;
     };
@@ -195,6 +199,15 @@ namespace mach::detail::validation
     FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::addRule(
         Rule rule,
         std::string_view errorMessage) {
+        if constexpr (IsUniqueRule<Rule>) {
+
+            const auto [_, inserted] = m_ruleTypes.insert(Rule::Type);
+            if (!inserted) {
+                throw std::logic_error(
+                    "The same validation rule cannot be applied more than once.");
+            }
+        }
+        
         m_validationBuilder.m_validators.emplace_back(
             [field = m_field, rule = std::move(rule), errorMessage = std::string(errorMessage)](
                 const T& instance,

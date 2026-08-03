@@ -1,6 +1,8 @@
 #include <mach/ValidationBuilder.hpp>
 #include <mach/Json.hpp>
 
+#include <mach/diagnostics/TerminateHandler.hpp>
+
 #include "Testing.hpp"
 
 struct TestRequest {
@@ -16,6 +18,10 @@ struct TestRequest {
 MACH_DEFINE_JSON(TestRequest, name, age)
 
 int main() {
-	
+    mach::installTerminateHandler();
+
+    TestRequest request;
+    mach::ValidationBuilder<TestRequest> builder;
+    request.validate(builder);
 	return 0;
 }
