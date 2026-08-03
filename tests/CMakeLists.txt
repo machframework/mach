@@ -212,6 +212,6 @@ add_mach_test(
 )
 
 add_mach_test(
-    CompileTimeValidationGuards
-    validation/CompileTimeValidationGuards.cpp
+    GeneralValidationTests
+    validation/GeneralValidationTests.cpp
 )

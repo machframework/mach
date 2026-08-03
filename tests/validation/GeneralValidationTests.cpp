@@ -1,5 +1,4 @@
-#include <mach/ValidationBuilder.hpp>
-#include <mach/Json.hpp>
+#include <mach/mach.hpp>
 
 #include <mach/diagnostics/TerminateHandler.hpp>
 
@@ -10,7 +9,7 @@ struct TestRequest {
     int age;
 
 	void validate(mach::ValidationBuilder<TestRequest>& builder) const {
-        builder.field(&TestRequest::name).length(1, 50).email();
+        builder.field(&TestRequest::name).regex(R"(^[A-Za-z]+$)").length(1, 10);
         builder.field(&TestRequest::age).range(1, 5);
     }
 };
@@ -20,8 +19,11 @@ MACH_DEFINE_JSON(TestRequest, name, age)
 int main() {
     mach::installTerminateHandler();
 
-    TestRequest request;
-    mach::ValidationBuilder<TestRequest> builder;
-    request.validate(builder);
-	return 0;
+    mach::App app = mach::AppBuilder{}.build();
+
+    app.mapPost("/test", [](TestRequest request) {
+        return mach::ok(request.age);
+    });
+
+	return app.run();
 }

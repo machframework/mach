@@ -152,7 +152,7 @@ namespace mach::detail::validation
 
         if constexpr (isString) {
             return addRule(
-                RegexRule{.pattern = std::regex(pattern)},
+                RegexRule{.pattern = std::regex(pattern.begin(), pattern.end())},
                 "Value does not match the specified regex pattern");
         }
     }
