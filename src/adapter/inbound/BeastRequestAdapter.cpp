@@ -1,5 +1,6 @@
 #include "BeastRequestAdapter.hpp"
 
+#include <string>
 #include <string_view>
 #include <unordered_map>
 
@@ -7,6 +8,7 @@
 #include <mach/http/StatusCode.hpp>
 
 #include "http/HttpUtils.hpp"
+#include "utility/StringUtils.hpp"
 
 namespace
 {
@@ -30,11 +32,19 @@ namespace mach::detail::http::adapter
         std::string target(rawRequest.target());
 
         std::unordered_map<std::string, std::string> headers;
+        std::unordered_map<std::string, std::string> cookies;
+
         for (auto const& field : rawRequest.base()) {
             auto key = std::string(field.name_string());
+            auto value = field.value();
+
             toLowercaseInPlace(key);
 
-            headers.insert_or_assign(std::move(key), std::string(field.value()));
+            if (field.name() == beast::http::field::cookie) {
+                extractCookiesFromHeader(value, cookies);
+            } else {
+                headers.insert_or_assign(std::move(key), std::string(value));
+            }
         }
 
         mach::Request req(
@@ -70,6 +80,23 @@ namespace mach::detail::http::adapter
         }
 
         return mach::Context(std::move(req), std::move(res));
+    }
+
+    void BeastRequestAdapter::extractCookiesFromHeader(
+        std::string_view value,
+        std::unordered_map<std::string, std::string>& cookies) const {
+        auto newCookies = detail::split(value, ';');
+
+        for (std::string_view cookie : newCookies) {
+            std::size_t equalPos = cookie.find('=');
+            if (equalPos != std::string_view::npos) {
+                std::string_view name = detail::trim(cookie.substr(0, equalPos));
+                std::string_view val = detail::trim(cookie.substr(equalPos + 1));
+                if (!name.empty()) {
+                    cookies.emplace(std::string(name), std::string(val));
+                }
+            }
+        }
     }
 
     mach::http::Method BeastRequestAdapter::fromBeastVerb(beast::http::verb verb) {

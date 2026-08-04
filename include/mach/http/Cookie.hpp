@@ -4,7 +4,7 @@
 #include <string>
 #include <optional>
 
-namespace mach
+namespace mach::http
 {
     enum class SameSite {
         Strict,
