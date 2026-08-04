@@ -3,8 +3,9 @@
 #include <functional>
 #include <vector>
 
-#include <mach/detail/validation/ValidationResult.hpp>
 #include <mach/validation/FieldValidationBuilder.hpp>
+
+#include <mach/detail/validation/ValidationResult.hpp>
 
 namespace mach::detail::dispatching
 {
@@ -17,10 +18,36 @@ namespace mach::detail::dispatching
 
 namespace mach
 {
-	template <typename T>
-	class ValidationBuilder {
+    /**
+     * Configures validation rules for a type.
+     *
+     * Used to associate validation rules with fields of a type before validation
+     * is performed.
+     *
+     * ValidationBuilder is passed to a type's `validate()` method and is not
+     * intended to be instantiated directly.
+     *
+     * @tparam T The type being configured.
+     *
+     * Thread safety:
+     * - Not thread-safe. Validation configuration should be performed from one thread.
+     *
+     * Stability:
+     * - This API is still experimental and may change before Mach's first stable release.
+     */
+    template <typename T>
+    class ValidationBuilder {
 
-	public:
+    public:
+        /**
+         * Begins configuring validation rules for a field.
+         *
+         * Returns a `FieldValidationBuilder` that allows one or more validation
+         * rules to be applied to the selected field.
+         *
+         * Validation rules are typically configured by chaining calls from the
+         * returned builder.
+         */
         template <typename Field>
         validation::FieldValidationBuilder<T, Field> field(Field T::* field);
 

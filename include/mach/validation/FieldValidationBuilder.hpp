@@ -3,6 +3,7 @@
 #include <concepts>
 #include <cstddef>
 #include <optional>
+#include <regex>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -26,42 +27,225 @@ namespace mach
 
 namespace mach::validation
 {
+    /**
+     * Configures validation rules for a field.
+     *
+     * Used to associate one or more validation rules with a field of a type.
+     *
+     * FieldValidationBuilder is returned by ValidationBuilder::field() and is not
+     * intended to be instantiated directly.
+     *
+     * Validation rules are typically configured by chaining calls on the returned
+     * builder.
+     *
+     * @tparam T The type being configured.
+     * @tparam Field The type of the field being configured.
+     *
+     * Thread safety:
+     * - Not thread-safe. Validation configuration should be performed from one thread.
+     *
+     * Stability:
+     * - This API is still experimental and may change before Mach's first stable release.
+     */
     template <typename T, typename Field>
     class FieldValidationBuilder {
+
     public:
+        /**
+         * Applies an email validation rule that requires the field to contain a valid email
+         * address.
+         *
+         * Can only be applied to std::string fields.
+         *
+         * @return A reference to this builder for method chaining.
+         *
+         * Thread safety:
+         * - Not thread-safe. Validation configuration should be performed from one thread.
+         */
         FieldValidationBuilder& email();
+
+        /**
+         * Applies a URL validation rule that requires the field to contain a valid URL.
+         *
+         * Can only be applied to std::string fields.
+         *
+         * @return A reference to this builder for method chaining.
+         *
+         * Thread safety:
+         * - Not thread-safe. Validation configuration should be performed from one thread.
+         */
         FieldValidationBuilder& url();
 
+        /**
+         * Applies a length validation rule that requires the field's length to be
+         * within the specified range.
+         *
+         * Can only be applied to std::string fields.
+         *
+         * @param minLength The minimum allowed length, inclusive.
+         * @param maxLength The maximum allowed length, inclusive.
+         *
+         * @return A reference to this builder for method chaining.
+         *
+         * Thread safety:
+         * - Not thread-safe. Validation configuration should be performed from one thread.
+         */
         FieldValidationBuilder& length(std::size_t minLength, std::size_t maxLength);
 
+        /**
+         * Applies a minimum length validation rule that requires the field's length
+         * to be greater than or equal to the specified value.
+         *
+         * Can only be applied to std::string fields.
+         *
+         * @param minLength The minimum allowed length, inclusive.
+         *
+         * @return A reference to this builder for method chaining.
+         *
+         * Thread safety:
+         * - Not thread-safe. Validation configuration should be performed from one thread.
+         */
         FieldValidationBuilder& minLength(std::size_t minLength);
+
+        /**
+         * Applies a maximum length validation rule that requires the field's length
+         * to be less than or equal to the specified value.
+         *
+         * Can only be applied to std::string fields.
+         *
+         * @param maxLength The maximum allowed length, inclusive.
+         *
+         * @return A reference to this builder for method chaining.
+         *
+         * Thread safety:
+         * - Not thread-safe. Validation configuration should be performed from one thread.
+         */
         FieldValidationBuilder& maxLength(std::size_t maxLength);
 
+        /**
+         * Applies a regular expression validation rule that requires the field to
+         * match the specified pattern.
+         *
+         * Can only be applied to std::string fields.
+         *
+         * @param pattern The regular expression pattern to match.
+         *
+         * @return A reference to this builder for method chaining.
+         *
+         * Thread safety:
+         * - Not thread-safe. Validation configuration should be performed from one thread.
+         */
         FieldValidationBuilder& regex(std::string_view pattern);
 
+        /**
+         * Applies a range validation rule that requires the field's value to be
+         * within the specified range.
+         *
+         * Can only be applied to numeric fields.
+         *
+         * @tparam Number The numeric type of the field and range bounds.
+         *
+         * @param min The minimum allowed value, inclusive.
+         * @param max The maximum allowed value, inclusive.
+         *
+         * @return A reference to this builder for method chaining.
+         *
+         * Thread safety:
+         * - Not thread-safe. Validation configuration should be performed from one thread.
+         */
         template <detail::traits::Numeric Number>
-        FieldValidationBuilder& range(Number min, Number max);
+        FieldValidationBuilder& range(Number minimum, Number maximum);
 
+        /**
+         * Applies a minimum value validation rule that requires the field's value
+         * to be greater than or equal to the specified value.
+         *
+         * Can only be applied to numeric fields.
+         *
+         * @tparam Number The numeric type of the field and minimum value.
+         *
+         * @param min The minimum allowed value, inclusive.
+         *
+         * @return A reference to this builder for method chaining.
+         *
+         * Thread safety:
+         * - Not thread-safe. Validation configuration should be performed from one thread.
+         */
         template <detail::traits::Numeric Number>
-        FieldValidationBuilder& min(Number min);
+        FieldValidationBuilder& min(Number minimum);
 
+        /**
+         * Applies a maximum value validation rule that requires the field's value
+         * to be less than or equal to the specified value.
+         *
+         * Can only be applied to numeric fields.
+         *
+         * @tparam Number The numeric type of the field and maximum value.
+         *
+         * @param max The maximum allowed value, inclusive.
+         *
+         * @return A reference to this builder for method chaining.
+         *
+         * Thread safety:
+         * - Not thread-safe. Validation configuration should be performed from one thread.
+         */
         template <detail::traits::Numeric Number>
-        FieldValidationBuilder& max(Number max);
+        FieldValidationBuilder& max(Number maximum);
 
+        /**
+         * Applies a multiple-of validation rule that requires the field's value to
+         * be a multiple of the specified factor.
+         *
+         * Can only be applied to numeric fields.
+         *
+         * @tparam Number The numeric type of the field and factor.
+         *
+         * @param factor The factor that the field's value must be a multiple of.
+         *
+         * @return A reference to this builder for method chaining.
+         *
+         * Thread safety:
+         * - Not thread-safe. Validation configuration should be performed from one thread.
+         */
         template <detail::traits::Numeric Number>
         FieldValidationBuilder& multipleOf(Number factor);
 
+        /**
+         * Applies an equality validation rule that requires the field's value to
+         * equal the specified value.
+         *
+         * @tparam U A type constructible as the field's type.
+         *
+         * @param value The value to compare against.
+         *
+         * @return A reference to this builder for method chaining.
+         *
+         * Thread safety:
+         * - Not thread-safe. Validation configuration should be performed from one thread.
+         */
         template <typename U>
             requires std::constructible_from<Field, U>
         FieldValidationBuilder& equals(U&& value);
 
+        /**
+         * Applies an inequality validation rule that requires the field's value to
+         * differ from the specified value.
+         *
+         * @tparam U A type constructible as the field's type.
+         *
+         * @param value The value to compare against.
+         *
+         * @return A reference to this builder for method chaining.
+         *
+         * Thread safety:
+         * - Not thread-safe. Validation configuration should be performed from one thread.
+         */
         template <typename U>
             requires std::constructible_from<Field, U>
         FieldValidationBuilder& notEquals(U&& value);
 
     private:
-        FieldValidationBuilder(mach::ValidationBuilder<T>& validationBuilder, Field T::* field)
-            : m_validationBuilder(validationBuilder), m_field(field) {}
+        FieldValidationBuilder(mach::ValidationBuilder<T>& validationBuilder, Field T::* field);
 
         template <bool Negate = false, typename Rule>
         FieldValidationBuilder& addRule(Rule rule, std::string_view errorMessage);
@@ -76,12 +260,20 @@ namespace mach::validation
         friend class mach::ValidationBuilder<T>;
     };
 
+    //----------------------------------------------------------------
+    // Implementation
+    //----------------------------------------------------------------
+
+    template <typename T, typename Field>
+    FieldValidationBuilder<T, Field>::FieldValidationBuilder(mach::ValidationBuilder<T>& validationBuilder, Field T::* field)
+        : m_validationBuilder(validationBuilder), m_field(field) {}
+
     template <typename T, typename Field>
     FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::email() {
         constexpr auto isString = std::same_as<std::remove_cvref_t<Field>, std::string>;
         static_assert(
             isString,
-            "FileValidationBuild::email() can only be used with std::string fields.");
+            "FileValidationBuilder::email() can only be used with std::string fields.");
 
         if constexpr (isString) {
             return addRule(detail::validation::EmailRule{}, "Invalid email format");
@@ -93,7 +285,7 @@ namespace mach::validation
         constexpr auto isString = std::same_as<std::remove_cvref_t<Field>, std::string>;
         static_assert(
             isString,
-            "FileValidationBuild::url() can only be used with std::string fields.");
+            "FileValidationBuilder::url() can only be used with std::string fields.");
 
         if constexpr (isString) {
             return addRule(detail::validation::UrlRule{}, "Invalid URL format");
@@ -107,7 +299,7 @@ namespace mach::validation
         constexpr auto isString = std::same_as<std::remove_cvref_t<Field>, std::string>;
         static_assert(
             isString,
-            "FileValidationBuild::length() can only be used with std::string fields.");
+            "FileValidationBuilder::length() can only be used with std::string fields.");
 
         if constexpr (isString) {
             return addRule(
@@ -148,7 +340,7 @@ namespace mach::validation
         constexpr auto isString = std::same_as<std::remove_cvref_t<Field>, std::string>;
         static_assert(
             isString,
-            "FileValidationBuild::regex() can only be used with std::string fields.");
+            "FileValidationBuilder::regex() can only be used with std::string fields.");
 
         if constexpr (isString) {
             return addRule(
@@ -160,32 +352,32 @@ namespace mach::validation
     template <typename T, typename Field>
     template <detail::traits::Numeric Number>
     FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::range(
-        Number min,
-        Number max) {
+        Number minimum,
+        Number maximum) {
         validateNumericRuleType<Number>();
 
         return addRule(
-            detail::validation::RangeRule<Number>{.min = min, .max = max},
+            detail::validation::RangeRule<Number>{.min = minimum, .max = maximum},
             "Value is not within the specified range");
     }
 
     template <typename T, typename Field>
     template <detail::traits::Numeric Number>
-    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::min(Number min) {
+    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::min(Number minimum) {
         validateNumericRuleType<Number>();
 
         return addRule(
-            detail::validation::RangeRule<Number>{.min = min, .max = std::nullopt},
+            detail::validation::RangeRule<Number>{.min = minimum, .max = std::nullopt},
             "Value is below the specified minimum");
     }
 
     template <typename T, typename Field>
     template <detail::traits::Numeric Number>
-    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::max(Number max) {
+    FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::max(Number maximum) {
         validateNumericRuleType<Number>();
 
         return addRule(
-            detail::validation::RangeRule<Number>{.min = std::nullopt, .max = max},
+            detail::validation::RangeRule<Number>{.min = std::nullopt, .max = maximum},
             "Value exceeds the specified maximum");
     }
 
