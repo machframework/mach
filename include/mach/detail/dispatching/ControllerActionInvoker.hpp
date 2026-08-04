@@ -6,7 +6,11 @@
 #include <typeindex>
 #include <utility>
 
+#include <nlohmann/json.hpp>
+
+#include <mach/exceptions/BadRequestException.hpp>
 #include <mach/Response.hpp>
+#include <mach/ValidationBuilder.hpp>
 
 #include <mach/detail/binding/BodyBinder.hpp>
 #include <mach/detail/binding/JsonConcepts.hpp>
@@ -15,6 +19,7 @@
 #include <mach/detail/http/ContentType.hpp>
 #include <mach/detail/results/ResultTraits.hpp>
 #include <mach/detail/serailization/Serializer.hpp>
+#include <mach/detail/validation/ValidationUtils.hpp>
 
 namespace mach::detail::dispatching
 {
@@ -94,6 +99,20 @@ namespace mach::detail::dispatching
                     if constexpr (passedByValue && jsonDeserializable) {
                         auto& binder = execution.scope.resolve<binding::BodyBinder>();
                         BodyType body = binder.bind<BodyType>(stringBody);
+
+                        if constexpr (requires(mach::ValidationBuilder<BodyType>& builder) {
+                                          { body.validate(builder) } -> std::same_as<void>;
+                                      }) {
+                            mach::ValidationBuilder<BodyType> validationBuilder;
+                            mach::detail::validation::ValidationResult validationResult;
+
+                            body.validate(validationBuilder);
+                            validationBuilder.validate(body, validationResult);
+
+                            if (validationResult.hasErrors()) {
+                                throw BadRequestException(makeValidationError(validationResult));
+                            }
+                        }
 
                         return std::invoke(m_action, controller, std::move(body));
                     }

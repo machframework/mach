@@ -4,11 +4,16 @@
 #include <type_traits>
 #include <utility>
 
+#include <mach/exceptions/BadRequestException.hpp>
+#include <mach/ValidationBuilder.hpp>
+
 #include <mach/detail/core/TypeTraits.hpp>
 #include <mach/detail/dispatching/IEndpointInvoker.hpp>
 #include <mach/detail/http/ContentType.hpp>
 #include <mach/detail/results/ResultTraits.hpp>
 #include <mach/detail/serailization/Serializer.hpp>
+#include <mach/detail/validation/ValidationResult.hpp>
+#include <mach/detail/validation/ValidationUtils.hpp>
 
 namespace mach::detail::dispatching
 {
@@ -97,6 +102,23 @@ namespace mach::detail::dispatching
                         if constexpr (binding::JsonDeserializable<ValueType>) {
                             auto& binder = execution.scope.resolve<binding::BodyBinder>();
                             ValueType body = binder.bind<ValueType>(context.request.body());
+
+                            if constexpr (requires(mach::ValidationBuilder<ValueType>& builder) {
+                                              {
+                                                  body.validate(builder)
+                                              } -> std::same_as<void>;
+                                          }) {
+                                mach::ValidationBuilder<ValueType> validationBuilder;
+                                mach::detail::validation::ValidationResult validationResult;
+
+                                body.validate(validationBuilder);
+                                validationBuilder.validate(body, validationResult);
+
+                                if (validationResult.hasErrors()) {
+                                    throw BadRequestException(
+                                        makeValidationError(validationResult));
+                                }
+                            }
 
                             return std::invoke(m_handler, std::move(body));
                         }

@@ -17,3 +17,5 @@
 #include <mach/results/Results.hpp>
 
 #include <mach/Logger.hpp>
+
+#include <mach/ValidationBuilder.hpp>
