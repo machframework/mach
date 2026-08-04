@@ -8,6 +8,7 @@ struct TestRequest {
     int age;
 
     void validate(mach::ValidationBuilder<TestRequest>& builder) const {
+        auto f = builder.field(&TestRequest::age);
         builder.field(&TestRequest::name).regex(R"(^[A-Za-z]+$)").length(1, 10);
 
         builder.field(&TestRequest::age).range(1, 5);

@@ -24,7 +24,7 @@ namespace mach
     class ValidationBuilder;
 }
 
-namespace mach::detail::validation
+namespace mach::validation
 {
     template <typename T, typename Field>
     class FieldValidationBuilder {
@@ -39,16 +39,16 @@ namespace mach::detail::validation
 
         FieldValidationBuilder& regex(std::string_view pattern);
 
-        template <traits::Numeric Number>
+        template <detail::traits::Numeric Number>
         FieldValidationBuilder& range(Number min, Number max);
 
-        template <traits::Numeric Number>
+        template <detail::traits::Numeric Number>
         FieldValidationBuilder& min(Number min);
 
-        template <traits::Numeric Number>
+        template <detail::traits::Numeric Number>
         FieldValidationBuilder& max(Number max);
 
-        template <traits::Numeric Number>
+        template <detail::traits::Numeric Number>
         FieldValidationBuilder& multipleOf(Number factor);
 
         template <typename U>
@@ -66,12 +66,12 @@ namespace mach::detail::validation
         template <bool Negate = false, typename Rule>
         FieldValidationBuilder& addRule(Rule rule, std::string_view errorMessage);
 
-        template <traits::Numeric Number>
+        template <detail::traits::Numeric Number>
         static consteval void validateNumericRuleType();
 
         mach::ValidationBuilder<T>& m_validationBuilder;
         Field T::* m_field;
-        std::unordered_set<ValidationRuleType> m_ruleTypes;
+        std::unordered_set<detail::validation::ValidationRuleType> m_ruleTypes;
 
         friend class mach::ValidationBuilder<T>;
     };
@@ -84,7 +84,7 @@ namespace mach::detail::validation
             "FileValidationBuild::email() can only be used with std::string fields.");
 
         if constexpr (isString) {
-            return addRule(EmailRule{}, "Invalid email format");
+            return addRule(detail::validation::EmailRule{}, "Invalid email format");
         }
     }
 
@@ -96,7 +96,7 @@ namespace mach::detail::validation
             "FileValidationBuild::url() can only be used with std::string fields.");
 
         if constexpr (isString) {
-            return addRule(UrlRule{}, "Invalid URL format");
+            return addRule(detail::validation::UrlRule{}, "Invalid URL format");
         }
     }
 
@@ -111,7 +111,7 @@ namespace mach::detail::validation
 
         if constexpr (isString) {
             return addRule(
-                LengthRule{.minLength = minLength, .maxLength = maxLength},
+                detail::validation::LengthRule{.minLength = minLength, .maxLength = maxLength},
                 "Value is not within the specified length range");
         }
     }
@@ -124,7 +124,7 @@ namespace mach::detail::validation
 
         if constexpr (isString) {
             return addRule(
-                LengthRule{.minLength = minLength, .maxLength = std::nullopt},
+                detail::validation::LengthRule{.minLength = minLength, .maxLength = std::nullopt},
                 "Value is too short");
         }
     }
@@ -137,7 +137,7 @@ namespace mach::detail::validation
 
         if constexpr (isString) {
             return addRule(
-                LengthRule{.minLength = std::nullopt, .maxLength = maxLength},
+                detail::validation::LengthRule{.minLength = std::nullopt, .maxLength = maxLength},
                 "Value is too long");
         }
     }
@@ -152,50 +152,50 @@ namespace mach::detail::validation
 
         if constexpr (isString) {
             return addRule(
-                RegexRule{.pattern = std::regex(pattern.begin(), pattern.end())},
+                detail::validation::RegexRule{.pattern = std::regex(pattern.begin(), pattern.end())},
                 "Value does not match the specified regex pattern");
         }
     }
 
     template <typename T, typename Field>
-    template <traits::Numeric Number>
+    template <detail::traits::Numeric Number>
     FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::range(
         Number min,
         Number max) {
         validateNumericRuleType<Number>();
 
         return addRule(
-            RangeRule<Number>{.min = min, .max = max},
+            detail::validation::RangeRule<Number>{.min = min, .max = max},
             "Value is not within the specified range");
     }
 
     template <typename T, typename Field>
-    template <traits::Numeric Number>
+    template <detail::traits::Numeric Number>
     FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::min(Number min) {
         validateNumericRuleType<Number>();
 
         return addRule(
-            RangeRule<Number>{.min = min, .max = std::nullopt},
+            detail::validation::RangeRule<Number>{.min = min, .max = std::nullopt},
             "Value is below the specified minimum");
     }
 
     template <typename T, typename Field>
-    template <traits::Numeric Number>
+    template <detail::traits::Numeric Number>
     FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::max(Number max) {
         validateNumericRuleType<Number>();
 
         return addRule(
-            RangeRule<Number>{.min = std::nullopt, .max = max},
+            detail::validation::RangeRule<Number>{.min = std::nullopt, .max = max},
             "Value exceeds the specified maximum");
     }
 
     template <typename T, typename Field>
-    template <traits::Numeric Number>
+    template <detail::traits::Numeric Number>
     FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::multipleOf(Number factor) {
         validateNumericRuleType<Number>();
 
         return addRule(
-            MultipleOfRule{.factor = factor},
+            detail::validation::MultipleOfRule{.factor = factor},
             "Value is not a multiple of the specified factor");
     }
 
@@ -204,7 +204,7 @@ namespace mach::detail::validation
         requires std::constructible_from<Field, U>
     FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::equals(U&& value) {
         return addRule(
-            EqualRule<Field>{.value = Field(std::forward<U>(value))},
+            detail::validation::EqualRule<Field>{.value = Field(std::forward<U>(value))},
             "Value is not equal to the specified value");
     }
 
@@ -213,7 +213,7 @@ namespace mach::detail::validation
         requires std::constructible_from<Field, U>
     FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::notEquals(U&& value) {
         return addRule(
-            NotEqualRule<Field>{.value = Field(std::forward<U>(value))},
+            detail::validation::NotEqualRule<Field>{.value = Field(std::forward<U>(value))},
             "Value is equal to the specified value");
     }
 
@@ -222,7 +222,7 @@ namespace mach::detail::validation
     FieldValidationBuilder<T, Field>& FieldValidationBuilder<T, Field>::addRule(
         Rule rule,
         std::string_view errorMessage) {
-        if constexpr (IsUniqueRule<Rule>) {
+        if constexpr (detail::validation::IsUniqueRule<Rule>) {
 
             const auto [_, inserted] = m_ruleTypes.insert(Rule::Type);
             if (!inserted) {
@@ -234,7 +234,7 @@ namespace mach::detail::validation
         m_validationBuilder.m_validators.emplace_back(
             [field = m_field, rule = std::move(rule), errorMessage = std::string(errorMessage)](
                 const T& instance,
-                ValidationResult& result) {
+                detail::validation::ValidationResult& result) {
                 const bool isValid = validate(instance.*field, rule);
 
                 if (isValid == Negate) {
@@ -246,10 +246,10 @@ namespace mach::detail::validation
     }
 
     template <typename T, typename Field>
-    template <traits::Numeric Number>
+    template <detail::traits::Numeric Number>
     consteval void FieldValidationBuilder<T, Field>::validateNumericRuleType() {
         static_assert(
-            traits::Numeric<Field>,
+            detail::traits::Numeric<Field>,
             "Numeric validation rules can only be applied "
             "to numeric fields.");
 
