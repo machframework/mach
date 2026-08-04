@@ -1,6 +1,5 @@
-#include <mach/mach.hpp>
-
 #include <mach/diagnostics/TerminateHandler.hpp>
+#include <mach/mach.hpp>
 
 #include "Testing.hpp"
 
@@ -8,8 +7,9 @@ struct TestRequest {
     std::string name;
     int age;
 
-	void validate(mach::ValidationBuilder<TestRequest>& builder) const {
+    void validate(mach::ValidationBuilder<TestRequest>& builder) const {
         builder.field(&TestRequest::name).regex(R"(^[A-Za-z]+$)").length(1, 10);
+
         builder.field(&TestRequest::age).range(1, 5);
     }
 };
@@ -22,8 +22,8 @@ int main() {
     mach::App app = mach::AppBuilder{}.build();
 
     app.mapPost("/test", [](TestRequest request) {
-        return mach::ok(request.age);
+        return mach::ok(request);
     });
 
-	return app.run();
+    return app.run();
 }
