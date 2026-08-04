@@ -52,7 +52,8 @@ namespace mach::detail::http::adapter
             version,
             std::move(target),
             std::move(rawRequest.body()),
-            std::move(headers));
+            std::move(headers),
+            std::move(cookies));
 
         // create an empty response
         mach::Response res(version);

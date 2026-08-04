@@ -13,9 +13,10 @@ namespace mach
         http::Version version,
         std::string target,
         std::string body,
-        std::unordered_map<std::string, std::string> headers)
+        std::unordered_map<std::string, std::string> headers,
+        std::unordered_map<std::string, std::string> cookies)
         : m_method(method), m_version(version), m_target(std::move(target)),
-          m_body(std::move(body)), m_headers(std::move(headers)) {}
+          m_body(std::move(body)), m_headers(std::move(headers)), m_cookies(std::move(cookies)) {}
 
     http::Version Request::version() const noexcept {
         return m_version;
@@ -46,10 +47,7 @@ namespace mach
     }
 
     bool Request::containsHeader(std::string_view name) const noexcept {
-        std::string normalizedName = std::string(name);
-        detail::http::toLowercaseInPlace(normalizedName);
-
-        return m_headers.find(normalizedName) != m_headers.end();
+        return this->header(name).has_value();
     }
 
     std::string_view Request::routeParam(std::string_view name) const {
@@ -59,6 +57,22 @@ namespace mach
         }
 
         throw std::out_of_range(std::format("Route parameter '{}' does not exist", name));
+    }
+
+    bool Request::containsCookie(std::string_view name) const noexcept {
+        return this->cookie(name).has_value();
+    }
+
+    std::optional<std::string_view> Request::cookie(std::string_view name) const {
+        std::string normalizedName = std::string(name);
+        detail::http::toLowercaseInPlace(normalizedName);
+
+        auto it = m_cookies.find(normalizedName);
+        if (it != m_cookies.end()) {
+            return it->second;
+        }
+
+        return std::nullopt;
     }
 
     void Request::setRouteParams(std::unordered_map<std::string, std::string>&& params) {
