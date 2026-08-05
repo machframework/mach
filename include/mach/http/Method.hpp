@@ -78,11 +78,12 @@ namespace mach::http
     /**
      * Contains all HTTP methods supported by Mach.
      */
-    inline constexpr std::array<Method, 6> allMethods{
+    inline constexpr std::array<Method, 7> allMethods{
         Method::Get,
-        Method::Head,
         Method::Post,
         Method::Put,
         Method::Patch,
-        Method::Delete};
+        Method::Delete,
+        Method::Head,
+        Method::Options};
 }

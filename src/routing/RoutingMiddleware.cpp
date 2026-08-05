@@ -8,16 +8,24 @@ namespace mach::detail::routing
         if (!plan.found()) {
             auto statusCode = routing::toStatusCode(plan.status);
 
+            // OPTIONS with no CORS should return 204
+            if (context.request.method() == mach::http::Method::Options) {
+                statusCode = mach::http::StatusCode::NoContent;
+            }
+
             context.response.status(statusCode);
             context.response.body(std::string(mach::http::reasonPhrase(statusCode)));
 
             std::string allow = "";
 
+            if (plan.allowedMethods.contains(mach::http::Method::Get)) {
+                allow += "HEAD";
+            }
+
             for (const mach::http::Method method : mach::http::allMethods) {
                 if (!plan.allowedMethods.contains(method)) {
                     continue;
                 }
-
                 if (!allow.empty()) {
                     allow += ", ";
                 }
@@ -26,7 +34,7 @@ namespace mach::detail::routing
             }
 
             if (!allow.empty()) {
-                context.response.setHeader("allow", allow);
+                context.response.setHeader("Allow", allow);
             }
 
             return;

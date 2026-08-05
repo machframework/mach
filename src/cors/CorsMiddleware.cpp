@@ -99,6 +99,7 @@ namespace mach::detail::cors
     void CorsMiddleware::handleOptionsRequest(mach::Context& context, const std::string& origin)
         const {
         if (!m_options.allowAnyOrigin && !m_options.allowedOrigins.contains(origin)) {
+            context.response.status(mach::http::StatusCode::Forbidden);
             return;
         }
         if (const auto methodStr = context.request.header("Access-Control-Request-Method")) {
@@ -107,7 +108,7 @@ namespace mach::detail::cors
                 context.response.status(mach::http::StatusCode::BadRequest);
                 return;
             }
-            if (!m_options.allowedMethods.contains(method)) {
+            if (!m_options.allowAnyMethod && !m_options.allowedMethods.contains(method)) {
                 context.response.status(mach::http::StatusCode::Forbidden);
                 return;
             }
@@ -149,10 +150,18 @@ namespace mach::detail::cors
     }
 
     std::string CorsMiddleware::joinMethods() const {
+        std::unordered_set<mach::http::Method> allowedMethods;
+
+        if (m_options.allowAnyMethod) {
+            allowedMethods.insert(mach::http::allMethods.begin(), mach::http::allMethods.end());
+        } else {
+            allowedMethods = m_options.allowedMethods;
+        }
+        
         std::string result;
 
         bool first = true;
-        for (auto method : m_options.allowedMethods) {
+        for (auto method : allowedMethods) {
             if (!first) {
                 result += ", ";
             }

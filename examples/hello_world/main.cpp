@@ -8,9 +8,9 @@ int main() {
     auto builder = mach::AppBuilder();
 
     builder.configureCors([](mach::CorsBuilder& cors) {
-        cors.allowAnyOrigin();
-        cors.allowAnyMethod();
-        cors.allowAnyHeader();
+        cors.allowOrigin("https://example.com");
+        cors.allowMethod(mach::http::Method::Post);
+        cors.maxAge(std::chrono::seconds(3600));
     });
 
     auto app = builder.build();
