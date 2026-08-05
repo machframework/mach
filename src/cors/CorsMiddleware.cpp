@@ -11,7 +11,7 @@
 
 namespace mach::detail::cors
 {
-    CorsMiddleware::CorsMiddleware(cors::CorsOptions&& options) : m_options(std::move(options)) {
+    CorsMiddleware::CorsMiddleware(cors::CorsOptions& options) : m_options(options) {
         buildCachedHeaders();
     }
 

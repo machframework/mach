@@ -6,9 +6,12 @@
 #include <mach/Logger.hpp>
 
 #include <mach/detail/binding/BodyBinder.hpp>
+#include <mach/detail/cors/CorsOptions.hpp>
 #include <mach/detail/exceptions/ExceptionMiddleware.hpp>
 #include <mach/detail/routing/Router.hpp>
 #include <mach/detail/routing/RoutingMiddleware.hpp>
+
+#include "cors/CorsMiddleware.hpp"
 
 namespace
 {
@@ -47,7 +50,7 @@ namespace mach
         this->use<detail::exceptions::ExceptionMiddleware, mach::Logger>(
             mach::detail::di::ServiceAccess::Internal);
 
-        // CORS middleware
+        this->use<detail::cors::CorsMiddleware, detail::cors::CorsOptions>(mach::detail::di::ServiceAccess::Internal);
 
         this->use<detail::routing::RoutingMiddleware, detail::routing::Router>(
             mach::detail::di::ServiceAccess::Internal);
@@ -73,6 +76,10 @@ namespace mach
         const auto& logger = m_container.addSingletonInstance(std::move(loggerInstance), detail::di::ServiceAccess::User);
 
         m_container.addService<detail::binding::BodyBinder>(
+            detail::di::ServiceLifetime::Singleton,
+            detail::di::ServiceAccess::Internal);
+
+        m_container.addService<detail::cors::CorsOptions>(
             detail::di::ServiceLifetime::Singleton,
             detail::di::ServiceAccess::Internal);
 

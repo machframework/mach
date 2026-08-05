@@ -13,7 +13,7 @@ namespace mach::detail::cors
     class CorsMiddleware {
 
     public:
-        explicit CorsMiddleware(cors::CorsOptions&& options);
+        explicit CorsMiddleware(cors::CorsOptions& options);
 
         void invoke(mach::Context& context, mach::Next& next);
 
