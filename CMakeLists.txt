@@ -74,7 +74,7 @@ add_library(mach
     src/utility/HttpDate.cpp
 
     src/cors/CorsBuilder.cpp
- )
+  "src/cors/CorsMiddleware.cpp")
 
 set_target_properties(mach PROPERTIES
     DEBUG_POSTFIX "d"

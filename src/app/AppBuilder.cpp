@@ -46,6 +46,9 @@ namespace mach
         // register preprocessing middleware
         this->use<detail::exceptions::ExceptionMiddleware, mach::Logger>(
             mach::detail::di::ServiceAccess::Internal);
+
+        // CORS middleware
+
         this->use<detail::routing::RoutingMiddleware, detail::routing::Router>(
             mach::detail::di::ServiceAccess::Internal);
     }
