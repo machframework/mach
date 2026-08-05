@@ -5,13 +5,10 @@
 #include <string_view>
 #include <unordered_map>
 
+#include <mach/http/Cookie.hpp>
 #include <mach/http/StatusCode.hpp>
 #include <mach/http/Version.hpp>
 
-namespace mach::http
-{
-    class Cookie;
-}
 namespace mach::detail::http::adapter
 {
     class BeastRequestAdapter;
@@ -143,6 +140,11 @@ namespace mach
          * @thread_safety This function is not thread-safe.
          */
         void setHeader(std::string_view name, std::string_view value);
+
+        bool containsCookie(std::string_view name) const noexcept;
+        std::optional<mach::http::Cookie> cookie(std::string_view name) const;
+        void addCookie(const mach::http::Cookie& cookie);
+        void addCookie(std::string name, std::string value);
 
     private:
         explicit Response(
