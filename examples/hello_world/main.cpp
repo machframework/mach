@@ -6,6 +6,13 @@
 
 int main() {
     auto builder = mach::AppBuilder();
+
+    builder.configureCors([](mach::CorsBuilder& cors) {
+        cors.allowAnyOrigin();
+        cors.allowAnyMethod();
+        cors.allowAnyHeader();
+    });
+
     auto app = builder.build();
 
     app.mapGet("/", [] {

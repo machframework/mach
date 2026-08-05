@@ -7,6 +7,7 @@
 #include <mach/http/StatusCode.hpp>
 #include <mach/middleware/Next.hpp>
 
+#include "http/HttpUtils.hpp"
 #include "utility/StringUtils.hpp"
 
 namespace mach::detail::cors
@@ -29,6 +30,7 @@ namespace mach::detail::cors
         // handle OPTIONS preflight
         if (request.method() == mach::http::Method::Options) {
             handleOptionsRequest(context, originValue);
+            return;
         }
 
         // verify origin
@@ -89,7 +91,9 @@ namespace mach::detail::cors
             }
         }
 
-        context.response.setHeader("Vary", vary);
+        if (!vary.empty()) {
+            context.response.setHeader("Vary", vary);
+        }
     }
 
     void CorsMiddleware::handleOptionsRequest(mach::Context& context, const std::string& origin)
@@ -117,7 +121,12 @@ namespace mach::detail::cors
             if (const auto headersStr = context.request.header("Access-Control-Request-Headers")) {
                 const auto headers = split(*headersStr, ',');
                 for (auto header : headers) {
-                    if (!m_options.allowedHeaders.contains(std::string(header))) {
+                    header = trim(header);
+
+                    auto normalizedHeader = std::string(header);
+                    http::toLowercaseInPlace(normalizedHeader);
+
+                    if (!m_options.allowedHeaders.contains(normalizedHeader)) {
                         context.response.status(mach::http::StatusCode::Forbidden);
                         return;
                     }
