@@ -142,8 +142,28 @@ namespace mach
          */
         std::string_view routeParam(std::string_view name) const;
 
+        /**
+         * Returns whether a given cookie exists in the request.
+         *
+         * @param name Cookie name (case-sensitive).
+         *
+         * @return Whether the cookie is found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
         bool containsCookie(std::string_view name) const noexcept;
 
+        /**
+         * Returns the value of an HTTP cookie if it exists.
+         *
+         * @param name Cookie name (case-sensitive).
+         *
+         * @return A view into the stored cookie value, or std::nullopt if not found.
+         *
+         * @throws std::bad_alloc If memory allocation fails while returning the string.
+         *
+         * @thread_safety This function is thread-safe.
+         */
         std::optional<std::string_view> cookie(std::string_view name) const;
 
     private:

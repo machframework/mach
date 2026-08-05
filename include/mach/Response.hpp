@@ -141,9 +141,51 @@ namespace mach
          */
         void setHeader(std::string_view name, std::string_view value);
 
+        /**
+         * Returns whether a given cookie exists in the response.
+         *
+         * @param name Cookie name (case-sensitive).
+         *
+         * @return Whether the cookie is found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
         bool containsCookie(std::string_view name) const noexcept;
+
+        /**
+         * Returns a cookie if it exists.
+         *
+         * @param name Cookie name (case-sensitive).
+         *
+         * @return The cookie if found, or std::nullopt otherwise.
+         *
+         * @throws std::bad_alloc If memory allocation fails while returning the cookie.
+         *
+         * @thread_safety This function is thread-safe.
+         */
         std::optional<mach::http::Cookie> cookie(std::string_view name) const;
+
+        /**
+         * Adds a cookie to the response.
+         *
+         * @param cookie Cookie to add.
+         *
+         * @throws std::bad_alloc If memory allocation fails while storing the cookie.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
         void addCookie(const mach::http::Cookie& cookie);
+
+        /**
+         * Adds a cookie to the response with the specified name and value.
+         *
+         * @param name Cookie name.
+         * @param value Cookie value.
+         *
+         * @throws std::bad_alloc If memory allocation fails while storing the cookie.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
         void addCookie(std::string name, std::string value);
 
     private:
