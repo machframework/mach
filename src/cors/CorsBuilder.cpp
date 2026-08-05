@@ -81,4 +81,8 @@ namespace mach
         m_options.maxAge = maxAge;
         return *this;
     }
+
+    detail::cors::CorsOptions&& CorsBuilder::takeOptions() && {
+        return std::move(m_options);
+    }
 }

@@ -9,6 +9,8 @@
 
 namespace mach
 {
+    class AppBuilder;
+
     class CorsBuilder {
 
     public:
@@ -43,5 +45,9 @@ namespace mach
 
     private:
         detail::cors::CorsOptions m_options;
+
+        detail::cors::CorsOptions&& takeOptions() &&;
+
+        friend class AppBuilder;
     };
 }

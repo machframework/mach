@@ -19,3 +19,5 @@
 #include <mach/Logger.hpp>
 
 #include <mach/ValidationBuilder.hpp>
+
+#include <mach/CorsBuilder.hpp>

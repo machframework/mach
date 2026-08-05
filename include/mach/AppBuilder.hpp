@@ -8,6 +8,7 @@
 #include <vector>
 
 #include <mach/App.hpp>
+#include <mach/CorsBuilder.hpp>
 #include <mach/LoggerOptions.hpp>
 #include <mach/ServerOptions.hpp>
 
@@ -167,6 +168,10 @@ namespace mach
             requires std::invocable<TConfigure, LoggerOptions&>
         AppBuilder& configureLogging(TConfigure&& configure);
 
+        template <typename TConfigure>
+            requires std::invocable<TConfigure, CorsBuilder&>
+        AppBuilder& configureCors(TConfigure&& configure);
+
         /**
          * Builds and returns the application instance.
          *
@@ -193,6 +198,7 @@ namespace mach
 
         ServerOptions m_serverOptions;
         LoggerOptions m_loggerOptions;
+        detail::cors::CorsOptions m_corsOptions;
 
         template <typename T, typename... Deps>
         AppBuilder& use(mach::detail::di::ServiceAccess access);
@@ -302,6 +308,16 @@ namespace mach
         requires std::invocable<TConfigure, LoggerOptions&>
     AppBuilder& AppBuilder::configureLogging(TConfigure&& configure) {
         std::invoke(std::forward<TConfigure>(configure), m_loggerOptions);
+        return *this;
+    }
+
+    template <typename TConfigure>
+        requires std::invocable<TConfigure, CorsBuilder&>
+    AppBuilder& AppBuilder::configureCors(TConfigure&& configure) {
+        CorsBuilder builder;
+        std::invoke(std::forward<TConfigure>(configure), builder);
+        m_corsOptions = std::move(builder).takeOptions();
+
         return *this;
     }
 }

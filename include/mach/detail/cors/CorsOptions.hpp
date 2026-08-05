@@ -11,7 +11,7 @@ namespace mach::detail::cors
 {
     struct CorsOptions {
         std::unordered_set<std::string> allowedOrigins;
-        std::unordered_set<http::Method> allowedMethods;
+        std::unordered_set<mach::http::Method> allowedMethods;
         std::unordered_set<std::string> allowedHeaders;
         std::unordered_set<std::string> exposedHeaders;
 
