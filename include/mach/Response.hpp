@@ -8,6 +8,10 @@
 #include <mach/http/StatusCode.hpp>
 #include <mach/http/Version.hpp>
 
+namespace mach::http
+{
+    class Cookie;
+}
 namespace mach::detail::http::adapter
 {
     class BeastRequestAdapter;
@@ -149,6 +153,7 @@ namespace mach
         http::StatusCode m_status;
         std::string m_body;
         std::unordered_map<std::string, std::string> m_headers;
+        std::vector<mach::http::Cookie> m_cookies;
 
         friend class detail::http::adapter::BeastRequestAdapter;
         friend class detail::http::adapter::BeastResponseAdapter;
