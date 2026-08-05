@@ -69,7 +69,7 @@ add_library(mach
     src/validation/ValidationResult.cpp
     src/validation/ValidationUtils.cpp
     src/validation/Validator.cpp
-)
+ "src/utility/StringUtils.cpp" "src/utility/HttpDate.cpp")
 
 set_target_properties(mach PROPERTIES
     DEBUG_POSTFIX "d"

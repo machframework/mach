@@ -109,4 +109,31 @@ namespace mach
 
         m_headers.insert_or_assign(std::move(normalizedName), std::string(value));
     }
+
+    bool Response::containsCookie(std::string_view name) const noexcept {
+        return this->cookie(name).has_value();
+    }
+
+    std::optional<mach::http::Cookie> Response::cookie(std::string_view name) const {
+        for (const auto& cookie : m_cookies) {
+            if (cookie.name == name) {
+                return cookie;
+            }
+        }
+
+        return std::nullopt;
+    }
+
+    void Response::addCookie(const mach::http::Cookie& cookie) {
+        m_cookies.push_back(cookie);
+    }
+
+    void Response::addCookie(std::string name, std::string value) {
+        mach::http::Cookie cookie{
+            .name = std::move(name),
+            .value = std::move(value),
+        };
+
+        this->addCookie(cookie);
+    }
 }

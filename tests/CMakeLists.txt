@@ -215,3 +215,8 @@ add_mach_test(
     GeneralValidationTests
     validation/GeneralValidationTests.cpp
 )
+
+add_mach_test(
+    RequestCookiesTests
+    requests/RequestCookiesTests.cpp
+)

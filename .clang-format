@@ -41,7 +41,7 @@ AllowShortLoopsOnASingleLine: false
 
 # Format long calls and function signatures vertically.
 BinPackArguments: false
-BinPackParameters: OnePerLine
+BinPackParameters: false
 AllowAllArgumentsOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false
 BreakAfterOpenBracketFunction: true

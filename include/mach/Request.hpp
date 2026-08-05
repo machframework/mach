@@ -87,6 +87,17 @@ namespace mach
         const std::string& body() const noexcept;
 
         /**
+         * Returns whether a given HTTP header exists in the request.
+         *
+         * @param name Header name (case-insensitive).
+         *
+         * @return Whether the header is found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        bool containsHeader(std::string_view name) const noexcept;
+
+        /**
          * Returns the value of an HTTP header if it exists.
          *
          * @param name Header name (case-insensitive).
@@ -98,17 +109,6 @@ namespace mach
          * @thread_safety This function is thread-safe.
          */
         std::optional<std::string_view> header(std::string_view name) const;
-
-        /**
-         * Returns whether a given HTTP header exists in the request.
-         *
-         * @param name Header name (case-insensitive).
-         *
-         * @return Whether the header is found.
-         *
-         * @thread_safety This function is thread-safe.
-         */
-        bool containsHeader(std::string_view name) const noexcept;
 
         /**
          * Returns the value of a route parameter converted to the specified type.
@@ -142,13 +142,38 @@ namespace mach
          */
         std::string_view routeParam(std::string_view name) const;
 
+        /**
+         * Returns whether a given cookie exists in the request.
+         *
+         * @param name Cookie name (case-sensitive).
+         *
+         * @return Whether the cookie is found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        bool containsCookie(std::string_view name) const noexcept;
+
+        /**
+         * Returns the value of an HTTP cookie if it exists.
+         *
+         * @param name Cookie name (case-sensitive).
+         *
+         * @return A view into the stored cookie value, or std::nullopt if not found.
+         *
+         * @throws std::bad_alloc If memory allocation fails while returning the string.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        std::optional<std::string_view> cookie(std::string_view name) const;
+
     private:
         Request(
             http::Method method,
             http::Version version,
             std::string target,
             std::string body,
-            std::unordered_map<std::string, std::string> headers);
+            std::unordered_map<std::string, std::string> headers,
+            std::unordered_map<std::string, std::string> cookies);
 
         void setRouteParams(std::unordered_map<std::string, std::string>&& params);
 
@@ -158,6 +183,7 @@ namespace mach
         std::string m_body;
         std::unordered_map<std::string, std::string> m_headers;
         std::unordered_map<std::string, std::string> m_routeParams;
+        std::unordered_map<std::string, std::string> m_cookies;
 
         friend class detail::http::adapter::BeastRequestAdapter;
         friend class detail::application::Runtime;
