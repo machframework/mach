@@ -1,7 +1,3 @@
-#include <exception>
-#include <iostream>
-#include <thread>
-
 #include <mach/mach.hpp>
 
 int main() {

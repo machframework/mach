@@ -12,7 +12,7 @@
 #include <mach/http/Method.hpp>
 #include <mach/Logger.hpp>
 
-#include <mach/ServerOptions.hpp>
+#include <mach/AppOptions.hpp>
 #include <mach/detail/controllers/ControllerTraits.hpp>
 #include <mach/detail/di/Container.hpp>
 #include <mach/detail/dispatching/MinimalApiInvoker.hpp>
@@ -202,7 +202,7 @@ namespace mach
         void stop();
 
     private:
-        App(ServerOptions serverOptions,
+        App(AppOptions serverOptions,
             detail::di::Container container,
             detail::middleware::MiddlewarePipeline middlewarePipeline,
             const Logger& logger);

@@ -15,31 +15,30 @@
 namespace mach::detail::server
 {
     Server::Server(
-        ServerOptions serverOptions,
+        AppOptions&& appOptions,
         di::Container container,
         middleware::MiddlewarePipeline middlewarePipeline,
         const mach::Logger& logger)
-        : m_threadCount(serverOptions.threadCount),
-          m_endpoint(
-              boost::asio::ip::make_address(serverOptions.host),
-              static_cast<std::uint16_t>(serverOptions.port)),
-          m_ioc(static_cast<int>(serverOptions.threadCount)), m_logger(logger),
-          m_runtime(std::move(container), std::move(middlewarePipeline), logger) {}
+        : m_appOptions(std::move(appOptions)),
+          m_endpoint(boost::asio::ip::make_address(m_appOptions.host), (m_appOptions.port)),
+          m_ioc(static_cast<int>(m_appOptions.threadCount)), m_logger(logger),
+          m_runtime(m_appOptions, std::move(container), std::move(middlewarePipeline), logger) {}
 
     std::string Server::host() const noexcept {
-        return m_endpoint.address().to_string();
+        return m_appOptions.host;
     }
 
     std::uint16_t Server::port() const noexcept {
-        return m_endpoint.port();
+        return m_appOptions.port;
     }
 
     std::size_t Server::threadCount() const noexcept {
-        return m_threadCount;
+        return m_appOptions.threadCount;
     }
 
     void Server::run() {
         m_listener = std::make_shared<BeastListener>(
+            m_appOptions,
             m_ioc,
             m_endpoint,
             m_runtime,
@@ -59,7 +58,7 @@ namespace mach::detail::server
 
         // Run the I/O service on the requested number of threads
         std::vector<std::thread> threads;
-        threads.reserve(m_threadCount - 1);
+        threads.reserve(m_appOptions.threadCount - 1);
 
         m_logger
             .info("Starting Mach server on {}:{} with {} threads", host(), port(), threadCount());
@@ -80,7 +79,7 @@ namespace mach::detail::server
             }
         };
 
-        for (int i = 0; i < m_threadCount - 1; ++i) {
+        for (int i = 0; i < m_appOptions.threadCount - 1; ++i) {
             threads.emplace_back(runIoContext);
         }
 

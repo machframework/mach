@@ -12,7 +12,7 @@
 #include <mach/CorsBuilder.hpp>
 #include <mach/CsrfBuilder.hpp>
 #include <mach/LoggerOptions.hpp>
-#include <mach/ServerOptions.hpp>
+#include <mach/AppOptions.hpp>
 
 #include <mach/detail/controllers/ControllerTraits.hpp>
 #include <mach/detail/di/Container.hpp>
@@ -55,7 +55,7 @@ namespace mach
          *
          * @throws std::invalid_argument If the supplied configuration is invalid.
          */
-        explicit AppBuilder(ServerOptions options);
+        explicit AppBuilder(AppOptions options);
 
         /**
          * Registers a scoped service in the dependency injection container.
@@ -153,6 +153,24 @@ namespace mach
         AppBuilder& use();
 
         /**
+         * Configures the application's server settings.
+         *
+         * The provided callback is invoked immediately and receives a mutable
+         * reference to the application's configuration. The configured options
+         * are used when the application is built.
+         *
+         * @tparam TConfigure A callable invocable with `AppOptions&`.
+         * @param configure The callback used to configure the application.
+         *
+         * @return A reference to this builder, allowing chaining.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        template <typename TConfigure>
+            requires std::invocable<TConfigure, AppOptions&>
+        AppBuilder& configureApp(TConfigure&& configure);
+
+        /**
          * Configures the application's logging options.
          *
          * The provided callback is invoked immediately and receives a mutable
@@ -241,7 +259,7 @@ namespace mach
         detail::middleware::MiddlewarePipeline m_middlewarePipeline;
         std::vector<std::function<void(App&)>> m_controllerMappers;
 
-        ServerOptions m_serverOptions;
+        AppOptions m_appOptions;
         LoggerOptions m_loggerOptions;
         std::optional<detail::cors::CorsOptions> m_corsOptions;
         std::optional<detail::csrf::CsrfOptions> m_csrfOptions;
@@ -347,6 +365,13 @@ namespace mach
         }
 
         m_middlewarePipeline.add<T>();
+        return *this;
+    }
+
+    template <typename TConfigure>
+        requires std::invocable<TConfigure, AppOptions&>
+    AppBuilder& AppBuilder::configureApp(TConfigure&& configure) {
+        std::invoke(std::forward<TConfigure>(configure), m_appOptions);
         return *this;
     }
 

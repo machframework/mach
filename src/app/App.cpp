@@ -26,7 +26,7 @@ namespace mach
 
     public:
         Impl(
-            ServerOptions serverOptions,
+            AppOptions serverOptions,
             detail::di::Container container,
             detail::middleware::MiddlewarePipeline middlewarePipeline,
             const Logger& logger);
@@ -46,7 +46,7 @@ namespace mach
         void stop();
 
     private:
-        ServerOptions m_serverOptions;
+        AppOptions m_appOptions;
         AppState m_state = AppState::Ready;
         std::unordered_set<std::type_index> m_mappedControllers;
 
@@ -61,7 +61,7 @@ namespace mach
     };
 
     App::App(
-        ServerOptions serverOptions,
+        AppOptions serverOptions,
         detail::di::Container container,
         detail::middleware::MiddlewarePipeline middlewarePipeline,
         const Logger& logger)
@@ -107,11 +107,11 @@ namespace mach
     }
 
     App::Impl::Impl(
-        ServerOptions serverOptions,
+        AppOptions serverOptions,
         detail::di::Container container,
         detail::middleware::MiddlewarePipeline middlewarePipeline,
         const Logger& logger)
-        : m_serverOptions(std::move(serverOptions)), m_container(std::move(container)),
+        : m_appOptions(std::move(serverOptions)), m_container(std::move(container)),
           m_middlewarePipeline(std::move(middlewarePipeline)), m_logger(logger) {}
 
     int App::Impl::run() {
@@ -137,8 +137,10 @@ namespace mach
 
             m_container.finalizeRegistrations();
 
+            auto& x = m_appOptions;
+
             m_server = std::make_unique<detail::server::Server>(
-                std::move(m_serverOptions),
+                std::move(m_appOptions),
                 std::move(m_container),
                 std::move(m_middlewarePipeline),
                 m_logger);
@@ -208,14 +210,14 @@ namespace mach
     }
 
     std::string App::Impl::host() const noexcept {
-        return m_serverOptions.host;
+        return m_appOptions.host;
     }
 
     std::uint16_t App::Impl::port() const noexcept {
-        return m_serverOptions.port;
+        return m_appOptions.port;
     }
 
     std::size_t App::Impl::threadCount() const noexcept {
-        return m_serverOptions.threadCount;
+        return m_appOptions.threadCount;
     }
 }
