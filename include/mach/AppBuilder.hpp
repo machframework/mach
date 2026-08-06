@@ -170,9 +170,23 @@ namespace mach
             requires std::invocable<TConfigure, LoggerOptions&>
         AppBuilder& configureLogging(TConfigure&& configure);
 
+        /**
+         * Adds CORS support to the application.
+         *
+         * The provided callback is invoked immediately and receives a mutable
+         * reference to the CORS configuration builder. The configured options are
+         * used by the CORS middleware when processing requests.
+         *
+         * @tparam TConfigure A callable invocable with `CorsBuilder&`.
+         * @param configure The callback used to configure the CORS policy.
+         *
+         * @return A reference to this builder, allowing chaining.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
         template <typename TConfigure>
             requires std::invocable<TConfigure, CorsBuilder&>
-        AppBuilder& configureCors(TConfigure&& configure);
+        AppBuilder& addCors(TConfigure&& configure);
 
         /**
          * Adds CSRF protection to the application.
@@ -345,7 +359,7 @@ namespace mach
 
     template <typename TConfigure>
         requires std::invocable<TConfigure, CorsBuilder&>
-    AppBuilder& AppBuilder::configureCors(TConfigure&& configure) {
+    AppBuilder& AppBuilder::addCors(TConfigure&& configure) {
         CorsBuilder builder;
         std::invoke(std::forward<TConfigure>(configure), builder);
         m_corsOptions = std::move(builder).takeOptions();
