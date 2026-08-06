@@ -12,7 +12,7 @@
 #include <mach/CorsBuilder.hpp>
 #include <mach/CsrfBuilder.hpp>
 #include <mach/LoggerOptions.hpp>
-#include <mach/ServerOptions.hpp>
+#include <mach/AppOptions.hpp>
 
 #include <mach/detail/controllers/ControllerTraits.hpp>
 #include <mach/detail/di/Container.hpp>
@@ -55,7 +55,7 @@ namespace mach
          *
          * @throws std::invalid_argument If the supplied configuration is invalid.
          */
-        explicit AppBuilder(ServerOptions options);
+        explicit AppBuilder(AppOptions options);
 
         /**
          * Registers a scoped service in the dependency injection container.
@@ -152,6 +152,10 @@ namespace mach
         template <typename T, typename... Deps>
         AppBuilder& use();
 
+        template <typename TConfigure>
+            requires std::invocable<TConfigure, AppOptions&>
+        AppBuilder& configureApp(TConfigure&& configure);
+
         /**
          * Configures the application's logging options.
          *
@@ -241,7 +245,7 @@ namespace mach
         detail::middleware::MiddlewarePipeline m_middlewarePipeline;
         std::vector<std::function<void(App&)>> m_controllerMappers;
 
-        ServerOptions m_serverOptions;
+        AppOptions m_appOptions;
         LoggerOptions m_loggerOptions;
         std::optional<detail::cors::CorsOptions> m_corsOptions;
         std::optional<detail::csrf::CsrfOptions> m_csrfOptions;
@@ -347,6 +351,13 @@ namespace mach
         }
 
         m_middlewarePipeline.add<T>();
+        return *this;
+    }
+
+    template <typename TConfigure>
+        requires std::invocable<TConfigure, AppOptions&>
+    AppBuilder& AppBuilder::configureApp(TConfigure&& configure) {
+        std::invoke(std::forward<TConfigure>(configure), m_appOptions);
         return *this;
     }
 

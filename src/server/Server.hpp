@@ -7,8 +7,8 @@
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/address.hpp>
 
+#include <mach/AppOptions.hpp>
 #include <mach/Logger.hpp>
-#include <mach/ServerOptions.hpp>
 
 #include <mach/detail/di/Container.hpp>
 #include <mach/detail/middleware/MiddlewarePipeline.hpp>
@@ -27,7 +27,7 @@ namespace mach::detail::server
 
     public:
         Server(
-            ServerOptions serverOptions,
+            AppOptions serverOptions,
             di::Container container,
             middleware::MiddlewarePipeline middlewarePipeline,
             const mach::Logger& logger);
@@ -45,6 +45,7 @@ namespace mach::detail::server
         boost::asio::ip::tcp::endpoint m_endpoint;
         boost::asio::io_context m_ioc;
         std::shared_ptr<BeastListener> m_listener;
+
         std::size_t m_threadCount;
 
         detail::application::Runtime m_runtime;

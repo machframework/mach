@@ -42,10 +42,10 @@ namespace
 
 namespace mach
 {
-    AppBuilder::AppBuilder() : AppBuilder(ServerOptions{}) {}
+    AppBuilder::AppBuilder() : AppBuilder(AppOptions{}) {}
 
-    AppBuilder::AppBuilder(ServerOptions options) {
-        m_serverOptions = std::move(options);
+    AppBuilder::AppBuilder(AppOptions options) {
+        m_appOptions = std::move(options);
 
         // reserve preprocessing middleware
         m_container.reserveInternal<detail::cors::CorsMiddleware>();
@@ -70,9 +70,9 @@ namespace mach
         mach::Logger loggerInstance(std::move(m_loggerOptions));
 
         try {
-            validateHost(m_serverOptions.host);
-            validatePort(m_serverOptions.port);
-            validateThreadCount(m_serverOptions.threadCount);
+            validateHost(m_appOptions.host);
+            validatePort(m_appOptions.port);
+            validateThreadCount(m_appOptions.threadCount);
         } catch (const std::exception& ex) {
             loggerInstance.error("Failed to build Mach application: {}", ex.what());
             throw;
@@ -108,7 +108,7 @@ namespace mach
             mach::detail::di::ServiceAccess::Internal);
 
         App app(
-            std::move(m_serverOptions),
+            std::move(m_appOptions),
             std::move(m_container),
             std::move(m_middlewarePipeline),
             logger);

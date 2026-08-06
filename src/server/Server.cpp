@@ -15,7 +15,7 @@
 namespace mach::detail::server
 {
     Server::Server(
-        ServerOptions serverOptions,
+        AppOptions serverOptions,
         di::Container container,
         middleware::MiddlewarePipeline middlewarePipeline,
         const mach::Logger& logger)

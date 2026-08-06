@@ -21,7 +21,7 @@ MACH_DEFINE_JSON(UserProfile, name, age, adult)
 
 int main() {
     auto builder = mach::AppBuilder(
-        mach::ServerOptions{
+        mach::AppOptions{
             .host = "127.0.0.1",
             .port = 3143,
             .threadCount = std::thread::hardware_concurrency()
