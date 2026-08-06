@@ -22,17 +22,19 @@
 
 namespace mach::detail::csrf
 {
-    CsrfMiddleware::CsrfMiddleware() {}
+    CsrfMiddleware::CsrfMiddleware(CsrfOptions& options) : m_options(options) {}
 
     void CsrfMiddleware::invoke(mach::Context& context, mach::Next& next) {
-        const auto tokenCookie = context.request.cookie("__Host-csrf-token");
+        const auto tokenCookie = context.request.cookie(m_options.cookieName);
 
         const auto method = context.request.method();
+
+        // safe method
         if (method == mach::http::Method::Get || method == mach::http::Method::Head ||
             method == mach::http::Method::Options) {
             if (!tokenCookie) {
                 auto cookie = mach::http::Cookie{
-                    .name = "__Host-csrf-token",
+                    .name = m_options.cookieName,
                     .value = generateToken(),
                     .secure = true,
 
@@ -45,8 +47,8 @@ namespace mach::detail::csrf
             return;
         }
 
-        // check for token
-        const auto tokenHeader = context.request.header("X-CSRF-Token");
+        // unsafe method
+        const auto tokenHeader = context.request.header(m_options.headerName);
 
         if (!tokenHeader || !tokenCookie || *tokenHeader != *tokenCookie) {
             context.response.status(mach::http::StatusCode::Forbidden);

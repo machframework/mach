@@ -10,6 +10,7 @@
 
 #include <mach/App.hpp>
 #include <mach/CorsBuilder.hpp>
+#include <mach/CsrfBuilder.hpp>
 #include <mach/LoggerOptions.hpp>
 #include <mach/ServerOptions.hpp>
 
@@ -173,6 +174,12 @@ namespace mach
             requires std::invocable<TConfigure, CorsBuilder&>
         AppBuilder& configureCors(TConfigure&& configure);
 
+        AppBuilder& addCsrf();
+
+        template <typename TConfigure>
+            requires std::invocable<TConfigure, CsrfBuilder&>
+        AppBuilder& addCsrf(TConfigure&& configure);
+
         /**
          * Builds and returns the application instance.
          *
@@ -200,6 +207,7 @@ namespace mach
         ServerOptions m_serverOptions;
         LoggerOptions m_loggerOptions;
         std::optional<detail::cors::CorsOptions> m_corsOptions;
+        std::optional<detail::csrf::CsrfOptions> m_csrfOptions;
 
         template <typename T, typename... Deps>
         AppBuilder& use(mach::detail::di::ServiceAccess access);
@@ -318,6 +326,15 @@ namespace mach
         CorsBuilder builder;
         std::invoke(std::forward<TConfigure>(configure), builder);
         m_corsOptions = std::move(builder).takeOptions();
+        return *this;
+    }
+
+    template <typename TConfigure>
+        requires std::invocable<TConfigure, CsrfBuilder&>
+    AppBuilder& AppBuilder::addCsrf(TConfigure&& configure) {
+        CsrfBuilder builder;
+        std::invoke(std::forward<TConfigure>(configure), builder);
+        m_csrfOptions = std::move(builder).takeOptions();
 
         return *this;
     }
