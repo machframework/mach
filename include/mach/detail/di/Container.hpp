@@ -231,7 +231,7 @@ namespace mach::detail::di
                                     if constexpr (serviceAllowed && dependenciesAllowed) {
                                         const std::type_index type = typeid(T);
 
-                                        if (m_reservedTypes.contains(type)) {
+                                        if (access != ServiceAccess::Internal && m_reservedTypes.contains(type)) {
                                             throw std::logic_error(
                                                 std::format(
                                                     "Mach DI error: service '{}' is reserved for "
@@ -307,7 +307,6 @@ namespace mach::detail::di
 
     template <typename T>
     void Container::reserveInternal() {
-        // TODO: enforce in registration
         m_reservedTypes.insert(typeid(T));
     }
 }

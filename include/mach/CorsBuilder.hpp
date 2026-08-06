@@ -12,16 +12,15 @@ namespace mach
     class AppBuilder;
 
     /**
-     * Configures Cross-Origin Resource Sharing (CORS) policies.
+     * Configures the application's Cross-Origin Resource Sharing (CORS) policy.
      *
      * Provides a fluent interface for configuring allowed origins, methods,
      * headers, credentials, exposed headers, and other CORS settings.
      *
-     * Instances of this class are intended to be configured within
-     * `AppBuilder::useCors` and are not typically created directly.
+     * Instances of this class are intended to be configured through
+     * `AppBuilder::addCors` and are not typically created directly.
      *
-     * Thread safety:
-     * - Not thread-safe.
+     * @thread_safety This class is not thread-safe.
      */
     class CorsBuilder {
 

@@ -74,7 +74,7 @@ add_library(mach
     src/utility/HttpDate.cpp
 
     src/cors/CorsBuilder.cpp
-  "src/cors/CorsMiddleware.cpp")
+  "src/cors/CorsMiddleware.cpp" "src/csrf/CsrfMiddleware.cpp" "src/csrf/CsrfBuilder.cpp")
 
 set_target_properties(mach PROPERTIES
     DEBUG_POSTFIX "d"
@@ -108,6 +108,13 @@ target_link_libraries(mach
     PRIVATE
         spdlog::spdlog
 )
+
+if (WIN32)
+    target_link_libraries(mach
+    PRIVATE
+        bcrypt
+    )
+endif()
 
 # Boost.Asio requires the target Windows version to be declared.
 # This definition has no effect on non-Windows platforms.
