@@ -137,6 +137,8 @@ namespace mach
 
             m_container.finalizeRegistrations();
 
+            auto& x = m_appOptions;
+
             m_server = std::make_unique<detail::server::Server>(
                 std::move(m_appOptions),
                 std::move(m_container),

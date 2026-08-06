@@ -24,6 +24,7 @@
 #include <boost/beast/http/message.hpp>
 #include <boost/beast/http/parser.hpp>
 
+#include <mach/AppOptions.hpp>
 #include <mach/Context.hpp>
 #include <mach/Logger.hpp>
 
@@ -45,6 +46,7 @@ namespace mach::detail::server
 
     public:
         BeastSession(
+            const AppOptions& appOptions,
             tcp::socket socket,
             detail::application::Runtime& runtime,
             detail::http::adapter::BeastRequestAdapter& requestAdapter,
@@ -69,6 +71,8 @@ namespace mach::detail::server
             http::request<Body, http::basic_fields<Allocator>>&& req);
 
         http::message_generator makeReadErrorResponse(mach::http::StatusCode status);
+
+        const AppOptions& m_appOptions;
 
         detail::application::Runtime& m_runtime;
         detail::http::adapter::BeastRequestAdapter& m_requestAdapter;

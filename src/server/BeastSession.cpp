@@ -31,13 +31,14 @@ namespace mach::detail::server
 {
     // Take ownership of the stream
     BeastSession::BeastSession(
+        const AppOptions& appOptions,
         tcp::socket socket,
         detail::application::Runtime& runtime,
         detail::http::adapter::BeastRequestAdapter& requestAdapter,
         detail::http::adapter::BeastResponseAdapter& responseAdapter,
         const mach::Logger& logger)
-        : m_stream(std::move(socket)), m_runtime(runtime), m_requestAdapter(requestAdapter),
-          m_responseAdapter(responseAdapter), m_logger(logger) {}
+        : m_appOptions(appOptions), m_stream(std::move(socket)), m_runtime(runtime),
+          m_requestAdapter(requestAdapter), m_responseAdapter(responseAdapter), m_logger(logger) {}
 
     // Start the asynchronous operation
     net::awaitable<void> BeastSession::run() {
@@ -60,7 +61,7 @@ namespace mach::detail::server
 
     net::awaitable<bool> BeastSession::do_read() {
         // Set the read timeout
-        m_stream.expires_after(std::chrono::seconds(30));
+        m_stream.expires_after(m_appOptions.requestTimeout);
         beast::error_code ec;
 
         http::request_parser<http::string_body> parser;
@@ -107,7 +108,7 @@ namespace mach::detail::server
         const bool keep_alive = msg.keep_alive();
 
         // Set the write timeout
-        m_stream.expires_after(std::chrono::seconds(30));
+        m_stream.expires_after(m_appOptions.requestTimeout);
         beast::error_code ec;
 
         // Write the response

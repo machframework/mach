@@ -17,6 +17,7 @@
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 
+#include <mach/AppOptions.hpp>
 #include <mach/Logger.hpp>
 
 #include "adapter/inbound/BeastRequestAdapter.hpp"
@@ -36,6 +37,7 @@ namespace mach::detail::server
 
     public:
         BeastListener(
+            const AppOptions& appOptions,
             net::io_context& ioc,
             tcp::endpoint endpoint,
             detail::application::Runtime& runtime,
@@ -49,6 +51,8 @@ namespace mach::detail::server
 
     private:
         net::awaitable<void> do_accept();
+
+        const AppOptions& m_appOptions;
 
         detail::application::Runtime& m_runtime;
         detail::http::adapter::BeastRequestAdapter& m_requestAdapter;

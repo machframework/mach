@@ -27,14 +27,16 @@
 namespace mach::detail::server
 {
     BeastListener::BeastListener(
+        const AppOptions& appOptions,
         net::io_context& ioc,
         tcp::endpoint endpoint,
         detail::application::Runtime& runtime,
         detail::http::adapter::BeastRequestAdapter& requestAdapter,
         detail::http::adapter::BeastResponseAdapter& responseAdapter,
         const mach::Logger& logger)
-        : m_ioc(ioc), m_acceptor(net::make_strand(ioc)), m_runtime(runtime),
-          m_requestAdapter(requestAdapter), m_responseAdapter(responseAdapter), m_logger(logger) {
+        : m_appOptions(appOptions), m_ioc(ioc), m_acceptor(net::make_strand(ioc)),
+          m_runtime(runtime), m_requestAdapter(requestAdapter), m_responseAdapter(responseAdapter),
+          m_logger(logger) {
         beast::error_code ec;
 
         // Open the acceptor
@@ -119,6 +121,7 @@ namespace mach::detail::server
             auto executor = socket.get_executor();
 
             auto session = std::make_shared<BeastSession>(
+                m_appOptions,
                 std::move(socket),
                 m_runtime,
                 m_requestAdapter,

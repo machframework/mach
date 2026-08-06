@@ -11,10 +11,11 @@
 namespace mach::detail::application
 {
     Runtime::Runtime(
+        const AppOptions& appOptions,
         di::Container container,
         middleware::MiddlewarePipeline middlewarePipeline,
         const Logger& logger)
-        : m_container(std::move(container)), m_logger(logger),
+        : m_appOptions(appOptions), m_container(std::move(container)), m_logger(logger),
           m_dispatcher(m_container, std::move(middlewarePipeline)) {}
 
     void Runtime::handle(mach::Context& context) {

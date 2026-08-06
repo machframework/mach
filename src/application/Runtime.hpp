@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mach/AppOptions.hpp>
 #include <mach/Context.hpp>
 #include <mach/Logger.hpp>
 
@@ -14,7 +15,11 @@ namespace mach::detail::application
     class Runtime {
 
     public:
-        Runtime(di::Container container, middleware::MiddlewarePipeline middlewarePipeline, const Logger& logger);
+        Runtime(
+            const AppOptions& appOptions,
+            di::Container container,
+            middleware::MiddlewarePipeline middlewarePipeline,
+            const Logger& logger);
 
         Runtime(const Runtime&) = delete;
         Runtime& operator=(const Runtime&) = delete;
@@ -24,6 +29,8 @@ namespace mach::detail::application
         void handle(mach::Context& context);
 
     private:
+        const AppOptions& m_appOptions;
+
         di::Container m_container;
         dispatching::Dispatcher m_dispatcher;
 
