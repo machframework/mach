@@ -6,6 +6,8 @@
 
 int main() {
     auto builder = mach::AppBuilder();
+    builder.addCsrf();
+
     auto app = builder.build();
 
     app.mapGet("/", [] {

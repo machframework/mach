@@ -37,7 +37,6 @@ namespace mach::detail::csrf
                     .name = m_options.cookieName,
                     .value = generateToken(),
                     .secure = true,
-
                 };
 
                 context.response.addCookie(std::move(cookie));

@@ -64,10 +64,7 @@ namespace mach
     }
 
     std::optional<std::string_view> Request::cookie(std::string_view name) const {
-        std::string normalizedName = std::string(name);
-        detail::http::toLowercaseInPlace(normalizedName);
-
-        auto it = m_cookies.find(normalizedName);
+        auto it = m_cookies.find(std::string(name));
         if (it != m_cookies.end()) {
             return it->second;
         }
