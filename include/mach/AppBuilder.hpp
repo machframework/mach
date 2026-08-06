@@ -162,7 +162,7 @@ namespace mach
          * @tparam TConfigure A callable invocable with `LoggerOptions&`.
          * @param configure The callback used to configure the logger options.
          *
-         * @return A reference to this builder.
+         * @return A reference to this builder, allowing chaining.
          *
          * @thread_safety This function is not thread-safe.
          */
@@ -174,8 +174,31 @@ namespace mach
             requires std::invocable<TConfigure, CorsBuilder&>
         AppBuilder& configureCors(TConfigure&& configure);
 
+        /**
+         * Adds CSRF protection to the application.
+         *
+         * Adds the CSRF middleware using the default configuration.
+         *
+         * @return A reference to this builder, allowing chaining.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
         AppBuilder& addCsrf();
 
+        /**
+         * Adds CSRF protection to the application.
+         *
+         * The provided callback is invoked immediately and receives a mutable
+         * reference to the CSRF configuration builder. The configured options are
+         * used by the CSRF middleware when processing requests.
+         *
+         * @tparam TConfigure A callable invocable with `CsrfBuilder&`.
+         * @param configure The callback used to configure CSRF protection.
+         *
+         * @return A reference to this builder, allowing chaining.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
         template <typename TConfigure>
             requires std::invocable<TConfigure, CsrfBuilder&>
         AppBuilder& addCsrf(TConfigure&& configure);
