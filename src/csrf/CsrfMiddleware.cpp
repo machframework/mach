@@ -60,6 +60,8 @@ namespace mach::detail::csrf
             context.response.body("CSRF token validation failed");
             return;
         }
+
+        next();
     }
 
     std::string CsrfMiddleware::generateToken() const {
