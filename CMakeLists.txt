@@ -69,7 +69,12 @@ add_library(mach
     src/validation/ValidationResult.cpp
     src/validation/ValidationUtils.cpp
     src/validation/Validator.cpp
- "src/utility/StringUtils.cpp" "src/utility/HttpDate.cpp")
+ 
+    src/utility/StringUtils.cpp
+    src/utility/HttpDate.cpp
+
+    src/cors/CorsBuilder.cpp
+  "src/cors/CorsMiddleware.cpp")
 
 set_target_properties(mach PROPERTIES
     DEBUG_POSTFIX "d"

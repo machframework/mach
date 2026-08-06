@@ -48,14 +48,42 @@ namespace mach::http
         }
     }
 
+    [[nodiscard]]
+    constexpr Method toMethod(std::string_view value) {
+        if (value == "GET") {
+            return Method::Get;
+        }
+        if (value == "POST") {
+            return Method::Post;
+        }
+        if (value == "PUT") {
+            return Method::Put;
+        }
+        if (value == "PATCH") {
+            return Method::Patch;
+        }
+        if (value == "DELETE") {
+            return Method::Delete;
+        }
+        if (value == "HEAD") {
+            return Method::Head;
+        }
+        if (value == "OPTIONS") {
+            return Method::Options;
+        }
+
+        return Method::Unknown;
+    }
+
     /**
      * Contains all HTTP methods supported by Mach.
      */
-    inline constexpr std::array<Method, 6> allMethods{
+    inline constexpr std::array<Method, 7> allMethods{
         Method::Get,
-        Method::Head,
         Method::Post,
         Method::Put,
         Method::Patch,
-        Method::Delete};
+        Method::Delete,
+        Method::Head,
+        Method::Options};
 }

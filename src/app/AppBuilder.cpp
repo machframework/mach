@@ -6,9 +6,12 @@
 #include <mach/Logger.hpp>
 
 #include <mach/detail/binding/BodyBinder.hpp>
+#include <mach/detail/cors/CorsOptions.hpp>
 #include <mach/detail/exceptions/ExceptionMiddleware.hpp>
 #include <mach/detail/routing/Router.hpp>
 #include <mach/detail/routing/RoutingMiddleware.hpp>
+
+#include "cors/CorsMiddleware.hpp"
 
 namespace
 {
@@ -46,6 +49,9 @@ namespace mach
         // register preprocessing middleware
         this->use<detail::exceptions::ExceptionMiddleware, mach::Logger>(
             mach::detail::di::ServiceAccess::Internal);
+
+        this->use<detail::cors::CorsMiddleware, detail::cors::CorsOptions>(mach::detail::di::ServiceAccess::Internal);
+
         this->use<detail::routing::RoutingMiddleware, detail::routing::Router>(
             mach::detail::di::ServiceAccess::Internal);
     }
@@ -72,6 +78,12 @@ namespace mach
         m_container.addService<detail::binding::BodyBinder>(
             detail::di::ServiceLifetime::Singleton,
             detail::di::ServiceAccess::Internal);
+
+        if (m_corsOptions) {
+            m_container.addSingletonInstance<detail::cors::CorsOptions>(
+                std::move(*m_corsOptions),
+                detail::di::ServiceAccess::Internal);
+        }
 
         App app(
             std::move(m_serverOptions),

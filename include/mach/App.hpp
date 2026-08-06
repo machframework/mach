@@ -77,7 +77,6 @@ namespace mach
          * @param pattern The route pattern to match (e.g. "/api/users").
          * @param handler The function invoked when the route is matched.
          *
-         * @throws std::invalid_argument If the supplied handler is invalid.
          * @throws std::logic_error If a route with the same method and pattern
          *         has already been registered.
          *
@@ -95,7 +94,6 @@ namespace mach
          * @param pattern The route pattern to match (e.g. "/api/users").
          * @param handler The function invoked when the route is matched.
          *
-         * @throws std::invalid_argument If the supplied handler is invalid.
          * @throws std::logic_error If a route with the same method and pattern
          *         has already been registered.
          *
@@ -113,7 +111,6 @@ namespace mach
          * @param pattern The route pattern to match (e.g. "/api/users").
          * @param handler The function invoked when the route is matched.
          *
-         * @throws std::invalid_argument If the supplied handler is invalid.
          * @throws std::logic_error If a route with the same method and pattern
          *         has already been registered.
          *
@@ -131,7 +128,6 @@ namespace mach
          * @param pattern The route pattern to match (e.g. "/api/users").
          * @param handler The function invoked when the route is matched.
          *
-         * @throws std::invalid_argument If the supplied handler is invalid.
          * @throws std::logic_error If a route with the same method and pattern
          *         has already been registered.
          *
@@ -149,7 +145,6 @@ namespace mach
          * @param pattern The route pattern to match (e.g. "/api/users").
          * @param handler The function invoked when the route is matched.
          *
-         * @throws std::invalid_argument If the supplied handler is invalid.
          * @throws std::logic_error If a route with the same method and pattern
          *         has already been registered.
          *
@@ -167,7 +162,6 @@ namespace mach
          * @param pattern The route pattern to match (e.g. "/api/users").
          * @param handler The function invoked when the route is matched.
          *
-         * @throws std::invalid_argument If the supplied handler is invalid.
          * @throws std::logic_error If a route with the same method and pattern
          *         has already been registered.
          *
@@ -178,23 +172,6 @@ namespace mach
         void mapHead(std::string_view pattern, THandler&& handler) {
             mapRoute(http::Method::Head, pattern, std::forward<THandler>(handler));
         }
-
-        /**
-         * Registers a route request handler.
-         *
-         * @param method The HTTP method to match (e.g. GET, POST).
-         * @param pattern The route pattern to match (e.g. "/api/users").
-         * @param handler The function invoked when the route is matched.
-         *
-         * @throws std::invalid_argument If the supplied handler is invalid.
-         * @throws std::logic_error If a route with the same method and pattern
-         *         has already been registered.
-         *
-         * @thread_safety This function is not thread-safe.
-         */
-        template <typename THandler>
-            requires detail::traits::MinimalApiHandler<THandler>
-        void mapRoute(http::Method method, std::string_view pattern, THandler&& handler);
 
         /**
          * Starts the application and begins accepting incoming HTTP requests.
@@ -229,6 +206,10 @@ namespace mach
             detail::di::Container container,
             detail::middleware::MiddlewarePipeline middlewarePipeline,
             const Logger& logger);
+
+        template <typename THandler>
+            requires detail::traits::MinimalApiHandler<THandler>
+        void mapRoute(http::Method method, std::string_view pattern, THandler&& handler);
 
         template <detail::controllers::MachController TController>
         App& mapController();

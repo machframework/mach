@@ -171,7 +171,7 @@ namespace mach::detail::routing
         const RouteNode* curr = &m_root;
 
         std::vector<std::string> capturedValues;
-        std::unordered_set<mach::http::Method> allowedMethods;
+        std::unordered_set<mach::http::Method> allowedMethods = {mach::http::Method::Options};
 
         return matchRoute(method, segments, 0, capturedValues, allowedMethods, curr);
     }
