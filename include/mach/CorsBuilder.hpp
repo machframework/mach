@@ -26,8 +26,6 @@ namespace mach
     class CorsBuilder {
 
     public:
-        CorsBuilder() = default;
-
         CorsBuilder(const CorsBuilder&) = delete;
         CorsBuilder& operator=(const CorsBuilder&) = delete;
 
@@ -177,9 +175,11 @@ namespace mach
         CorsBuilder& maxAge(std::chrono::seconds maxAge);
 
     private:
-        detail::cors::CorsOptions m_options;
-
+        CorsBuilder() = default;
+        
         detail::cors::CorsOptions&& takeOptions() &&;
+
+        detail::cors::CorsOptions m_options;
 
         friend class AppBuilder;
     };
