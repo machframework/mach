@@ -152,6 +152,20 @@ namespace mach
         template <typename T, typename... Deps>
         AppBuilder& use();
 
+        /**
+         * Configures the application's server settings.
+         *
+         * The provided callback is invoked immediately and receives a mutable
+         * reference to the application's configuration. The configured options
+         * are used when the application is built.
+         *
+         * @tparam TConfigure A callable invocable with `AppOptions&`.
+         * @param configure The callback used to configure the application.
+         *
+         * @return A reference to this builder, allowing chaining.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
         template <typename TConfigure>
             requires std::invocable<TConfigure, AppOptions&>
         AppBuilder& configureApp(TConfigure&& configure);
