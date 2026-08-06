@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -198,7 +199,7 @@ namespace mach
 
         ServerOptions m_serverOptions;
         LoggerOptions m_loggerOptions;
-        detail::cors::CorsOptions m_corsOptions;
+        std::optional<detail::cors::CorsOptions> m_corsOptions;
 
         template <typename T, typename... Deps>
         AppBuilder& use(mach::detail::di::ServiceAccess access);

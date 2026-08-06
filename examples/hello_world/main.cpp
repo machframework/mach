@@ -6,13 +6,6 @@
 
 int main() {
     auto builder = mach::AppBuilder();
-
-    builder.configureCors([](mach::CorsBuilder& cors) {
-        cors.allowOrigin("https://example.com");
-        cors.allowMethod(mach::http::Method::Post);
-        cors.maxAge(std::chrono::seconds(3600));
-    });
-
     auto app = builder.build();
 
     app.mapGet("/", [] {

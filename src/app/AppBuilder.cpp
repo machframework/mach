@@ -79,9 +79,11 @@ namespace mach
             detail::di::ServiceLifetime::Singleton,
             detail::di::ServiceAccess::Internal);
 
-        m_container.addSingletonInstance<detail::cors::CorsOptions>(
-            std::move(m_corsOptions),
-            detail::di::ServiceAccess::Internal);
+        if (m_corsOptions) {
+            m_container.addSingletonInstance<detail::cors::CorsOptions>(
+                std::move(*m_corsOptions),
+                detail::di::ServiceAccess::Internal);
+        }
 
         App app(
             std::move(m_serverOptions),
