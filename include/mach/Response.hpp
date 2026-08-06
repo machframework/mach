@@ -177,6 +177,19 @@ namespace mach
         void addCookie(const mach::http::Cookie& cookie);
 
         /**
+         * Adds a cookie to the response.
+         *
+         * Takes ownership of the cookie when possible to avoid unnecessary copies.
+         *
+         * @param cookie Cookie to add.
+         *
+         * @throws std::bad_alloc If memory allocation fails while storing the cookie.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void addCookie(mach::http::Cookie&& cookie);
+
+        /**
          * Adds a cookie to the response with the specified name and value.
          *
          * @param name Cookie name.

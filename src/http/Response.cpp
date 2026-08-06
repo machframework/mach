@@ -128,12 +128,16 @@ namespace mach
         m_cookies.push_back(cookie);
     }
 
+    void Response::addCookie(mach::http::Cookie&& cookie) {
+        m_cookies.push_back(std::move(cookie));
+    }
+
     void Response::addCookie(std::string name, std::string value) {
         mach::http::Cookie cookie{
             .name = std::move(name),
             .value = std::move(value),
         };
 
-        this->addCookie(cookie);
+        this->addCookie(std::move(cookie));
     }
 }
