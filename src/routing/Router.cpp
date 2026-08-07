@@ -281,8 +281,8 @@ namespace mach::detail::routing
     }
 
     routing::RouteMatch Router::matchRoute(mach::Request& request) const {
-        auto segments = splitToSegments(request.target());
         request.setRouteQuery(extractQuery(request.m_target));
+        auto segments = splitToSegments(request.target());
 
         return m_routes.matchRoute(request.method(), std::move(segments));
     }
