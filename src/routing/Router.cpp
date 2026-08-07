@@ -105,6 +105,33 @@ namespace
         return true;
     }
 
+    void decodeQueryComponent(std::string& value) {
+        std::size_t write = 0;
+
+        for (std::size_t read = 0; read < value.size(); ++read) {
+            if (value[read] == '%') {
+                const auto hi = value[read + 1];
+                const auto lo = value[read + 2];
+
+                auto hexToInt = [](char c) -> unsigned char {
+                    if (c >= '0' && c <= '9')
+                        return c - '0';
+                    if (c >= 'A' && c <= 'F')
+                        return c - 'A' + 10;
+                    return c - 'a' + 10;
+                };
+
+                value[write++] = static_cast<char>((hexToInt(hi) << 4) | hexToInt(lo));
+
+                read += 2;
+            } else {
+                value[write++] = value[read];
+            }
+        }
+
+        value.resize(write);
+    }
+
     bool hasBalancedBracesPerSegment(const std::vector<std::string_view>& segments) {
         for (const auto segment : segments) {
             int depth = 0;
@@ -199,8 +226,8 @@ namespace
                 continue;
             }
 
-            std::string_view name;
-            std::string_view value;
+            std::string name;
+            std::string value;
 
             if (const auto equalsPos = param.find('='); equalsPos != std::string_view::npos) {
                 name = param.substr(0, equalsPos);
@@ -213,6 +240,9 @@ namespace
             if (!validateQueryComponent(name) || !validateQueryComponent(value)) {
                 throw mach::BadRequestException("Malformed query parameter.");
             }
+
+            decodeQueryComponent(name);
+            decodeQueryComponent(value);
 
             queryParams.emplace(name, value);
         }
