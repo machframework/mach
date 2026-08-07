@@ -167,6 +167,8 @@ namespace mach
          */
         std::optional<std::string_view> cookie(std::string_view name) const;
 
+        bool containsQuery(std::string_view name) const;
+
         template <typename T>
         std::optional<T> query(std::string_view name) const;
 
@@ -201,12 +203,12 @@ namespace mach
 
     template <typename T>
     T Request::routeParam(std::string_view name) const {
-        return mach::fromString<T>(routeParam(name));
+        return mach::fromString<T>(this->routeParam(name));
     }
 
     template <typename T>
     std::optional<T> Request::query(std::string_view name) const {
-        if (auto result = query(name)) {
+        if (auto result = this->query(name)) {
             return mach::fromString<T>(*result);
         }
 
