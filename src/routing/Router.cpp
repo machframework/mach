@@ -5,6 +5,8 @@
 #include <stdexcept>
 #include <unordered_set>
 
+#include <mach/exceptions/BadRequestException.hpp>
+
 #include "utility/StringUtils.hpp"
 
 namespace
@@ -82,19 +84,25 @@ namespace
         return std::string(segment);
     }
 
-    std::unordered_map<std::string, std::string> parseQuery(std::string_view query) {
-        std::unordered_map<std::string, std::string> queryParams;
-        auto queries = mach::detail::split(query, '&');
-
-        for (auto param : queries) {
-            if (const auto equalsPos = param.find('='); equalsPos != std::string_view::npos) {
-                queryParams.emplace(param.substr(0, equalsPos), param.substr(equalsPos + 1));
-            } else {
-                queryParams.emplace(param, "");
+    bool validateQueryComponent(std::string_view component) {
+        for (std::size_t i = 0; i < component.size(); ++i) {
+            if (component[i] != '%') {
+                continue;
             }
+
+            if (i + 2 >= component.size()) {
+                return false;
+            }
+
+            if (!std::isxdigit(static_cast<unsigned char>(component[i + 1])) ||
+                !std::isxdigit(static_cast<unsigned char>(component[i + 2]))) {
+                return false;
+            }
+
+            i += 2;
         }
 
-        return queryParams;
+        return true;
     }
 
     bool hasBalancedBracesPerSegment(const std::vector<std::string_view>& segments) {
@@ -180,6 +188,36 @@ namespace
             }
         }
         return true;
+    }
+
+    std::unordered_map<std::string, std::string> parseQuery(std::string_view query) {
+        std::unordered_map<std::string, std::string> queryParams;
+        auto queries = mach::detail::split(query, '&');
+
+        for (auto param : queries) {
+            if (param.empty()) {
+                continue;
+            }
+
+            std::string_view name;
+            std::string_view value;
+
+            if (const auto equalsPos = param.find('='); equalsPos != std::string_view::npos) {
+                name = param.substr(0, equalsPos);
+                value = param.substr(equalsPos + 1);
+            } else {
+                name = param;
+                value = {};
+            }
+
+            if (!validateQueryComponent(name) || !validateQueryComponent(value)) {
+                throw mach::BadRequestException("Malformed query parameter.");
+            }
+
+            queryParams.emplace(name, value);
+        }
+
+        return queryParams;
     }
 }
 
