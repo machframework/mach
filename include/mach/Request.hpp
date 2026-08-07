@@ -22,6 +22,7 @@ namespace mach::detail
     }
     namespace routing
     {
+        class Router;
         class RoutingMiddleware;
     }
 }
@@ -176,6 +177,7 @@ namespace mach
             std::unordered_map<std::string, std::string> cookies);
 
         void setRouteParams(std::unordered_map<std::string, std::string>&& params);
+        void setRouteQuery(std::unordered_map<std::string, std::string>&& query);
 
         http::Version m_version;
         http::Method m_method;
@@ -183,10 +185,12 @@ namespace mach
         std::string m_body;
         std::unordered_map<std::string, std::string> m_headers;
         std::unordered_map<std::string, std::string> m_routeParams;
+        std::unordered_map<std::string, std::string> m_query;
         std::unordered_map<std::string, std::string> m_cookies;
 
         friend class detail::http::adapter::BeastRequestAdapter;
         friend class detail::application::Runtime;
+        friend class detail::routing::Router;
         friend class detail::routing::RoutingMiddleware;
     };
 

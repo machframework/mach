@@ -18,11 +18,12 @@ namespace mach::detail::routing
     class Router {
 
     public:
-        application::ExecutionPlan route(const mach::Request& request) const;
+        application::ExecutionPlan route(mach::Request& request) const;
         void mapRoute(RouteEndpoint&& endpoint);
 
     private:
-        routing::RouteMatch matchRoute(const mach::Request& request) const;
+        routing::RouteMatch matchRoute(mach::Request& request) const;
+        std::unordered_map<std::string, std::string> extractQuery(std::string& target) const;
 
         std::deque<routing::RouteEndpoint> m_endpoints;
         routing::RouteTrie m_routes;

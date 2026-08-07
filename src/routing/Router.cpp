@@ -5,6 +5,8 @@
 #include <stdexcept>
 #include <unordered_set>
 
+#include "utility/StringUtils.hpp"
+
 namespace
 {
     std::vector<std::string_view> splitToSegments(std::string_view pattern) {
@@ -29,11 +31,6 @@ namespace
 
         return segments;
     }
-
-    // bool isParameter(std::string_view segment) {
-    //     return segment.front() == '{'
-    //         && segment.back() == '}';
-    // }
 
     bool isParameter(std::string_view segment) {
         return segment.find('{') != std::string_view::npos &&
@@ -83,6 +80,21 @@ namespace
         segment.remove_suffix(1);
 
         return std::string(segment);
+    }
+
+    std::unordered_map<std::string, std::string> parseQuery(std::string_view query) {
+        std::unordered_map<std::string, std::string> queryParams;
+        auto queries = mach::detail::split(query, '&');
+
+        for (auto param : queries) {
+            if (const auto equalsPos = param.find('='); equalsPos != std::string_view::npos) {
+                queryParams.emplace(param.substr(0, equalsPos), param.substr(equalsPos + 1));
+            } else {
+                queryParams.emplace(param, "");
+            }
+        }
+
+        return queryParams;
     }
 
     bool hasBalancedBracesPerSegment(const std::vector<std::string_view>& segments) {
@@ -173,7 +185,7 @@ namespace
 
 namespace mach::detail::routing
 {
-    application::ExecutionPlan Router::route(const mach::Request& request) const {
+    application::ExecutionPlan Router::route(mach::Request& request) const {
         application::ExecutionPlan plan{};
 
         auto match = matchRoute(request);
@@ -268,8 +280,22 @@ namespace mach::detail::routing
         m_routes.mapRoute(std::move(segments), stored);
     }
 
-    routing::RouteMatch Router::matchRoute(const mach::Request& request) const {
+    routing::RouteMatch Router::matchRoute(mach::Request& request) const {
         auto segments = splitToSegments(request.target());
+        request.setRouteQuery(extractQuery(request.m_target));
+
         return m_routes.matchRoute(request.method(), std::move(segments));
+    }
+
+    std::unordered_map<std::string, std::string> Router::extractQuery(std::string& target) const {
+        auto queryPos = target.find('?');
+        if (queryPos == std::string_view::npos) {
+            return {};
+        }
+
+        auto query = target.substr(queryPos + 1);
+        target = target.substr(0, queryPos);
+
+        return parseQuery(query);
     }
 }

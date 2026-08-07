@@ -75,4 +75,8 @@ namespace mach
     void Request::setRouteParams(std::unordered_map<std::string, std::string>&& params) {
         m_routeParams = std::move(params);
     }
+
+    void Request::setRouteQuery(std::unordered_map<std::string, std::string>&& query) {
+        m_query = std::move(query);
+    }
 }
