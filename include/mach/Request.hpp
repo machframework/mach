@@ -112,6 +112,20 @@ namespace mach
         std::optional<std::string_view> header(std::string_view name) const;
 
         /**
+         * Returns the value of a route parameter.
+         *
+         * @param name Parameter name (case-sensitive).
+         *
+         * @return A view into the stored parameter value.
+         *
+         * @throws std::bad_alloc If memory allocation fails while returning the string.
+         * @throws std::out_of_range If the parameter does not exist.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        std::string_view routeParam(std::string_view name) const;
+
+        /**
          * Returns the value of a route parameter converted to the specified type.
          *
          * @tparam T Type to convert the route parameter value to.
@@ -128,20 +142,6 @@ namespace mach
          */
         template <typename T>
         T routeParam(std::string_view name) const;
-
-        /**
-         * Returns the value of an HTTP header.
-         *
-         * @param name Header name (case-sensitive).
-         *
-         * @return A view into the stored header value.
-         *
-         * @throws std::bad_alloc If memory allocation fails while returning the string.
-         * @throws std::out_of_range If the parameter does not exist.
-         *
-         * @thread_safety This function is thread-safe.
-         */
-        std::string_view routeParam(std::string_view name) const;
 
         /**
          * Returns whether a given cookie exists in the request.
@@ -167,12 +167,47 @@ namespace mach
          */
         std::optional<std::string_view> cookie(std::string_view name) const;
 
+        /**
+         * Returns whether a given query parameter exists in the request.
+         *
+         * @param name Query parameter name (case-sensitive).
+         *
+         * @return Whether the query parameter is found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
         bool containsQuery(std::string_view name) const;
 
+        /**
+         * Returns the value of a query parameter.
+         *
+         * @param name Query parameter name (case-sensitive).
+         *
+         * @return A view into the stored query parameter value, or std::nullopt if the
+         * query parameter does not exist.
+         *
+         * @throws std::bad_alloc If memory allocation fails during lookup.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        std::optional<std::string_view> query(std::string_view name) const;
+
+        /**
+         * Returns the value of a query parameter converted to the specified type.
+         *
+         * @tparam T Type to convert the query parameter value to.
+         *
+         * @param name Query parameter name (case-sensitive).
+         *
+         * @return The query parameter value converted to T, or std::nullopt if the
+         * query parameter does not exist or cannot be converted to T.
+         *
+         * @throws std::bad_alloc If memory allocation fails during lookup.
+         *
+         * @thread_safety This function is thread-safe.
+         */
         template <typename T>
         std::optional<T> query(std::string_view name) const;
-
-        std::optional<std::string_view> query(std::string_view name) const;
 
     private:
         Request(
