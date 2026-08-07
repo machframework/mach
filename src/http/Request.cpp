@@ -72,7 +72,25 @@ namespace mach
         return std::nullopt;
     }
 
+    bool Request::containsQuery(std::string_view name) const {
+        return this->query(name).has_value();
+    }
+
+
+    std::optional<std::string_view> Request::query(std::string_view name) const {
+        auto it = m_query.find(std::string(name));
+        if (it != m_query.end()) {
+            return it->second;
+        }
+
+        return std::nullopt;
+    }
+
     void Request::setRouteParams(std::unordered_map<std::string, std::string>&& params) {
         m_routeParams = std::move(params);
+    }
+
+    void Request::setRouteQuery(std::unordered_map<std::string, std::string>&& query) {
+        m_query = std::move(query);
     }
 }

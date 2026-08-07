@@ -5,6 +5,10 @@
 #include <stdexcept>
 #include <unordered_set>
 
+#include <mach/exceptions/BadRequestException.hpp>
+
+#include "utility/StringUtils.hpp"
+
 namespace
 {
     std::vector<std::string_view> splitToSegments(std::string_view pattern) {
@@ -29,11 +33,6 @@ namespace
 
         return segments;
     }
-
-    // bool isParameter(std::string_view segment) {
-    //     return segment.front() == '{'
-    //         && segment.back() == '}';
-    // }
 
     bool isParameter(std::string_view segment) {
         return segment.find('{') != std::string_view::npos &&
@@ -83,6 +82,54 @@ namespace
         segment.remove_suffix(1);
 
         return std::string(segment);
+    }
+
+    bool validateQueryComponent(std::string_view component) {
+        for (std::size_t i = 0; i < component.size(); ++i) {
+            if (component[i] != '%') {
+                continue;
+            }
+
+            if (i + 2 >= component.size()) {
+                return false;
+            }
+
+            if (!std::isxdigit(static_cast<unsigned char>(component[i + 1])) ||
+                !std::isxdigit(static_cast<unsigned char>(component[i + 2]))) {
+                return false;
+            }
+
+            i += 2;
+        }
+
+        return true;
+    }
+
+    void decodeQueryComponent(std::string& value) {
+        std::size_t write = 0;
+
+        for (std::size_t read = 0; read < value.size(); ++read) {
+            if (value[read] == '%') {
+                const auto hi = value[read + 1];
+                const auto lo = value[read + 2];
+
+                auto hexToInt = [](char c) -> unsigned char {
+                    if (c >= '0' && c <= '9')
+                        return c - '0';
+                    if (c >= 'A' && c <= 'F')
+                        return c - 'A' + 10;
+                    return c - 'a' + 10;
+                };
+
+                value[write++] = static_cast<char>((hexToInt(hi) << 4) | hexToInt(lo));
+
+                read += 2;
+            } else {
+                value[write++] = value[read];
+            }
+        }
+
+        value.resize(write);
     }
 
     bool hasBalancedBracesPerSegment(const std::vector<std::string_view>& segments) {
@@ -169,11 +216,44 @@ namespace
         }
         return true;
     }
+
+    std::unordered_map<std::string, std::string> parseQuery(std::string_view query) {
+        std::unordered_map<std::string, std::string> queryParams;
+        auto queries = mach::detail::split(query, '&');
+
+        for (auto param : queries) {
+            if (param.empty()) {
+                continue;
+            }
+
+            std::string name;
+            std::string value;
+
+            if (const auto equalsPos = param.find('='); equalsPos != std::string_view::npos) {
+                name = param.substr(0, equalsPos);
+                value = param.substr(equalsPos + 1);
+            } else {
+                name = param;
+                value = {};
+            }
+
+            if (!validateQueryComponent(name) || !validateQueryComponent(value)) {
+                throw mach::BadRequestException("Malformed query parameter.");
+            }
+
+            decodeQueryComponent(name);
+            decodeQueryComponent(value);
+
+            queryParams.emplace(name, value);
+        }
+
+        return queryParams;
+    }
 }
 
 namespace mach::detail::routing
 {
-    application::ExecutionPlan Router::route(const mach::Request& request) const {
+    application::ExecutionPlan Router::route(mach::Request& request) const {
         application::ExecutionPlan plan{};
 
         auto match = matchRoute(request);
@@ -268,8 +348,22 @@ namespace mach::detail::routing
         m_routes.mapRoute(std::move(segments), stored);
     }
 
-    routing::RouteMatch Router::matchRoute(const mach::Request& request) const {
+    routing::RouteMatch Router::matchRoute(mach::Request& request) const {
+        request.setRouteQuery(extractQuery(request.m_target));
         auto segments = splitToSegments(request.target());
+
         return m_routes.matchRoute(request.method(), std::move(segments));
+    }
+
+    std::unordered_map<std::string, std::string> Router::extractQuery(std::string& target) const {
+        auto queryPos = target.find('?');
+        if (queryPos == std::string_view::npos) {
+            return {};
+        }
+
+        auto query = target.substr(queryPos + 1);
+        target = target.substr(0, queryPos);
+
+        return parseQuery(query);
     }
 }
