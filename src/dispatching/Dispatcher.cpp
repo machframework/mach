@@ -12,7 +12,7 @@ namespace mach::detail::dispatching
         middleware::MiddlewarePipeline&& middlewarePipeline)
         : m_container(container), m_middlewarePipeline(std::move(middlewarePipeline)) {}
 
-    void Dispatcher::execute(mach::Context& context) {
+    void Dispatcher::execute(mach::Context& context) const {
         auto scope = m_container.createScope();
 
         RequestExecution execution(context, scope);

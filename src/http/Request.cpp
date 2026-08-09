@@ -15,7 +15,7 @@ namespace mach
         std::string body,
         std::unordered_map<std::string, std::string> headers,
         std::unordered_map<std::string, std::string> cookies)
-        : m_method(method), m_version(version), m_target(std::move(target)),
+        : m_version(version), m_method(method), m_target(std::move(target)),
           m_body(std::move(body)), m_headers(std::move(headers)), m_cookies(std::move(cookies)) {}
 
     http::Version Request::version() const noexcept {

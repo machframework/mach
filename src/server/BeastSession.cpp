@@ -34,7 +34,7 @@ namespace mach::detail::server
         detail::http::adapter::BeastRequestAdapter& requestAdapter,
         detail::http::adapter::BeastResponseAdapter& responseAdapter,
         const mach::Logger& logger)
-        : m_appOptions(appOptions), m_stream(std::move(socket)), m_runtime(runtime),
+        : m_stream(std::move(socket)), m_appOptions(appOptions), m_runtime(runtime),
           m_requestAdapter(requestAdapter), m_responseAdapter(responseAdapter), m_logger(logger) {}
 
     // Start the asynchronous operation

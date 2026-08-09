@@ -21,7 +21,7 @@ namespace mach::detail::middleware
         const middleware::InternalNext& next) {
         auto& middleware = execution.scope.resolve<TMiddleware>();
 
-        mach::Next publicNext([&execution, next = std::move(next)]() {
+        mach::Next publicNext([&execution, next = next]() {
             next(execution);
         });
 

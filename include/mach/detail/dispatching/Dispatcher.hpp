@@ -14,7 +14,7 @@ namespace mach::detail::dispatching
     public:
         Dispatcher(di::Container& container, middleware::MiddlewarePipeline&& middlewarePipeline);
 
-        void execute(mach::Context& context);
+        void execute(mach::Context& context) const;
 
     private:
         di::Container& m_container;

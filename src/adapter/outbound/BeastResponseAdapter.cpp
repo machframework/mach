@@ -9,7 +9,7 @@
 namespace mach::detail::http::adapter
 {
     beast::http::response<beast::http::string_body> BeastResponseAdapter::adapt(
-        mach::Context&& context) {
+        mach::Context&& context) const {
         beast::http::response<beast::http::string_body> res;
 
         auto version = context.response.version();

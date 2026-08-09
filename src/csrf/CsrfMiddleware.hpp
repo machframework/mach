@@ -15,7 +15,7 @@ namespace mach::detail::csrf
     class CsrfMiddleware {
 
     public:
-        explicit CsrfMiddleware(CsrfOptions& options);
+        explicit CsrfMiddleware(const CsrfOptions& options);
 
         void invoke(mach::Context& context, mach::Next& next);
 

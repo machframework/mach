@@ -76,11 +76,11 @@ namespace mach
 
     App::App(App&&) noexcept = default;
 
-    int App::run() {
+    int App::run() const {
         return m_impl->run();
     }
 
-    void App::stop() {
+    void App::stop() const {
         m_impl->stop();
     }
 
@@ -96,13 +96,13 @@ namespace mach
         return m_impl->threadCount();
     }
 
-    void App::addRouteImpl(detail::routing::RouteEndpoint route) {
+    void App::addRouteImpl(detail::routing::RouteEndpoint route) const {
         m_impl->mapRoute(std::move(route));
     }
 
     void App::addControllerRoutesImpl(
         std::vector<detail::routing::RouteEndpoint> routes,
-        std::type_index controllerType) {
+        std::type_index controllerType) const {
         m_impl->addControllerRoutes(std::move(routes), controllerType);
     }
 

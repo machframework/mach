@@ -184,7 +184,7 @@ namespace mach
          * @thread_safety This function is not thread-safe.
          */
         [[nodiscard]]
-        int run();
+        int run() const;
 
         /**
          * Stops the application and shuts down the HTTP server.
@@ -198,7 +198,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        void stop();
+        void stop() const;
 
     private:
         App(AppOptions serverOptions,
@@ -213,11 +213,11 @@ namespace mach
         template <detail::controllers::MachController TController>
         App& mapController();
 
-        void addRouteImpl(detail::routing::RouteEndpoint route);
+        void addRouteImpl(detail::routing::RouteEndpoint route) const;
 
         void addControllerRoutesImpl(
             std::vector<detail::routing::RouteEndpoint> routes,
-            std::type_index controllerType);
+            std::type_index controllerType) const;
 
         class Impl;
         std::unique_ptr<Impl> m_impl;

@@ -28,7 +28,7 @@ namespace mach::detail::di
         T& addSingletonInstance(T&& instance, ServiceAccess access = ServiceAccess::Internal);
 
         const ServiceDescriptor* getDescriptor(std::type_index type) const;
-        std::shared_ptr<void> getOrCreateSingleton(std::type_index type, Scope& container);
+        std::shared_ptr<void> getOrCreateSingleton(std::type_index type, Scope& scope) const;
 
         Scope createScope();
 

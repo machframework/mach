@@ -105,7 +105,7 @@ namespace mach::detail::routing
                     const auto [parameter, constraint] =
                         extractParameter(endpoint->pattern, nextSegmentKey);
 
-                    if (parameter == "") {
+                    if (parameter.empty()) {
                         throw std::invalid_argument(
                             std::format(
                                 "Invalid route definition '{}': Route parameter name cannot be "

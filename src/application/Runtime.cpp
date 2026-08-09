@@ -15,8 +15,8 @@ namespace mach::detail::application
         di::Container container,
         middleware::MiddlewarePipeline middlewarePipeline,
         const Logger& logger)
-        : m_appOptions(appOptions), m_container(std::move(container)), m_logger(logger),
-          m_dispatcher(m_container, std::move(middlewarePipeline)) {}
+        : m_appOptions(appOptions), m_container(std::move(container)), m_dispatcher(m_container, std::move(middlewarePipeline)),
+          m_logger(logger) {}
 
     void Runtime::handle(mach::Context& context) {
         try {

@@ -35,7 +35,7 @@ namespace mach::detail::server
         detail::http::adapter::BeastRequestAdapter& requestAdapter,
         detail::http::adapter::BeastResponseAdapter& responseAdapter,
         const mach::Logger& logger)
-        : m_appOptions(appOptions), m_ioc(ioc), m_acceptor(net::make_strand(ioc)),
+        : m_ioc(ioc), m_acceptor(net::make_strand(ioc)), m_appOptions(appOptions),
           m_runtime(runtime), m_requestAdapter(requestAdapter), m_responseAdapter(responseAdapter),
           m_logger(logger) {
         beast::error_code ec;

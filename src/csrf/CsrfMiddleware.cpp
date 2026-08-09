@@ -24,7 +24,7 @@
 
 namespace mach::detail::csrf
 {
-    CsrfMiddleware::CsrfMiddleware(CsrfOptions& options) : m_options(options) {}
+    CsrfMiddleware::CsrfMiddleware(const CsrfOptions& options) : m_options(options) {}
 
     void CsrfMiddleware::invoke(mach::Context& context, mach::Next& next) {
         const auto tokenCookie = context.request.cookie(m_options.cookieName);
