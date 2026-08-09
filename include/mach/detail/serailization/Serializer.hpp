@@ -11,7 +11,7 @@ namespace mach::detail::serialization
 
     public:
         template <typename T>
-        static std::string serialize(const T& value);
+        [[nodiscard]] static std::string serialize(const T& value);
     };
 
     template <typename T>

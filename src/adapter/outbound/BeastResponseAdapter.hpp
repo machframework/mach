@@ -20,7 +20,7 @@ namespace mach::detail::http::adapter
     class BeastResponseAdapter {
 
     public:
-        beast::http::response<beast::http::string_body> adapt(mach::Context&& context) const;
+        [[nodiscard]] beast::http::response<beast::http::string_body> adapt(mach::Context&& context) const;
 
     private:
         void writeCookies(

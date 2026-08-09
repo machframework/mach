@@ -50,7 +50,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        std::string host() const noexcept;
+        [[nodiscard]] std::string host() const noexcept;
 
         /**
          * Returns the port the application is configured to listen on (e.g. 3143, 8080).
@@ -59,7 +59,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        std::uint16_t port() const noexcept;
+        [[nodiscard]] std::uint16_t port() const noexcept;
 
         /**
          * Returns the number of worker threads the application is configured to use.
@@ -68,7 +68,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        std::size_t threadCount() const noexcept;
+        [[nodiscard]] std::size_t threadCount() const noexcept;
 
         /**
          * Registers a GET request handler.
@@ -183,8 +183,7 @@ namespace mach
          *
          * @thread_safety This function is not thread-safe.
          */
-        [[nodiscard]]
-        int run() const;
+        [[nodiscard]] int run() const;
 
         /**
          * Stops the application and shuts down the HTTP server.

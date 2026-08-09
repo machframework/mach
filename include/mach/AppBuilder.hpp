@@ -250,7 +250,7 @@ namespace mach
          *
          * @thread_safety This function is not thread-safe.
          */
-        App build();
+        [[nodiscard]] App build();
 
     private:
         detail::di::Container m_container;

@@ -30,7 +30,7 @@ namespace mach::detail::di
         const ServiceDescriptor* getDescriptor(std::type_index type) const;
         std::shared_ptr<void> getOrCreateSingleton(std::type_index type, Scope& scope) const;
 
-        Scope createScope();
+        [[nodiscard]] Scope createScope();
 
         void finalizeRegistrations();
 

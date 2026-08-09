@@ -15,7 +15,7 @@ namespace mach::detail::http::adapter
     class BeastRequestAdapter {
 
     public:
-        mach::Context adapt(
+        [[nodiscard]] mach::Context adapt(
             beast::http::request<beast::http::string_body>&& rawRequest,
             bool& adapterRejectedRequest);
 

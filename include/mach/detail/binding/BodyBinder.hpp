@@ -14,7 +14,7 @@ namespace mach::detail::binding
 
     public:
         template <typename T>
-        T bind(std::string_view body);
+        [[nodiscard]] T bind(std::string_view body);
     };
 
     template <typename T>

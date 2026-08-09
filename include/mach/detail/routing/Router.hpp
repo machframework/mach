@@ -16,7 +16,7 @@ namespace mach::detail::routing
     class Router {
 
     public:
-        application::ExecutionPlan route(mach::Request& request) const;
+        [[nodiscard]] application::ExecutionPlan route(mach::Request& request) const;
         void mapRoute(RouteEndpoint&& endpoint);
 
     private:

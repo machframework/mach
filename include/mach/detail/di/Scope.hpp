@@ -13,7 +13,7 @@ namespace mach::detail::di
 
     public:
         template <typename T>
-        T& resolve();
+        [[nodiscard]] T& resolve();
 
     private:
         explicit Scope(Container& container);

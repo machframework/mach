@@ -20,7 +20,7 @@ namespace mach::detail::routing
 
         void mapRoute(std::vector<std::string_view>&& segments, routing::RouteEndpoint* endpoint);
 
-        routing::RouteMatch matchRoute(
+        [[nodiscard]] routing::RouteMatch matchRoute(
             mach::http::Method method,
             std::vector<std::string_view>&& segments) const;
 
