@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.25)
 
 project(
     Mach
-    VERSION 0.7.0
+    VERSION 0.9.0
     DESCRIPTION "A modern C++ web framework"
     LANGUAGES CXX
 )
@@ -74,7 +74,11 @@ add_library(mach
     src/utility/HttpDate.cpp
 
     src/cors/CorsBuilder.cpp
-  "src/cors/CorsMiddleware.cpp" "src/csrf/CsrfMiddleware.cpp" "src/csrf/CsrfBuilder.cpp")
+    src/cors/CorsMiddleware.cpp
+
+    src/csrf/CsrfMiddleware.cpp
+    src/csrf/CsrfBuilder.cpp
+)
 
 set_target_properties(mach PROPERTIES
     DEBUG_POSTFIX "d"
@@ -98,11 +102,11 @@ target_include_directories(mach
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${Boost_INCLUDE_DIRS}
 )
 
 target_link_libraries(mach
     PUBLIC
-        Boost::headers
         nlohmann_json::nlohmann_json
         fmt::fmt
     PRIVATE
@@ -178,7 +182,7 @@ install(
 # -------------------------
 # Optional components
 # -------------------------
-option(MACH_BUILD_EXAMPLES "Build Mach examples" OFF)
+option(MACH_BUILD_EXAMPLES "Build Mach examples" ON)
 option(MACH_BUILD_TESTS "Build Mach tests" OFF)
 option(MACH_BUILD_BENCHMARKS "Build Mach benchmarks" OFF)
 
