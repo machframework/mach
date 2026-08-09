@@ -99,7 +99,6 @@ public:
 
     UserController(UserService& userService) : m_userService(userService) {}
 
-    [[mach::get("/{type:int}")]]
     mach::Reply<std::string> getByType() {
         int type = std::stoi(std::string(request().routeParam("type")));
 

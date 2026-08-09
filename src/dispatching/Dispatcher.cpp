@@ -2,8 +2,8 @@
 
 #include <mach/Context.hpp>
 
-#include <mach/detail/middleware/InternalNext.hpp>
 #include <mach/detail/routing/RouteEndpoint.hpp>
+#include <mach/detail/di/Container.hpp>
 
 namespace mach::detail::dispatching
 {

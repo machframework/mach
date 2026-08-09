@@ -13,10 +13,8 @@ static http::request<http::string_body> makeRequest(
 
 #include <boost/beast/http.hpp>
 
-#include <iostream>
 #include <string>
 #include <string_view>
-#include <thread>
 
 #include <mach/http/Method.hpp>
 #include <mach/http/StatusCode.hpp>

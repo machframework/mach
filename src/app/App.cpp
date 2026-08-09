@@ -137,8 +137,6 @@ namespace mach
 
             m_container.finalizeRegistrations();
 
-            auto& x = m_appOptions;
-
             m_server = std::make_unique<detail::server::Server>(
                 std::move(m_appOptions),
                 std::move(m_container),
@@ -172,16 +170,11 @@ namespace mach
     }
 
     void App::Impl::stop() {
-        detail::server::Server* server = nullptr;
+        std::lock_guard lock(m_serverMutex);
 
-        {
-            std::lock_guard lock(m_serverMutex);
-            server = m_server.get();
-
-            if (server && m_state == AppState::Running) {
-                server->stop();
-                m_state = AppState::Stopped;
-            }
+        if (m_server && m_state == AppState::Running) {
+            m_server->stop();
+            m_state = AppState::Stopped;
         }
     }
 

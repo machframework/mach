@@ -1,5 +1,7 @@
 #include <mach/detail/routing/RoutingMiddleware.hpp>
 
+#include <mach/Context.hpp>
+
 namespace mach::detail::routing
 {
     void RoutingMiddleware::invoke(mach::Context& context, mach::Next& next) {
@@ -16,7 +18,7 @@ namespace mach::detail::routing
             context.response.status(statusCode);
             context.response.body(std::string(mach::http::reasonPhrase(statusCode)));
 
-            std::string allow = "";
+            std::string allow;
 
             if (plan.allowedMethods.contains(mach::http::Method::Get)) {
                 allow += "HEAD";

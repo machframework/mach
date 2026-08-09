@@ -11,18 +11,14 @@
 
 #pragma once
 
-#include <format>
-#include <optional>
 #include <utility>
 
 #include <boost/asio/awaitable.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/beast/core.hpp>
 #include <boost/beast/core/flat_buffer.hpp>
 #include <boost/beast/core/tcp_stream.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/http/message.hpp>
-#include <boost/beast/http/parser.hpp>
 
 #include <mach/AppOptions.hpp>
 #include <mach/Context.hpp>

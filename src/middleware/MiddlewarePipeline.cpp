@@ -4,7 +4,7 @@ namespace mach::detail::middleware
 {
     void MiddlewarePipeline::invoke(
         dispatching::RequestExecution& execution,
-        const middleware::InternalNext& terminal) const {
+        const InternalNext& terminal) const {
         auto current = terminal;
 
         for (auto it = m_middlewares.rbegin(); it != m_middlewares.rend(); ++it) {

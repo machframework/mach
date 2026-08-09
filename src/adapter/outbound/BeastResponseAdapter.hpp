@@ -3,16 +3,14 @@
 #include <vector>
 
 #include <boost/beast/http.hpp>
-#include <boost/beast/http/message_generator.hpp>
 #include <boost/beast/http/string_body.hpp>
 
 #include <mach/Context.hpp>
-#include <mach/http/Method.hpp>
 #include <mach/http/Version.hpp>
 
 namespace mach::http
 {
-    class Cookie;
+    struct Cookie;
 }
 
 namespace mach::detail::http::adapter

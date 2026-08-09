@@ -1,5 +1,7 @@
 #include <mach/middleware/Next.hpp>
 
+#include <stdexcept>
+
 namespace mach
 {
     Next::Next(std::function<void()> next) : m_next(std::move(next)) {}

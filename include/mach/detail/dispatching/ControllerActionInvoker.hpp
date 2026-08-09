@@ -1,9 +1,7 @@
 #pragma once
 
 #include <functional>
-#include <memory>
 #include <tuple>
-#include <typeindex>
 #include <utility>
 
 #include <nlohmann/json.hpp>
@@ -54,7 +52,6 @@ namespace mach::detail::dispatching
         controller.setContext(context);
 
         constexpr std::size_t parameterCount = sizeof...(TArgs);
-        constexpr bool expectsBody = parameterCount != 0;
 
         static_assert(
             parameterCount <= 1,

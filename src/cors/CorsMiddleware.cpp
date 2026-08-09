@@ -51,7 +51,7 @@ namespace mach::detail::cors
 
     void CorsMiddleware::addCorsHeaders(mach::Context& context, bool preflight) const {
         std::string origin = std::string(context.request.header("origin").value());
-        std::string vary = "";
+        std::string vary;
 
         if (m_options.allowAnyOrigin && !m_options.allowCredentials) {
             origin = "*";

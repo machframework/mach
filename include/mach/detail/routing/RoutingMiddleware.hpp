@@ -1,9 +1,5 @@
 #pragma once
 
-#include <string>
-#include <utility>
-
-#include <mach/Context.hpp>
 #include <mach/middleware/Next.hpp>
 
 #include <mach/detail/routing/Router.hpp>

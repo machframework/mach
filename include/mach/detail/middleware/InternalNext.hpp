@@ -4,7 +4,7 @@
 
 namespace mach::detail::dispatching
 {
-    class RequestExecution;
+    struct RequestExecution;
 }
 
 namespace mach::detail::middleware

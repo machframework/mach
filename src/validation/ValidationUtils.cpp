@@ -1,5 +1,7 @@
 #include <mach/detail/validation/ValidationUtils.hpp>
 
+#include <nlohmann/json.hpp>
+
 namespace mach::detail::validation
 {
     std::string makeValidationError(const mach::detail::validation::ValidationResult& result) {

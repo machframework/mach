@@ -2,7 +2,6 @@
 
 #include <format>
 
-#include <mach/http/StatusCode.hpp>
 #include <mach/http/Cookie.hpp>
 
 #include "utility/HttpDate.hpp"

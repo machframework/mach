@@ -1,5 +1,3 @@
-#include <string>
-
 #include <mach/detail/di/Container.hpp>
 
 namespace test_compile_di

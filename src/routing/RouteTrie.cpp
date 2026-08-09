@@ -82,7 +82,7 @@ namespace mach::detail::routing
 {
     void RouteTrie::mapRoute(
         std::vector<std::string_view>&& segments,
-        routing::RouteEndpoint* endpoint) {
+        RouteEndpoint* endpoint) {
         RouteNode* curr = &m_root;
 
         // registering root
@@ -176,12 +176,12 @@ namespace mach::detail::routing
         return matchRoute(method, segments, 0, capturedValues, allowedMethods, curr);
     }
 
-    routing::RouteMatch RouteTrie::matchRoute(
-        mach::http::Method method,
+    RouteMatch RouteTrie::matchRoute(
+        http::Method method,
         const std::vector<std::string_view>& segments,
         std::size_t index,
         std::vector<std::string>& capturedValues,
-        std::unordered_set<mach::http::Method>& allowedMethods,
+        std::unordered_set<http::Method>& allowedMethods,
         const RouteNode* curr) const {
         auto segmentsSize = segments.size();
 
@@ -204,7 +204,7 @@ namespace mach::detail::routing
 
         // reached the end of the segments without finding a match
         if (index >= segmentsSize || !curr) {
-            return routing::RouteMatch(RoutingStatus::NotFound);
+            return RouteMatch(RoutingStatus::NotFound);
         }
 
         auto segmentKey = std::string(segments[index]);
@@ -218,10 +218,10 @@ namespace mach::detail::routing
                 if (endpointsByMethod.contains(method)) {
                     auto endpoint = endpointsByMethod.find(method)->second;
 
-                    return routing::RouteMatch(
+                    return RouteMatch(
                         endpoint,
                         std::move(makeRouteParameters(endpoint->parameterNames, capturedValues)));
-                } else if (
+                } if (
                     method == http::Method::Head && endpointsByMethod.contains(http::Method::Get)
                 ) {
                     auto endpoint = endpointsByMethod.find(http::Method::Get)->second;
@@ -237,7 +237,7 @@ namespace mach::detail::routing
                     allowedMethods.insert(entry.first);
                 }
 
-                return routing::RouteMatch(allowedMethods);
+                return RouteMatch(allowedMethods);
             }
 
             auto result = matchRoute(
@@ -279,14 +279,14 @@ namespace mach::detail::routing
 
             if (index == segmentsSize - 1) {
                 if (childNode->endpointsByMethod.empty()) {
-                    return routing::RouteMatch(RoutingStatus::NotFound);
+                    return RouteMatch(RoutingStatus::NotFound);
                 }
                 if (!childNode->endpointsByMethod.contains(method)) {
                     if (method == http::Method::Head &&
                         childNode->endpointsByMethod.contains(http::Method::Get)) {
                         auto endpoint =
                             childNode->endpointsByMethod.find(http::Method::Get)->second;
-                        return routing::RouteMatch(
+                        return RouteMatch(
                             endpoint,
                             std::move(
                                 makeRouteParameters(endpoint->parameterNames, capturedValues)));
@@ -296,12 +296,12 @@ namespace mach::detail::routing
                         allowedMethods.insert(entry.first);
                     }
 
-                    return routing::RouteMatch(allowedMethods);
+                    return RouteMatch(allowedMethods);
                 }
 
                 auto endpoint = childNode->endpointsByMethod.find(method)->second;
 
-                return routing::RouteMatch(
+                return RouteMatch(
                     endpoint,
                     std::move(makeRouteParameters(endpoint->parameterNames, capturedValues)));
             }
@@ -316,7 +316,7 @@ namespace mach::detail::routing
 			);
         }
 
-        return routing::RouteMatch(RoutingStatus::NotFound);
+        return RouteMatch(RoutingStatus::NotFound);
     }
 
     void RouteTrie::debugDump() const {
@@ -325,7 +325,7 @@ namespace mach::detail::routing
             const std::string&,
             bool,
             bool,
-            const std::optional<routing::RouteConstraint>&)>
+            const std::optional<RouteConstraint>&)>
             print = [&](const RouteNode& node,
                         const std::string& prefix,
                         bool isLast,

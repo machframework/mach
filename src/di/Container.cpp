@@ -1,6 +1,6 @@
 #include <mach/detail/di/Container.hpp>
 
-#include <vector>
+#include <mach/detail/di/ServiceDescriptor.hpp>
 
 namespace mach::detail::di
 {

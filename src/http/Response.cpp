@@ -18,9 +18,9 @@ namespace
         "upgrade",
         "proxy-connection"};
 
-    inline bool isValidHeaderName(std::string_view name) noexcept {
+    bool isValidHeaderName(std::string_view name) noexcept {
         for (unsigned char c : name) {
-            if (!std::isalnum(static_cast<unsigned char>(c)) && c != '!' && c != '#' && c != '$' &&
+            if (!std::isalnum(c) && c != '!' && c != '#' && c != '$' &&
                 c != '%' && c != '&' && c != '\'' && c != '*' && c != '+' && c != '-' && c != '.' &&
                 c != '^' && c != '_' && c != '`' && c != '|' && c != '~') {
                 return false;

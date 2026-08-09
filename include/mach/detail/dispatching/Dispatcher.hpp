@@ -1,12 +1,10 @@
 #pragma once
 
-#include <mach/detail/application/ExecutionPlan.hpp>
-#include <mach/detail/di/Container.hpp>
 #include <mach/detail/middleware/MiddlewarePipeline.hpp>
 
 namespace mach
 {
-    class Context;
+    struct Context;
 }
 
 namespace mach::detail::dispatching

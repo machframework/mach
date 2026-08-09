@@ -5,7 +5,9 @@
 #include <stdexcept>
 
 #ifdef _WIN32
-    #define NOMINMAX
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
     #include <Windows.h>
     #include <bcrypt.h>
 #elif defined(__linux__)

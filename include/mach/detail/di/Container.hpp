@@ -1,7 +1,6 @@
 #pragma once
 
 #include <format>
-#include <functional>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -15,6 +14,7 @@
 #include <mach/detail/di/ServiceTraits.hpp>
 
 #include "Scope.hpp"
+#include "ServiceDescriptor.hpp"
 
 namespace mach::detail::di
 {

@@ -23,8 +23,6 @@ private:
 };
 
 int main() {
-    const auto hardwareThreads = std::thread::hardware_concurrency();
-
     auto builder = mach::AppBuilder(
         mach::AppOptions{
             .host = "127.0.0.1",

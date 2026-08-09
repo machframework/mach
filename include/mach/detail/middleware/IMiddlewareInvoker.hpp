@@ -1,7 +1,5 @@
 #pragma once
 
-#include <mach/middleware/Next.hpp>
-
 #include <mach/detail/dispatching/RequestExecution.hpp>
 
 namespace mach::detail::middleware

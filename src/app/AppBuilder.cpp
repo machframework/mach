@@ -118,6 +118,6 @@ namespace mach
             mapper(app);
         }
 
-        return app;
+        return std::move(app);
     }
 }

@@ -1,10 +1,6 @@
 #pragma once
 
 #include <functional>
-#include <stdexcept>
-
-#include <mach/detail/dispatching/RequestExecution.hpp>
-#include <mach/detail/middleware/InternalNext.hpp>
 
 namespace mach
 {

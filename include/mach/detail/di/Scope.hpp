@@ -5,8 +5,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include <mach/detail/di/ServiceDescriptor.hpp>
-
 namespace mach::detail::di
 {
     class Container;
