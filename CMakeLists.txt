@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.26)
 
 project(
     Mach
@@ -13,10 +13,7 @@ include(CMakePackageConfigHelpers)
 # -------------------------
 # Dependencies
 # -------------------------
-find_package(Boost CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
-find_package(fmt CONFIG REQUIRED)
-find_package(spdlog CONFIG REQUIRED)
+include(cmake/Dependencies.cmake)
 
 # -------------------------
 # Core library
@@ -102,7 +99,7 @@ target_include_directories(mach
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
-        ${Boost_INCLUDE_DIRS}
+        ${MACH_BOOST_INCLUDE_DIR}
 )
 
 target_link_libraries(mach
@@ -113,10 +110,12 @@ target_link_libraries(mach
         spdlog::spdlog
 )
 
-if (WIN32)
+if(WIN32)
     target_link_libraries(mach
-    PRIVATE
-        bcrypt
+        PRIVATE
+            bcrypt
+            ws2_32
+            mswsock
     )
 endif()
 
@@ -132,52 +131,56 @@ endif()
 # -------------------------
 # Installation
 # -------------------------
-set(
-    MACH_CMAKE_INSTALL_DIR
-    "${CMAKE_INSTALL_LIBDIR}/cmake/Mach"
-)
+if(MACH_CAN_INSTALL)
 
-install(
-    TARGETS mach
-    EXPORT MachTargets
+    set(
+        MACH_CMAKE_INSTALL_DIR
+        "${CMAKE_INSTALL_LIBDIR}/cmake/Mach"
+    )
 
-    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
-    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    install(
+        TARGETS mach
+        EXPORT MachTargets
 
-    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-)
+        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+        ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 
-install(
-    DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/mach"
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-)
+        INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+    )
 
-install(
-    EXPORT MachTargets
-    FILE MachTargets.cmake
-    NAMESPACE Mach::
-    DESTINATION "${MACH_CMAKE_INSTALL_DIR}"
-)
+    install(
+        DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/mach"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+    )
 
-configure_package_config_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/MachConfig.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/MachConfig.cmake"
-    INSTALL_DESTINATION "${MACH_CMAKE_INSTALL_DIR}"
-)
+    install(
+        EXPORT MachTargets
+        FILE MachTargets.cmake
+        NAMESPACE Mach::
+        DESTINATION "${MACH_CMAKE_INSTALL_DIR}"
+    )
 
-write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/MachConfigVersion.cmake"
-    VERSION "${PROJECT_VERSION}"
-    COMPATIBILITY SameMajorVersion
-)
-
-install(
-    FILES
+    configure_package_config_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/MachConfig.cmake.in"
         "${CMAKE_CURRENT_BINARY_DIR}/MachConfig.cmake"
+        INSTALL_DESTINATION "${MACH_CMAKE_INSTALL_DIR}"
+    )
+
+    write_basic_package_version_file(
         "${CMAKE_CURRENT_BINARY_DIR}/MachConfigVersion.cmake"
-    DESTINATION "${MACH_CMAKE_INSTALL_DIR}"
-)
+        VERSION "${PROJECT_VERSION}"
+        COMPATIBILITY SameMajorVersion
+    )
+
+    install(
+        FILES
+            "${CMAKE_CURRENT_BINARY_DIR}/MachConfig.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}/MachConfigVersion.cmake"
+        DESTINATION "${MACH_CMAKE_INSTALL_DIR}"
+    )
+
+endif()
 
 # -------------------------
 # Optional components
