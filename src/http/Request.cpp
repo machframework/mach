@@ -1,10 +1,9 @@
 #include <mach/Request.hpp>
 
-#include "HttpUtils.hpp"
-
 #include <format>
-#include <optional>
 #include <stdexcept>
+
+#include "HttpUtils.hpp"
 
 namespace mach
 {

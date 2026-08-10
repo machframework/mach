@@ -1,6 +1,5 @@
 #include <mach/AppBuilder.hpp>
 
-#include <iostream>
 #include <stdexcept>
 
 #include <mach/Logger.hpp>

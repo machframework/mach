@@ -1,12 +1,15 @@
 #pragma once
 
-#include <mach/AppOptions.hpp>
-#include <mach/Logger.hpp>
-
 #include <mach/detail/di/Container.hpp>
 #include <mach/detail/dispatching/Dispatcher.hpp>
 #include <mach/detail/middleware/MiddlewarePipeline.hpp>
 #include <mach/detail/routing/RouteEndpoint.hpp>
+
+namespace mach
+{
+    struct AppOptions;
+    class Logger;
+}
 
 namespace mach::detail::application
 {

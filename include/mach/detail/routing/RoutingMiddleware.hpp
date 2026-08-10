@@ -1,8 +1,12 @@
 #pragma once
 
-#include <mach/middleware/Next.hpp>
-
 #include <mach/detail/routing/Router.hpp>
+
+namespace mach
+{
+    struct Context;
+    class Next;
+}
 
 namespace mach::detail::routing
 {

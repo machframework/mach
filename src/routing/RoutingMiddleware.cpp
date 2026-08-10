@@ -1,6 +1,7 @@
 #include <mach/detail/routing/RoutingMiddleware.hpp>
 
 #include <mach/Context.hpp>
+#include <mach/middleware/Next.hpp>
 
 namespace mach::detail::routing
 {

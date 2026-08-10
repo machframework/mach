@@ -20,13 +20,17 @@
 #include <boost/beast/http.hpp>
 #include <boost/beast/http/message.hpp>
 
-#include <mach/AppOptions.hpp>
 #include <mach/Context.hpp>
 #include <mach/Logger.hpp>
 
 #include "adapter/inbound/BeastRequestAdapter.hpp"
 #include "adapter/outbound/BeastResponseAdapter.hpp"
 #include "application/Runtime.hpp"
+
+namespace mach
+{
+    struct AppOptions;
+}
 
 namespace mach::detail::server
 {

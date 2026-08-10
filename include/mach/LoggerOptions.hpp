@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <mach/LogLevel.hpp>
 
 namespace mach

@@ -36,6 +36,7 @@ namespace mach
      * Thread safety:
      * - Not thread-safe. Concurrent access must be synchronized externally.
      */
+    // TODO: move implementation to .cpp
     struct Context {
         Context(Request&& request, Response&& response)
             : request(std::move(request)), response(std::move(response)) {}

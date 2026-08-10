@@ -2,7 +2,9 @@
 
 #include <exception>
 
+#include <mach/AppOptions.hpp>
 #include <mach/Context.hpp>
+#include <mach/Logger.hpp>
 #include <mach/Response.hpp>
 #include <mach/http/StatusCode.hpp>
 

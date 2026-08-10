@@ -12,6 +12,8 @@
 
 #include <mach/Logger.hpp>
 
+#include "BeastListener.hpp"
+
 namespace mach::detail::server
 {
     Server::Server(

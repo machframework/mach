@@ -1,12 +1,10 @@
 #include <mach/App.hpp>
 
-#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <typeindex>
 #include <unordered_set>
 
-#include <mach/detail/dispatching/MinimalApiInvoker.hpp>
 #include <mach/detail/routing/RouteEndpoint.hpp>
 
 #include "server/Server.hpp"

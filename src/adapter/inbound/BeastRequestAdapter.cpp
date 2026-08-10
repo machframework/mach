@@ -5,7 +5,6 @@
 #include <string_view>
 #include <unordered_map>
 
-#include <mach/http/Method.hpp>
 #include <mach/http/StatusCode.hpp>
 
 #include "http/HttpUtils.hpp"

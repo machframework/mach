@@ -14,7 +14,6 @@
 #include <chrono>
 #include <memory>
 #include <string>
-#include <utility>
 
 #include <boost/asio/dispatch.hpp>
 #include <boost/asio/redirect_error.hpp>
@@ -22,6 +21,7 @@
 #include <boost/beast/core/error.hpp>
 #include <boost/beast/http/message_generator.hpp>
 
+#include <mach/AppOptions.hpp>
 #include <mach/http/StatusCode.hpp>
 
 namespace mach::detail::server

@@ -23,6 +23,9 @@
 #include <boost/asio/strand.hpp>
 #include <boost/asio/use_awaitable.hpp>
 
+#include <mach/AppOptions.hpp>
+#include <mach/Logger.hpp>
+
 #include "BeastSession.hpp"
 
 namespace mach::detail::server

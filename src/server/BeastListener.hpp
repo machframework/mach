@@ -15,10 +15,13 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/beast/http.hpp>
 
-#include <mach/AppOptions.hpp>
-#include <mach/Logger.hpp>
-
 #include "adapter/inbound/BeastRequestAdapter.hpp"
+
+namespace mach
+{
+    struct AppOptions;
+    class Logger;
+}
 
 namespace mach::detail::server
 {

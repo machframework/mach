@@ -5,21 +5,27 @@
 
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/address.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 #include <mach/AppOptions.hpp>
-#include <mach/Logger.hpp>
 
 #include <mach/detail/di/Container.hpp>
 #include <mach/detail/middleware/MiddlewarePipeline.hpp>
 
-#include "BeastListener.hpp"
-#include "BeastSession.hpp"
 #include "adapter/inbound/BeastRequestAdapter.hpp"
 #include "adapter/outbound/BeastResponseAdapter.hpp"
+#include "application/Runtime.hpp"
+
+namespace mach
+{
+    class Logger;
+}
 
 namespace mach::detail::server
 {
     namespace net = boost::asio;
+
+    class BeastListener;
 
     class Server {
 

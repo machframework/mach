@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <unordered_set>
 
+#include <mach/Request.hpp>
 #include <mach/exceptions/BadRequestException.hpp>
 
 #include "utility/StringUtils.hpp"
