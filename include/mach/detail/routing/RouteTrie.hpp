@@ -21,7 +21,7 @@ namespace mach::detail::routing
         void mapRoute(std::vector<std::string_view>&& segments, RouteEndpoint* endpoint);
 
         [[nodiscard]] RouteMatch matchRoute(
-            http::Method method,
+            mach::http::Method method,
             std::vector<std::string_view>&& segments) const;
 
         void debugDump() const;
@@ -29,7 +29,7 @@ namespace mach::detail::routing
     private:
         struct RouteNode {
             std::string segmentKey;
-            std::unordered_map<http::Method, RouteEndpoint*> endpointsByMethod;
+            std::unordered_map<mach::http::Method, RouteEndpoint*> endpointsByMethod;
 
             std::unordered_map<std::string, std::unique_ptr<RouteNode>> childrenByStaticSegment;
             std::unordered_map<std::optional<RouteConstraint>, std::unique_ptr<RouteNode>>
@@ -45,11 +45,11 @@ namespace mach::detail::routing
         };
 
         RouteMatch matchRoute(
-            http::Method method,
+            mach::http::Method method,
             const std::vector<std::string_view>& segments,
             std::size_t index,
             std::vector<std::string>& capturedValues,
-            std::unordered_set<http::Method>& allowedMethods,
+            std::unordered_set<mach::http::Method>& allowedMethods,
             const RouteNode* curr) const;
 
         RouteNode m_root;
