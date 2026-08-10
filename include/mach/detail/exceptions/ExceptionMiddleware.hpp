@@ -1,11 +1,11 @@
 #pragma once
 
-#include <string>
-#include <utility>
-
-#include <mach/Context.hpp>
-#include <mach/Logger.hpp>
-#include <mach/middleware/Next.hpp>
+namespace mach
+{
+    struct Context;
+    class Next;
+    class Logger;
+}
 
 namespace mach::detail::exceptions
 {

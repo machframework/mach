@@ -1,9 +1,7 @@
 #pragma once
 
-#include <utility>
-
-#include <mach/Request.hpp>
 #include <mach/Response.hpp>
+#include <mach/Request.hpp>
 
 #include <mach/detail/application/ExecutionPlan.hpp>
 
@@ -37,8 +35,7 @@ namespace mach
      * - Not thread-safe. Concurrent access must be synchronized externally.
      */
     struct Context {
-        Context(Request&& request, Response&& response)
-            : request(std::move(request)), response(std::move(response)) {}
+        Context(Request&& request, Response&& response);
 
         Context(const Context&) = delete;
         Context& operator=(const Context&) = delete;

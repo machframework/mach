@@ -57,7 +57,7 @@ namespace mach
      * @return A 204 No Content reply.
      */
     inline Reply<> noContent() {
-        return Reply<>(http::StatusCode::NoContent);
+        return Reply(http::StatusCode::NoContent);
     }
 
     /**

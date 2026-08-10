@@ -1,6 +1,5 @@
 #include <mach/AppBuilder.hpp>
 #include <mach/Context.hpp>
-#include <mach/http/Method.hpp>
 
 #include <iostream>
 #include <stdexcept>

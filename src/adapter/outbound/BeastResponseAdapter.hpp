@@ -3,16 +3,14 @@
 #include <vector>
 
 #include <boost/beast/http.hpp>
-#include <boost/beast/http/message_generator.hpp>
 #include <boost/beast/http/string_body.hpp>
 
 #include <mach/Context.hpp>
-#include <mach/http/Method.hpp>
 #include <mach/http/Version.hpp>
 
 namespace mach::http
 {
-    class Cookie;
+    struct Cookie;
 }
 
 namespace mach::detail::http::adapter
@@ -22,14 +20,14 @@ namespace mach::detail::http::adapter
     class BeastResponseAdapter {
 
     public:
-        beast::http::response<beast::http::string_body> adapt(mach::Context&& context);
+        [[nodiscard]] beast::http::response<beast::http::string_body> adapt(mach::Context&& context) const;
 
     private:
-        void writeCookies(
+        static void writeCookies(
             beast::http::response<beast::http::string_body>& response,
-            const std::vector<mach::http::Cookie>& cookies) const;
+            const std::vector<mach::http::Cookie>& cookies);
 
-        std::string cookieToString(const mach::http::Cookie& cookie) const;
+        [[nodiscard]] static std::string cookieToString(const mach::http::Cookie& cookie);
 
         static unsigned int fromMachVersion(mach::http::Version version);
     };

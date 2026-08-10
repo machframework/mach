@@ -75,7 +75,7 @@ add_library(mach
 
     src/csrf/CsrfMiddleware.cpp
     src/csrf/CsrfBuilder.cpp
-)
+ "src/http/Context.cpp")
 
 set_target_properties(mach PROPERTIES
     DEBUG_POSTFIX "d"

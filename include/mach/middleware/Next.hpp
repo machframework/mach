@@ -1,10 +1,12 @@
 #pragma once
 
 #include <functional>
-#include <stdexcept>
 
-#include <mach/detail/dispatching/RequestExecution.hpp>
-#include <mach/detail/middleware/InternalNext.hpp>
+namespace mach::detail::middleware
+{
+    template <typename TMiddleware>
+    class MiddlewareInvoker;
+}
 
 namespace mach
 {
@@ -17,15 +19,6 @@ namespace mach
     class Next {
 
     public:
-        // TODO: make private
-        /**
-         * Constructs a Next object wrapping the next pipeline step.
-         *
-         * @param next The function to invoke when continuing pipeline
-         *             execution.
-         */
-        explicit Next(std::function<void()> next);
-
         Next(const Next&) = delete;
         Next& operator=(const Next&) = delete;
 
@@ -40,7 +33,12 @@ namespace mach
         void operator()();
 
     private:
+        explicit Next(std::function<void()> next);
+
         std::function<void()> m_next;
         bool m_invoked = false;
+
+        template <typename TMiddleware>
+        friend class detail::middleware::MiddlewareInvoker;
     };
 }

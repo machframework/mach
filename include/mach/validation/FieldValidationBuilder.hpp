@@ -17,7 +17,6 @@
 #include <mach/detail/validation/rules/ValidationRuleType.hpp>
 #include <mach/detail/validation/rules/StringRules.hpp>
 #include <mach/detail/validation/ValidationResult.hpp>
-#include <mach/detail/validation/Validator.hpp>
 
 namespace mach
 {
@@ -145,8 +144,8 @@ namespace mach::validation
          *
          * @tparam Number The numeric type of the field and range bounds.
          *
-         * @param min The minimum allowed value, inclusive.
-         * @param max The maximum allowed value, inclusive.
+         * @param minimum The minimum allowed value, inclusive.
+         * @param maximum The maximum allowed value, inclusive.
          *
          * @return A reference to this builder for method chaining.
          *
@@ -164,7 +163,7 @@ namespace mach::validation
          *
          * @tparam Number The numeric type of the field and minimum value.
          *
-         * @param min The minimum allowed value, inclusive.
+         * @param minimum The minimum allowed value, inclusive.
          *
          * @return A reference to this builder for method chaining.
          *
@@ -182,7 +181,7 @@ namespace mach::validation
          *
          * @tparam Number The numeric type of the field and maximum value.
          *
-         * @param max The maximum allowed value, inclusive.
+         * @param maximum The maximum allowed value, inclusive.
          *
          * @return A reference to this builder for method chaining.
          *
@@ -427,9 +426,8 @@ namespace mach::validation
             [field = m_field, rule = std::move(rule), errorMessage = std::string(errorMessage)](
                 const T& instance,
                 detail::validation::ValidationResult& result) {
-                const bool isValid = validate(instance.*field, rule);
 
-                if (isValid == Negate) {
+                if (const bool isValid = validate(instance.*field, rule); isValid == Negate) {
                     result.addError(errorMessage);
                 }
             });

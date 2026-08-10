@@ -5,7 +5,9 @@
 #include <stdexcept>
 
 #ifdef _WIN32
-    #define NOMINMAX
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
     #include <Windows.h>
     #include <bcrypt.h>
 #elif defined(__linux__)
@@ -22,15 +24,13 @@
 
 namespace mach::detail::csrf
 {
-    CsrfMiddleware::CsrfMiddleware(CsrfOptions& options) : m_options(options) {}
+    CsrfMiddleware::CsrfMiddleware(const CsrfOptions& options) : m_options(options) {}
 
     void CsrfMiddleware::invoke(mach::Context& context, mach::Next& next) {
         const auto tokenCookie = context.request.cookie(m_options.cookieName);
 
-        const auto method = context.request.method();
-
         // safe method
-        if (method == mach::http::Method::Get || method == mach::http::Method::Head ||
+        if (const auto method = context.request.method(); method == mach::http::Method::Get || method == mach::http::Method::Head ||
             method == mach::http::Method::Options) {
             if (!tokenCookie) {
                 auto cookie = mach::http::Cookie{
@@ -64,7 +64,7 @@ namespace mach::detail::csrf
         next();
     }
 
-    std::string CsrfMiddleware::generateToken() const {
+    std::string CsrfMiddleware::generateToken() {
         constexpr std::size_t tokenSize = 32;
         constexpr char hexDigits[] = "0123456789abcdef";
 

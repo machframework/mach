@@ -1,6 +1,5 @@
 #include <mach/AppBuilder.hpp>
 
-#include <iostream>
 #include <stdexcept>
 
 #include <mach/Logger.hpp>
@@ -33,7 +32,7 @@ namespace
         }
     }
 
-    void validateThreadCount(std::int64_t threadCount) {
+    void validateThreadCount(std::size_t threadCount) {
         if (threadCount < 1) {
             throw std::invalid_argument("Thread count must be at least 1.");
         }
@@ -55,7 +54,7 @@ namespace mach
         m_container.reserveInternal<detail::routing::Router>();
 
         this->use<detail::exceptions::ExceptionMiddleware, mach::Logger>(
-            mach::detail::di::ServiceAccess::Internal);
+            detail::di::ServiceAccess::Internal);
     }
 
     AppBuilder& AppBuilder::addCsrf() {
@@ -93,7 +92,7 @@ namespace mach
                 detail::di::ServiceAccess::Internal);
 
             this->use<detail::cors::CorsMiddleware, detail::cors::CorsOptions>(
-                mach::detail::di::ServiceAccess::Internal);
+                detail::di::ServiceAccess::Internal);
         }
         if (m_csrfOptions) {
             m_container.addSingletonInstance<detail::csrf::CsrfOptions>(
@@ -101,11 +100,11 @@ namespace mach
                 detail::di::ServiceAccess::Internal);
 
             this->use<detail::csrf::CsrfMiddleware, detail::csrf::CsrfOptions>(
-                mach::detail::di::ServiceAccess::Internal);
+                detail::di::ServiceAccess::Internal);
         }
 
         this->use<detail::routing::RoutingMiddleware, detail::routing::Router>(
-            mach::detail::di::ServiceAccess::Internal);
+            detail::di::ServiceAccess::Internal);
 
         App app(
             std::move(m_appOptions),
@@ -118,6 +117,6 @@ namespace mach
             mapper(app);
         }
 
-        return app;
+        return std::move(app);
     }
 }

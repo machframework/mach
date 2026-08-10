@@ -4,12 +4,10 @@
 #include <format>
 #include <functional>
 #include <iostream>
-#include <optional>
+#include <ranges>
 #include <stdexcept>
 #include <unordered_set>
 #include <utility>
-
-#include <mach/detail/routing/RouteConstraint.hpp>
 
 namespace
 {
@@ -25,12 +23,12 @@ namespace
         segment.remove_prefix(1);
         segment.remove_suffix(1);
 
-        auto pos = segment.find(':');
+        const auto pos = segment.find(':');
         if (pos == std::string_view::npos) {
             return {std::string(segment), RouteConstraint::String};
         }
 
-        auto param = segment.substr(0, pos);
+        const auto param = segment.substr(0, pos);
         auto constraint = segment.substr(pos + 1);
 
         if (constraint.empty()) {
@@ -82,7 +80,7 @@ namespace mach::detail::routing
 {
     void RouteTrie::mapRoute(
         std::vector<std::string_view>&& segments,
-        routing::RouteEndpoint* endpoint) {
+        RouteEndpoint* endpoint) {
         RouteNode* curr = &m_root;
 
         // registering root
@@ -105,7 +103,7 @@ namespace mach::detail::routing
                     const auto [parameter, constraint] =
                         extractParameter(endpoint->pattern, nextSegmentKey);
 
-                    if (parameter == "") {
+                    if (parameter.empty()) {
                         throw std::invalid_argument(
                             std::format(
                                 "Invalid route definition '{}': Route parameter name cannot be "
@@ -148,67 +146,65 @@ namespace mach::detail::routing
                         "for method {}",
                         endpoint->pattern,
                         mach::http::toString(endpoint->method)));
-            } else {
-                throw std::invalid_argument(
-                    std::format(
-                        "Invalid route definition '{}': The route is ambiguous with existing route "
-                        "'{}' for method {}",
-                        endpoint->pattern,
-                        conflictingEndpoint->pattern,
-                        mach::http::toString(endpoint->method)));
             }
+
+            throw std::invalid_argument(
+                std::format(
+                    "Invalid route definition '{}': The route is ambiguous with existing route "
+                    "'{}' for method {}",
+                    endpoint->pattern,
+                    conflictingEndpoint->pattern,
+                    mach::http::toString(endpoint->method)));
         }
 
         // same route, different method
         curr->endpointsByMethod.emplace(endpoint->method, endpoint);
-
-        // debugDump();
     }
 
-    routing::RouteMatch RouteTrie::matchRoute(
+    RouteMatch RouteTrie::matchRoute(
         mach::http::Method method,
         std::vector<std::string_view>&& segments) const {
         const RouteNode* curr = &m_root;
 
         std::vector<std::string> capturedValues;
-        std::unordered_set<mach::http::Method> allowedMethods = {mach::http::Method::Options};
+        std::unordered_set allowedMethods = {mach::http::Method::Options};
 
         return matchRoute(method, segments, 0, capturedValues, allowedMethods, curr);
     }
 
-    routing::RouteMatch RouteTrie::matchRoute(
-        mach::http::Method method,
+    RouteMatch RouteTrie::matchRoute(
+        http::Method method,
         const std::vector<std::string_view>& segments,
         std::size_t index,
         std::vector<std::string>& capturedValues,
-        std::unordered_set<mach::http::Method>& allowedMethods,
+        std::unordered_set<http::Method>& allowedMethods,
         const RouteNode* curr) const {
-        auto segmentsSize = segments.size();
+        const auto segmentsSize = segments.size();
 
         // check for root
         if (segments.empty()) {
             if (curr->endpointsByMethod.contains(method)) {
-                auto endpoint = curr->endpointsByMethod.find(method)->second;
+                const auto endpoint = curr->endpointsByMethod.find(method)->second;
                 return RouteMatch(endpoint);
             }
             if (curr->endpointsByMethod.empty()) {
-                return routing::RouteMatch(RoutingStatus::NotFound);
+                return RouteMatch(RoutingStatus::NotFound);
             }
 
-            for (const auto& entry : curr->endpointsByMethod) {
-                allowedMethods.insert(entry.first);
+            for (auto allowedMethod : curr->endpointsByMethod | std::views::keys) {
+                allowedMethods.insert(allowedMethod);
             }
 
-            return routing::RouteMatch(allowedMethods);
+            return RouteMatch(allowedMethods);
         }
 
         // reached the end of the segments without finding a match
         if (index >= segmentsSize || !curr) {
-            return routing::RouteMatch(RoutingStatus::NotFound);
+            return RouteMatch(RoutingStatus::NotFound);
         }
 
-        auto segmentKey = std::string(segments[index]);
-        auto nextSegment = curr->childrenByStaticSegment.find(segmentKey);
+        const auto segmentKey = std::string(segments[index]);
+        const auto nextSegment = curr->childrenByStaticSegment.find(segmentKey);
 
         // try static route first
         if (nextSegment != curr->childrenByStaticSegment.end()) {
@@ -216,28 +212,29 @@ namespace mach::detail::routing
                 const auto& endpointsByMethod = nextSegment->second->endpointsByMethod;
 
                 if (endpointsByMethod.contains(method)) {
-                    auto endpoint = endpointsByMethod.find(method)->second;
+                    const auto endpoint = endpointsByMethod.find(method)->second;
 
-                    return routing::RouteMatch(
+                    return {
                         endpoint,
-                        std::move(makeRouteParameters(endpoint->parameterNames, capturedValues)));
-                } else if (
+                        std::move(makeRouteParameters(endpoint->parameterNames, capturedValues))};
+                } if (
                     method == http::Method::Head && endpointsByMethod.contains(http::Method::Get)
                 ) {
-                    auto endpoint = endpointsByMethod.find(http::Method::Get)->second;
-                    return routing::RouteMatch(
+                    const auto endpoint = endpointsByMethod.find(http::Method::Get)->second;
+                    return {
                         endpoint,
-                        std::move(makeRouteParameters(endpoint->parameterNames, capturedValues)));
+                        std::move(makeRouteParameters(endpoint->parameterNames, capturedValues))};
                 }
                 if (endpointsByMethod.empty()) {
-                    return routing::RouteMatch(RoutingStatus::NotFound);
+                    return RouteMatch(RoutingStatus::NotFound);
                 }
 
-                for (const auto& entry : endpointsByMethod) {
-                    allowedMethods.insert(entry.first);
+                for (auto allowedMethod : curr->endpointsByMethod | std::views::keys) {
+                    allowedMethods.insert(allowedMethod);
                 }
 
-                return routing::RouteMatch(allowedMethods);
+
+                return RouteMatch(allowedMethods);
             }
 
             auto result = matchRoute(
@@ -257,13 +254,13 @@ namespace mach::detail::routing
         // check for parameters
         if (!curr->constrainedParameterChildren.empty()) {
             // find the parameter type of the segment
-            RouteConstraint constraint = RouteConstraint::String; // default to string
+            auto  constraint = RouteConstraint::String; // default to string
 
             if (satisfiesConstraint(segmentKey, RouteConstraint::Int)) {
                 constraint = RouteConstraint::Int;
             }
 
-            RouteNode* childNode = nullptr;
+            const RouteNode* childNode = nullptr;
 
             if (curr->constrainedParameterChildren.contains(constraint)) {
                 childNode = curr->constrainedParameterChildren.find(constraint)->second.get();
@@ -279,31 +276,31 @@ namespace mach::detail::routing
 
             if (index == segmentsSize - 1) {
                 if (childNode->endpointsByMethod.empty()) {
-                    return routing::RouteMatch(RoutingStatus::NotFound);
+                    return RouteMatch(RoutingStatus::NotFound);
                 }
                 if (!childNode->endpointsByMethod.contains(method)) {
                     if (method == http::Method::Head &&
                         childNode->endpointsByMethod.contains(http::Method::Get)) {
-                        auto endpoint =
+                        const auto endpoint =
                             childNode->endpointsByMethod.find(http::Method::Get)->second;
-                        return routing::RouteMatch(
+                        return {
                             endpoint,
                             std::move(
-                                makeRouteParameters(endpoint->parameterNames, capturedValues)));
+                                makeRouteParameters(endpoint->parameterNames, capturedValues))};
                     }
 
-                    for (const auto& entry : childNode->endpointsByMethod) {
-                        allowedMethods.insert(entry.first);
+                    for (auto allowedMethod : curr->endpointsByMethod | std::views::keys) {
+                        allowedMethods.insert(allowedMethod);
                     }
 
-                    return routing::RouteMatch(allowedMethods);
+                    return RouteMatch(allowedMethods);
                 }
 
-                auto endpoint = childNode->endpointsByMethod.find(method)->second;
+                const auto endpoint = childNode->endpointsByMethod.find(method)->second;
 
-                return routing::RouteMatch(
+                return {
                     endpoint,
-                    std::move(makeRouteParameters(endpoint->parameterNames, capturedValues)));
+                    std::move(makeRouteParameters(endpoint->parameterNames, capturedValues))};
             }
 
             return matchRoute(
@@ -316,7 +313,7 @@ namespace mach::detail::routing
 			);
         }
 
-        return routing::RouteMatch(RoutingStatus::NotFound);
+        return RouteMatch(RoutingStatus::NotFound);
     }
 
     void RouteTrie::debugDump() const {
@@ -325,12 +322,12 @@ namespace mach::detail::routing
             const std::string&,
             bool,
             bool,
-            const std::optional<routing::RouteConstraint>&)>
+            const std::optional<RouteConstraint>&)>
             print = [&](const RouteNode& node,
                         const std::string& prefix,
                         bool isLast,
                         bool isParam,
-                        const std::optional<routing::RouteConstraint>& constraint) {
+                        const std::optional<RouteConstraint>& constraint) {
                 const std::string connector = isLast ? "\\-- " : "|-- ";
                 // Build label
                 std::string label =
@@ -344,13 +341,16 @@ namespace mach::detail::routing
                 if (!node.endpointsByMethod.empty()) {
                     label += " [";
                     bool first = true;
-                    for (const auto& [method, _] : node.endpointsByMethod) {
+
+                    for (auto method : node.endpointsByMethod | std::views::keys) {
                         if (!first)
                             label += ", ";
+
                         label += toString(method);
                         first = false;
                     }
-                    label += "]";
+
+                    label += ']';
                 }
                 std::cout << prefix << connector << label << "\n";
                 const std::string childPrefix = prefix + (isLast ? "    " : "|   ");
@@ -358,9 +358,12 @@ namespace mach::detail::routing
                 // Collect and sort static children
                 std::vector<std::string> keys;
                 keys.reserve(node.childrenByStaticSegment.size());
-                for (const auto& [key, _] : node.childrenByStaticSegment)
+
+                for (const auto& key : node.childrenByStaticSegment | std::views::keys) {
                     keys.push_back(key);
-                std::sort(keys.begin(), keys.end());
+                }
+
+                std::ranges::sort(keys);
                 for (size_t i = 0; i < keys.size(); ++i) {
                     const bool lastChild = !hasParamChildren && (i == keys.size() - 1);
                     print(
@@ -371,12 +374,13 @@ namespace mach::detail::routing
                         std::nullopt);
                 }
                 // Collect and sort parameterized children by constraint name for stable output
-                std::vector<std::optional<routing::RouteConstraint>> constraints;
+                std::vector<std::optional<RouteConstraint>> constraints;
                 constraints.reserve(node.constrainedParameterChildren.size());
-                for (const auto& [constraintKey, _] : node.constrainedParameterChildren)
+                for (const auto& constraintKey : node.constrainedParameterChildren | std::views::keys) {
                     constraints.push_back(constraintKey);
+                }
 
-                std::sort(constraints.begin(), constraints.end(), [](const auto& a, const auto& b) {
+                std::ranges::sort(constraints, [](const auto& a, const auto& b) {
                     const std::string_view sa = a ? toString(*a) : "";
                     const std::string_view sb = b ? toString(*b) : "";
                     return sa < sb;

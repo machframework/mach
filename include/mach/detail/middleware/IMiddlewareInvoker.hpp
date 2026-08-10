@@ -1,7 +1,5 @@
 #pragma once
 
-#include <mach/middleware/Next.hpp>
-
 #include <mach/detail/dispatching/RequestExecution.hpp>
 
 namespace mach::detail::middleware
@@ -12,6 +10,6 @@ namespace mach::detail::middleware
         virtual ~IMiddlewareInvoker() = default;
         virtual void invoke(
             dispatching::RequestExecution& execution,
-            const middleware::InternalNext& next) = 0;
+            const InternalNext& next) = 0;
     };
 }

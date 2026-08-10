@@ -1,13 +1,10 @@
 #pragma once
 
 #include <memory>
-#include <string>
 #include <string_view>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
-#include <mach/Context.hpp>
 #include <mach/controllers/ControllerBuilder.hpp>
 #include <mach/http/Method.hpp>
 #include <mach/Logger.hpp>
@@ -51,7 +48,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        std::string host() const noexcept;
+        [[nodiscard]] std::string host() const noexcept;
 
         /**
          * Returns the port the application is configured to listen on (e.g. 3143, 8080).
@@ -60,7 +57,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        std::uint16_t port() const noexcept;
+        [[nodiscard]] std::uint16_t port() const noexcept;
 
         /**
          * Returns the number of worker threads the application is configured to use.
@@ -69,7 +66,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        std::size_t threadCount() const noexcept;
+        [[nodiscard]] std::size_t threadCount() const noexcept;
 
         /**
          * Registers a GET request handler.
@@ -184,8 +181,7 @@ namespace mach
          *
          * @thread_safety This function is not thread-safe.
          */
-        [[nodiscard]]
-        int run();
+        [[nodiscard]] int run() const;
 
         /**
          * Stops the application and shuts down the HTTP server.
@@ -199,7 +195,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        void stop();
+        void stop() const;
 
     private:
         App(AppOptions serverOptions,
@@ -214,11 +210,11 @@ namespace mach
         template <detail::controllers::MachController TController>
         App& mapController();
 
-        void addRouteImpl(detail::routing::RouteEndpoint route);
+        void addRouteImpl(detail::routing::RouteEndpoint route) const;
 
         void addControllerRoutesImpl(
             std::vector<detail::routing::RouteEndpoint> routes,
-            std::type_index controllerType);
+            std::type_index controllerType) const;
 
         class Impl;
         std::unique_ptr<Impl> m_impl;
@@ -228,11 +224,11 @@ namespace mach
 
     template <typename THandler>
         requires detail::traits::MinimalApiHandler<THandler>
-    void mach::App::mapRoute(http::Method method, std::string_view pattern, THandler&& handler) {
+    void App::mapRoute(http::Method method, std::string_view pattern, THandler&& handler) {
         using Handler = std::decay_t<THandler>;
         using Traits = detail::traits::FunctionTraits<Handler>;
-        using ArgsTuple = typename Traits::ArgsTuple;
-        using Result = typename Traits::ReturnType;
+        using ArgsTuple = Traits::ArgsTuple;
+        using Result = Traits::ReturnType;
 
         using Invoker =
             detail::dispatching::MinimalApiInvokerFromTupleT<Handler, Result, ArgsTuple>;

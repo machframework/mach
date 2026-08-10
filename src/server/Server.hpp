@@ -2,26 +2,30 @@
 
 #include <memory>
 #include <string>
-#include <string_view>
 
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/address.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 #include <mach/AppOptions.hpp>
-#include <mach/Logger.hpp>
 
 #include <mach/detail/di/Container.hpp>
 #include <mach/detail/middleware/MiddlewarePipeline.hpp>
-#include <mach/detail/routing/Router.hpp>
 
-#include "BeastListener.hpp"
-#include "BeastSession.hpp"
 #include "adapter/inbound/BeastRequestAdapter.hpp"
 #include "adapter/outbound/BeastResponseAdapter.hpp"
+#include "application/Runtime.hpp"
+
+namespace mach
+{
+    class Logger;
+}
 
 namespace mach::detail::server
 {
     namespace net = boost::asio;
+
+    class BeastListener;
 
     class Server {
 
@@ -48,7 +52,7 @@ namespace mach::detail::server
         boost::asio::io_context m_ioc;
         std::shared_ptr<BeastListener> m_listener;
 
-        detail::application::Runtime m_runtime;
+        application::Runtime m_runtime;
         detail::http::adapter::BeastRequestAdapter m_requestAdapter;
         detail::http::adapter::BeastResponseAdapter m_responseAdapter;
 

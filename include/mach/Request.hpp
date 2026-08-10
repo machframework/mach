@@ -243,7 +243,7 @@ namespace mach
 
     template <typename T>
     std::optional<T> Request::query(std::string_view name) const {
-        if (auto result = this->query(name)) {
+        if (const auto result = this->query(name)) {
             try {
                 return mach::fromString<T>(*result);
             } catch (const std::invalid_argument&) {

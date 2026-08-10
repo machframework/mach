@@ -12,8 +12,7 @@ namespace mach::detail::validation
             return false;
         }
 
-        const auto dot = value.rfind('.');
-        if (dot == std::string_view::npos || dot <= at + 1 || dot == value.size() - 1) {
+        if (const auto dot = value.rfind('.'); dot == std::string_view::npos || dot <= at + 1 || dot == value.size() - 1) {
             return false;
         }
 

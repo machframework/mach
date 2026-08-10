@@ -11,26 +11,26 @@
 
 #pragma once
 
-#include <format>
-#include <optional>
 #include <utility>
 
 #include <boost/asio/awaitable.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/beast/core.hpp>
 #include <boost/beast/core/flat_buffer.hpp>
 #include <boost/beast/core/tcp_stream.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/http/message.hpp>
-#include <boost/beast/http/parser.hpp>
 
-#include <mach/AppOptions.hpp>
 #include <mach/Context.hpp>
 #include <mach/Logger.hpp>
 
 #include "adapter/inbound/BeastRequestAdapter.hpp"
 #include "adapter/outbound/BeastResponseAdapter.hpp"
 #include "application/Runtime.hpp"
+
+namespace mach
+{
+    struct AppOptions;
+}
 
 namespace mach::detail::server
 {
@@ -70,7 +70,7 @@ namespace mach::detail::server
         http::message_generator handle_request(
             http::request<Body, http::basic_fields<Allocator>>&& req);
 
-        http::message_generator makeReadErrorResponse(mach::http::StatusCode status);
+        static http::message_generator makeReadErrorResponse(mach::http::StatusCode status);
 
         const AppOptions& m_appOptions;
 
@@ -87,9 +87,9 @@ namespace mach::detail::server
         bool keepAlive = req.keep_alive();
         auto version = req.version();
 
-        bool adapterRejectedRequest = false;
-
         try {
+            bool adapterRejectedRequest = false;
+
             auto context = m_requestAdapter.adapt(std::move(req), adapterRejectedRequest);
             auto method = context.request.method();
 

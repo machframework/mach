@@ -12,12 +12,12 @@
 
 namespace mach::detail::cors
 {
-    CorsMiddleware::CorsMiddleware(cors::CorsOptions& options) : m_options(options) {
+    CorsMiddleware::CorsMiddleware(const CorsOptions& options) : m_options(options) {
         buildCachedHeaders();
     }
 
     void CorsMiddleware::invoke(mach::Context& context, mach::Next& next) {
-        auto& request = context.request;
+        const auto& request = context.request;
         
         const auto origin = request.header("origin");
         if (!origin) {
@@ -25,7 +25,7 @@ namespace mach::detail::cors
             return;
         }
 
-        std::string originValue = std::string(*origin);
+        const auto  originValue = std::string(*origin);
 
         // handle OPTIONS preflight
         if (request.method() == mach::http::Method::Options) {
@@ -50,8 +50,8 @@ namespace mach::detail::cors
     }
 
     void CorsMiddleware::addCorsHeaders(mach::Context& context, bool preflight) const {
-        std::string origin = std::string(context.request.header("origin").value());
-        std::string vary = "";
+        auto  origin = std::string(context.request.header("origin").value());
+        std::string vary;
 
         if (m_options.allowAnyOrigin && !m_options.allowCredentials) {
             origin = "*";
@@ -103,7 +103,7 @@ namespace mach::detail::cors
             return;
         }
         if (const auto methodStr = context.request.header("Access-Control-Request-Method")) {
-            auto method = mach::http::toMethod(*methodStr);
+            const auto method = mach::http::toMethod(*methodStr);
             if (method == mach::http::Method::Unknown) {
                 context.response.status(mach::http::StatusCode::BadRequest);
                 return;
@@ -120,8 +120,7 @@ namespace mach::detail::cors
         // validate headers
         if (!m_options.allowAnyHeader) {
             if (const auto headersStr = context.request.header("Access-Control-Request-Headers")) {
-                const auto headers = split(*headersStr, ',');
-                for (auto header : headers) {
+                for (const auto headers = split(*headersStr, ','); auto header : headers) {
                     header = trim(header);
 
                     auto normalizedHeader = std::string(header);

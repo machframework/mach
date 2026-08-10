@@ -1,10 +1,9 @@
-#include "mach/Request.hpp"
-
-#include "HttpUtils.hpp"
+#include <mach/Request.hpp>
 
 #include <format>
-#include <optional>
 #include <stdexcept>
+
+#include "HttpUtils.hpp"
 
 namespace mach
 {
@@ -15,7 +14,7 @@ namespace mach
         std::string body,
         std::unordered_map<std::string, std::string> headers,
         std::unordered_map<std::string, std::string> cookies)
-        : m_method(method), m_version(version), m_target(std::move(target)),
+        : m_version(version), m_method(method), m_target(std::move(target)),
           m_body(std::move(body)), m_headers(std::move(headers)), m_cookies(std::move(cookies)) {}
 
     http::Version Request::version() const noexcept {
@@ -35,11 +34,10 @@ namespace mach
     }
 
     std::optional<std::string_view> Request::header(std::string_view name) const {
-        std::string normalizedName = std::string(name);
+        auto  normalizedName = std::string(name);
         detail::http::toLowercaseInPlace(normalizedName);
 
-        auto it = m_headers.find(normalizedName);
-        if (it != m_headers.end()) {
+        if (const auto it = m_headers.find(normalizedName); it != m_headers.end()) {
             return it->second;
         }
 
@@ -51,8 +49,7 @@ namespace mach
     }
 
     std::string_view Request::routeParam(std::string_view name) const {
-        auto it = m_routeParams.find(std::string(name));
-        if (it != m_routeParams.end()) {
+        if (const auto it = m_routeParams.find(std::string(name)); it != m_routeParams.end()) {
             return it->second;
         }
 
@@ -64,8 +61,7 @@ namespace mach
     }
 
     std::optional<std::string_view> Request::cookie(std::string_view name) const {
-        auto it = m_cookies.find(std::string(name));
-        if (it != m_cookies.end()) {
+        if (const auto it = m_cookies.find(std::string(name)); it != m_cookies.end()) {
             return it->second;
         }
 
@@ -76,10 +72,8 @@ namespace mach
         return this->query(name).has_value();
     }
 
-
     std::optional<std::string_view> Request::query(std::string_view name) const {
-        auto it = m_query.find(std::string(name));
-        if (it != m_query.end()) {
+        if (const auto it = m_query.find(std::string(name)); it != m_query.end()) {
             return it->second;
         }
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string_view>
+
 namespace mach::detail::http::headers
 {
     inline constexpr std::string_view SetCookie = "set-cookie";

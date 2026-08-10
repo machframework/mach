@@ -1,14 +1,15 @@
 #pragma once
 
-#include <mach/AppOptions.hpp>
-#include <mach/Context.hpp>
-#include <mach/Logger.hpp>
-
 #include <mach/detail/di/Container.hpp>
 #include <mach/detail/dispatching/Dispatcher.hpp>
 #include <mach/detail/middleware/MiddlewarePipeline.hpp>
 #include <mach/detail/routing/RouteEndpoint.hpp>
-#include <mach/detail/routing/Router.hpp>
+
+namespace mach
+{
+    struct AppOptions;
+    class Logger;
+}
 
 namespace mach::detail::application
 {
@@ -26,7 +27,7 @@ namespace mach::detail::application
         Runtime(Runtime&&) = delete;
         Runtime& operator=(Runtime&&) = delete;
 
-        void handle(mach::Context& context);
+        void handle(mach::Context& context) const;
 
     private:
         const AppOptions& m_appOptions;

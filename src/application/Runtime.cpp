@@ -1,12 +1,14 @@
 #include "Runtime.hpp"
 
 #include <exception>
-#include <iostream>
 
+#include <mach/AppOptions.hpp>
+#include <mach/Context.hpp>
+#include <mach/Logger.hpp>
+#include <mach/Response.hpp>
 #include <mach/http/StatusCode.hpp>
 
 #include <mach/detail/application/ExecutionPlan.hpp>
-#include <mach/detail/routing/RoutingStatus.hpp>
 
 namespace mach::detail::application
 {
@@ -15,10 +17,10 @@ namespace mach::detail::application
         di::Container container,
         middleware::MiddlewarePipeline middlewarePipeline,
         const Logger& logger)
-        : m_appOptions(appOptions), m_container(std::move(container)), m_logger(logger),
-          m_dispatcher(m_container, std::move(middlewarePipeline)) {}
+        : m_appOptions(appOptions), m_container(std::move(container)), m_dispatcher(m_container, std::move(middlewarePipeline)),
+          m_logger(logger) {}
 
-    void Runtime::handle(mach::Context& context) {
+    void Runtime::handle(mach::Context& context) const {
         try {
             m_dispatcher.execute(context);
         } catch (const std::exception& ex) {

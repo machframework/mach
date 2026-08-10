@@ -1,8 +1,10 @@
+#include <iostream>
+#include <thread>
+
 #include <mach/mach.hpp>
 
 #include "Testing.hpp"
 
-#include <iostream>
 
 int main() {
     auto builder = mach::AppBuilder(

@@ -7,7 +7,7 @@
 int main() {
     int threads = std::thread::hardware_concurrency();
 
-    mach::AppBuilder builder("127.0.0.1", 3143, 16);
+    mach::AppBuilder builder;
     auto app = builder.build();
 
     // root

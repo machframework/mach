@@ -19,9 +19,7 @@ namespace mach::detail::dispatching
 {
     template <typename Tuple>
     consteval bool expectsBody() {
-        constexpr std::size_t parameterCount = std::tuple_size_v<Tuple>;
-
-        if constexpr (parameterCount == 0) {
+        if constexpr (constexpr std::size_t parameterCount = std::tuple_size_v<Tuple>; parameterCount == 0) {
             return false;
         } else if constexpr (parameterCount == 1) {
             using Arg = std::tuple_element_t<0, Tuple>;
@@ -62,12 +60,11 @@ namespace mach::detail::dispatching
             "Mach error: minimal API handlers currently support at most two parameters.");
 
         const auto& stringBody = context.request.body();
-        const auto contentType = context.request.header("content-type");
 
-        if (handlerExpectsBody && !stringBody.empty() &&
+        if (const auto contentType = context.request.header("content-type"); handlerExpectsBody && !stringBody.empty() &&
             (!contentType ||
-             !mach::detail::http::matchesMediaType(*contentType, "application/json") ||
-             mach::detail::http::hasUnsupportedCharset(*contentType))) {
+             !http::matchesMediaType(*contentType, "application/json") ||
+             http::hasUnsupportedCharset(*contentType))) {
             context.response = mach::Response{context.request.version()};
             context.response.status(mach::http::StatusCode::UnsupportedMediaType);
             return;
@@ -109,7 +106,7 @@ namespace mach::detail::dispatching
                                               } -> std::same_as<void>;
                                           }) {
                                 mach::ValidationBuilder<ValueType> validationBuilder;
-                                mach::detail::validation::ValidationResult validationResult;
+                                validation::ValidationResult validationResult;
 
                                 body.validate(validationBuilder);
                                 validationBuilder.validate(body, validationResult);
@@ -212,7 +209,7 @@ namespace mach::detail::dispatching
 
             execution.context.response.status(res.statusCode());
 
-            using ValueType = typename TResult::ValueType;
+            using ValueType = TResult::ValueType;
 
             if constexpr (!std::same_as<ValueType, void>) {
                 if (res.hasValue()) {
@@ -237,5 +234,5 @@ namespace mach::detail::dispatching
 
     template <typename THandler, typename TResult, typename TArgsTuple>
     using MinimalApiInvokerFromTupleT =
-        typename MinimalApiInvokerFromTuple<THandler, TResult, TArgsTuple>::Type;
+        MinimalApiInvokerFromTuple<THandler, TResult, TArgsTuple>::Type;
 }

@@ -2,6 +2,18 @@
 
 namespace mach
 {
+    mach::Reply<std::string> ControllerBase::ok(const char* value) {
+        return mach::ok(value);
+    }
+
+    mach::Reply<std::string> ControllerBase::created(const char* value) {
+        return mach::created(value);
+    }
+
+    mach::Reply<> ControllerBase::noContent() {
+        return mach::noContent();
+    }
+
     [[nodiscard]]
     mach::Request& ControllerBase::request() noexcept {
         return m_context->request;

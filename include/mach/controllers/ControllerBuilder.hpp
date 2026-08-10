@@ -305,9 +305,9 @@ namespace mach
         if constexpr (isMemberFunction) {
             using Traits = detail::traits::FunctionTraits<HandlerType>;
 
-            using HandlerControllerType = typename Traits::ClassType;
-            using ReturnType = typename Traits::ReturnType;
-            using ArgsTuple = typename Traits::ArgsTuple;
+            using HandlerControllerType = Traits::ClassType;
+            using ReturnType = Traits::ReturnType;
+            using ArgsTuple = Traits::ArgsTuple;
 
             constexpr bool containsContextArg =
                 mach::detail::traits::tuple_contains_v<mach::Context, ArgsTuple>;
@@ -324,7 +324,7 @@ namespace mach
                 "Use the inherited 'context' member instead.");
 
             if constexpr (isSameController) {
-                using InvokerType = typename detail::dispatching::
+                using InvokerType = detail::dispatching::
                     ControllerActionInvokerFromTuple<TController, ReturnType, ArgsTuple>::Type;
 
                 constexpr bool isReply = detail::traits::dispatching::is_reply_v<ReturnType>;

@@ -25,10 +25,10 @@ namespace mach::detail::middleware
 
         void invoke(
             dispatching::RequestExecution& execution,
-            const middleware::InternalNext& terminal) const;
+            const InternalNext& terminal) const;
 
     private:
-        std::vector<std::unique_ptr<middleware::IMiddlewareInvoker>> m_middlewares;
+        std::vector<std::unique_ptr<IMiddlewareInvoker>> m_middlewares;
     };
 
     template <typename TMiddleware>

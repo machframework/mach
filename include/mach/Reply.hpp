@@ -140,13 +140,13 @@ namespace mach
         return m_value.has_value();
     }
 
-    inline Reply<void>::Reply(http::StatusCode statusCode) : m_statusCode(statusCode) {}
+    inline Reply<>::Reply(http::StatusCode statusCode) : m_statusCode(statusCode) {}
 
-    inline http::StatusCode Reply<void>::statusCode() const noexcept {
+    inline http::StatusCode Reply<>::statusCode() const noexcept {
         return m_statusCode;
     }
 
-    inline bool Reply<void>::hasValue() const noexcept {
+    inline bool Reply<>::hasValue() const noexcept {
         return false;
     }
 }

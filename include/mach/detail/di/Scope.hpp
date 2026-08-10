@@ -5,8 +5,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include <mach/detail/di/ServiceDescriptor.hpp>
-
 namespace mach::detail::di
 {
     class Container;
@@ -15,7 +13,7 @@ namespace mach::detail::di
 
     public:
         template <typename T>
-        T& resolve();
+        [[nodiscard]] T& resolve();
 
     private:
         explicit Scope(Container& container);

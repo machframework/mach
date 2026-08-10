@@ -18,9 +18,9 @@ namespace mach::detail::routing
     public:
         RouteTrie() = default;
 
-        void mapRoute(std::vector<std::string_view>&& segments, routing::RouteEndpoint* endpoint);
+        void mapRoute(std::vector<std::string_view>&& segments, RouteEndpoint* endpoint);
 
-        routing::RouteMatch matchRoute(
+        [[nodiscard]] RouteMatch matchRoute(
             mach::http::Method method,
             std::vector<std::string_view>&& segments) const;
 
@@ -29,10 +29,10 @@ namespace mach::detail::routing
     private:
         struct RouteNode {
             std::string segmentKey;
-            std::unordered_map<mach::http::Method, routing::RouteEndpoint*> endpointsByMethod;
+            std::unordered_map<mach::http::Method, RouteEndpoint*> endpointsByMethod;
 
             std::unordered_map<std::string, std::unique_ptr<RouteNode>> childrenByStaticSegment;
-            std::unordered_map<std::optional<routing::RouteConstraint>, std::unique_ptr<RouteNode>>
+            std::unordered_map<std::optional<RouteConstraint>, std::unique_ptr<RouteNode>>
                 constrainedParameterChildren;
 
             explicit RouteNode(std::string_view segmentKey = "") : segmentKey(segmentKey) {}
@@ -44,7 +44,7 @@ namespace mach::detail::routing
             RouteNode& operator=(RouteNode&&) noexcept = default;
         };
 
-        routing::RouteMatch matchRoute(
+        RouteMatch matchRoute(
             mach::http::Method method,
             const std::vector<std::string_view>& segments,
             std::size_t index,

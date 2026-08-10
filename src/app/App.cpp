@@ -1,12 +1,10 @@
 #include <mach/App.hpp>
 
-#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <typeindex>
 #include <unordered_set>
 
-#include <mach/detail/dispatching/MinimalApiInvoker.hpp>
 #include <mach/detail/routing/RouteEndpoint.hpp>
 
 #include "server/Server.hpp"
@@ -76,11 +74,11 @@ namespace mach
 
     App::App(App&&) noexcept = default;
 
-    int App::run() {
+    int App::run() const {
         return m_impl->run();
     }
 
-    void App::stop() {
+    void App::stop() const {
         m_impl->stop();
     }
 
@@ -96,13 +94,13 @@ namespace mach
         return m_impl->threadCount();
     }
 
-    void App::addRouteImpl(detail::routing::RouteEndpoint route) {
+    void App::addRouteImpl(detail::routing::RouteEndpoint route) const {
         m_impl->mapRoute(std::move(route));
     }
 
     void App::addControllerRoutesImpl(
         std::vector<detail::routing::RouteEndpoint> routes,
-        std::type_index controllerType) {
+        std::type_index controllerType) const {
         m_impl->addControllerRoutes(std::move(routes), controllerType);
     }
 
@@ -137,8 +135,6 @@ namespace mach
 
             m_container.finalizeRegistrations();
 
-            auto& x = m_appOptions;
-
             m_server = std::make_unique<detail::server::Server>(
                 std::move(m_appOptions),
                 std::move(m_container),
@@ -172,16 +168,11 @@ namespace mach
     }
 
     void App::Impl::stop() {
-        detail::server::Server* server = nullptr;
+        std::lock_guard lock(m_serverMutex);
 
-        {
-            std::lock_guard lock(m_serverMutex);
-            server = m_server.get();
-
-            if (server && m_state == AppState::Running) {
-                server->stop();
-                m_state = AppState::Stopped;
-            }
+        if (m_server && m_state == AppState::Running) {
+            m_server->stop();
+            m_state = AppState::Stopped;
         }
     }
 
@@ -196,9 +187,8 @@ namespace mach
     void App::Impl::addControllerRoutes(
         std::vector<detail::routing::RouteEndpoint> routes,
         std::type_index controllerType) {
-        const auto [_, inserted] = m_mappedControllers.emplace(controllerType);
 
-        if (!inserted) {
+        if (const auto [_, inserted] = m_mappedControllers.emplace(controllerType);!inserted) {
             throw std::logic_error(
                 "Mach error: controller '" + std::string(controllerType.name()) +
                 "' has already been mapped");

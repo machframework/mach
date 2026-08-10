@@ -20,7 +20,11 @@
 #include <boost/asio/co_spawn.hpp>
 #include <boost/asio/detached.hpp>
 #include <boost/asio/redirect_error.hpp>
+#include <boost/asio/strand.hpp>
 #include <boost/asio/use_awaitable.hpp>
+
+#include <mach/AppOptions.hpp>
+#include <mach/Logger.hpp>
 
 #include "BeastSession.hpp"
 
@@ -29,12 +33,12 @@ namespace mach::detail::server
     BeastListener::BeastListener(
         const AppOptions& appOptions,
         net::io_context& ioc,
-        tcp::endpoint endpoint,
-        detail::application::Runtime& runtime,
+        const tcp::endpoint& endpoint,
+        application::Runtime& runtime,
         detail::http::adapter::BeastRequestAdapter& requestAdapter,
         detail::http::adapter::BeastResponseAdapter& responseAdapter,
         const mach::Logger& logger)
-        : m_appOptions(appOptions), m_ioc(ioc), m_acceptor(net::make_strand(ioc)),
+        : m_ioc(ioc), m_acceptor(net::make_strand(ioc)), m_appOptions(appOptions),
           m_runtime(runtime), m_requestAdapter(requestAdapter), m_responseAdapter(responseAdapter),
           m_logger(logger) {
         beast::error_code ec;
@@ -47,7 +51,7 @@ namespace mach::detail::server
 
 #ifdef _WIN32
 
-        BOOL exclusiveAddressUse = TRUE;
+         constexpr BOOL exclusiveAddressUse = TRUE;
 
         if (::setsockopt(
                 m_acceptor.native_handle(),

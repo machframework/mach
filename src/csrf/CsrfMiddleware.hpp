@@ -15,12 +15,12 @@ namespace mach::detail::csrf
     class CsrfMiddleware {
 
     public:
-        explicit CsrfMiddleware(CsrfOptions& options);
+        explicit CsrfMiddleware(const CsrfOptions& options);
 
         void invoke(mach::Context& context, mach::Next& next);
 
     private:
-        std::string generateToken() const;
+        [[nodiscard]] static std::string generateToken();
 
         CsrfOptions m_options;
     };

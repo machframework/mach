@@ -1,9 +1,7 @@
 #pragma once
 
 #include <functional>
-#include <memory>
 #include <tuple>
-#include <typeindex>
 #include <utility>
 
 #include <nlohmann/json.hpp>
@@ -54,7 +52,6 @@ namespace mach::detail::dispatching
         controller.setContext(context);
 
         constexpr std::size_t parameterCount = sizeof...(TArgs);
-        constexpr bool expectsBody = parameterCount != 0;
 
         static_assert(
             parameterCount <= 1,
@@ -62,12 +59,11 @@ namespace mach::detail::dispatching
             "the request body.");
 
         const auto& stringBody = context.request.body();
-        const auto contentType = context.request.header("content-type");
 
-        if (!stringBody.empty() &&
+        if (const auto contentType = context.request.header("content-type"); !stringBody.empty() &&
             (!contentType ||
-             !mach::detail::http::matchesMediaType(*contentType, "application/json") ||
-             mach::detail::http::hasUnsupportedCharset(*contentType))) {
+             !http::matchesMediaType(*contentType, "application/json") ||
+             http::hasUnsupportedCharset(*contentType))) {
             context.response = mach::Response{context.request.version()};
             context.response.status(mach::http::StatusCode::UnsupportedMediaType);
             return;
@@ -104,7 +100,7 @@ namespace mach::detail::dispatching
                                           { body.validate(builder) } -> std::same_as<void>;
                                       }) {
                             mach::ValidationBuilder<BodyType> validationBuilder;
-                            mach::detail::validation::ValidationResult validationResult;
+                            validation::ValidationResult validationResult;
 
                             body.validate(validationBuilder);
                             validationBuilder.validate(body, validationResult);
@@ -121,7 +117,7 @@ namespace mach::detail::dispatching
 
             context.response.status(res.statusCode());
 
-            using ValueType = typename TResult::ValueType;
+            using ValueType = TResult::ValueType;
 
             if constexpr (!std::same_as<ValueType, void>) {
                 if (res.hasValue()) {

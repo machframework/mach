@@ -7,7 +7,7 @@
 class LoggingMiddleware {
 
 public:
-    LoggingMiddleware(mach::Logger& logger) : m_logger(logger) {}
+    explicit LoggingMiddleware(mach::Logger& logger) : m_logger(logger) {}
 
     void invoke(mach::Context& context, mach::Next& next) {
         m_logger.info("Before handler");
@@ -23,8 +23,6 @@ private:
 };
 
 int main() {
-    const auto hardwareThreads = std::thread::hardware_concurrency();
-
     auto builder = mach::AppBuilder(
         mach::AppOptions{
             .host = "127.0.0.1",

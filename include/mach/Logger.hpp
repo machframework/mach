@@ -100,7 +100,7 @@ namespace mach
         void error(fmt::format_string<Args...> format, Args&&... args) const;
 
     private:
-        Logger(mach::LoggerOptions&& options);
+        explicit Logger(mach::LoggerOptions&& options);
 
         Logger& operator=(Logger&&) noexcept;
 

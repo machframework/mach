@@ -1,6 +1,6 @@
 #include <mach/detail/di/Container.hpp>
 
-#include <vector>
+#include <mach/detail/di/ServiceDescriptor.hpp>
 
 namespace mach::detail::di
 {
@@ -21,8 +21,7 @@ namespace mach::detail::di
     void Container::finalizeRegistrations() {
         for (const auto& [type, descriptor] : m_serviceRegistry) {
             if (descriptor.access == ServiceAccess::User) {
-                const auto internalDependency = findInaccessibleDependency(descriptor);
-                if (internalDependency) {
+                if (const auto internalDependency = findInaccessibleDependency(descriptor)) {
                     throw std::logic_error(
                         "Mach error: service '" + std::string(type.name()) +
                         "' cannot depend directly or indirectly on an internal Mach service '" +
@@ -30,8 +29,7 @@ namespace mach::detail::di
                 }
             }
             if (descriptor.lifetime == ServiceLifetime::Singleton) {
-                const auto scopedDependency = findScopedDependency(descriptor);
-                if (scopedDependency) {
+                if (const auto scopedDependency = findScopedDependency(descriptor)) {
                     throw std::logic_error(
                         "Mach error: singleton service '" + std::string(type.name()) +
                         "' cannot depend directly or indirectly on scoped service '" +
@@ -43,7 +41,7 @@ namespace mach::detail::di
         }
     }
 
-    std::shared_ptr<void> Container::getOrCreateSingleton(std::type_index type, Scope& scope) {
+    std::shared_ptr<void> Container::getOrCreateSingleton(std::type_index type, Scope& scope) const {
         auto& entry = *m_singletonEntries.at(type);
         const auto& descriptor = m_serviceRegistry.at(type);
 
@@ -62,7 +60,7 @@ namespace mach::detail::di
             if (dependency.lifetime == ServiceLifetime::Scoped) {
                 return dependencyType;
             }
-            if (auto scopedDependency = findScopedDependency(dependency)) {
+            if (const auto scopedDependency = findScopedDependency(dependency)) {
                 return scopedDependency;
             }
         }
@@ -86,7 +84,7 @@ namespace mach::detail::di
             if (dependency.access == ServiceAccess::Internal) {
                 return dependencyType;
             }
-            if (auto scopedDependency = findInaccessibleDependency(dependency)) {
+            if (const auto scopedDependency = findInaccessibleDependency(dependency)) {
                 return scopedDependency;
             }
         }

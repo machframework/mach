@@ -12,6 +12,8 @@
 
 #include <mach/Logger.hpp>
 
+#include "BeastListener.hpp"
+
 namespace mach::detail::server
 {
     Server::Server(
@@ -20,9 +22,9 @@ namespace mach::detail::server
         middleware::MiddlewarePipeline middlewarePipeline,
         const mach::Logger& logger)
         : m_appOptions(std::move(appOptions)),
-          m_endpoint(boost::asio::ip::make_address(m_appOptions.host), (m_appOptions.port)),
-          m_ioc(static_cast<int>(m_appOptions.threadCount)), m_logger(logger),
-          m_runtime(m_appOptions, std::move(container), std::move(middlewarePipeline), logger) {}
+          m_endpoint(boost::asio::ip::make_address(m_appOptions.host), m_appOptions.port),
+          m_ioc(static_cast<int>(m_appOptions.threadCount)), m_runtime(m_appOptions, std::move(container), std::move(middlewarePipeline), logger),
+          m_logger(logger) {}
 
     std::string Server::host() const noexcept {
         return m_appOptions.host;
@@ -48,7 +50,7 @@ namespace mach::detail::server
 
         // configure signals
         net::signal_set signals(m_ioc, SIGINT, SIGTERM);
-        signals.async_wait([this](boost::system::error_code ec, int signal) {
+        signals.async_wait([this](boost::system::error_code ec, int) {
             if (!ec) {
                 stop();
             }

@@ -35,6 +35,6 @@ namespace mach::detail::routing
             return StatusCode::MethodNotAllowed;
         }
 
-        return mach::http::StatusCode::InternalServerError; // fallback for safety
+        return StatusCode::InternalServerError; // fallback for safety
     }
 }

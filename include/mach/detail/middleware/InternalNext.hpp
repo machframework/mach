@@ -4,10 +4,10 @@
 
 namespace mach::detail::dispatching
 {
-    class RequestExecution;
+    struct RequestExecution;
 }
 
 namespace mach::detail::middleware
 {
-    using InternalNext = std::function<void(detail::dispatching::RequestExecution&)>;
+    using InternalNext = std::function<void(dispatching::RequestExecution&)>;
 }

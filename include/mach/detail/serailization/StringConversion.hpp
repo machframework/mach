@@ -11,7 +11,7 @@
 namespace mach
 {
     template <typename T>
-    T fromString(std::string_view value) {
+    [[nodiscard]] T fromString(std::string_view value) {
         using ValueType = std::remove_cvref_t<T>;
 
         static_assert(

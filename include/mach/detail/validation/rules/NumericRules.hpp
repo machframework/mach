@@ -1,8 +1,6 @@
 #pragma once
 
-#include <concepts>
 #include <optional>
-#include <type_traits>
 
 #include <mach/detail/core/TypeTraits.hpp>
 #include <mach/detail/validation/rules/ValidationRuleType.hpp>
@@ -11,14 +9,14 @@ namespace mach::detail::validation
 {
     template <traits::Numeric Number>
     struct RangeRule {
-        static constexpr ValidationRuleType Type = ValidationRuleType::Range;
+        static constexpr auto  Type = ValidationRuleType::Range;
         std::optional<Number> min;
         std::optional<Number> max;
     };
 
     template <traits::Numeric Number>
     struct MultipleOfRule {
-        static constexpr ValidationRuleType Type = ValidationRuleType::MultipleOf;
+        static constexpr auto  Type = ValidationRuleType::MultipleOf;
         Number factor;
     };
 }

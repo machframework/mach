@@ -1,7 +1,6 @@
 #pragma once
 
 #include <format>
-#include <functional>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -15,6 +14,7 @@
 #include <mach/detail/di/ServiceTraits.hpp>
 
 #include "Scope.hpp"
+#include "ServiceDescriptor.hpp"
 
 namespace mach::detail::di
 {
@@ -28,9 +28,9 @@ namespace mach::detail::di
         T& addSingletonInstance(T&& instance, ServiceAccess access = ServiceAccess::Internal);
 
         const ServiceDescriptor* getDescriptor(std::type_index type) const;
-        std::shared_ptr<void> getOrCreateSingleton(std::type_index type, Scope& container);
+        std::shared_ptr<void> getOrCreateSingleton(std::type_index type, Scope& scope) const;
 
-        Scope createScope();
+        [[nodiscard]] Scope createScope();
 
         void finalizeRegistrations();
 
@@ -282,7 +282,7 @@ namespace mach::detail::di
             .lifetime = ServiceLifetime::Singleton,
             .access = access};
 
-        auto sharedInstance = std::make_shared<T>(std::move(instance));
+        auto sharedInstance = std::make_shared<T>(std::forward<T>(instance));
         T& reference = *sharedInstance;
 
         auto [it, inserted] =

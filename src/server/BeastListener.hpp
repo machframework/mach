@@ -13,15 +13,15 @@
 
 #include <boost/asio/awaitable.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/asio/strand.hpp>
-#include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 
-#include <mach/AppOptions.hpp>
-#include <mach/Logger.hpp>
-
 #include "adapter/inbound/BeastRequestAdapter.hpp"
-#include "application/Runtime.hpp"
+
+namespace mach
+{
+    struct AppOptions;
+    class Logger;
+}
 
 namespace mach::detail::server
 {
@@ -39,8 +39,8 @@ namespace mach::detail::server
         BeastListener(
             const AppOptions& appOptions,
             net::io_context& ioc,
-            tcp::endpoint endpoint,
-            detail::application::Runtime& runtime,
+            const tcp::endpoint& endpoint,
+            application::Runtime& runtime,
             detail::http::adapter::BeastRequestAdapter& requestAdapter,
             detail::http::adapter::BeastResponseAdapter& responseAdapter,
             const mach::Logger& logger);
@@ -54,7 +54,7 @@ namespace mach::detail::server
 
         const AppOptions& m_appOptions;
 
-        detail::application::Runtime& m_runtime;
+        application::Runtime& m_runtime;
         detail::http::adapter::BeastRequestAdapter& m_requestAdapter;
         detail::http::adapter::BeastResponseAdapter& m_responseAdapter;
 

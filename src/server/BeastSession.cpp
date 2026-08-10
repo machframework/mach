@@ -13,19 +13,16 @@
 
 #include <chrono>
 #include <memory>
-#include <optional>
 #include <string>
-#include <utility>
 
 #include <boost/asio/dispatch.hpp>
 #include <boost/asio/redirect_error.hpp>
 #include <boost/asio/use_awaitable.hpp>
 #include <boost/beast/core/error.hpp>
 #include <boost/beast/http/message_generator.hpp>
-#include <boost/beast/http/serializer.hpp>
 
+#include <mach/AppOptions.hpp>
 #include <mach/http/StatusCode.hpp>
-#include <mach/http/Version.hpp>
 
 namespace mach::detail::server
 {
@@ -33,11 +30,11 @@ namespace mach::detail::server
     BeastSession::BeastSession(
         const AppOptions& appOptions,
         tcp::socket socket,
-        detail::application::Runtime& runtime,
+        application::Runtime& runtime,
         detail::http::adapter::BeastRequestAdapter& requestAdapter,
         detail::http::adapter::BeastResponseAdapter& responseAdapter,
         const mach::Logger& logger)
-        : m_appOptions(appOptions), m_stream(std::move(socket)), m_runtime(runtime),
+        : m_stream(std::move(socket)), m_appOptions(appOptions), m_runtime(runtime),
           m_requestAdapter(requestAdapter), m_responseAdapter(responseAdapter), m_logger(logger) {}
 
     // Start the asynchronous operation
@@ -50,9 +47,7 @@ namespace mach::detail::server
         co_await net::dispatch(m_stream.get_executor(), net::use_awaitable);
 
         while (true) {
-            const bool keepAlive = co_await do_read();
-
-            if (!keepAlive) {
+            if (const bool keepAlive = co_await do_read(); !keepAlive) {
                 do_close();
                 co_return;
             }
@@ -85,10 +80,10 @@ namespace mach::detail::server
         if (ec == http::error::body_limit) {
             co_return co_await send_response(
                 makeReadErrorResponse(mach::http::StatusCode::PayloadTooLarge));
-        } else if (ec == http::error::header_limit) {
+        } if (ec == http::error::header_limit) {
             co_return co_await send_response(
                 makeReadErrorResponse(mach::http::StatusCode::RequestHeaderFieldsTooLarge));
-        } else if (ec) {
+        } if (ec) {
             m_logger.warning("Failed to read request: {}", ec.message());
             co_return false;
         }

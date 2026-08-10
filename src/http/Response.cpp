@@ -1,5 +1,6 @@
-#include "mach/Response.hpp"
+#include <mach/Response.hpp>
 
+#include <algorithm>
 #include <format>
 #include <stdexcept>
 #include <unordered_set>
@@ -18,19 +19,17 @@ namespace
         "upgrade",
         "proxy-connection"};
 
-    inline bool isValidHeaderName(std::string_view name) noexcept {
-        for (unsigned char c : name) {
-            if (!std::isalnum(static_cast<unsigned char>(c)) && c != '!' && c != '#' && c != '$' &&
-                c != '%' && c != '&' && c != '\'' && c != '*' && c != '+' && c != '-' && c != '.' &&
-                c != '^' && c != '_' && c != '`' && c != '|' && c != '~') {
-                return false;
-            }
-        }
-
-        return true;
+    bool isValidHeaderName(std::string_view name) noexcept {
+        return !name.empty() && std::ranges::all_of(name, [](unsigned char c) {
+            return std::isalnum(c) ||
+                   c == '!' || c == '#' || c == '$' || c == '%' ||
+                   c == '&' || c == '\'' || c == '*' || c == '+' ||
+                   c == '-' || c == '.' || c == '^' || c == '_' ||
+                   c == '`' || c == '|' || c == '~';
+        });
     }
 
-    inline bool containsCrOrLf(std::string_view value) noexcept {
+    bool containsCrOrLf(std::string_view value) noexcept {
         return value.find('\r') != std::string_view::npos ||
                value.find('\n') != std::string_view::npos;
     }
@@ -54,11 +53,10 @@ namespace mach
     }
 
     std::optional<std::string_view> Response::header(std::string_view name) const {
-        std::string normalizedName = std::string(name);
+        auto normalizedName = std::string(name);
         detail::http::toLowercaseInPlace(normalizedName);
 
-        auto it = m_headers.find(normalizedName);
-        if (it != m_headers.end()) {
+        if (const auto it = m_headers.find(normalizedName); it != m_headers.end()) {
             return it->second;
         }
 
@@ -66,10 +64,10 @@ namespace mach
     }
 
     bool Response::containsHeader(std::string_view name) const noexcept {
-        std::string normalizedName = std::string(name);
+        auto  normalizedName = std::string(name);
         detail::http::toLowercaseInPlace(normalizedName);
 
-        return m_headers.find(normalizedName) != m_headers.end();
+        return m_headers.contains(normalizedName);
     }
 
     void Response::status(http::StatusCode status) {
@@ -85,7 +83,7 @@ namespace mach
     }
 
     void Response::setHeader(std::string_view name, std::string_view value) {
-        std::string normalizedName = std::string(name);
+        auto  normalizedName = std::string(name);
         detail::http::toLowercaseInPlace(normalizedName);
 
         if (normalizedName.empty()) {

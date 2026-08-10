@@ -2,7 +2,6 @@
 
 #include <format>
 
-#include <mach/http/StatusCode.hpp>
 #include <mach/http/Cookie.hpp>
 
 #include "utility/HttpDate.hpp"
@@ -10,11 +9,11 @@
 namespace mach::detail::http::adapter
 {
     beast::http::response<beast::http::string_body> BeastResponseAdapter::adapt(
-        mach::Context&& context) {
+        mach::Context&& context) const {
         beast::http::response<beast::http::string_body> res;
 
-        auto version = context.response.version();
-        auto beastVersion = fromMachVersion(version);
+        const auto version = context.response.version();
+        const auto beastVersion = fromMachVersion(version);
         res.version(beastVersion);
         res.result(static_cast<unsigned int>(context.response.status()));
 
@@ -30,13 +29,13 @@ namespace mach::detail::http::adapter
 
     void BeastResponseAdapter::writeCookies(
         beast::http::response<beast::http::string_body>& response,
-        const std::vector<mach::http::Cookie>& cookies) const {
+        const std::vector<mach::http::Cookie>& cookies) {
         for (const auto& cookie : cookies) {
             response.set(beast::http::field::set_cookie, cookieToString(cookie));
         }
     }
 
-    std::string BeastResponseAdapter::cookieToString(const mach::http::Cookie& cookie) const {
+    std::string BeastResponseAdapter::cookieToString(const mach::http::Cookie& cookie) {
         auto cookieStr = std::format("{}={};", cookie.name, cookie.value);
 
         if (const auto& expires = cookie.expires) {

@@ -188,21 +188,9 @@ namespace mach
         return mach::ok<T>(value);
     }
 
-    inline mach::Reply<std::string> ControllerBase::ok(const char* value) {
-        return mach::ok(value);
-    }
-
     template <typename T>
     mach::Reply<T> ControllerBase::created(T value) {
         return mach::created<T>(value);
-    }
-
-    inline mach::Reply<std::string> ControllerBase::created(const char* value) {
-        return mach::created(value);
-    }
-
-    inline mach::Reply<> ControllerBase::noContent() {
-        return mach::noContent();
     }
 
     template <typename T>

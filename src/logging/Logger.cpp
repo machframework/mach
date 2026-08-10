@@ -1,8 +1,5 @@
 #include <mach/Logger.hpp>
 
-#include <memory>
-#include <utility>
-
 #include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/stdout_sinks.h>

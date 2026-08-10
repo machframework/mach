@@ -1,10 +1,10 @@
 #include "BeastRequestAdapter.hpp"
 
+#include <algorithm>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 
-#include <mach/http/Method.hpp>
 #include <mach/http/StatusCode.hpp>
 
 #include "http/HttpUtils.hpp"
@@ -13,13 +13,9 @@
 namespace
 {
     bool containsControlCharacters(std::string_view target) {
-        for (unsigned char c : target) {
-            if (std::iscntrl(c)) {
-                return true;
-            }
-        }
-
-        return false;
+        return std::ranges::any_of(target, [](unsigned char c) {
+            return std::iscntrl(c);
+        });
     }
 }
 namespace mach::detail::http::adapter
@@ -27,8 +23,8 @@ namespace mach::detail::http::adapter
     mach::Context BeastRequestAdapter::adapt(
         beast::http::request<beast::http::string_body>&& rawRequest,
         bool& adapterRejectedRequest) {
-        auto version = fromBeastVersion(rawRequest.version());
-        auto method = fromBeastVerb(rawRequest.method());
+        const auto version = fromBeastVersion(rawRequest.version());
+        const auto method = fromBeastVerb(rawRequest.method());
         std::string target(rawRequest.target());
 
         std::unordered_map<std::string, std::string> headers;
@@ -80,17 +76,15 @@ namespace mach::detail::http::adapter
             res.body("Request target contains control characters.");
         }
 
-        return mach::Context(std::move(req), std::move(res));
+        return {std::move(req), std::move(res)};
     }
 
     void BeastRequestAdapter::extractCookiesFromHeader(
         std::string_view value,
-        std::unordered_map<std::string, std::string>& cookies) const {
-        auto newCookies = detail::split(value, ';');
+        std::unordered_map<std::string, std::string>& cookies) {
 
-        for (std::string_view cookie : newCookies) {
-            std::size_t equalPos = cookie.find('=');
-            if (equalPos != std::string_view::npos) {
+        for (const auto newCookies = detail::split(value, ';'); std::string_view cookie : newCookies) {
+            if (const std::size_t equalPos = cookie.find('='); equalPos != std::string_view::npos) {
                 std::string_view name = detail::trim(cookie.substr(0, equalPos));
                 std::string_view val = detail::trim(cookie.substr(equalPos + 1));
                 if (!name.empty()) {

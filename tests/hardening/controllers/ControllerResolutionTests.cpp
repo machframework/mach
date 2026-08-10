@@ -3,7 +3,6 @@
 #include <string>
 #include <string_view>
 
-#include <mach/Reply.hpp>
 #include <mach/controllers/ControllerBase.hpp>
 #include <mach/controllers/ControllerBuilder.hpp>
 #include <mach/diagnostics/TerminateHandler.hpp>
