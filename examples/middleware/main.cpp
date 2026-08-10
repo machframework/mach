@@ -7,7 +7,7 @@
 class LoggingMiddleware {
 
 public:
-    LoggingMiddleware(mach::Logger& logger) : m_logger(logger) {}
+    explicit LoggingMiddleware(mach::Logger& logger) : m_logger(logger) {}
 
     void invoke(mach::Context& context, mach::Next& next) {
         m_logger.info("Before handler");

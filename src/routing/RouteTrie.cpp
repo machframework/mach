@@ -5,6 +5,7 @@
 #include <functional>
 #include <iostream>
 #include <optional>
+#include <ranges>
 #include <stdexcept>
 #include <unordered_set>
 #include <utility>
@@ -193,8 +194,8 @@ namespace mach::detail::routing
                 return RouteMatch(RoutingStatus::NotFound);
             }
 
-            for (const auto& entry : curr->endpointsByMethod) {
-                allowedMethods.insert(entry.first);
+            for (auto allowedMethod : curr->endpointsByMethod | std::views::keys) {
+                allowedMethods.insert(allowedMethod);
             }
 
             return RouteMatch(allowedMethods);
@@ -231,9 +232,10 @@ namespace mach::detail::routing
                     return RouteMatch(RoutingStatus::NotFound);
                 }
 
-                for (const auto& entry : endpointsByMethod) {
-                    allowedMethods.insert(entry.first);
+                for (auto allowedMethod : curr->endpointsByMethod | std::views::keys) {
+                    allowedMethods.insert(allowedMethod);
                 }
+
 
                 return RouteMatch(allowedMethods);
             }
@@ -290,8 +292,8 @@ namespace mach::detail::routing
                                 makeRouteParameters(endpoint->parameterNames, capturedValues))};
                     }
 
-                    for (const auto& entry : childNode->endpointsByMethod) {
-                        allowedMethods.insert(entry.first);
+                    for (auto allowedMethod : curr->endpointsByMethod | std::views::keys) {
+                        allowedMethods.insert(allowedMethod);
                     }
 
                     return RouteMatch(allowedMethods);
@@ -342,12 +344,15 @@ namespace mach::detail::routing
                 if (!node.endpointsByMethod.empty()) {
                     label += " [";
                     bool first = true;
-                    for (const auto& [method, _] : node.endpointsByMethod) {
+
+                    for (auto method : node.endpointsByMethod | std::views::keys) {
                         if (!first)
                             label += ", ";
+
                         label += toString(method);
                         first = false;
                     }
+
                     label += "]";
                 }
                 std::cout << prefix << connector << label << "\n";
@@ -356,8 +361,11 @@ namespace mach::detail::routing
                 // Collect and sort static children
                 std::vector<std::string> keys;
                 keys.reserve(node.childrenByStaticSegment.size());
-                for (const auto& [key, _] : node.childrenByStaticSegment)
+
+                for (const auto& key : node.childrenByStaticSegment | std::views::keys) {
                     keys.push_back(key);
+                }
+
                 std::ranges::sort(keys);
                 for (size_t i = 0; i < keys.size(); ++i) {
                     const bool lastChild = !hasParamChildren && (i == keys.size() - 1);
@@ -371,8 +379,9 @@ namespace mach::detail::routing
                 // Collect and sort parameterized children by constraint name for stable output
                 std::vector<std::optional<RouteConstraint>> constraints;
                 constraints.reserve(node.constrainedParameterChildren.size());
-                for (const auto& [constraintKey, _] : node.constrainedParameterChildren)
+                for (const auto& constraintKey : node.constrainedParameterChildren | std::views::keys) {
                     constraints.push_back(constraintKey);
+                }
 
                 std::ranges::sort(constraints, [](const auto& a, const auto& b) {
                     const std::string_view sa = a ? toString(*a) : "";
