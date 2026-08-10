@@ -23,9 +23,10 @@ namespace mach::detail::routing
         switch (constraint) {
         case RouteConstraint::Int:
             return "int";
-        }
 
-        return "string";
+        default:
+            return "string";
+        }
     }
 
     std::optional<RouteConstraint> toRouteConstraint(std::string_view value) {
@@ -44,6 +45,9 @@ namespace mach::detail::routing
         switch (constraint) {
         case RouteConstraint::Int:
             return isInt(value);
+
+        case RouteConstraint::String:
+            return false;
         }
 
         return false;

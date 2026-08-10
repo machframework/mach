@@ -48,7 +48,7 @@ namespace mach::detail::server
 
         // configure signals
         net::signal_set signals(m_ioc, SIGINT, SIGTERM);
-        signals.async_wait([this](boost::system::error_code ec, int signal) {
+        signals.async_wait([this](boost::system::error_code ec, int) {
             if (!ec) {
                 stop();
             }

@@ -144,8 +144,8 @@ namespace mach::validation
          *
          * @tparam Number The numeric type of the field and range bounds.
          *
-         * @param min The minimum allowed value, inclusive.
-         * @param max The maximum allowed value, inclusive.
+         * @param minimum The minimum allowed value, inclusive.
+         * @param maximum The maximum allowed value, inclusive.
          *
          * @return A reference to this builder for method chaining.
          *
@@ -163,7 +163,7 @@ namespace mach::validation
          *
          * @tparam Number The numeric type of the field and minimum value.
          *
-         * @param min The minimum allowed value, inclusive.
+         * @param minimum The minimum allowed value, inclusive.
          *
          * @return A reference to this builder for method chaining.
          *
@@ -181,7 +181,7 @@ namespace mach::validation
          *
          * @tparam Number The numeric type of the field and maximum value.
          *
-         * @param max The maximum allowed value, inclusive.
+         * @param maximum The maximum allowed value, inclusive.
          *
          * @return A reference to this builder for method chaining.
          *
