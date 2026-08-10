@@ -218,19 +218,19 @@ namespace mach::detail::routing
                 if (endpointsByMethod.contains(method)) {
                     const auto endpoint = endpointsByMethod.find(method)->second;
 
-                    return RouteMatch(
+                    return {
                         endpoint,
-                        std::move(makeRouteParameters(endpoint->parameterNames, capturedValues)));
+                        std::move(makeRouteParameters(endpoint->parameterNames, capturedValues))};
                 } if (
                     method == http::Method::Head && endpointsByMethod.contains(http::Method::Get)
                 ) {
                     const auto endpoint = endpointsByMethod.find(http::Method::Get)->second;
-                    return RouteMatch(
+                    return {
                         endpoint,
-                        std::move(makeRouteParameters(endpoint->parameterNames, capturedValues)));
+                        std::move(makeRouteParameters(endpoint->parameterNames, capturedValues))};
                 }
                 if (endpointsByMethod.empty()) {
-                    return routing::RouteMatch(RoutingStatus::NotFound);
+                    return RouteMatch(RoutingStatus::NotFound);
                 }
 
                 for (const auto& entry : endpointsByMethod) {
@@ -286,10 +286,10 @@ namespace mach::detail::routing
                         childNode->endpointsByMethod.contains(http::Method::Get)) {
                         const auto endpoint =
                             childNode->endpointsByMethod.find(http::Method::Get)->second;
-                        return RouteMatch(
+                        return {
                             endpoint,
                             std::move(
-                                makeRouteParameters(endpoint->parameterNames, capturedValues)));
+                                makeRouteParameters(endpoint->parameterNames, capturedValues))};
                     }
 
                     for (const auto& entry : childNode->endpointsByMethod) {
@@ -301,9 +301,9 @@ namespace mach::detail::routing
 
                 const auto endpoint = childNode->endpointsByMethod.find(method)->second;
 
-                return RouteMatch(
+                return {
                     endpoint,
-                    std::move(makeRouteParameters(endpoint->parameterNames, capturedValues)));
+                    std::move(makeRouteParameters(endpoint->parameterNames, capturedValues))};
             }
 
             return matchRoute(

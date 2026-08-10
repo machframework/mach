@@ -80,7 +80,7 @@ namespace mach::detail::http::adapter
             res.body("Request target contains control characters.");
         }
 
-        return mach::Context(std::move(req), std::move(res));
+        return {std::move(req), std::move(res)};
     }
 
     void BeastRequestAdapter::extractCookiesFromHeader(
