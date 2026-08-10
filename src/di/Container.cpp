@@ -21,8 +21,7 @@ namespace mach::detail::di
     void Container::finalizeRegistrations() {
         for (const auto& [type, descriptor] : m_serviceRegistry) {
             if (descriptor.access == ServiceAccess::User) {
-                const auto internalDependency = findInaccessibleDependency(descriptor);
-                if (internalDependency) {
+                if (const auto internalDependency = findInaccessibleDependency(descriptor)) {
                     throw std::logic_error(
                         "Mach error: service '" + std::string(type.name()) +
                         "' cannot depend directly or indirectly on an internal Mach service '" +
@@ -30,8 +29,7 @@ namespace mach::detail::di
                 }
             }
             if (descriptor.lifetime == ServiceLifetime::Singleton) {
-                const auto scopedDependency = findScopedDependency(descriptor);
-                if (scopedDependency) {
+                if (const auto scopedDependency = findScopedDependency(descriptor)) {
                     throw std::logic_error(
                         "Mach error: singleton service '" + std::string(type.name()) +
                         "' cannot depend directly or indirectly on scoped service '" +

@@ -120,8 +120,7 @@ namespace mach::detail::cors
         // validate headers
         if (!m_options.allowAnyHeader) {
             if (const auto headersStr = context.request.header("Access-Control-Request-Headers")) {
-                const auto headers = split(*headersStr, ',');
-                for (auto header : headers) {
+                for (const auto headers = split(*headersStr, ','); auto header : headers) {
                     header = trim(header);
 
                     auto normalizedHeader = std::string(header);

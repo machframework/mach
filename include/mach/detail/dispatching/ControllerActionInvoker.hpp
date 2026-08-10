@@ -59,9 +59,8 @@ namespace mach::detail::dispatching
             "the request body.");
 
         const auto& stringBody = context.request.body();
-        const auto contentType = context.request.header("content-type");
 
-        if (!stringBody.empty() &&
+        if (const auto contentType = context.request.header("content-type"); !stringBody.empty() &&
             (!contentType ||
              !mach::detail::http::matchesMediaType(*contentType, "application/json") ||
              mach::detail::http::hasUnsupportedCharset(*contentType))) {

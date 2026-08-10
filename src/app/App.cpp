@@ -189,9 +189,8 @@ namespace mach
     void App::Impl::addControllerRoutes(
         std::vector<detail::routing::RouteEndpoint> routes,
         std::type_index controllerType) {
-        const auto [_, inserted] = m_mappedControllers.emplace(controllerType);
 
-        if (!inserted) {
+        if (const auto [_, inserted] = m_mappedControllers.emplace(controllerType);!inserted) {
             throw std::logic_error(
                 "Mach error: controller '" + std::string(controllerType.name()) +
                 "' has already been mapped");

@@ -47,9 +47,7 @@ namespace mach::detail::server
         co_await net::dispatch(m_stream.get_executor(), net::use_awaitable);
 
         while (true) {
-            const bool keepAlive = co_await do_read();
-
-            if (!keepAlive) {
+            if (const bool keepAlive = co_await do_read(); !keepAlive) {
                 do_close();
                 co_return;
             }

@@ -426,9 +426,8 @@ namespace mach::validation
             [field = m_field, rule = std::move(rule), errorMessage = std::string(errorMessage)](
                 const T& instance,
                 detail::validation::ValidationResult& result) {
-                const bool isValid = validate(instance.*field, rule);
 
-                if (isValid == Negate) {
+                if (const bool isValid = validate(instance.*field, rule); isValid == Negate) {
                     result.addError(errorMessage);
                 }
             });

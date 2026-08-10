@@ -62,8 +62,7 @@ namespace mach
     }
 
     std::optional<std::string_view> Request::cookie(std::string_view name) const {
-        auto it = m_cookies.find(std::string(name));
-        if (it != m_cookies.end()) {
+        if (const auto it = m_cookies.find(std::string(name)); it != m_cookies.end()) {
             return it->second;
         }
 
@@ -74,10 +73,8 @@ namespace mach
         return this->query(name).has_value();
     }
 
-
     std::optional<std::string_view> Request::query(std::string_view name) const {
-        auto it = m_query.find(std::string(name));
-        if (it != m_query.end()) {
+        if (const auto it = m_query.find(std::string(name)); it != m_query.end()) {
             return it->second;
         }
 

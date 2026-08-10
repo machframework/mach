@@ -29,10 +29,8 @@ namespace mach::detail::csrf
     void CsrfMiddleware::invoke(mach::Context& context, mach::Next& next) {
         const auto tokenCookie = context.request.cookie(m_options.cookieName);
 
-        const auto method = context.request.method();
-
         // safe method
-        if (method == mach::http::Method::Get || method == mach::http::Method::Head ||
+        if (const auto method = context.request.method(); method == mach::http::Method::Get || method == mach::http::Method::Head ||
             method == mach::http::Method::Options) {
             if (!tokenCookie) {
                 auto cookie = mach::http::Cookie{

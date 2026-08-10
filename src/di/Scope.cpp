@@ -45,9 +45,7 @@ namespace
 namespace mach::detail::di
 {
     std::shared_ptr<void> Scope::resolve(std::type_index type) {
-        const auto cycleStart = std::find(m_resolutionStack.begin(), m_resolutionStack.end(), type);
-
-        if (cycleStart != m_resolutionStack.end()) {
+        if (const auto cycleStart = std::find(m_resolutionStack.begin(), m_resolutionStack.end(), type); cycleStart != m_resolutionStack.end()) {
             throw std::logic_error(
                 buildCircularDependencyMessage(cycleStart, type, m_resolutionStack));
         }

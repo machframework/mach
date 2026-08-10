@@ -54,11 +54,10 @@ namespace mach
     }
 
     std::optional<std::string_view> Response::header(std::string_view name) const {
-        auto  normalizedName = std::string(name);
+        auto normalizedName = std::string(name);
         detail::http::toLowercaseInPlace(normalizedName);
 
-        auto it = m_headers.find(normalizedName);
-        if (it != m_headers.end()) {
+        if (const auto it = m_headers.find(normalizedName); it != m_headers.end()) {
             return it->second;
         }
 

@@ -83,9 +83,9 @@ namespace mach::detail::server
         bool keepAlive = req.keep_alive();
         auto version = req.version();
 
-        bool adapterRejectedRequest = false;
-
         try {
+            bool adapterRejectedRequest = false;
+
             auto context = m_requestAdapter.adapt(std::move(req), adapterRejectedRequest);
             auto method = context.request.method();
 
