@@ -17,7 +17,7 @@ namespace mach::detail::cors
     }
 
     void CorsMiddleware::invoke(mach::Context& context, mach::Next& next) {
-        auto& request = context.request;
+        const auto& request = context.request;
         
         const auto origin = request.header("origin");
         if (!origin) {
@@ -25,7 +25,7 @@ namespace mach::detail::cors
             return;
         }
 
-        std::string originValue = std::string(*origin);
+        const std::string originValue = std::string(*origin);
 
         // handle OPTIONS preflight
         if (request.method() == mach::http::Method::Options) {

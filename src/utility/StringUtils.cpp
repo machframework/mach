@@ -20,7 +20,7 @@ namespace mach::detail
         return result;
     }
 
-    constexpr std::string_view trim(std::string_view str) {
+    std::string_view trim(std::string_view str) {
         constexpr auto isWhitespace = [](char c) {
             return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == '\v';
         };

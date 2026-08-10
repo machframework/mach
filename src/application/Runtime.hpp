@@ -24,7 +24,7 @@ namespace mach::detail::application
         Runtime(Runtime&&) = delete;
         Runtime& operator=(Runtime&&) = delete;
 
-        void handle(mach::Context& context);
+        void handle(mach::Context& context) const;
 
     private:
         const AppOptions& m_appOptions;

@@ -62,7 +62,7 @@ namespace mach::detail::di
             if (dependency.lifetime == ServiceLifetime::Scoped) {
                 return dependencyType;
             }
-            if (auto scopedDependency = findScopedDependency(dependency)) {
+            if (const auto scopedDependency = findScopedDependency(dependency)) {
                 return scopedDependency;
             }
         }
@@ -86,7 +86,7 @@ namespace mach::detail::di
             if (dependency.access == ServiceAccess::Internal) {
                 return dependencyType;
             }
-            if (auto scopedDependency = findInaccessibleDependency(dependency)) {
+            if (const auto scopedDependency = findInaccessibleDependency(dependency)) {
                 return scopedDependency;
             }
         }

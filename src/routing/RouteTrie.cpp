@@ -25,12 +25,12 @@ namespace
         segment.remove_prefix(1);
         segment.remove_suffix(1);
 
-        auto pos = segment.find(':');
+        const auto pos = segment.find(':');
         if (pos == std::string_view::npos) {
             return {std::string(segment), RouteConstraint::String};
         }
 
-        auto param = segment.substr(0, pos);
+        const auto param = segment.substr(0, pos);
         auto constraint = segment.substr(pos + 1);
 
         if (constraint.empty()) {
@@ -207,8 +207,8 @@ namespace mach::detail::routing
             return RouteMatch(RoutingStatus::NotFound);
         }
 
-        auto segmentKey = std::string(segments[index]);
-        auto nextSegment = curr->childrenByStaticSegment.find(segmentKey);
+        const auto segmentKey = std::string(segments[index]);
+        const auto nextSegment = curr->childrenByStaticSegment.find(segmentKey);
 
         // try static route first
         if (nextSegment != curr->childrenByStaticSegment.end()) {
@@ -216,7 +216,7 @@ namespace mach::detail::routing
                 const auto& endpointsByMethod = nextSegment->second->endpointsByMethod;
 
                 if (endpointsByMethod.contains(method)) {
-                    auto endpoint = endpointsByMethod.find(method)->second;
+                    const auto endpoint = endpointsByMethod.find(method)->second;
 
                     return RouteMatch(
                         endpoint,
@@ -224,8 +224,8 @@ namespace mach::detail::routing
                 } if (
                     method == http::Method::Head && endpointsByMethod.contains(http::Method::Get)
                 ) {
-                    auto endpoint = endpointsByMethod.find(http::Method::Get)->second;
-                    return routing::RouteMatch(
+                    const auto endpoint = endpointsByMethod.find(http::Method::Get)->second;
+                    return RouteMatch(
                         endpoint,
                         std::move(makeRouteParameters(endpoint->parameterNames, capturedValues)));
                 }
@@ -284,7 +284,7 @@ namespace mach::detail::routing
                 if (!childNode->endpointsByMethod.contains(method)) {
                     if (method == http::Method::Head &&
                         childNode->endpointsByMethod.contains(http::Method::Get)) {
-                        auto endpoint =
+                        const auto endpoint =
                             childNode->endpointsByMethod.find(http::Method::Get)->second;
                         return RouteMatch(
                             endpoint,
@@ -299,7 +299,7 @@ namespace mach::detail::routing
                     return RouteMatch(allowedMethods);
                 }
 
-                auto endpoint = childNode->endpointsByMethod.find(method)->second;
+                const auto endpoint = childNode->endpointsByMethod.find(method)->second;
 
                 return RouteMatch(
                     endpoint,

@@ -51,8 +51,7 @@ namespace mach
     }
 
     std::string_view Request::routeParam(std::string_view name) const {
-        auto it = m_routeParams.find(std::string(name));
-        if (it != m_routeParams.end()) {
+        if (const auto it = m_routeParams.find(std::string(name)); it != m_routeParams.end()) {
             return it->second;
         }
 

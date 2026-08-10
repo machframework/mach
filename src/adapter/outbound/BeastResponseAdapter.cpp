@@ -12,8 +12,8 @@ namespace mach::detail::http::adapter
         mach::Context&& context) const {
         beast::http::response<beast::http::string_body> res;
 
-        auto version = context.response.version();
-        auto beastVersion = fromMachVersion(version);
+        const auto version = context.response.version();
+        const auto beastVersion = fromMachVersion(version);
         res.version(beastVersion);
         res.result(static_cast<unsigned int>(context.response.status()));
 

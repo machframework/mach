@@ -14,7 +14,7 @@ namespace
     std::vector<std::string_view> splitToSegments(std::string_view pattern) {
         std::vector<std::string_view> segments;
 
-        const char delimiter = '/';
+         constexpr char delimiter = '/';
         std::size_t segmentStart = 0;
 
         for (std::size_t i = 0; i < pattern.size(); ++i) {
@@ -356,7 +356,7 @@ namespace mach::detail::routing
     }
 
     std::unordered_map<std::string, std::string> Router::extractQuery(std::string& target) const {
-        auto queryPos = target.find('?');
+        const auto queryPos = target.find('?');
         if (queryPos == std::string_view::npos) {
             return {};
         }

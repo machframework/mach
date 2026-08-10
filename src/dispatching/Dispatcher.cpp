@@ -17,8 +17,8 @@ namespace mach::detail::dispatching
 
         RequestExecution execution(context, scope);
 
-        auto terminal = [](RequestExecution& execution) {
-            execution.context.executionPlan.endpoint->invoker->invoke(execution);
+        auto terminal = [](RequestExecution& requestExecution) {
+            requestExecution.context.executionPlan.endpoint->invoker->invoke(requestExecution);
         };
 
         m_middlewarePipeline.invoke(execution, terminal);

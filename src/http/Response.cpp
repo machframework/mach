@@ -69,7 +69,7 @@ namespace mach
         std::string normalizedName = std::string(name);
         detail::http::toLowercaseInPlace(normalizedName);
 
-        return m_headers.find(normalizedName) != m_headers.end();
+        return m_headers.contains(normalizedName);
     }
 
     void Response::status(http::StatusCode status) {

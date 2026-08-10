@@ -18,7 +18,7 @@ namespace mach::detail::application
         : m_appOptions(appOptions), m_container(std::move(container)), m_dispatcher(m_container, std::move(middlewarePipeline)),
           m_logger(logger) {}
 
-    void Runtime::handle(mach::Context& context) {
+    void Runtime::handle(mach::Context& context) const {
         try {
             m_dispatcher.execute(context);
         } catch (const std::exception& ex) {
