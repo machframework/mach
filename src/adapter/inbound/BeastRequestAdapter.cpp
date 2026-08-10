@@ -85,7 +85,7 @@ namespace mach::detail::http::adapter
 
     void BeastRequestAdapter::extractCookiesFromHeader(
         std::string_view value,
-        std::unordered_map<std::string, std::string>& cookies) const {
+        std::unordered_map<std::string, std::string>& cookies) {
 
         for (const auto newCookies = detail::split(value, ';'); std::string_view cookie : newCookies) {
             if (const std::size_t equalPos = cookie.find('='); equalPos != std::string_view::npos) {

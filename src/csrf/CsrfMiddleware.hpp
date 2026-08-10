@@ -20,7 +20,7 @@ namespace mach::detail::csrf
         void invoke(mach::Context& context, mach::Next& next);
 
     private:
-        std::string generateToken() const;
+        [[nodiscard]] static std::string generateToken();
 
         CsrfOptions m_options;
     };

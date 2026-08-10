@@ -20,11 +20,11 @@ namespace mach::detail::http::adapter
             bool& adapterRejectedRequest);
 
     private:
-        void extractCookiesFromHeader(
+        static void extractCookiesFromHeader(
             std::string_view value,
-            std::unordered_map<std::string, std::string>& cookies) const;
+            std::unordered_map<std::string, std::string>& cookies);
 
-        mach::http::Method fromBeastVerb(beast::http::verb verb);
-        mach::http::Version fromBeastVersion(unsigned int version);
+        static mach::http::Method fromBeastVerb(beast::http::verb verb);
+        static mach::http::Version fromBeastVersion(unsigned int version);
     };
 }

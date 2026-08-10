@@ -354,7 +354,7 @@ namespace mach::detail::routing
         return m_routes.matchRoute(request.method(), std::move(segments));
     }
 
-    std::unordered_map<std::string, std::string> Router::extractQuery(std::string& target) const {
+    std::unordered_map<std::string, std::string> Router::extractQuery(std::string& target) {
         const auto queryPos = target.find('?');
         if (queryPos == std::string_view::npos) {
             return {};

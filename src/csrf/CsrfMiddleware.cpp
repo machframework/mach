@@ -64,7 +64,7 @@ namespace mach::detail::csrf
         next();
     }
 
-    std::string CsrfMiddleware::generateToken() const {
+    std::string CsrfMiddleware::generateToken() {
         constexpr std::size_t tokenSize = 32;
         constexpr char hexDigits[] = "0123456789abcdef";
 

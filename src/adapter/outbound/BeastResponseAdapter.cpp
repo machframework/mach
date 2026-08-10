@@ -29,13 +29,13 @@ namespace mach::detail::http::adapter
 
     void BeastResponseAdapter::writeCookies(
         beast::http::response<beast::http::string_body>& response,
-        const std::vector<mach::http::Cookie>& cookies) const {
+        const std::vector<mach::http::Cookie>& cookies) {
         for (const auto& cookie : cookies) {
             response.set(beast::http::field::set_cookie, cookieToString(cookie));
         }
     }
 
-    std::string BeastResponseAdapter::cookieToString(const mach::http::Cookie& cookie) const {
+    std::string BeastResponseAdapter::cookieToString(const mach::http::Cookie& cookie) {
         auto cookieStr = std::format("{}={};", cookie.name, cookie.value);
 
         if (const auto& expires = cookie.expires) {

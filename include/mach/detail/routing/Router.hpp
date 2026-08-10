@@ -21,7 +21,7 @@ namespace mach::detail::routing
 
     private:
         routing::RouteMatch matchRoute(mach::Request& request) const;
-        std::unordered_map<std::string, std::string> extractQuery(std::string& target) const;
+        static std::unordered_map<std::string, std::string> extractQuery(std::string& target);
 
         std::deque<routing::RouteEndpoint> m_endpoints;
         routing::RouteTrie m_routes;

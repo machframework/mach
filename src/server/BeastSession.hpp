@@ -66,7 +66,7 @@ namespace mach::detail::server
         http::message_generator handle_request(
             http::request<Body, http::basic_fields<Allocator>>&& req);
 
-        http::message_generator makeReadErrorResponse(mach::http::StatusCode status);
+        static http::message_generator makeReadErrorResponse(mach::http::StatusCode status);
 
         const AppOptions& m_appOptions;
 
