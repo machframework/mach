@@ -1,5 +1,6 @@
 #include "BeastRequestAdapter.hpp"
 
+#include <algorithm>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -13,13 +14,9 @@
 namespace
 {
     bool containsControlCharacters(std::string_view target) {
-        for (unsigned char c : target) {
-            if (std::iscntrl(c)) {
-                return true;
-            }
-        }
-
-        return false;
+        return std::ranges::any_of(target, [](unsigned char c) {
+            return std::iscntrl(c);
+        });
     }
 }
 namespace mach::detail::http::adapter
@@ -27,8 +24,8 @@ namespace mach::detail::http::adapter
     mach::Context BeastRequestAdapter::adapt(
         beast::http::request<beast::http::string_body>&& rawRequest,
         bool& adapterRejectedRequest) {
-        auto version = fromBeastVersion(rawRequest.version());
-        auto method = fromBeastVerb(rawRequest.method());
+        const auto version = fromBeastVersion(rawRequest.version());
+        const auto method = fromBeastVerb(rawRequest.method());
         std::string target(rawRequest.target());
 
         std::unordered_map<std::string, std::string> headers;

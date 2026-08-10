@@ -1,5 +1,6 @@
 #include <mach/detail/routing/Router.hpp>
 
+#include <algorithm>
 #include <format>
 #include <iostream>
 #include <stdexcept>
@@ -68,13 +69,9 @@ namespace
     }
 
     bool containsSpaces(const std::vector<std::string_view>& segments) {
-        for (const auto& segment : segments) {
-            if (segment.find(' ') != std::string_view::npos) {
-                return true;
-            }
-        }
-
-        return false;
+        return std::ranges::any_of(segments, [](std::string_view segment) {
+            return segment.find(' ') != std::string_view::npos;
+        });
     }
 
     std::string extractParameter(std::string_view segment) {

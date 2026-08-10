@@ -1,5 +1,6 @@
 #include "mach/Response.hpp"
 
+#include <algorithm>
 #include <format>
 #include <stdexcept>
 #include <unordered_set>
@@ -19,15 +20,13 @@ namespace
         "proxy-connection"};
 
     bool isValidHeaderName(std::string_view name) noexcept {
-        for (unsigned char c : name) {
-            if (!std::isalnum(c) && c != '!' && c != '#' && c != '$' &&
-                c != '%' && c != '&' && c != '\'' && c != '*' && c != '+' && c != '-' && c != '.' &&
-                c != '^' && c != '_' && c != '`' && c != '|' && c != '~') {
-                return false;
-            }
-        }
-
-        return true;
+        return !name.empty() && std::ranges::all_of(name, [](unsigned char c) {
+            return std::isalnum(c) ||
+                   c == '!' || c == '#' || c == '$' || c == '%' ||
+                   c == '&' || c == '\'' || c == '*' || c == '+' ||
+                   c == '-' || c == '.' || c == '^' || c == '_' ||
+                   c == '`' || c == '|' || c == '~';
+        });
     }
 
     inline bool containsCrOrLf(std::string_view value) noexcept {
