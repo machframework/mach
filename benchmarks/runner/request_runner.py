@@ -14,11 +14,33 @@ ROOT = Path(__file__).resolve().parents[2]
 
 BASE_URL = "http://127.0.0.1:3143"
 
-SERVER_BIN = ROOT / "build" / "release" / "benchmarks" / "RequestBenchmarks.exe"
+SERVER_NAME = (
+    "RequestBenchmarks.exe"
+    if os.name == "nt"
+    else "RequestBenchmarks"
+)
 
-CSV_PATH = ROOT / "benchmarks" / "results" / "request_wrk_results.csv"
+SERVER_BIN = (
+    ROOT
+    / "build"
+    / "release"
+    / "benchmarks"
+    / SERVER_NAME
+)
 
-SCRIPTS = ROOT / "benchmarks" / "scripts" / "request"
+CSV_PATH = (
+    ROOT
+    / "benchmarks"
+    / "results"
+    / "request_wrk_results.csv"
+)
+
+SCRIPTS = (
+    ROOT
+    / "benchmarks"
+    / "scripts"
+    / "request"
+)
 
 DURATION = "30s"
 
@@ -83,13 +105,22 @@ LATENCY_RE = re.compile(
 
 REQUESTS_RE = re.compile(r"(\d+)\s+requests in")
 
-TRANSFER_RE = re.compile(r"Transfer/sec:\s+([0-9.]+\w+)")
+TRANSFER_RE = re.compile(
+    r"Transfer/sec:\s+([0-9.]+\w+)"
+)
 
 
 # ---------------- SERVER CONTROL ----------------
 
 def start_server():
-    print("[INFO] Starting request benchmark server...")
+    if not SERVER_BIN.is_file():
+        raise FileNotFoundError(
+            f"Request benchmark executable not found: {SERVER_BIN}"
+        )
+
+    print(
+        f"[INFO] Starting request benchmark server: {SERVER_BIN}"
+    )
 
     return subprocess.Popen(
         [str(SERVER_BIN)],
@@ -132,6 +163,7 @@ def get_git_commit():
             ["git", "rev-parse", "--short", "HEAD"],
             cwd=ROOT,
             text=True,
+            stderr=subprocess.DEVNULL,
         ).strip()
     except Exception:
         return "unknown"
@@ -156,19 +188,29 @@ def run_wrk(benchmark, threads, connections):
     script_name = benchmark.get("script")
 
     if script_name:
+        script_path = SCRIPTS / script_name
+
+        if not script_path.is_file():
+            raise FileNotFoundError(
+                f"wrk script not found: {script_path}"
+            )
+
         cmd.extend([
             "-s",
-            str(SCRIPTS / script_name),
+            str(script_path),
         ])
 
     cmd.append(
         BASE_URL + benchmark["route"]
     )
 
+    print()
     print(
-        f"\n[INFO] Running wrk: "
+        f"[INFO] Running wrk: "
         f"benchmark={benchmark['name']}, "
-        f"t={threads}, c={connections}, d={DURATION}"
+        f"t={threads}, "
+        f"c={connections}, "
+        f"d={DURATION}"
     )
 
     result = subprocess.run(
@@ -197,7 +239,9 @@ def parse_wrk(output):
         )
 
     return {
-        "rps": float(rps_match.group(1)),
+        "rps": float(
+            rps_match.group(1)
+        ),
         "avg_latency": latency_match.group(1),
         "latency_stdev": latency_match.group(2),
         "max_latency": latency_match.group(3),
@@ -216,52 +260,56 @@ def parse_wrk(output):
 
 # ---------------- CSV ----------------
 
-def write_session_header():
+def prepare_csv():
     CSV_PATH.parent.mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    file_exists = CSV_PATH.exists()
+    if CSV_PATH.is_dir():
+        raise RuntimeError(
+            f"CSV path is a directory, not a file: {CSV_PATH}"
+        )
 
-    with CSV_PATH.open("a", newline="") as f:
-        writer = csv.writer(f)
 
-        writer.writerow([])
+def write_session_header():
+    prepare_csv()
 
-        writer.writerow([
-            "SESSION START",
-            datetime.now().isoformat(
-                timespec="seconds"
-            ),
-            get_git_commit(),
-        ])
+    file_exists = (
+        CSV_PATH.exists()
+        and CSV_PATH.stat().st_size > 0
+    )
+
+    with CSV_PATH.open(
+        "a",
+        newline="",
+    ) as csvfile:
+        writer = csv.writer(csvfile)
 
         if not file_exists:
             writer.writerow([
-                "timestamp",
-                "benchmark",
-                "route",
-                "threads",
-                "connections",
-                "duration",
-                "rps",
-                "avg_latency",
-                "latency_stdev",
-                "max_latency",
-                "requests",
-                "transfer_per_sec",
+                "Timestamp",
+                "Commit",
+                "Benchmark",
+                "Route",
+                "Threads",
+                "Connections",
+                "Duration",
+                "Requests",
+                "Requests/sec",
+                "Avg latency",
+                "Latency stdev",
+                "Max latency",
+                "Transfer/sec",
             ])
 
 
 def write_row(row):
-    CSV_PATH.parent.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
-
-    with CSV_PATH.open("a", newline="") as f:
-        writer = csv.writer(f)
+    with CSV_PATH.open(
+        "a",
+        newline="",
+    ) as csvfile:
+        writer = csv.writer(csvfile)
         writer.writerow(row)
 
 
@@ -269,6 +317,11 @@ def write_row(row):
 
 def main():
     write_session_header()
+
+    commit = get_git_commit()
+    timestamp = datetime.now().isoformat(
+        timespec="seconds"
+    )
 
     server = start_server()
 
@@ -286,19 +339,18 @@ def main():
                 parsed = parse_wrk(output)
 
                 write_row([
-                    datetime.now().isoformat(
-                        timespec="seconds"
-                    ),
+                    timestamp,
+                    commit,
                     benchmark["name"],
                     benchmark["route"],
                     threads,
                     connections,
                     DURATION,
+                    parsed["requests"],
                     parsed["rps"],
                     parsed["avg_latency"],
                     parsed["latency_stdev"],
                     parsed["max_latency"],
-                    parsed["requests"],
                     parsed["transfer_per_sec"],
                 ])
 
@@ -314,9 +366,16 @@ def main():
 
                 time.sleep(2)
 
+        print()
+        print(
+            f"Results written to: {CSV_PATH}"
+        )
+
     finally:
         stop_server(server)
 
 
 if __name__ == "__main__":
     main()
+
+

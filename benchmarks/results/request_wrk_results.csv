@@ -1,3 +1,47 @@
 Timestamp,Commit,Benchmark,Route,Threads,Connections,Duration,Requests,Requests/sec,Avg latency,Latency stdev,Max latency,Transfer/sec
 
 SESSION START,2026-08-11T00:11:25,ac28def
+
+SESSION START,2026-08-11T00:25:36,de36047
+2026-08-11T00:26:57,de36047,plain,/benchmark/request/plain,1,1,30s,877018,29137.3,38.74us,95.23us,4.15ms,2.39MB
+2026-08-11T00:26:57,de36047,plain,/benchmark/request/plain,2,10,30s,5597970,186597.48,53.58us,57.49us,3.48ms,15.30MB
+2026-08-11T00:26:57,de36047,plain,/benchmark/request/plain,4,25,30s,8765539,291218.97,78.52us,80.37us,5.15ms,23.88MB
+2026-08-11T00:26:57,de36047,plain,/benchmark/request/plain,8,50,30s,8581463,285101.37,167.79us,101.61us,13.61ms,23.38MB
+2026-08-11T00:26:57,de36047,plain,/benchmark/request/plain,16,100,30s,8439540,280385.96,342.22us,126.06us,16.28ms,23.00MB
+2026-08-11T00:26:57,de36047,plain,/benchmark/request/plain,16,250,30s,8438856,280365.5,0.86ms,375.49us,42.91ms,22.99MB
+2026-08-11T00:26:57,de36047,plain,/benchmark/request/plain,16,500,30s,8801460,292407.99,1.81ms,3.47ms,196.81ms,23.98MB
+2026-08-11T00:26:57,de36047,headers,/benchmark/request/headers,1,1,30s,888668,29622.01,33.57us,37.64us,3.80ms,2.43MB
+2026-08-11T00:26:57,de36047,headers,/benchmark/request/headers,2,10,30s,5423609,180187.23,55.40us,52.08us,4.07ms,14.78MB
+2026-08-11T00:26:57,de36047,headers,/benchmark/request/headers,4,25,30s,8646554,288205.36,80.52us,92.82us,4.72ms,23.64MB
+2026-08-11T00:26:57,de36047,headers,/benchmark/request/headers,8,50,30s,8596174,285591.95,165.90us,67.45us,6.08ms,23.42MB
+2026-08-11T00:26:57,de36047,headers,/benchmark/request/headers,16,100,30s,8430846,280097.0,341.99us,98.03us,19.71ms,22.97MB
+2026-08-11T00:26:57,de36047,headers,/benchmark/request/headers,16,250,30s,8454730,280886.24,0.85ms,218.37us,32.10ms,23.04MB
+2026-08-11T00:26:57,de36047,headers,/benchmark/request/headers,16,500,30s,8803136,292466.79,1.80ms,3.24ms,188.56ms,23.99MB
+2026-08-11T00:26:57,de36047,cookies,/benchmark/request/cookies,1,1,30s,880403,29346.52,33.68us,25.75us,3.17ms,2.41MB
+2026-08-11T00:26:57,de36047,cookies,/benchmark/request/cookies,2,10,30s,5415480,179918.93,58.15us,86.28us,6.09ms,14.76MB
+2026-08-11T00:26:57,de36047,cookies,/benchmark/request/cookies,4,25,30s,8794458,292177.65,76.20us,64.23us,5.94ms,23.96MB
+2026-08-11T00:26:57,de36047,cookies,/benchmark/request/cookies,8,50,30s,8588744,285342.02,166.19us,61.80us,6.12ms,23.40MB
+2026-08-11T00:26:57,de36047,cookies,/benchmark/request/cookies,16,100,30s,8438173,280342.45,340.90us,55.52us,6.57ms,22.99MB
+2026-08-11T00:26:57,de36047,cookies,/benchmark/request/cookies,16,250,30s,8459485,281049.54,0.85ms,238.41us,33.30ms,23.05MB
+2026-08-11T00:26:57,de36047,cookies,/benchmark/request/cookies,16,500,30s,8808193,292631.25,1.80ms,3.19ms,188.74ms,24.00MB
+2026-08-11T00:26:57,de36047,body,/benchmark/request/body,1,1,30s,615192,20438.22,48.74us,36.28us,4.08ms,1.68MB
+2026-08-11T00:26:57,de36047,body,/benchmark/request/body,2,10,30s,3234759,107469.15,94.78us,82.36us,4.75ms,8.81MB
+2026-08-11T00:26:57,de36047,body,/benchmark/request/body,4,25,30s,4752577,157892.95,149.56us,59.47us,4.89ms,12.95MB
+2026-08-11T00:26:57,de36047,body,/benchmark/request/body,8,50,30s,4727850,157071.01,303.71us,46.93us,7.41ms,12.88MB
+2026-08-11T00:26:57,de36047,body,/benchmark/request/body,16,100,30s,4724907,156975.64,609.81us,44.71us,5.33ms,12.87MB
+2026-08-11T00:26:57,de36047,body,/benchmark/request/body,16,250,30s,4743722,157600.01,1.52ms,188.42us,29.84ms,12.93MB
+2026-08-11T00:26:57,de36047,body,/benchmark/request/body,16,500,30s,4760047,158141.88,3.22ms,2.82ms,173.31ms,12.97MB
+2026-08-11T00:26:57,de36047,binding_small,/benchmark/request/binding/small,1,1,30s,809186,26972.77,36.51us,24.17us,2.88ms,2.21MB
+2026-08-11T00:26:57,de36047,binding_small,/benchmark/request/binding/small,2,10,30s,5201711,172816.27,58.41us,69.36us,6.72ms,14.17MB
+2026-08-11T00:26:57,de36047,binding_small,/benchmark/request/binding/small,4,25,30s,8587418,285299.92,82.51us,103.93us,6.75ms,23.40MB
+2026-08-11T00:26:57,de36047,binding_small,/benchmark/request/binding/small,8,50,30s,8627848,286643.68,164.84us,57.94us,9.15ms,23.51MB
+2026-08-11T00:26:57,de36047,binding_small,/benchmark/request/binding/small,16,100,30s,8437961,280337.85,341.08us,74.63us,13.32ms,22.99MB
+2026-08-11T00:26:57,de36047,binding_small,/benchmark/request/binding/small,16,250,30s,8436614,280286.03,0.86ms,186.69us,30.21ms,22.99MB
+2026-08-11T00:26:57,de36047,binding_small,/benchmark/request/binding/small,16,500,30s,8768810,291328.09,1.80ms,3.12ms,185.64ms,23.89MB
+2026-08-11T00:26:57,de36047,binding_large,/benchmark/request/binding/large,1,1,30s,240194,8006.38,123.97us,45.03us,3.19ms,672.41KB
+2026-08-11T00:26:57,de36047,binding_large,/benchmark/request/binding/large,2,10,30s,2470093,82062.47,121.63us,60.17us,4.21ms,6.73MB
+2026-08-11T00:26:57,de36047,binding_large,/benchmark/request/binding/large,4,25,30s,4521194,150208.18,156.83us,88.15us,4.86ms,12.32MB
+2026-08-11T00:26:57,de36047,binding_large,/benchmark/request/binding/large,8,50,30s,4606224,153032.24,310.65us,51.70us,5.75ms,12.55MB
+2026-08-11T00:26:57,de36047,binding_large,/benchmark/request/binding/large,16,100,30s,4502166,149575.36,639.43us,62.37us,7.21ms,12.27MB
+2026-08-11T00:26:57,de36047,binding_large,/benchmark/request/binding/large,16,250,30s,4550807,151191.76,1.59ms,196.99us,29.90ms,12.40MB
+2026-08-11T00:26:57,de36047,binding_large,/benchmark/request/binding/large,16,500,30s,4640897,154183.56,3.29ms,2.59ms,168.11ms,12.65MB
