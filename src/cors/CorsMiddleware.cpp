@@ -25,7 +25,7 @@ namespace mach::detail::cors
             return;
         }
 
-        const std::string originValue = std::string(*origin);
+        const auto  originValue = std::string(*origin);
 
         // handle OPTIONS preflight
         if (request.method() == mach::http::Method::Options) {
@@ -50,7 +50,7 @@ namespace mach::detail::cors
     }
 
     void CorsMiddleware::addCorsHeaders(mach::Context& context, bool preflight) const {
-        std::string origin = std::string(context.request.header("origin").value());
+        auto  origin = std::string(context.request.header("origin").value());
         std::string vary;
 
         if (m_options.allowAnyOrigin && !m_options.allowCredentials) {

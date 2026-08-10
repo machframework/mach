@@ -54,7 +54,7 @@ namespace mach
     }
 
     std::optional<std::string_view> Response::header(std::string_view name) const {
-        std::string normalizedName = std::string(name);
+        auto  normalizedName = std::string(name);
         detail::http::toLowercaseInPlace(normalizedName);
 
         auto it = m_headers.find(normalizedName);
@@ -66,7 +66,7 @@ namespace mach
     }
 
     bool Response::containsHeader(std::string_view name) const noexcept {
-        std::string normalizedName = std::string(name);
+        auto  normalizedName = std::string(name);
         detail::http::toLowercaseInPlace(normalizedName);
 
         return m_headers.contains(normalizedName);
@@ -85,7 +85,7 @@ namespace mach
     }
 
     void Response::setHeader(std::string_view name, std::string_view value) {
-        std::string normalizedName = std::string(name);
+        auto  normalizedName = std::string(name);
         detail::http::toLowercaseInPlace(normalizedName);
 
         if (normalizedName.empty()) {

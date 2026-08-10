@@ -257,7 +257,7 @@ namespace mach::detail::routing
         // check for parameters
         if (!curr->constrainedParameterChildren.empty()) {
             // find the parameter type of the segment
-            RouteConstraint constraint = RouteConstraint::String; // default to string
+            auto  constraint = RouteConstraint::String; // default to string
 
             if (satisfiesConstraint(segmentKey, RouteConstraint::Int)) {
                 constraint = RouteConstraint::Int;
