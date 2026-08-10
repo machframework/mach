@@ -55,7 +55,7 @@ namespace mach
         m_container.reserveInternal<detail::routing::Router>();
 
         this->use<detail::exceptions::ExceptionMiddleware, mach::Logger>(
-            mach::detail::di::ServiceAccess::Internal);
+            detail::di::ServiceAccess::Internal);
     }
 
     AppBuilder& AppBuilder::addCsrf() {
@@ -93,7 +93,7 @@ namespace mach
                 detail::di::ServiceAccess::Internal);
 
             this->use<detail::cors::CorsMiddleware, detail::cors::CorsOptions>(
-                mach::detail::di::ServiceAccess::Internal);
+                detail::di::ServiceAccess::Internal);
         }
         if (m_csrfOptions) {
             m_container.addSingletonInstance<detail::csrf::CsrfOptions>(
@@ -101,11 +101,11 @@ namespace mach
                 detail::di::ServiceAccess::Internal);
 
             this->use<detail::csrf::CsrfMiddleware, detail::csrf::CsrfOptions>(
-                mach::detail::di::ServiceAccess::Internal);
+                detail::di::ServiceAccess::Internal);
         }
 
         this->use<detail::routing::RoutingMiddleware, detail::routing::Router>(
-            mach::detail::di::ServiceAccess::Internal);
+            detail::di::ServiceAccess::Internal);
 
         App app(
             std::move(m_appOptions),

@@ -30,7 +30,7 @@ namespace mach::detail::server
     BeastSession::BeastSession(
         const AppOptions& appOptions,
         tcp::socket socket,
-        detail::application::Runtime& runtime,
+        application::Runtime& runtime,
         detail::http::adapter::BeastRequestAdapter& requestAdapter,
         detail::http::adapter::BeastResponseAdapter& responseAdapter,
         const mach::Logger& logger)
@@ -80,10 +80,10 @@ namespace mach::detail::server
         if (ec == http::error::body_limit) {
             co_return co_await send_response(
                 makeReadErrorResponse(mach::http::StatusCode::PayloadTooLarge));
-        } else if (ec == http::error::header_limit) {
+        } if (ec == http::error::header_limit) {
             co_return co_await send_response(
                 makeReadErrorResponse(mach::http::StatusCode::RequestHeaderFieldsTooLarge));
-        } else if (ec) {
+        } if (ec) {
             m_logger.warning("Failed to read request: {}", ec.message());
             co_return false;
         }

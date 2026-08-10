@@ -20,10 +20,10 @@ namespace mach::detail::routing
         void mapRoute(RouteEndpoint&& endpoint);
 
     private:
-        routing::RouteMatch matchRoute(mach::Request& request) const;
+        RouteMatch matchRoute(mach::Request& request) const;
         static std::unordered_map<std::string, std::string> extractQuery(std::string& target);
 
-        std::deque<routing::RouteEndpoint> m_endpoints;
-        routing::RouteTrie m_routes;
+        std::deque<RouteEndpoint> m_endpoints;
+        RouteTrie m_routes;
     };
 }

@@ -148,30 +148,28 @@ namespace mach::detail::routing
                         "for method {}",
                         endpoint->pattern,
                         mach::http::toString(endpoint->method)));
-            } else {
-                throw std::invalid_argument(
-                    std::format(
-                        "Invalid route definition '{}': The route is ambiguous with existing route "
-                        "'{}' for method {}",
-                        endpoint->pattern,
-                        conflictingEndpoint->pattern,
-                        mach::http::toString(endpoint->method)));
             }
+
+            throw std::invalid_argument(
+                std::format(
+                    "Invalid route definition '{}': The route is ambiguous with existing route "
+                    "'{}' for method {}",
+                    endpoint->pattern,
+                    conflictingEndpoint->pattern,
+                    mach::http::toString(endpoint->method)));
         }
 
         // same route, different method
         curr->endpointsByMethod.emplace(endpoint->method, endpoint);
-
-        // debugDump();
     }
 
-    routing::RouteMatch RouteTrie::matchRoute(
+    RouteMatch RouteTrie::matchRoute(
         mach::http::Method method,
         std::vector<std::string_view>&& segments) const {
         const RouteNode* curr = &m_root;
 
         std::vector<std::string> capturedValues;
-        std::unordered_set<mach::http::Method> allowedMethods = {mach::http::Method::Options};
+        std::unordered_set allowedMethods = {mach::http::Method::Options};
 
         return matchRoute(method, segments, 0, capturedValues, allowedMethods, curr);
     }
@@ -192,14 +190,14 @@ namespace mach::detail::routing
                 return RouteMatch(endpoint);
             }
             if (curr->endpointsByMethod.empty()) {
-                return routing::RouteMatch(RoutingStatus::NotFound);
+                return RouteMatch(RoutingStatus::NotFound);
             }
 
             for (const auto& entry : curr->endpointsByMethod) {
                 allowedMethods.insert(entry.first);
             }
 
-            return routing::RouteMatch(allowedMethods);
+            return RouteMatch(allowedMethods);
         }
 
         // reached the end of the segments without finding a match
@@ -330,7 +328,7 @@ namespace mach::detail::routing
                         const std::string& prefix,
                         bool isLast,
                         bool isParam,
-                        const std::optional<routing::RouteConstraint>& constraint) {
+                        const std::optional<RouteConstraint>& constraint) {
                 const std::string connector = isLast ? "\\-- " : "|-- ";
                 // Build label
                 std::string label =
@@ -371,7 +369,7 @@ namespace mach::detail::routing
                         std::nullopt);
                 }
                 // Collect and sort parameterized children by constraint name for stable output
-                std::vector<std::optional<routing::RouteConstraint>> constraints;
+                std::vector<std::optional<RouteConstraint>> constraints;
                 constraints.reserve(node.constrainedParameterChildren.size());
                 for (const auto& [constraintKey, _] : node.constrainedParameterChildren)
                     constraints.push_back(constraintKey);

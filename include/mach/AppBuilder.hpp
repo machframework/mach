@@ -263,13 +263,13 @@ namespace mach
         std::optional<detail::csrf::CsrfOptions> m_csrfOptions;
 
         template <typename T, typename... Deps>
-        AppBuilder& use(mach::detail::di::ServiceAccess access);
+        AppBuilder& use(detail::di::ServiceAccess access);
     };
 
     template <typename T, typename... Deps>
     AppBuilder& AppBuilder::addScoped() {
         static_assert(
-            !mach::detail::controllers::ValidController<T>,
+            !detail::controllers::ValidController<T>,
             "Mach error: Controllers must be registered using addController<T>(), not "
             "addScoped<T>().");
 
@@ -337,11 +337,11 @@ namespace mach
 
     template <typename T, typename... Deps>
     AppBuilder& AppBuilder::use() {
-        return this->use<T, Deps...>(mach::detail::di::ServiceAccess::User);
+        return this->use<T, Deps...>(detail::di::ServiceAccess::User);
     }
 
     template <typename T, typename... Deps>
-    AppBuilder& AppBuilder::use(mach::detail::di::ServiceAccess access) {
+    AppBuilder& AppBuilder::use(detail::di::ServiceAccess access) {
         constexpr bool isValidMiddlewareType = detail::traits::middleware::ValidMiddlewareType<T>;
         constexpr bool hasValidMiddlewareInvoke =
             detail::traits::middleware::HasValidMiddlewareInvoke<T>;

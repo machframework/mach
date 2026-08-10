@@ -63,8 +63,8 @@ namespace mach::detail::dispatching
 
         if (const auto contentType = context.request.header("content-type"); handlerExpectsBody && !stringBody.empty() &&
             (!contentType ||
-             !mach::detail::http::matchesMediaType(*contentType, "application/json") ||
-             mach::detail::http::hasUnsupportedCharset(*contentType))) {
+             !http::matchesMediaType(*contentType, "application/json") ||
+             http::hasUnsupportedCharset(*contentType))) {
             context.response = mach::Response{context.request.version()};
             context.response.status(mach::http::StatusCode::UnsupportedMediaType);
             return;
@@ -106,7 +106,7 @@ namespace mach::detail::dispatching
                                               } -> std::same_as<void>;
                                           }) {
                                 mach::ValidationBuilder<ValueType> validationBuilder;
-                                mach::detail::validation::ValidationResult validationResult;
+                                validation::ValidationResult validationResult;
 
                                 body.validate(validationBuilder);
                                 validationBuilder.validate(body, validationResult);
@@ -209,7 +209,7 @@ namespace mach::detail::dispatching
 
             execution.context.response.status(res.statusCode());
 
-            using ValueType = typename TResult::ValueType;
+            using ValueType = TResult::ValueType;
 
             if constexpr (!std::same_as<ValueType, void>) {
                 if (res.hasValue()) {
@@ -234,5 +234,5 @@ namespace mach::detail::dispatching
 
     template <typename THandler, typename TResult, typename TArgsTuple>
     using MinimalApiInvokerFromTupleT =
-        typename MinimalApiInvokerFromTuple<THandler, TResult, TArgsTuple>::Type;
+        MinimalApiInvokerFromTuple<THandler, TResult, TArgsTuple>::Type;
 }

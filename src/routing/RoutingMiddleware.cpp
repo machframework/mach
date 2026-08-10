@@ -8,11 +8,11 @@ namespace mach::detail::routing
         auto plan = m_router.route(context.request);
 
         if (!plan.found()) {
-            auto statusCode = routing::toStatusCode(plan.status);
+            auto statusCode = toStatusCode(plan.status);
 
             // OPTIONS with no CORS should return 204
             if (context.request.method() == mach::http::Method::Options) {
-                statusCode = mach::http::StatusCode::NoContent;
+                statusCode = StatusCode::NoContent;
             }
 
             context.response.status(statusCode);

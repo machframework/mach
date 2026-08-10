@@ -226,11 +226,11 @@ namespace mach
 
     template <typename THandler>
         requires detail::traits::MinimalApiHandler<THandler>
-    void mach::App::mapRoute(http::Method method, std::string_view pattern, THandler&& handler) {
+    void App::mapRoute(http::Method method, std::string_view pattern, THandler&& handler) {
         using Handler = std::decay_t<THandler>;
         using Traits = detail::traits::FunctionTraits<Handler>;
-        using ArgsTuple = typename Traits::ArgsTuple;
-        using Result = typename Traits::ReturnType;
+        using ArgsTuple = Traits::ArgsTuple;
+        using Result = Traits::ReturnType;
 
         using Invoker =
             detail::dispatching::MinimalApiInvokerFromTupleT<Handler, Result, ArgsTuple>;

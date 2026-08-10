@@ -62,8 +62,8 @@ namespace mach::detail::dispatching
 
         if (const auto contentType = context.request.header("content-type"); !stringBody.empty() &&
             (!contentType ||
-             !mach::detail::http::matchesMediaType(*contentType, "application/json") ||
-             mach::detail::http::hasUnsupportedCharset(*contentType))) {
+             !http::matchesMediaType(*contentType, "application/json") ||
+             http::hasUnsupportedCharset(*contentType))) {
             context.response = mach::Response{context.request.version()};
             context.response.status(mach::http::StatusCode::UnsupportedMediaType);
             return;
@@ -100,7 +100,7 @@ namespace mach::detail::dispatching
                                           { body.validate(builder) } -> std::same_as<void>;
                                       }) {
                             mach::ValidationBuilder<BodyType> validationBuilder;
-                            mach::detail::validation::ValidationResult validationResult;
+                            validation::ValidationResult validationResult;
 
                             body.validate(validationBuilder);
                             validationBuilder.validate(body, validationResult);
@@ -117,7 +117,7 @@ namespace mach::detail::dispatching
 
             context.response.status(res.statusCode());
 
-            using ValueType = typename TResult::ValueType;
+            using ValueType = TResult::ValueType;
 
             if constexpr (!std::same_as<ValueType, void>) {
                 if (res.hasValue()) {

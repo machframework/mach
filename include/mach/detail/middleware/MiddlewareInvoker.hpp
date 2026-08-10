@@ -18,7 +18,7 @@ namespace mach::detail::middleware
     template <typename TMiddleware>
     void MiddlewareInvoker<TMiddleware>::invoke(
         dispatching::RequestExecution& execution,
-        const middleware::InternalNext& next) {
+        const InternalNext& next) {
         auto& middleware = execution.scope.resolve<TMiddleware>();
 
         mach::Next publicNext([&execution, next = next]() {

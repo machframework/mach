@@ -20,7 +20,7 @@ namespace mach::detail::server
         middleware::MiddlewarePipeline middlewarePipeline,
         const mach::Logger& logger)
         : m_appOptions(std::move(appOptions)),
-          m_endpoint(boost::asio::ip::make_address(m_appOptions.host), (m_appOptions.port)),
+          m_endpoint(boost::asio::ip::make_address(m_appOptions.host), m_appOptions.port),
           m_ioc(static_cast<int>(m_appOptions.threadCount)), m_runtime(m_appOptions, std::move(container), std::move(middlewarePipeline), logger),
           m_logger(logger) {}
 

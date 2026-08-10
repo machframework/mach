@@ -17,7 +17,7 @@ namespace mach::detail::dispatching
 namespace mach::detail::di
 {
     using ForbiddenDITypes =
-        std::tuple<mach::detail::routing::RouteTrie, mach::detail::dispatching::Dispatcher>;
+        std::tuple<routing::RouteTrie, dispatching::Dispatcher>;
 
     template <typename T, typename Tuple>
     struct TupleContains;

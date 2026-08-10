@@ -13,7 +13,7 @@ namespace mach::detail::cors
     class CorsMiddleware {
 
     public:
-        explicit CorsMiddleware(const cors::CorsOptions& options);
+        explicit CorsMiddleware(const CorsOptions& options);
 
         void invoke(mach::Context& context, mach::Next& next);
 
@@ -26,7 +26,7 @@ namespace mach::detail::cors
         std::string joinMethods() const;
         static std::string joinStrings(const std::unordered_set<std::string>& values);
 
-        cors::CorsOptions m_options;
+        CorsOptions m_options;
 
         std::string m_allowedHeaders;
         std::string m_allowedMethods;

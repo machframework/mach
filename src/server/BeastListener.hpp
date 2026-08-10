@@ -37,7 +37,7 @@ namespace mach::detail::server
             const AppOptions& appOptions,
             net::io_context& ioc,
             tcp::endpoint endpoint,
-            detail::application::Runtime& runtime,
+            application::Runtime& runtime,
             detail::http::adapter::BeastRequestAdapter& requestAdapter,
             detail::http::adapter::BeastResponseAdapter& responseAdapter,
             const mach::Logger& logger);
@@ -51,7 +51,7 @@ namespace mach::detail::server
 
         const AppOptions& m_appOptions;
 
-        detail::application::Runtime& m_runtime;
+        application::Runtime& m_runtime;
         detail::http::adapter::BeastRequestAdapter& m_requestAdapter;
         detail::http::adapter::BeastResponseAdapter& m_responseAdapter;
 

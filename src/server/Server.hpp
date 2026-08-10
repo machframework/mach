@@ -46,7 +46,7 @@ namespace mach::detail::server
         boost::asio::io_context m_ioc;
         std::shared_ptr<BeastListener> m_listener;
 
-        detail::application::Runtime m_runtime;
+        application::Runtime m_runtime;
         detail::http::adapter::BeastRequestAdapter m_requestAdapter;
         detail::http::adapter::BeastResponseAdapter m_responseAdapter;
 

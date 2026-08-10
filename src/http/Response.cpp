@@ -29,7 +29,7 @@ namespace
         });
     }
 
-    inline bool containsCrOrLf(std::string_view value) noexcept {
+    bool containsCrOrLf(std::string_view value) noexcept {
         return value.find('\r') != std::string_view::npos ||
                value.find('\n') != std::string_view::npos;
     }
