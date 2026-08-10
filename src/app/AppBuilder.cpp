@@ -33,7 +33,7 @@ namespace
         }
     }
 
-    void validateThreadCount(std::int64_t threadCount) {
+    void validateThreadCount(std::size_t threadCount) {
         if (threadCount < 1) {
             throw std::invalid_argument("Thread count must be at least 1.");
         }
