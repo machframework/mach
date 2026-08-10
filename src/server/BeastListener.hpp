@@ -36,7 +36,7 @@ namespace mach::detail::server
         BeastListener(
             const AppOptions& appOptions,
             net::io_context& ioc,
-            tcp::endpoint endpoint,
+            const tcp::endpoint& endpoint,
             application::Runtime& runtime,
             detail::http::adapter::BeastRequestAdapter& requestAdapter,
             detail::http::adapter::BeastResponseAdapter& responseAdapter,

@@ -353,7 +353,7 @@ namespace mach::detail::routing
                         first = false;
                     }
 
-                    label += "]";
+                    label += ']';
                 }
                 std::cout << prefix << connector << label << "\n";
                 const std::string childPrefix = prefix + (isLast ? "    " : "|   ");

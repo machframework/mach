@@ -282,7 +282,7 @@ namespace mach::detail::di
             .lifetime = ServiceLifetime::Singleton,
             .access = access};
 
-        auto sharedInstance = std::make_shared<T>(std::move(instance));
+        auto sharedInstance = std::make_shared<T>(std::forward<T>(instance));
         T& reference = *sharedInstance;
 
         auto [it, inserted] =
