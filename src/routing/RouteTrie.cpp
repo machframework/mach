@@ -181,12 +181,12 @@ namespace mach::detail::routing
         std::vector<std::string>& capturedValues,
         std::unordered_set<http::Method>& allowedMethods,
         const RouteNode* curr) const {
-        auto segmentsSize = segments.size();
+        const auto segmentsSize = segments.size();
 
         // check for root
         if (segments.empty()) {
             if (curr->endpointsByMethod.contains(method)) {
-                auto endpoint = curr->endpointsByMethod.find(method)->second;
+                const auto endpoint = curr->endpointsByMethod.find(method)->second;
                 return RouteMatch(endpoint);
             }
             if (curr->endpointsByMethod.empty()) {
@@ -261,7 +261,7 @@ namespace mach::detail::routing
                 constraint = RouteConstraint::Int;
             }
 
-            RouteNode* childNode = nullptr;
+            const RouteNode* childNode = nullptr;
 
             if (curr->constrainedParameterChildren.contains(constraint)) {
                 childNode = curr->constrainedParameterChildren.find(constraint)->second.get();

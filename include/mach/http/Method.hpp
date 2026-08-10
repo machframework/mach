@@ -27,7 +27,7 @@ namespace mach::http
      * @param method The HTTP method.
      * @return The corresponding HTTP method name.
      */
-    constexpr std::string_view toString(Method method) {
+    constexpr std::string_view toString(Method ethod) {
         switch (method) {
         case Method::Get:
             return "GET";

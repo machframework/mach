@@ -103,7 +103,7 @@ namespace mach::detail::cors
             return;
         }
         if (const auto methodStr = context.request.header("Access-Control-Request-Method")) {
-            auto method = mach::http::toMethod(*methodStr);
+            const auto method = mach::http::toMethod(*methodStr);
             if (method == mach::http::Method::Unknown) {
                 context.response.status(mach::http::StatusCode::BadRequest);
                 return;

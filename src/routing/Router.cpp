@@ -357,7 +357,7 @@ namespace mach::detail::routing
             return {};
         }
 
-        auto query = target.substr(queryPos + 1);
+        const auto query = target.substr(queryPos + 1);
         target = target.substr(0, queryPos);
 
         return parseQuery(query);
