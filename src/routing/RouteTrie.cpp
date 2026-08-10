@@ -358,7 +358,7 @@ namespace mach::detail::routing
                 keys.reserve(node.childrenByStaticSegment.size());
                 for (const auto& [key, _] : node.childrenByStaticSegment)
                     keys.push_back(key);
-                std::sort(keys.begin(), keys.end());
+                std::ranges::sort(keys);
                 for (size_t i = 0; i < keys.size(); ++i) {
                     const bool lastChild = !hasParamChildren && (i == keys.size() - 1);
                     print(
@@ -374,7 +374,7 @@ namespace mach::detail::routing
                 for (const auto& [constraintKey, _] : node.constrainedParameterChildren)
                     constraints.push_back(constraintKey);
 
-                std::sort(constraints.begin(), constraints.end(), [](const auto& a, const auto& b) {
+                std::ranges::sort(constraints, [](const auto& a, const auto& b) {
                     const std::string_view sa = a ? toString(*a) : "";
                     const std::string_view sb = b ? toString(*b) : "";
                     return sa < sb;

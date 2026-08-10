@@ -1,5 +1,6 @@
 #include <mach/detail/di/Scope.hpp>
 
+#include <algorithm>
 #include <format>
 #include <stdexcept>
 #include <string>
@@ -45,7 +46,8 @@ namespace
 namespace mach::detail::di
 {
     std::shared_ptr<void> Scope::resolve(std::type_index type) {
-        if (const auto cycleStart = std::find(m_resolutionStack.begin(), m_resolutionStack.end(), type); cycleStart != m_resolutionStack.end()) {
+        if (const auto cycleStart = std::ranges::find(m_resolutionStack, type);
+            cycleStart != m_resolutionStack.end()) {
             throw std::logic_error(
                 buildCircularDependencyMessage(cycleStart, type, m_resolutionStack));
         }
