@@ -1,8 +1,8 @@
 Timestamp,Commit,Benchmark,Route,Threads,Connections,Duration,Requests,Requests/sec,Avg latency,Latency stdev,Max latency,Transfer/sec
-
-SESSION START,2026-08-11T00:11:25,ac28def
-
-SESSION START,2026-08-11T00:25:36,de36047
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+SESSION START,2026-08-11T00:25:36,de36047,,,,,,,,,,
 2026-08-11T00:26:57,de36047,plain,/benchmark/request/plain,1,1,30s,877018,29137.3,38.74us,95.23us,4.15ms,2.39MB
 2026-08-11T00:26:57,de36047,plain,/benchmark/request/plain,2,10,30s,5597970,186597.48,53.58us,57.49us,3.48ms,15.30MB
 2026-08-11T00:26:57,de36047,plain,/benchmark/request/plain,4,25,30s,8765539,291218.97,78.52us,80.37us,5.15ms,23.88MB
@@ -14,7 +14,7 @@ SESSION START,2026-08-11T00:25:36,de36047
 2026-08-11T00:26:57,de36047,headers,/benchmark/request/headers,2,10,30s,5423609,180187.23,55.40us,52.08us,4.07ms,14.78MB
 2026-08-11T00:26:57,de36047,headers,/benchmark/request/headers,4,25,30s,8646554,288205.36,80.52us,92.82us,4.72ms,23.64MB
 2026-08-11T00:26:57,de36047,headers,/benchmark/request/headers,8,50,30s,8596174,285591.95,165.90us,67.45us,6.08ms,23.42MB
-2026-08-11T00:26:57,de36047,headers,/benchmark/request/headers,16,100,30s,8430846,280097.0,341.99us,98.03us,19.71ms,22.97MB
+2026-08-11T00:26:57,de36047,headers,/benchmark/request/headers,16,100,30s,8430846,280097,341.99us,98.03us,19.71ms,22.97MB
 2026-08-11T00:26:57,de36047,headers,/benchmark/request/headers,16,250,30s,8454730,280886.24,0.85ms,218.37us,32.10ms,23.04MB
 2026-08-11T00:26:57,de36047,headers,/benchmark/request/headers,16,500,30s,8803136,292466.79,1.80ms,3.24ms,188.56ms,23.99MB
 2026-08-11T00:26:57,de36047,cookies,/benchmark/request/cookies,1,1,30s,880403,29346.52,33.68us,25.75us,3.17ms,2.41MB
@@ -45,3 +45,4 @@ SESSION START,2026-08-11T00:25:36,de36047
 2026-08-11T00:26:57,de36047,binding_large,/benchmark/request/binding/large,16,100,30s,4502166,149575.36,639.43us,62.37us,7.21ms,12.27MB
 2026-08-11T00:26:57,de36047,binding_large,/benchmark/request/binding/large,16,250,30s,4550807,151191.76,1.59ms,196.99us,29.90ms,12.40MB
 2026-08-11T00:26:57,de36047,binding_large,/benchmark/request/binding/large,16,500,30s,4640897,154183.56,3.29ms,2.59ms,168.11ms,12.65MB
+,,,,,,,,292631.25,,,,
