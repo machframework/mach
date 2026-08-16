@@ -75,7 +75,8 @@ add_library(mach
 
     src/csrf/CsrfMiddleware.cpp
     src/csrf/CsrfBuilder.cpp
- "src/http/Context.cpp")
+    src/http/Context.cpp
+)
 
 set_target_properties(mach PROPERTIES
     DEBUG_POSTFIX "d"
@@ -187,7 +188,7 @@ endif()
 # -------------------------
 option(MACH_BUILD_EXAMPLES "Build Mach examples" ON)
 option(MACH_BUILD_TESTS "Build Mach tests" OFF)
-option(MACH_BUILD_BENCHMARKS "Build Mach benchmarks" OFF)
+option(MACH_BUILD_BENCHMARKS "Build Mach benchmarks" ON)
 
 if(MACH_BUILD_EXAMPLES)
     add_subdirectory(examples)
@@ -199,5 +200,6 @@ if(MACH_BUILD_TESTS)
 endif()
 
 if(MACH_BUILD_BENCHMARKS)
+    message(STATUS "Building Mach benchmarks")
     add_subdirectory(benchmarks)
 endif()

@@ -28,3 +28,8 @@ add_mach_bench(
     BindingPerformanceBenchmark
     binding/BindingPerformanceBenchmark.cpp
 )
+
+add_mach_bench(
+    RequestBenchmarks
+    request/RequestBenchmarks.cpp
+)

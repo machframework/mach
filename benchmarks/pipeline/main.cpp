@@ -4,8 +4,6 @@
 
 #include <mach/controllers.hpp>
 
-#include "server/BeastSession.hpp"
-
 struct RequestIdService {
     std::string make() const {
         return "req-123";
