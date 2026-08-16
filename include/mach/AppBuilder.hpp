@@ -46,15 +46,6 @@ namespace mach
         explicit AppBuilder();
 
         /**
-         * Creates a new application builder instance.
-         *
-         * @param options The server configuration to use for the application.
-         *
-         * @throws std::invalid_argument If the supplied configuration is invalid.
-         */
-        explicit AppBuilder(AppOptions options);
-
-        /**
          * Registers a scoped service in the dependency injection container.
          *
          * A scoped service is created once per scope and reused for all

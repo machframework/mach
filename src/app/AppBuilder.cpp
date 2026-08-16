@@ -41,10 +41,8 @@ namespace
 
 namespace mach
 {
-    AppBuilder::AppBuilder() : AppBuilder(AppOptions{}) {}
-
-    AppBuilder::AppBuilder(AppOptions options) {
-        m_appOptions = std::move(options);
+    AppBuilder::AppBuilder() {
+        m_appOptions = AppOptions{};
 
         // reserve preprocessing middleware
         m_container.reserveInternal<detail::cors::CorsMiddleware>();

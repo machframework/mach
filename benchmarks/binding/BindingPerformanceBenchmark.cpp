@@ -32,11 +32,13 @@ struct LargeBindingRequest {
 MACH_DEFINE_JSON(LargeBindingRequest, batchName, items)
 
 int main() {
-    auto builder = mach::AppBuilder(
-        mach::AppOptions{
-            .host = "127.0.0.1",
-            .port = 3143,
-            .threadCount = std::thread::hardware_concurrency()});
+    auto builder = mach::AppBuilder();
+
+    builder.configureApp([](mach::AppOptions& options) {
+        options.host = "127.0.0.1";
+        options.port = 3143;
+        options.threadCount = std::thread::hardware_concurrency();
+    });
 
     auto app = builder.build();
 
