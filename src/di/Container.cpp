@@ -41,7 +41,8 @@ namespace mach::detail::di
         }
     }
 
-    std::shared_ptr<void> Container::getOrCreateSingleton(std::type_index type, Scope& scope) const {
+    std::shared_ptr<void> Container::getOrCreateSingleton(std::type_index type, Scope& scope)
+        const {
         auto& entry = *m_singletonEntries.at(type);
         const auto& descriptor = m_serviceRegistry.at(type);
 

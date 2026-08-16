@@ -5,7 +5,6 @@
 
 #include "Testing.hpp"
 
-
 int main() {
     auto builder = mach::AppBuilder(
         mach::AppOptions{

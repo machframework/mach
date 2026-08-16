@@ -51,7 +51,7 @@ namespace mach::detail::server
 
 #ifdef _WIN32
 
-         constexpr BOOL exclusiveAddressUse = TRUE;
+        constexpr BOOL exclusiveAddressUse = TRUE;
 
         if (::setsockopt(
                 m_acceptor.native_handle(),

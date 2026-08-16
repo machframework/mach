@@ -11,8 +11,8 @@ namespace mach::detail::middleware
             auto* middleware = it->get();
             auto next = std::move(current);
 
-            current = [middleware,
-                       next = std::move(next)](dispatching::RequestExecution& requestExecution) mutable {
+            current = [middleware, next = std::move(next)](
+                          dispatching::RequestExecution& requestExecution) mutable {
                 middleware->invoke(requestExecution, next);
             };
         }

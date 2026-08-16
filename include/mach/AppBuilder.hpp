@@ -7,10 +7,10 @@
 #include <vector>
 
 #include <mach/App.hpp>
+#include <mach/AppOptions.hpp>
 #include <mach/CorsBuilder.hpp>
 #include <mach/CsrfBuilder.hpp>
 #include <mach/LoggerOptions.hpp>
-#include <mach/AppOptions.hpp>
 
 #include <mach/detail/controllers/ControllerTraits.hpp>
 #include <mach/detail/di/Container.hpp>
@@ -40,7 +40,6 @@ namespace mach
     class AppBuilder {
 
     public:
-
         /**
          * Creates a new application builder instance using the default server configuration.
          */

@@ -6,8 +6,8 @@
 
 #include <fmt/format.h>
 
-#include <mach/LoggerOptions.hpp>
 #include <mach/LogLevel.hpp>
+#include <mach/LoggerOptions.hpp>
 
 namespace mach
 {

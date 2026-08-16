@@ -80,10 +80,12 @@ namespace mach::detail::server
         if (ec == http::error::body_limit) {
             co_return co_await send_response(
                 makeReadErrorResponse(mach::http::StatusCode::PayloadTooLarge));
-        } if (ec == http::error::header_limit) {
+        }
+        if (ec == http::error::header_limit) {
             co_return co_await send_response(
                 makeReadErrorResponse(mach::http::StatusCode::RequestHeaderFieldsTooLarge));
-        } if (ec) {
+        }
+        if (ec) {
             m_logger.warning("Failed to read request: {}", ec.message());
             co_return false;
         }

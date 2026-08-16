@@ -34,7 +34,7 @@ namespace mach
     }
 
     std::optional<std::string_view> Request::header(std::string_view name) const {
-        auto  normalizedName = std::string(name);
+        auto normalizedName = std::string(name);
         detail::http::toLowercaseInPlace(normalizedName);
 
         if (const auto it = m_headers.find(normalizedName); it != m_headers.end()) {

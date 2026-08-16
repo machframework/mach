@@ -3,7 +3,6 @@
 #include "adapter/inbound/BeastRequestAdapter.hpp"
 #include <mach/Request.hpp>
 
-
 int main() {
     mach::detail::http::adapter::BeastRequestAdapter adapter;
 

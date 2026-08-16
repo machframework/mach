@@ -8,14 +8,14 @@
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
-    #include <Windows.h>
-    #include <bcrypt.h>
+#include <Windows.h>
+#include <bcrypt.h>
 #elif defined(__linux__)
-    #include <sys/random.h>
+#include <sys/random.h>
 #elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
-    #include <stdlib.h>
+#include <stdlib.h>
 #else
-    #error Unsupported platform
+#error Unsupported platform
 #endif
 
 #include <mach/Context.hpp>
@@ -30,8 +30,9 @@ namespace mach::detail::csrf
         const auto tokenCookie = context.request.cookie(m_options.cookieName);
 
         // safe method
-        if (const auto method = context.request.method(); method == mach::http::Method::Get || method == mach::http::Method::Head ||
-            method == mach::http::Method::Options) {
+        if (const auto method = context.request.method(); method == mach::http::Method::Get ||
+                                                          method == mach::http::Method::Head ||
+                                                          method == mach::http::Method::Options) {
             if (!tokenCookie) {
                 auto cookie = mach::http::Cookie{
                     .name = m_options.cookieName,

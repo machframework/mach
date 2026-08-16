@@ -20,16 +20,12 @@ namespace mach::detail::routing
 
         explicit RouteMatch(RoutingStatus status) : status(status) {}
 
-        explicit RouteMatch(RouteEndpoint* endpoint)
-            : endpoint(endpoint) {}
+        explicit RouteMatch(RouteEndpoint* endpoint) : endpoint(endpoint) {}
 
         explicit RouteMatch(std::unordered_set<mach::http::Method> allowedMethods)
-            : status(RoutingStatus::MethodNotAllowed),
-              allowedMethods(std::move(allowedMethods)) {}
+            : status(RoutingStatus::MethodNotAllowed), allowedMethods(std::move(allowedMethods)) {}
 
-        RouteMatch(
-            RouteEndpoint* endpoint,
-            std::unordered_map<std::string, std::string>&& params)
+        RouteMatch(RouteEndpoint* endpoint, std::unordered_map<std::string, std::string>&& params)
             : endpoint(endpoint), params(std::move(params)) {}
     };
 }

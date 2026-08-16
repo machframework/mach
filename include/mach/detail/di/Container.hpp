@@ -231,7 +231,8 @@ namespace mach::detail::di
                                     if constexpr (serviceAllowed && dependenciesAllowed) {
                                         const std::type_index type = typeid(T);
 
-                                        if (access != ServiceAccess::Internal && m_reservedTypes.contains(type)) {
+                                        if (access != ServiceAccess::Internal &&
+                                            m_reservedTypes.contains(type)) {
                                             throw std::logic_error(
                                                 std::format(
                                                     "Mach DI error: service '{}' is reserved for "

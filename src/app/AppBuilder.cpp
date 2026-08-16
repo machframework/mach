@@ -80,7 +80,9 @@ namespace mach
             throw;
         }
 
-        const auto& logger = m_container.addSingletonInstance(std::move(loggerInstance), detail::di::ServiceAccess::User);
+        const auto& logger = m_container.addSingletonInstance(
+            std::move(loggerInstance),
+            detail::di::ServiceAccess::User);
 
         m_container.addService<detail::binding::BodyBinder>(
             detail::di::ServiceLifetime::Singleton,

@@ -6,9 +6,9 @@
 
 #include <nlohmann/json.hpp>
 
-#include <mach/exceptions/BadRequestException.hpp>
 #include <mach/Response.hpp>
 #include <mach/ValidationBuilder.hpp>
+#include <mach/exceptions/BadRequestException.hpp>
 
 #include <mach/detail/binding/BodyBinder.hpp>
 #include <mach/detail/binding/JsonConcepts.hpp>
@@ -60,9 +60,9 @@ namespace mach::detail::dispatching
 
         const auto& stringBody = context.request.body();
 
-        if (const auto contentType = context.request.header("content-type"); !stringBody.empty() &&
-            (!contentType ||
-             !http::matchesMediaType(*contentType, "application/json") ||
+        if (const auto contentType = context.request.header("content-type");
+            !stringBody.empty() &&
+            (!contentType || !http::matchesMediaType(*contentType, "application/json") ||
              http::hasUnsupportedCharset(*contentType))) {
             context.response = mach::Response{context.request.version()};
             context.response.status(mach::http::StatusCode::UnsupportedMediaType);

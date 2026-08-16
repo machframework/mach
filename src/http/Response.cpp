@@ -21,11 +21,9 @@ namespace
 
     bool isValidHeaderName(std::string_view name) noexcept {
         return !name.empty() && std::ranges::all_of(name, [](unsigned char c) {
-            return std::isalnum(c) ||
-                   c == '!' || c == '#' || c == '$' || c == '%' ||
-                   c == '&' || c == '\'' || c == '*' || c == '+' ||
-                   c == '-' || c == '.' || c == '^' || c == '_' ||
-                   c == '`' || c == '|' || c == '~';
+            return std::isalnum(c) || c == '!' || c == '#' || c == '$' || c == '%' || c == '&' ||
+                   c == '\'' || c == '*' || c == '+' || c == '-' || c == '.' || c == '^' ||
+                   c == '_' || c == '`' || c == '|' || c == '~';
         });
     }
 
@@ -64,7 +62,7 @@ namespace mach
     }
 
     bool Response::containsHeader(std::string_view name) const noexcept {
-        auto  normalizedName = std::string(name);
+        auto normalizedName = std::string(name);
         detail::http::toLowercaseInPlace(normalizedName);
 
         return m_headers.contains(normalizedName);
@@ -83,7 +81,7 @@ namespace mach
     }
 
     void Response::setHeader(std::string_view name, std::string_view value) {
-        auto  normalizedName = std::string(name);
+        auto normalizedName = std::string(name);
         detail::http::toLowercaseInPlace(normalizedName);
 
         if (normalizedName.empty()) {

@@ -22,7 +22,6 @@ namespace mach
          * @param message The error message describing the bad request.
          *                Defaults to "The request was invalid.".
          */
-        explicit BadRequestException(
-            std::string message = "The request was invalid.");
+        explicit BadRequestException(std::string message = "The request was invalid.");
     };
 }

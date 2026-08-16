@@ -175,7 +175,7 @@ namespace mach
 
     private:
         CorsBuilder() = default;
-        
+
         detail::cors::CorsOptions&& takeOptions() &&;
 
         detail::cors::CorsOptions m_options;

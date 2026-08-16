@@ -35,7 +35,7 @@ namespace mach::detail::validation
     //----------------------------------------------------------------
     // Implementation
     //----------------------------------------------------------------
-    
+
     template <typename T>
         requires requires(const T& value) {
             { value.size() } -> std::convertible_to<std::size_t>;

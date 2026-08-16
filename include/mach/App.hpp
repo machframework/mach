@@ -5,9 +5,9 @@
 #include <utility>
 #include <vector>
 
+#include <mach/Logger.hpp>
 #include <mach/controllers/ControllerBuilder.hpp>
 #include <mach/http/Method.hpp>
-#include <mach/Logger.hpp>
 
 #include <mach/AppOptions.hpp>
 #include <mach/detail/controllers/ControllerTraits.hpp>

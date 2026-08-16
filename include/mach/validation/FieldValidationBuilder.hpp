@@ -12,11 +12,11 @@
 #include <utility>
 
 #include <mach/detail/core/TypeTraits.hpp>
+#include <mach/detail/validation/ValidationResult.hpp>
 #include <mach/detail/validation/rules/GeneralRules.hpp>
 #include <mach/detail/validation/rules/NumericRules.hpp>
-#include <mach/detail/validation/rules/ValidationRuleType.hpp>
 #include <mach/detail/validation/rules/StringRules.hpp>
-#include <mach/detail/validation/ValidationResult.hpp>
+#include <mach/detail/validation/rules/ValidationRuleType.hpp>
 
 namespace mach
 {
@@ -264,7 +264,9 @@ namespace mach::validation
     //----------------------------------------------------------------
 
     template <typename T, typename Field>
-    FieldValidationBuilder<T, Field>::FieldValidationBuilder(mach::ValidationBuilder<T>& validationBuilder, Field T::* field)
+    FieldValidationBuilder<T, Field>::FieldValidationBuilder(
+        mach::ValidationBuilder<T>& validationBuilder,
+        Field T::* field)
         : m_validationBuilder(validationBuilder), m_field(field) {}
 
     template <typename T, typename Field>
@@ -343,7 +345,8 @@ namespace mach::validation
 
         if constexpr (isString) {
             return addRule(
-                detail::validation::RegexRule{.pattern = std::regex(pattern.begin(), pattern.end())},
+                detail::validation::RegexRule{
+                    .pattern = std::regex(pattern.begin(), pattern.end())},
                 "Value does not match the specified regex pattern");
         }
     }
@@ -421,12 +424,11 @@ namespace mach::validation
                     "The same validation rule cannot be applied more than once.");
             }
         }
-        
+
         m_validationBuilder.m_validators.emplace_back(
             [field = m_field, rule = std::move(rule), errorMessage = std::string(errorMessage)](
                 const T& instance,
                 detail::validation::ValidationResult& result) {
-
                 if (const bool isValid = validate(instance.*field, rule); isValid == Negate) {
                     result.addError(errorMessage);
                 }

@@ -21,7 +21,8 @@ namespace mach
          * Initializes a new conflict exception.
          *
          * @param message The error message describing the conflict.
-         *                Defaults to "The request could not be completed because of a resource conflict.".
+         *                Defaults to "The request could not be completed because of a resource
+         * conflict.".
          */
         explicit ConflictException(
             std::string message =

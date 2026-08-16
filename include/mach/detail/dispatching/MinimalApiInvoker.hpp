@@ -4,8 +4,8 @@
 #include <type_traits>
 #include <utility>
 
-#include <mach/exceptions/BadRequestException.hpp>
 #include <mach/ValidationBuilder.hpp>
+#include <mach/exceptions/BadRequestException.hpp>
 
 #include <mach/detail/core/TypeTraits.hpp>
 #include <mach/detail/dispatching/IEndpointInvoker.hpp>
@@ -19,7 +19,9 @@ namespace mach::detail::dispatching
 {
     template <typename Tuple>
     consteval bool expectsBody() {
-        if constexpr (constexpr std::size_t parameterCount = std::tuple_size_v<Tuple>; parameterCount == 0) {
+        if constexpr (
+            constexpr std::size_t parameterCount = std::tuple_size_v<Tuple>; parameterCount == 0
+        ) {
             return false;
         } else if constexpr (parameterCount == 1) {
             using Arg = std::tuple_element_t<0, Tuple>;
@@ -61,9 +63,9 @@ namespace mach::detail::dispatching
 
         const auto& stringBody = context.request.body();
 
-        if (const auto contentType = context.request.header("content-type"); handlerExpectsBody && !stringBody.empty() &&
-            (!contentType ||
-             !http::matchesMediaType(*contentType, "application/json") ||
+        if (const auto contentType = context.request.header("content-type");
+            handlerExpectsBody && !stringBody.empty() &&
+            (!contentType || !http::matchesMediaType(*contentType, "application/json") ||
              http::hasUnsupportedCharset(*contentType))) {
             context.response = mach::Response{context.request.version()};
             context.response.status(mach::http::StatusCode::UnsupportedMediaType);
@@ -101,9 +103,7 @@ namespace mach::detail::dispatching
                             ValueType body = binder.bind<ValueType>(context.request.body());
 
                             if constexpr (requires(mach::ValidationBuilder<ValueType>& builder) {
-                                              {
-                                                  body.validate(builder)
-                                              } -> std::same_as<void>;
+                                              { body.validate(builder) } -> std::same_as<void>;
                                           }) {
                                 mach::ValidationBuilder<ValueType> validationBuilder;
                                 validation::ValidationResult validationResult;

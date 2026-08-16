@@ -2,7 +2,7 @@
 
 namespace mach
 {
-    CorsBuilder& CorsBuilder::allowOrigin(std::string_view origin){
+    CorsBuilder& CorsBuilder::allowOrigin(std::string_view origin) {
         m_options.allowedOrigins.emplace(origin);
         return *this;
     }
@@ -28,7 +28,7 @@ namespace mach
         return *this;
     }
 
-    CorsBuilder& CorsBuilder::allowHeader(std::string_view header){
+    CorsBuilder& CorsBuilder::allowHeader(std::string_view header) {
         m_options.allowedHeaders.emplace(header);
         return *this;
     }
@@ -61,7 +61,7 @@ namespace mach
     }
 
     CorsBuilder& CorsBuilder::allowAnyHeader() {
-        m_options.allowAnyHeader= true;
+        m_options.allowAnyHeader = true;
         m_options.allowedHeaders.clear();
         return *this;
     }

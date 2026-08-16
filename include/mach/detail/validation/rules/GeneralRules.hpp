@@ -6,13 +6,13 @@ namespace mach::detail::validation
 {
     template <typename T>
     struct EqualRule {
-        static constexpr auto  Type = ValidationRuleType::Equal;
+        static constexpr auto Type = ValidationRuleType::Equal;
         T value;
     };
 
     template <typename T>
     struct NotEqualRule {
-        static constexpr auto  Type = ValidationRuleType::NotEqual;
+        static constexpr auto Type = ValidationRuleType::NotEqual;
         T value;
     };
 }

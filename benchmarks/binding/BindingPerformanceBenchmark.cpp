@@ -1,9 +1,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
-#include <thread>
 
 #include <mach/mach.hpp>
 

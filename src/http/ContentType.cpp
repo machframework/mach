@@ -51,8 +51,10 @@ namespace mach::detail::http
                 nextParameter == std::string_view::npos ? std::string_view::npos
                                                         : nextParameter - parameterStart));
 
-            if (const auto equalsPosition = parameter.find('='); equalsPosition != std::string_view::npos) {
-                if (const auto name = trim(parameter.substr(0, equalsPosition)); name == "charset") {
+            if (const auto equalsPosition = parameter.find('=');
+                equalsPosition != std::string_view::npos) {
+                if (const auto name = trim(parameter.substr(0, equalsPosition));
+                    name == "charset") {
                     auto charset = trim(parameter.substr(equalsPosition + 1));
 
                     charset = removeQuotes(charset);

@@ -3,11 +3,11 @@
 #include <stdexcept>
 
 #include <mach/Context.hpp>
-#include <mach/middleware/Next.hpp>
 #include <mach/Logger.hpp>
+#include <mach/Response.hpp>
 #include <mach/exceptions/HttpException.hpp>
 #include <mach/http/StatusCode.hpp>
-#include <mach/Response.hpp>
+#include <mach/middleware/Next.hpp>
 
 #include <mach/detail/exceptions/BodyBindingException.hpp>
 

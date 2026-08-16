@@ -58,7 +58,8 @@ namespace mach
             }
         }
 
-        std::vector<std::function<void(const T&, detail::validation::ValidationResult&)>> m_validators;
+        std::vector<std::function<void(const T&, detail::validation::ValidationResult&)>>
+            m_validators;
 
         template <typename U, typename Field>
         friend class validation::FieldValidationBuilder;
@@ -68,7 +69,7 @@ namespace mach
 
         template <typename THandler, typename TResult, typename... TArgs>
         friend class detail::dispatching::MinimalApiInvoker;
-	};
+    };
 
     template <typename T>
     template <typename Field>

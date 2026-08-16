@@ -18,14 +18,14 @@ namespace mach::detail::cors
 
     void CorsMiddleware::invoke(mach::Context& context, mach::Next& next) {
         const auto& request = context.request;
-        
+
         const auto origin = request.header("origin");
         if (!origin) {
             next();
             return;
         }
 
-        const auto  originValue = std::string(*origin);
+        const auto originValue = std::string(*origin);
 
         // handle OPTIONS preflight
         if (request.method() == mach::http::Method::Options) {
@@ -50,7 +50,7 @@ namespace mach::detail::cors
     }
 
     void CorsMiddleware::addCorsHeaders(mach::Context& context, bool preflight) const {
-        auto  origin = std::string(context.request.header("origin").value());
+        auto origin = std::string(context.request.header("origin").value());
         std::string vary;
 
         if (m_options.allowAnyOrigin && !m_options.allowCredentials) {
@@ -60,7 +60,7 @@ namespace mach::detail::cors
         }
 
         context.response.setHeader("Access-Control-Allow-Origin", origin);
-        
+
         if (m_options.allowCredentials) {
             context.response.setHeader("Access-Control-Allow-Credentials", "true");
         }
@@ -75,9 +75,9 @@ namespace mach::detail::cors
                 if (const auto requestedHeaders =
                         context.request.header("Access-Control-Request-Headers")) {
                     context.response.setHeader("Access-Control-Allow-Headers", *requestedHeaders);
-                    
+
                     if (!vary.empty()) {
-                        vary += ", ";    
+                        vary += ", ";
                     }
 
                     vary += "Access-Control-Request-Headers";
@@ -156,7 +156,7 @@ namespace mach::detail::cors
         } else {
             allowedMethods = m_options.allowedMethods;
         }
-        
+
         std::string result;
 
         bool first = true;

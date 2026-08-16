@@ -78,9 +78,7 @@ namespace
 
 namespace mach::detail::routing
 {
-    void RouteTrie::mapRoute(
-        std::vector<std::string_view>&& segments,
-        RouteEndpoint* endpoint) {
+    void RouteTrie::mapRoute(std::vector<std::string_view>&& segments, RouteEndpoint* endpoint) {
         RouteNode* curr = &m_root;
 
         // registering root
@@ -217,9 +215,8 @@ namespace mach::detail::routing
                     return {
                         endpoint,
                         std::move(makeRouteParameters(endpoint->parameterNames, capturedValues))};
-                } if (
-                    method == http::Method::Head && endpointsByMethod.contains(http::Method::Get)
-                ) {
+                }
+                if (method == http::Method::Head && endpointsByMethod.contains(http::Method::Get)) {
                     const auto endpoint = endpointsByMethod.find(http::Method::Get)->second;
                     return {
                         endpoint,
@@ -232,7 +229,6 @@ namespace mach::detail::routing
                 for (auto allowedMethod : curr->endpointsByMethod | std::views::keys) {
                     allowedMethods.insert(allowedMethod);
                 }
-
 
                 return RouteMatch(allowedMethods);
             }
@@ -254,7 +250,7 @@ namespace mach::detail::routing
         // check for parameters
         if (!curr->constrainedParameterChildren.empty()) {
             // find the parameter type of the segment
-            auto  constraint = RouteConstraint::String; // default to string
+            auto constraint = RouteConstraint::String; // default to string
 
             if (satisfiesConstraint(segmentKey, RouteConstraint::Int)) {
                 constraint = RouteConstraint::Int;
@@ -376,7 +372,8 @@ namespace mach::detail::routing
                 // Collect and sort parameterized children by constraint name for stable output
                 std::vector<std::optional<RouteConstraint>> constraints;
                 constraints.reserve(node.constrainedParameterChildren.size());
-                for (const auto& constraintKey : node.constrainedParameterChildren | std::views::keys) {
+                for (const auto& constraintKey :
+                     node.constrainedParameterChildren | std::views::keys) {
                     constraints.push_back(constraintKey);
                 }
 

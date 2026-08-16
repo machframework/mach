@@ -23,9 +23,7 @@ namespace mach::detail::middleware
         template <typename TMiddleware>
         void add();
 
-        void invoke(
-            dispatching::RequestExecution& execution,
-            const InternalNext& terminal) const;
+        void invoke(dispatching::RequestExecution& execution, const InternalNext& terminal) const;
 
     private:
         std::vector<std::unique_ptr<IMiddlewareInvoker>> m_middlewares;

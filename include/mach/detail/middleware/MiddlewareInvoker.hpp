@@ -1,7 +1,7 @@
 #pragma once
 
-#include <mach/middleware/Next.hpp>
 #include <mach/detail/middleware/InternalNext.hpp>
+#include <mach/middleware/Next.hpp>
 
 #include "IMiddlewareInvoker.hpp"
 
@@ -11,8 +11,7 @@ namespace mach::detail::middleware
     class MiddlewareInvoker final : public IMiddlewareInvoker {
 
     public:
-        void invoke(dispatching::RequestExecution& execution, const InternalNext& next)
-            override;
+        void invoke(dispatching::RequestExecution& execution, const InternalNext& next) override;
     };
 
     template <typename TMiddleware>
