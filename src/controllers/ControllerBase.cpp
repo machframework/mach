@@ -33,4 +33,8 @@ namespace mach
     const mach::Response& ControllerBase::response() const noexcept {
         return m_context->response;
     }
+
+    void ControllerBase::setContext(mach::Context& context) noexcept {
+        m_context = &context;
+    }
 }

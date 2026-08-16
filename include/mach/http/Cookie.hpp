@@ -7,7 +7,7 @@
 namespace mach::http
 {
     /**
-     * Specifies the cross - site behavior of an HTTP cookie.
+     * Specifies the cross-site behavior of an HTTP cookie.
      */
     enum class SameSite {
         Strict,

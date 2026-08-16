@@ -176,9 +176,7 @@ namespace mach
         template <typename TController, typename TResult, typename... TArgs>
         friend class mach::detail::dispatching::ControllerActionInvoker;
 
-        void setContext(mach::Context& context) noexcept {
-            m_context = &context;
-        }
+        void setContext(mach::Context& context) noexcept;
 
         mach::Context* m_context = nullptr;
     };
