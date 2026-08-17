@@ -48,8 +48,13 @@ namespace mach
          * Maps an HTTP GET route to a controller action.
          *
          * @tparam THandler The type of the controller action.
+         * 
          * @param pattern The route pattern, relative to the controller's base route.
          * @param handler The controller action to invoke.
+         * 
+         * @throws std::logic_error If a route with the same method and pattern
+         *         has already been registered.
+         * 
          * @return A reference to this builder.
          */
         template <typename THandler>
@@ -59,7 +64,12 @@ namespace mach
          * Maps the controller's base route to an HTTP GET controller action.
          *
          * @tparam THandler The type of the controller action.
+         * 
          * @param handler The controller action to invoke.
+         * 
+         * @throws std::logic_error If a route with the same method and pattern
+         *         has already been registered.
+         * 
          * @return A reference to this builder.
          */
         template <typename THandler>
@@ -69,8 +79,13 @@ namespace mach
          * Maps an HTTP POST route to a controller action.
          *
          * @tparam THandler The type of the controller action.
+         * 
          * @param pattern The route pattern, relative to the controller's base route.
          * @param handler The controller action to invoke.
+         * 
+         * @throws std::logic_error If a route with the same method and pattern
+         *         has already been registered.
+         * 
          * @return A reference to this builder.
          */
         template <typename THandler>
@@ -80,7 +95,12 @@ namespace mach
          * Maps the controller's base route to an HTTP POST controller action.
          *
          * @tparam THandler The type of the controller action.
+         * 
          * @param handler The controller action to invoke.
+         * 
+         * @throws std::logic_error If a route with the same method and pattern
+         *         has already been registered.
+         * 
          * @return A reference to this builder.
          */
         template <typename THandler>
@@ -90,8 +110,13 @@ namespace mach
          * Maps an HTTP PUT route to a controller action.
          *
          * @tparam THandler The type of the controller action.
+         * 
          * @param pattern The route pattern, relative to the controller's base route.
          * @param handler The controller action to invoke.
+         * 
+         * @throws std::logic_error If a route with the same method and pattern
+         *         has already been registered.
+         * 
          * @return A reference to this builder.
          */
         template <typename THandler>
@@ -101,7 +126,12 @@ namespace mach
          * Maps the controller's base route to an HTTP PUT controller action.
          *
          * @tparam THandler The type of the controller action.
+         * 
          * @param handler The controller action to invoke.
+         * 
+         * @throws std::logic_error If a route with the same method and pattern
+         *         has already been registered.
+         * 
          * @return A reference to this builder.
          */
         template <typename THandler>
@@ -111,8 +141,13 @@ namespace mach
          * Maps an HTTP PATCH route to a controller action.
          *
          * @tparam THandler The type of the controller action.
+         * 
          * @param pattern The route pattern, relative to the controller's base route.
          * @param handler The controller action to invoke.
+         * 
+         * @throws std::logic_error If a route with the same method and pattern
+         *         has already been registered.
+         * 
          * @return A reference to this builder.
          */
         template <typename THandler>
@@ -122,7 +157,12 @@ namespace mach
          * Maps the controller's base route to an HTTP PATCH controller action.
          *
          * @tparam THandler The type of the controller action.
+         * 
          * @param handler The controller action to invoke.
+         * 
+         * @throws std::logic_error If a route with the same method and pattern
+         *         has already been registered.
+         * 
          * @return A reference to this builder.
          */
         template <typename THandler>
@@ -132,8 +172,13 @@ namespace mach
          * Maps an HTTP DELETE route to a controller action.
          *
          * @tparam THandler The type of the controller action.
+         * 
          * @param pattern The route pattern, relative to the controller's base route.
          * @param handler The controller action to invoke.
+         * 
+         * @throws std::logic_error If a route with the same method and pattern
+         *         has already been registered.
+         * 
          * @return A reference to this builder.
          */
         template <typename THandler>
@@ -143,7 +188,12 @@ namespace mach
          * Maps the controller's base route to an HTTP DELETE controller action.
          *
          * @tparam THandler The type of the controller action.
+         * 
          * @param handler The controller action to invoke.
+         * 
+         * @throws std::logic_error If a route with the same method and pattern
+         *         has already been registered.
+         * 
          * @return A reference to this builder.
          */
         template <typename THandler>
@@ -153,8 +203,13 @@ namespace mach
          * Maps an HTTP HEAD route to a controller action.
          *
          * @tparam THandler The type of the controller action.
+         * 
          * @param pattern The route pattern, relative to the controller's base route.
          * @param handler The controller action to invoke.
+         * 
+         * @throws std::logic_error If a route with the same method and pattern
+         *         has already been registered.
+         * 
          * @return A reference to this builder.
          */
         template <typename THandler>
@@ -164,7 +219,12 @@ namespace mach
          * Maps the controller's base route to an HTTP HEAD controller action.
          *
          * @tparam THandler The type of the controller action.
+         * 
          * @param handler The controller action to invoke.
+         * 
+         * @throws std::logic_error If a route with the same method and pattern
+         *         has already been registered.
+         * 
          * @return A reference to this builder.
          */
         template <typename THandler>
