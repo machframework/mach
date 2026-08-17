@@ -41,8 +41,7 @@ namespace mach
          *
          * @thread_safety This function is not thread-safe.
          */
-        [[nodiscard]]
-        mach::Request& request() noexcept;
+        [[nodiscard]] mach::Request& request() noexcept;
 
         /**
          * Returns the current HTTP request.
@@ -54,8 +53,7 @@ namespace mach
          *
          * @thread_safety This function is not thread-safe.
          */
-        [[nodiscard]]
-        const mach::Request& request() const noexcept;
+        [[nodiscard]] const mach::Request& request() const noexcept;
 
         /**
          * Returns the current HTTP response.
@@ -67,8 +65,7 @@ namespace mach
          *
          * @thread_safety This function is not thread-safe.
          */
-        [[nodiscard]]
-        mach::Response& response() noexcept;
+        [[nodiscard]] mach::Response& response() noexcept;
 
         /**
          * Returns the current HTTP response.
@@ -80,8 +77,7 @@ namespace mach
          *
          * @thread_safety This function is not thread-safe.
          */
-        [[nodiscard]]
-        const mach::Response& response() const noexcept;
+        [[nodiscard]] const mach::Response& response() const noexcept;
 
     protected:
         /**
