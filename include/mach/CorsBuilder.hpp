@@ -40,6 +40,7 @@ namespace mach
          * validation.
          *
          * @param origin The origin to allow (for example, "https://example.com").
+         * 
          * @return A reference to this builder for call chaining.
          */
         CorsBuilder& allowOrigin(std::string_view origin);
@@ -51,6 +52,7 @@ namespace mach
          * validation.
          *
          * @param origins The origins to allow.
+         * 
          * @return A reference to this builder for call chaining.
          */
         CorsBuilder& allowOrigins(std::initializer_list<std::string_view> origins);
@@ -62,6 +64,7 @@ namespace mach
          * CORS validation.
          *
          * @param method The HTTP method to allow.
+         * 
          * @return A reference to this builder for call chaining.
          */
         CorsBuilder& allowMethod(http::Method method);
@@ -73,6 +76,7 @@ namespace mach
          * CORS validation.
          *
          * @param methods The HTTP methods to allow.
+         * 
          * @return A reference to this builder for call chaining.
          */
         CorsBuilder& allowMethods(std::initializer_list<http::Method> methods);
@@ -84,6 +88,7 @@ namespace mach
          * validation.
          *
          * @param header The request header to allow.
+         * 
          * @return A reference to this builder for call chaining.
          */
         CorsBuilder& allowHeader(std::string_view header);
@@ -95,6 +100,7 @@ namespace mach
          * validation.
          *
          * @param headers The request headers to allow.
+         * 
          * @return A reference to this builder for call chaining.
          */
         CorsBuilder& allowHeaders(std::initializer_list<std::string_view> headers);
@@ -106,6 +112,7 @@ namespace mach
          * during CORS validation.
          *
          * @param header The response header to expose.
+         * 
          * @return A reference to this builder for call chaining.
          */
         CorsBuilder& exposeHeader(std::string_view header);
@@ -117,6 +124,7 @@ namespace mach
          * during CORS validation.
          *
          * @param headers The response headers to expose.
+         * 
          * @return A reference to this builder for call chaining.
          */
         CorsBuilder& exposeHeaders(std::initializer_list<std::string_view> headers);
@@ -158,6 +166,7 @@ namespace mach
          * cookies or authorization headers, in cross-origin requests.
          *
          * @param enabled Whether credentials are allowed. Defaults to `true`.
+         * 
          * @return A reference to this builder for call chaining.
          */
         CorsBuilder& allowCredentials(bool enabled = true);
@@ -169,6 +178,7 @@ namespace mach
          * preflight request.
          *
          * @param maxAge The maximum cache duration for preflight responses.
+         * 
          * @return A reference to this builder for call chaining.
          */
         CorsBuilder& maxAge(std::chrono::seconds maxAge);
