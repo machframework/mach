@@ -57,7 +57,8 @@ namespace mach
          * @return A reference to the current AppBuilder instance, allowing
          *         method chaining.
          *
-         * @throws std::logic_error If the service type has already been registered.
+         * @throws std::logic_error If the service type has already been registered
+         *         or is reserved by the framework.
          *
          * @thread_safety This function is not thread-safe.
          */
@@ -76,7 +77,8 @@ namespace mach
          * @return A reference to the current AppBuilder instance, allowing
          *         method chaining.
          *
-         * @throws std::logic_error If the service type has already been registered.
+         * @throws std::logic_error If the service type has already been registered
+         *         or is reserved by the framework.
          *
          * @thread_safety This function is not thread-safe.
          */
@@ -94,7 +96,8 @@ namespace mach
          * @return A reference to the current AppBuilder instance, allowing
          *         method chaining.
          *
-         * @throws std::logic_error If the service type has already been registered.
+         * @throws std::logic_error If the service type has already been registered
+         *         or is reserved by the framework.
          *
          * @thread_safety This function is not thread-safe.
          */
@@ -112,7 +115,8 @@ namespace mach
          * @return A reference to the current AppBuilder instance, allowing
          *         method chaining.
          *
-         * @throws std::logic_error If the service type has already been registered.
+         * @throws std::logic_error If the controller type has already been registered
+         *         or is reserved by the framework.
          *
          * @thread_safety This function is not thread-safe.
          */
@@ -133,7 +137,7 @@ namespace mach
          *         method chaining.
          *
          * @throws std::logic_error If the middleware type has already been
-         *         registered.
+         *         registered or is reserved by the framework.
          *
          * @thread_safety This function is not thread-safe.
          */
