@@ -44,30 +44,27 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        [[nodiscard]]
-        http::StatusCode statusCode() const noexcept;
+        [[nodiscard]] http::StatusCode statusCode() const noexcept;
 
         /**
-         * Returns the response body.
+         * Returns the reply body.
          *
-         * @return A const reference to the response body.
+         * @return A const reference to the reply body.
          *
          * @throws std::bad_optional_access if the reply does not contain a value.
          *
          * @thread_safety This function is thread-safe.
          */
-        [[nodiscard]]
-        const T& value() const;
+        [[nodiscard]] const T& value() const;
 
         /**
-         * Determines whether the reply contains a response body.
+         * Determines whether the reply contains a body.
          *
-         * @return True if the reply contains a response body; otherwise, false.
+         * @return True if the reply contains a body; otherwise, false.
          *
          * @thread_safety This function is thread-safe.
          */
-        [[nodiscard]]
-        bool hasValue() const noexcept;
+        [[nodiscard]] bool hasValue() const noexcept;
 
     private:
         http::StatusCode m_statusCode;
