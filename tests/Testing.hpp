@@ -3,7 +3,7 @@
 #include <iostream>
 #include <thread>
 
-#include <mach/ServerOptions.hpp>
+#include <mach/AppOptions.hpp>
 
 namespace testing
 {

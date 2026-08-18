@@ -7,6 +7,10 @@
 struct CreateUserRequest {
     std::string name;
     int age;
+
+    void validate(mach::ValidationBuilder<CreateUserRequest>& validation) const {
+        validation.field(&CreateUserRequest::name);
+    }
 };
 
 MACH_DEFINE_JSON(CreateUserRequest, name, age)

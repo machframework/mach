@@ -12,11 +12,12 @@
 #include <utility>
 
 #include <mach/detail/core/TypeTraits.hpp>
-#include <mach/detail/validation/ValidationResult.hpp>
 #include <mach/detail/validation/rules/GeneralRules.hpp>
 #include <mach/detail/validation/rules/NumericRules.hpp>
 #include <mach/detail/validation/rules/StringRules.hpp>
 #include <mach/detail/validation/rules/ValidationRuleType.hpp>
+#include <mach/detail/validation/ValidationResult.hpp>
+#include <mach/detail/validation/Validator.hpp>
 
 namespace mach
 {
@@ -417,19 +418,14 @@ namespace mach::validation
         Rule rule,
         std::string_view errorMessage) {
         if constexpr (detail::validation::IsUniqueRule<Rule>) {
-
-            const auto [_, inserted] = m_ruleTypes.insert(Rule::Type);
-            if (!inserted) {
-                throw std::logic_error(
-                    "The same validation rule cannot be applied more than once.");
-            }
+            m_ruleTypes.insert(Rule::Type);
         }
 
         m_validationBuilder.m_validators.emplace_back(
             [field = m_field, rule = std::move(rule), errorMessage = std::string(errorMessage)](
                 const T& instance,
                 detail::validation::ValidationResult& result) {
-                if (const bool isValid = validate(instance.*field, rule); isValid == Negate) {
+                if (const bool isValid = detail::validation::validate(instance.*field, rule); isValid == Negate) {
                     result.addError(errorMessage);
                 }
             });
