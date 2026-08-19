@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mach/diagnostics/TerminateHandler.hpp>
+
 #include <mach/App.hpp>
 #include <mach/AppBuilder.hpp>
 
