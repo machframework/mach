@@ -57,3 +57,8 @@ add_mach_example(
     mach_error_handling
     error_handling/main.cpp
 )
+
+add_mach_example(
+    mach_exceptions
+    exceptions/main.cpp
+)
