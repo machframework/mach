@@ -21,7 +21,7 @@ int main() {
     });
 
     app.mapPost("/users", [] {
-        return mach::created("User created");
+        return mach::created();
     });
 
     app.mapDelete("/users/{id:int}", [](mach::Context& context) {
