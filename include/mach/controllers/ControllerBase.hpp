@@ -99,6 +99,13 @@ namespace mach
         mach::Reply<std::string> ok(const char* value);
 
         /**
+         * Creates a 200 OK response.
+         * 
+         * @return A 200 OK reply with no value.
+         */
+        mach::Reply<> ok();
+
+        /**
          * Creates a 201 Created response containing the specified value.
          *
          * @tparam T The type of the response body.
@@ -112,9 +119,17 @@ namespace mach
          * Creates a 201 Created response containing the specified string.
          *
          * @param value The response body.
+         * 
          * @return A 201 Created reply containing the specified string.
          */
         mach::Reply<std::string> created(const char* value);
+
+        /**
+         * Creates a 201 Created response.
+         *
+         * @return A 201 Created reply with no value.
+         */
+        mach::Reply<> created();
 
         /**
          * Creates a 204 No Content response.

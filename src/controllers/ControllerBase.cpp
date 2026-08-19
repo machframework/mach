@@ -6,8 +6,16 @@ namespace mach
         return mach::ok(value);
     }
 
+    mach::Reply<> ControllerBase::ok() {
+        return mach::ok();
+    }
+
     mach::Reply<std::string> ControllerBase::created(const char* value) {
         return mach::created(value);
+    }
+
+    mach::Reply<> ControllerBase::created() {
+        return mach::created();
     }
 
     mach::Reply<> ControllerBase::noContent() {
