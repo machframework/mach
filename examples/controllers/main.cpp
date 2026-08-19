@@ -1,5 +1,5 @@
+#include <string>
 #include <string_view>
-#include <thread>
 
 #include <mach/controllers.hpp>
 
@@ -17,7 +17,7 @@ public:
 
     mach::Reply<std::string> sayHi() {
         m_logger.info("Handling GET /home/hi");
-        return ok("Hi");
+        return ok("Hi from Mach!");
     }
 
     static void configure(mach::ControllerBuilder<HomeController>& routes) {
@@ -31,12 +31,6 @@ private:
 
 int main() {
     auto builder = mach::AppBuilder();
-
-    builder.configureApp([](mach::AppOptions& options) {
-        options.host = "127.0.0.1";
-        options.port = 3143;
-        options.threadCount = std::thread::hardware_concurrency();
-    });
 
     builder.addController<HomeController, mach::Logger>();
 

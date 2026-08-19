@@ -27,3 +27,48 @@ add_mach_example(
     mach_body_binding
     body_binding/main.cpp
 )
+
+add_mach_example(
+    mach_dependency_injection
+    dependency_injection/main.cpp
+)
+
+add_mach_example(
+    mach_validation
+    validation/main.cpp
+)
+
+add_mach_example(
+    mach_cookies
+    cookies/main.cpp
+)
+
+add_mach_example(
+    mach_cors
+    cors/main.cpp
+)
+
+add_mach_example(
+    mach_csrf
+    csrf/main.cpp
+)
+
+add_mach_example(
+    mach_error_handling
+    error_handling/main.cpp
+)
+
+add_mach_example(
+    mach_exceptions
+    exceptions/main.cpp
+)
+
+add_mach_example(
+    mach_query_parameters
+    query_parameters/main.cpp
+)
+
+add_mach_example(
+    mach_routing
+    routing/main.cpp
+)
