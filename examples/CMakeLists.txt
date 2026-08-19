@@ -32,3 +32,8 @@ add_mach_example(
     mach_dependency_injection
     dependency_injection/main.cpp
 )
+
+add_mach_example(
+    mach_validation
+    validation/main.cpp
+)
