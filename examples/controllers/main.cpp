@@ -4,6 +4,7 @@
 #include <mach/controllers.hpp>
 
 class HomeController : public mach::ControllerBase {
+
 public:
     HomeController(mach::Logger& logger) : m_logger(logger) {}
 

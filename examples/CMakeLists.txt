@@ -37,3 +37,8 @@ add_mach_example(
     mach_validation
     validation/main.cpp
 )
+
+add_mach_example(
+    mach_cookies
+    cookies/main.cpp
+)

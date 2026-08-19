@@ -4,6 +4,7 @@
 #include <mach/controllers.hpp>
 
 class GreetingService {
+
 public:
     std::string greet(std::string_view name) const {
         return "Hello, " + std::string(name) + "!";
@@ -11,6 +12,7 @@ public:
 };
 
 class GreetingController : public mach::ControllerBase {
+
 public:
     inline static constexpr std::string_view route = "/greetings";
 
