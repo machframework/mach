@@ -2,6 +2,7 @@
 #include <mach/middleware/Next.hpp>
 
 class LoggingMiddleware {
+
 public:
     explicit LoggingMiddleware(mach::Logger& logger) : m_logger(logger) {}
 

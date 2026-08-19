@@ -27,3 +27,8 @@ add_mach_example(
     mach_body_binding
     body_binding/main.cpp
 )
+
+add_mach_example(
+    mach_dependency_injection
+    dependency_injection/main.cpp
+)
