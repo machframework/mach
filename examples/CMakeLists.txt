@@ -52,3 +52,8 @@ add_mach_example(
     mach_csrf
     csrf/main.cpp
 )
+
+add_mach_example(
+    mach_error_handling
+    error_handling/main.cpp
+)
