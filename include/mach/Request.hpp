@@ -81,8 +81,6 @@ namespace mach
          *
          * @return request body.
          *
-         * @throws std::bad_alloc If memory allocation fails while returning the string.
-         *
          * @thread_safety This function is thread-safe.
          */
         const std::string& body() const noexcept;
@@ -93,10 +91,12 @@ namespace mach
          * @param name Header name (case-insensitive).
          *
          * @return Whether the header is found.
+         * 
+         * @throws std::bad_alloc If memory allocation fails.
          *
          * @thread_safety This function is thread-safe.
          */
-        bool containsHeader(std::string_view name) const noexcept;
+        bool containsHeader(std::string_view name) const;
 
         /**
          * Returns the value of an HTTP header if it exists.
@@ -105,7 +105,7 @@ namespace mach
          *
          * @return A view into the stored header value, or std::nullopt if not found.
          *
-         * @throws std::bad_alloc If memory allocation fails while returning the string.
+         * @throws std::bad_alloc If memory allocation fails.
          *
          * @thread_safety This function is thread-safe.
          */
@@ -118,7 +118,7 @@ namespace mach
          *
          * @return A view into the stored parameter value.
          *
-         * @throws std::bad_alloc If memory allocation fails while returning the string.
+         * @throws std::bad_alloc If memory allocation fails.
          * @throws std::out_of_range If the parameter does not exist.
          *
          * @thread_safety This function is thread-safe.
@@ -134,9 +134,9 @@ namespace mach
          *
          * @return The route parameter value converted to T.
          *
-         * @throws std::invalid_argument If the route parameter value cannot be converted to T.
-         * @throws std::out_of_range If the route parameter does not exist.
          * @throws std::bad_alloc If memory allocation fails during conversion.
+         * @throws std::out_of_range If the route parameter does not exist.
+         * @throws std::invalid_argument If the route parameter value cannot be converted to T.
          *
          * @thread_safety This function is thread-safe.
          */
@@ -149,10 +149,12 @@ namespace mach
          * @param name Cookie name (case-sensitive).
          *
          * @return Whether the cookie is found.
+         * 
+         * @throws std::bad_alloc If memory allocation fails.
          *
          * @thread_safety This function is thread-safe.
          */
-        bool containsCookie(std::string_view name) const noexcept;
+        bool containsCookie(std::string_view name) const;
 
         /**
          * Returns the value of an HTTP cookie if it exists.
@@ -161,7 +163,7 @@ namespace mach
          *
          * @return A view into the stored cookie value, or std::nullopt if not found.
          *
-         * @throws std::bad_alloc If memory allocation fails while returning the string.
+         * @throws std::bad_alloc If memory allocation fails.
          *
          * @thread_safety This function is thread-safe.
          */
@@ -173,6 +175,8 @@ namespace mach
          * @param name Query parameter name (case-sensitive).
          *
          * @return Whether the query parameter is found.
+         * 
+         * @throws std::bad_alloc If memory allocation fails during lookup.
          *
          * @thread_safety This function is thread-safe.
          */
