@@ -52,11 +52,7 @@ namespace mach
         validation::FieldValidationBuilder<T, Field> field(Field T::* field);
 
     private:
-        void validate(const T& instance, detail::validation::ValidationResult& result) const {
-            for (const auto& validator : m_validators) {
-                validator(instance, result);
-            }
-        }
+        void validate(const T& instance, detail::validation::ValidationResult& result) const;
 
         std::vector<std::function<void(const T&, detail::validation::ValidationResult&)>>
             m_validators;
@@ -75,5 +71,14 @@ namespace mach
     template <typename Field>
     validation::FieldValidationBuilder<T, Field> ValidationBuilder<T>::field(Field T::* field) {
         return validation::FieldValidationBuilder<T, Field>(*this, field);
+    }
+
+    template <typename T>
+    void ValidationBuilder<T>::validate(
+        const T& instance,
+        detail::validation::ValidationResult& result) const {
+        for (const auto& validator : m_validators) {
+            validator(instance, result);
+        }
     }
 }

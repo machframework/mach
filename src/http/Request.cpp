@@ -44,7 +44,7 @@ namespace mach
         return std::nullopt;
     }
 
-    bool Request::containsHeader(std::string_view name) const noexcept {
+    bool Request::containsHeader(std::string_view name) const {
         return this->header(name).has_value();
     }
 
@@ -56,7 +56,7 @@ namespace mach
         throw std::out_of_range(std::format("Route parameter '{}' does not exist", name));
     }
 
-    bool Request::containsCookie(std::string_view name) const noexcept {
+    bool Request::containsCookie(std::string_view name) const {
         return this->cookie(name).has_value();
     }
 
