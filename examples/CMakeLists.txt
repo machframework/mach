@@ -62,3 +62,8 @@ add_mach_example(
     mach_exceptions
     exceptions/main.cpp
 )
+
+add_mach_example(
+    mach_query_parameters
+    query_parameters/main.cpp
+)
