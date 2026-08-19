@@ -67,3 +67,8 @@ add_mach_example(
     mach_query_parameters
     query_parameters/main.cpp
 )
+
+add_mach_example(
+    mach_routing
+    routing/main.cpp
+)
