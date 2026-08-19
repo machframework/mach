@@ -42,3 +42,8 @@ add_mach_example(
     mach_cookies
     cookies/main.cpp
 )
+
+add_mach_example(
+    mach_cors
+    cors/main.cpp
+)
