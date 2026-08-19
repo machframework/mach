@@ -47,3 +47,8 @@ add_mach_example(
     mach_cors
     cors/main.cpp
 )
+
+add_mach_example(
+    mach_csrf
+    csrf/main.cpp
+)
