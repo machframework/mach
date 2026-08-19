@@ -5,7 +5,7 @@ int main() {
     auto app = builder.build();
 
     app.mapGet("/", [] {
-        return mach::ok("Hello, world!");
+        return mach::ok("Hello from Mach!");
     });
 
     return app.run();
