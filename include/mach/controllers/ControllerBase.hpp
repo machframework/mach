@@ -84,7 +84,9 @@ namespace mach
          * Creates a 200 OK response containing the specified value.
          *
          * @tparam T The type of the response body.
+         * 
          * @param value The response body.
+         * 
          * @return A 200 OK reply containing the specified value.
          */
         template <typename T>
@@ -94,6 +96,7 @@ namespace mach
          * Creates a 200 OK response containing the specified string.
          *
          * @param value The response body.
+         * 
          * @return A 200 OK reply containing the specified string.
          */
         mach::Reply<std::string> ok(const char* value);
@@ -109,7 +112,9 @@ namespace mach
          * Creates a 201 Created response containing the specified value.
          *
          * @tparam T The type of the response body.
+         * 
          * @param value The response body.
+         * 
          * @return A 201 Created reply containing the specified value.
          */
         template <typename T>
@@ -139,49 +144,139 @@ namespace mach
         mach::Reply<> noContent();
 
         /**
+         * Creates a 400 Bad Request response containing the specified value.
+         *
+         * @tparam T The type of the response body.
+         * 
+         * @param value The response body.
+         * @return A 400 Bad Request reply containing the specified value.
+         */
+        template <typename T>
+        mach::Reply<T> badRequest(T value);
+
+        /**
+         * Creates a 400 Bad Request response containing the specified string.
+         *
+         * @param value The response body.
+         *
+         * @return A 400 Bad Request reply containing the specified string.
+         */
+        mach::Reply<std::string> badRequest(const char* value);
+
+        /**
          * Creates a 400 Bad Request response.
          *
-         * @tparam T The type of the response body. Defaults to void.
-         * @return A 400 Bad Request reply.
+         * @return A 400 Bad Request reply with no value.
          */
-        template <typename T = void>
-        mach::Reply<T> badRequest();
+        mach::Reply<> badRequest();
+        
+        /**
+         * Creates a 401 Unauthorized response containing the specified value.
+         *
+         * @tparam T The type of the response body.
+         *
+         * @param value The response body.
+         * @return A 401 Unauthorized reply containing the specified value.
+         */
+        template <typename T>
+        mach::Reply<T> unauthorized(T value);
+
+        /**
+         * Creates a 401 Unauthorized response containing the specified string.
+         *
+         * @param value The response body.
+         *
+         * @return A 401 Unauthorized reply containing the specified string.
+         */
+        mach::Reply<std::string> unauthorized(const char* value);
 
         /**
          * Creates a 401 Unauthorized response.
          *
-         * @tparam T The type of the response body. Defaults to void.
-         * @return A 401 Unauthorized reply.
+         * @return A 401 Unauthorized reply with no value.
          */
-        template <typename T = void>
-        mach::Reply<T> unauthorized();
+        mach::Reply<> unauthorized();
+
+        /**
+         * Creates a 403 Forbidden response containing the specified value.
+         *
+         * @tparam T The type of the response body.
+         *
+         * @param value The response body.
+         * @return A 403 Forbidden reply containing the specified value.
+         */
+        template <typename T>
+        mach::Reply<T> forbidden(T value);
+
+        /**
+         * Creates a 403 Forbidden response containing the specified string.
+         *
+         * @param value The response body.
+         *
+         * @return A 403 Forbidden reply containing the specified string.
+         */
+        mach::Reply<std::string> forbidden(const char* value);
 
         /**
          * Creates a 403 Forbidden response.
          *
-         * @tparam T The type of the response body. Defaults to void.
-         * @return A 403 Forbidden reply.
+         * @return A 403 Forbidden reply with no value.
          */
-        template <typename T = void>
-        mach::Reply<T> forbidden();
+        mach::Reply<> forbidden();
+
+        /**
+         * Creates a 404 Not Found response containing the specified value.
+         *
+         * @tparam T The type of the response body.
+         *
+         * @param value The response body.
+         * @return A 404 Not Found reply containing the specified value.
+         */
+        template <typename T>
+        mach::Reply<T> notFound(T value);
+
+        /**
+         * Creates a 404 Not Found response containing the specified string.
+         *
+         * @param value The response body.
+         *
+         * @return A 404 Not Found reply containing the specified string.
+         */
+        mach::Reply<std::string> notFound(const char* value);
 
         /**
          * Creates a 404 Not Found response.
          *
-         * @tparam T The type of the response body. Defaults to void.
-         * @return A 404 Not Found reply.
+         * @return A 404 Not Found reply with no value.
          */
-        template <typename T = void>
-        mach::Reply<T> notFound();
+        mach::Reply<> notFound();
+
+        /**
+         * Creates a 409 Conflict response containing the specified value.
+         *
+         * @tparam T The type of the response body.
+         *
+         * @param value The response body.
+         * @return A 409 Conflict reply containing the specified value.
+         */
+        template <typename T>
+        mach::Reply<T> conflict(T value);
+
+        /**
+         * Creates a 409 Conflict response containing the specified string.
+         *
+         * @param value The response body.
+         *
+         * @return A 409 Conflict reply containing the specified string.
+         */
+        mach::Reply<std::string> conflict(const char* value);
 
         /**
          * Creates a 409 Conflict response.
          *
-         * @tparam T The type of the response body. Defaults to void.
-         * @return A 409 Conflict reply.
+         * @return A 409 Conflict reply with no value.
          */
-        template <typename T = void>
-        mach::Reply<T> conflict();
+        mach::Reply<void> conflict();
 
     private:
         template <typename TController, typename TResult, typename... TArgs>
@@ -203,27 +298,27 @@ namespace mach
     }
 
     template <typename T>
-    mach::Reply<T> ControllerBase::badRequest() {
-        return mach::badRequest<T>();
+    mach::Reply<T> ControllerBase::badRequest(T value) {
+        return mach::badRequest<T>(value);
     }
 
     template <typename T>
-    mach::Reply<T> ControllerBase::unauthorized() {
-        return mach::unauthorized<T>();
+    mach::Reply<T> ControllerBase::unauthorized(T value) {
+        return mach::unauthorized<T>(value);
     }
 
     template <typename T>
-    mach::Reply<T> ControllerBase::forbidden() {
-        return mach::forbidden<T>();
+    mach::Reply<T> ControllerBase::forbidden(T value) {
+        return mach::forbidden<T>(value);
     }
 
     template <typename T>
-    mach::Reply<T> ControllerBase::notFound() {
-        return mach::notFound<T>();
+    mach::Reply<T> ControllerBase::notFound(T value) {
+        return mach::notFound<T>(value);
     }
 
     template <typename T>
-    mach::Reply<T> ControllerBase::conflict() {
-        return mach::conflict<T>();
+    mach::Reply<T> ControllerBase::conflict(T value) {
+        return mach::conflict<T>(value);
     }
 }

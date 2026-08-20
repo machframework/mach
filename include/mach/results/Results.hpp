@@ -75,10 +75,34 @@ namespace mach
     Reply<> noContent();
 
     /**
-     * Creates a 400 Bad Request response.
+     * Creates a 400 Bad Request response containing the specified value.
+     *
+     * @tparam T The type of the response body.
+     *
+     * @param value The response body.
+     *
+     * @return A 400 Bad Request reply containing the specified value.
+     */
+    template <typename T>
+    Reply<T> badRequest(T value) {
+        return Reply<T>(http::StatusCode::BadRequest, std::move(value));
+    }
+
+    /**
+     * Creates a 400 Bad Request response containing the specified string.
+     *
+     * @param value The response body.
+     *
+     * @return A 400 Bad Request reply containing the specified string.
+     */
+    Reply<std::string> badRequest(const char* value);
+
+    /**
+     * Creates a 400 Bad Request response with no value.
      *
      * @tparam T The type of the response body. Defaults to void.
-     * @return A 400 Bad Request reply.
+     *
+     * @return A 400 Bad Request reply with no value.
      */
     template <typename T = void>
     Reply<T> badRequest() {
@@ -86,10 +110,34 @@ namespace mach
     }
 
     /**
-     * Creates a 401 Unauthorized response.
+     * Creates a 401 Unauthorized response containing the specified value.
+     *
+     * @tparam T The type of the response body.
+     *
+     * @param value The response body.
+     *
+     * @return A 401 Unauthorized reply containing the specified value.
+     */
+    template <typename T>
+    Reply<T> unauthorized(T value) {
+        return Reply<T>(http::StatusCode::Unauthorized, std::move(value));
+    }
+
+    /**
+     * Creates a 401 Unauthorized response containing the specified string.
+     *
+     * @param value The response body.
+     *
+     * @return A 401 Unauthorized reply containing the specified string.
+     */
+    Reply<std::string> unauthorized(const char* value);
+
+    /**
+     * Creates a 401 Unauthorized response with no value.
      *
      * @tparam T The type of the response body. Defaults to void.
-     * @return A 401 Unauthorized reply.
+     *
+     * @return A 401 Unauthorized reply with no value.
      */
     template <typename T = void>
     Reply<T> unauthorized() {
@@ -97,10 +145,34 @@ namespace mach
     }
 
     /**
-     * Creates a 403 Forbidden response.
+     * Creates a 403 Forbidden response containing the specified value.
+     *
+     * @tparam T The type of the response body.
+     *
+     * @param value The response body.
+     *
+     * @return A 403 Forbidden reply containing the specified value.
+     */
+    template <typename T>
+    Reply<T> forbidden(T value) {
+        return Reply<T>(http::StatusCode::Forbidden, std::move(value));
+    }
+
+    /**
+     * Creates a 403 Forbidden response containing the specified string.
+     *
+     * @param value The response body.
+     *
+     * @return A 403 Forbidden reply containing the specified string.
+     */
+    Reply<std::string> forbidden(const char* value);
+
+    /**
+     * Creates a 403 Forbidden response with no value.
      *
      * @tparam T The type of the response body. Defaults to void.
-     * @return A 403 Forbidden reply.
+     *
+     * @return A 403 Forbidden reply with no value.
      */
     template <typename T = void>
     Reply<T> forbidden() {
@@ -108,10 +180,34 @@ namespace mach
     }
 
     /**
-     * Creates a 404 Not Found response.
+     * Creates a 404 Not Found response containing the specified value.
+     *
+     * @tparam T The type of the response body.
+     *
+     * @param value The response body.
+     *
+     * @return A 404 Not Found reply containing the specified value.
+     */
+    template <typename T>
+    Reply<T> notFound(T value) {
+        return Reply<T>(http::StatusCode::NotFound, std::move(value));
+    }
+
+    /**
+     * Creates a 404 Not Found response containing the specified string.
+     *
+     * @param value The response body.
+     *
+     * @return A 404 Not Found reply containing the specified string.
+     */
+    Reply<std::string> notFound(const char* value);
+
+    /**
+     * Creates a 404 Not Found response with no value.
      *
      * @tparam T The type of the response body. Defaults to void.
-     * @return A 404 Not Found reply.
+     *
+     * @return A 404 Not Found reply with no value.
      */
     template <typename T = void>
     Reply<T> notFound() {
@@ -119,10 +215,34 @@ namespace mach
     }
 
     /**
-     * Creates a 409 Conflict response.
+     * Creates a 409 Conflict response containing the specified value.
+     *
+     * @tparam T The type of the response body.
+     *
+     * @param value The response body.
+     *
+     * @return A 409 Conflict reply containing the specified value.
+     */
+    template <typename T>
+    Reply<T> conflict(T value) {
+        return Reply<T>(http::StatusCode::Conflict, std::move(value));
+    }
+
+    /**
+     * Creates a 409 Conflict response containing the specified string.
+     *
+     * @param value The response body.
+     *
+     * @return A 409 Conflict reply containing the specified string.
+     */
+    Reply<std::string> conflict(const char* value);
+
+    /**
+     * Creates a 409 Conflict response with no value.
      *
      * @tparam T The type of the response body. Defaults to void.
-     * @return A 409 Conflict reply.
+     *
+     * @return A 409 Conflict reply with no value.
      */
     template <typename T = void>
     Reply<T> conflict() {
