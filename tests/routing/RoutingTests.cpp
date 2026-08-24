@@ -1,437 +1,595 @@
+#include <catch2/catch_test_macros.hpp>
+
 #include <mach/AppBuilder.hpp>
 #include <mach/Context.hpp>
 
-#include "support/Testing.hpp"
+#include "support/BeastHttpClient.hpp"
 
-#include <exception>
-#include <iostream>
+#include <chrono>
 #include <stdexcept>
-#include <string_view>
+#include <string>
+#include <thread>
 
-int main() {
+namespace
+{
+
+    class RoutingServer {
+    public:
+        RoutingServer() : app_(mach::AppBuilder().build()) {
+            registerRoutes();
+
+            thread_ = std::thread([this] {
+                app_.run();
+            });
+
+            waitUntilReady();
+        }
+
+        ~RoutingServer() {
+            app_.stop();
+
+            if (thread_.joinable()) {
+                thread_.join();
+            }
+        }
+
+        RoutingServer(const RoutingServer&) = delete;
+        RoutingServer& operator=(const RoutingServer&) = delete;
+
+    private:
+        void registerRoutes() {
+            app_.mapGet("/", [](mach::Context& context) {
+                context.response.body("root");
+            });
+
+            app_.mapGet("/static", [](mach::Context& context) {
+                context.response.body("static");
+            });
+
+            app_.mapGet("/users/{id}", [](mach::Context& context) {
+                context.response.body(std::string(context.request.routeParam("id")));
+            });
+
+            app_.mapGet("/users/{userId}/posts/{postId}", [](mach::Context& context) {
+                context.response.body(
+                    std::string(context.request.routeParam("userId")) + ":" +
+                    std::string(context.request.routeParam("postId")));
+            });
+
+            app_.mapGet("/precedence/{id}", [](mach::Context& context) {
+                context.response.body("parameter");
+            });
+
+            app_.mapGet("/precedence/me", [](mach::Context& context) {
+                context.response.body("static");
+            });
+
+            app_.mapGet("/orders/{id:int}", [](mach::Context& context) {
+                context.response.body(std::string(context.request.routeParam("id")));
+            });
+
+            app_.mapGet("/get-only", [](mach::Context& context) {
+                context.response.body("GET");
+            });
+
+            app_.mapPost("/post-only", [](mach::Context& context) {
+                context.response.body("POST");
+            });
+
+            app_.mapGet("/me/profile", [](mach::Context& context) {
+                context.response.body("static");
+            });
+
+            app_.mapGet("/{username}/posts", [](mach::Context& context) {
+                context.response.body(std::string(context.request.routeParam("username")));
+            });
+
+            app_.mapGet("/me/profile/details", [](mach::Context& context) {
+                context.response.body("static");
+            });
+
+            app_.mapGet("/{username}/posts/archive/details", [](mach::Context& context) {
+                context.response.body("archive");
+            });
+
+            app_.mapGet("/{username}/posts/{postId}/comments", [](mach::Context& context) {
+                context.response.body(
+                    std::string(context.request.routeParam("username")) + ":" +
+                    std::string(context.request.routeParam("postId")));
+            });
+        }
+
+        void waitUntilReady() {
+            constexpr int attempts = 100;
+
+            testing::http::BeastHttpClient client;
+
+            for (int i = 0; i < attempts; ++i) {
+                try {
+                    (void)client.get("/");
+                    return;
+                } catch (...) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                }
+            }
+
+            throw std::runtime_error("Mach test server failed to start");
+        }
+
+        mach::App app_;
+        std::thread thread_;
+    };
+
+    RoutingServer& routingServer() {
+        static RoutingServer server;
+        return server;
+    }
+
+    void ensureServerRunning() {
+        (void)routingServer();
+    }
+
+    testing::http::BeastHttpClient& httpClient() {
+        static testing::http::BeastHttpClient client;
+        return client;
+    }
+
+} // namespace
+
+// -----------------------------------------------------------------------------
+// Registration
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Valid route patterns can be registered") {
     auto app = mach::AppBuilder().build();
 
-    auto pass = [](std::string_view testName) {
-        std::cout << testing::GREEN << "[SUCCESS] " << testName << testing::RESET << std::endl;
-    };
-
-    auto expectValid = [&](std::string_view testName, auto&& action) {
-        try {
-            action();
-            pass(testName);
-        } catch (const std::exception& ex) {
-            testing::fail(testName, ex.what());
-        } catch (...) {
-            testing::fail(testName, "Unknown exception thrown");
-        }
-    };
-
-    auto expectInvalidArgument = [&](std::string_view testName, auto&& action) {
-        try {
-            action();
-            testing::fail(testName, "Expected std::invalid_argument but nothing was thrown");
-        } catch (const std::invalid_argument&) {
-            pass(testName);
-        } catch (const std::exception& ex) {
-            testing::fail(
-                testName,
-                std::string("Expected std::invalid_argument but got: ") + ex.what());
-        } catch (...) {
-            testing::fail(testName, "Expected std::invalid_argument but got unknown exception");
-        }
-    };
-
-    auto expectLogicError = [&](std::string_view testName, auto&& action) {
-        try {
-            action();
-            testing::fail(testName, "Expected std::logic_error but nothing was thrown");
-        } catch (const std::logic_error&) {
-            pass(testName);
-        } catch (const std::exception& ex) {
-            testing::fail(testName, std::string("Expected std::logic_error but got: ") + ex.what());
-        } catch (...) {
-            testing::fail(testName, "Expected std::logic_error but got unknown exception");
-        }
-    };
-
-    // -------------------------
-    // Register root route
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Register root route";
-
-        expectValid(testName, [&] {
-            app.mapGet("/", [](mach::Context&) {
-            });
-        });
+    SECTION("Root route") {
+        REQUIRE_NOTHROW(app.mapGet("/", [](mach::Context&) {
+        }));
     }
 
-    // -------------------------
-    // Register simple static route
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Register simple static route";
-
-        expectValid(testName, [&] {
-            app.mapGet("/routing/static", [](mach::Context&) {
-            });
-        });
+    SECTION("Static route") {
+        REQUIRE_NOTHROW(app.mapGet("/users", [](mach::Context&) {
+        }));
     }
 
-    // -------------------------
-    // Register deep static route
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Register deep static route";
-
-        expectValid(testName, [&] {
-            app.mapGet("/routing/static/deep/path", [](mach::Context&) {
-            });
-        });
+    SECTION("Parameter route") {
+        REQUIRE_NOTHROW(app.mapGet("/users/{id}", [](mach::Context&) {
+        }));
     }
 
-    // -------------------------
-    // Register simple parameter route
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Register simple parameter route";
-
-        expectValid(testName, [&] {
-            app.mapGet("/routing/users/{id}", [](mach::Context&) {
-            });
-        });
+    SECTION("Explicit string constraint") {
+        REQUIRE_NOTHROW(app.mapGet("/users/{name:string}", [](mach::Context&) {
+        }));
     }
 
-    // -------------------------
-    // Register multiple parameter route
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Register multiple parameter route";
-
-        expectValid(testName, [&] {
-            app.mapGet("/routing/users/{userId}/posts/{postId}", [](mach::Context&) {
-            });
-        });
+    SECTION("Integer constraint") {
+        REQUIRE_NOTHROW(app.mapGet("/users/{id:int}", [](mach::Context&) {
+        }));
     }
 
-    // -------------------------
-    // Register constrained int parameter route
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Register constrained int parameter route";
+    SECTION("Trailing slash") {
+        REQUIRE_NOTHROW(app.mapGet("/users/", [](mach::Context&) {
+        }));
+    }
+}
 
-        expectValid(testName, [&] {
-            app.mapGet("/routing/orders/{orderId:int}", [](mach::Context&) {
-            });
+TEST_CASE("Compatible routes can coexist") {
+    auto app = mach::AppBuilder().build();
+
+    SECTION("Same path with different methods") {
+        app.mapGet("/users", [](mach::Context&) {
         });
+
+        REQUIRE_NOTHROW(app.mapPost("/users", [](mach::Context&) {
+        }));
     }
 
-    // -------------------------
-    // Register static route beside parameter route
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Register static route beside parameter route";
-
-        expectValid(testName, [&] {
-            app.mapGet("/routing/users/me", [](mach::Context&) {
-            });
+    SECTION("Static and parameter routes") {
+        app.mapGet("/users/{id}", [](mach::Context&) {
         });
+
+        REQUIRE_NOTHROW(app.mapGet("/users/me", [](mach::Context&) {
+        }));
     }
 
-    // -------------------------
-    // Register same path with different methods
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Register same path with different methods";
-
-        expectValid(testName, [&] {
-            app.mapPost("/routing/multi-method", [](mach::Context&) {
-            });
-            app.mapGet("/routing/multi-method", [](mach::Context&) {
-            });
+    SECTION("Parent and child parameter routes") {
+        app.mapGet("/users/{id}/profile", [](mach::Context&) {
         });
+
+        REQUIRE_NOTHROW(app.mapGet("/users/{id}", [](mach::Context&) {
+        }));
     }
 
-    // -------------------------
-    // Reject duplicate exact GET route
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject duplicate exact GET route";
-
-        expectLogicError(testName, [&] {
-            app.mapGet("/routing/duplicates/exact", [](mach::Context&) {
-            });
-            app.mapGet("/routing/duplicates/exact", [](mach::Context&) {
-            });
+    SECTION("Different parameter constraints") {
+        app.mapGet("/users/{value}", [](mach::Context&) {
         });
+
+        REQUIRE_NOTHROW(app.mapGet("/users/{value:int}", [](mach::Context&) {
+        }));
+    }
+}
+
+TEST_CASE("Conflicting route registrations are rejected") {
+    auto app = mach::AppBuilder().build();
+
+    SECTION("Exact duplicate") {
+        app.mapGet("/users", [](mach::Context&) {
+        });
+
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users",
+                [](mach::Context&) {
+                }),
+            std::logic_error);
     }
 
-    // -------------------------
-    // Reject duplicate parameter shape with different names
-    // -------------------------
-    {
-        constexpr std::string_view testName =
-            "Reject duplicate parameter shape with different names";
-
-        expectLogicError(testName, [&] {
-            app.mapGet("/routing/duplicates/{id}", [](mach::Context&) {
-            });
-            app.mapGet("/routing/duplicates/{name}", [](mach::Context&) {
-            });
+    SECTION("Equivalent parameter shape") {
+        app.mapGet("/users/{id}", [](mach::Context&) {
         });
+
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users/{name}",
+                [](mach::Context&) {
+                }),
+            std::logic_error);
+    }
+}
+
+TEST_CASE("Malformed route syntax is rejected") {
+    auto app = mach::AppBuilder().build();
+
+    SECTION("Empty route") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Reject route that does not start with slash
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject route that does not start with slash";
-
-        expectInvalidArgument(testName, [&] {
-            app.mapGet("routing/no-leading-slash", [](mach::Context&) {
-            });
-        });
+    SECTION("Missing leading slash") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "users",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Reject empty route pattern
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject empty route pattern";
-
-        expectInvalidArgument(testName, [&] {
-            app.mapGet("", [](mach::Context&) {
-            });
-        });
+    SECTION("Query marker") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users?active=true",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Reject route containing query marker
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject route containing query marker";
-
-        expectInvalidArgument(testName, [&] {
-            app.mapGet("/routing/query?x=1", [](mach::Context&) {
-            });
-        });
+    SECTION("Fragment marker") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users#active",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Reject route containing fragment marker
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject route containing fragment marker";
-
-        expectInvalidArgument(testName, [&] {
-            app.mapGet("/routing/fragment#section", [](mach::Context&) {
-            });
-        });
+    SECTION("Repeated slash") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users//profile",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Reject unclosed parameter brace
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject unclosed parameter brace";
-
-        expectInvalidArgument(testName, [&] {
-            app.mapGet("/routing/users/{id", [](mach::Context&) {
-            });
-        });
+    SECTION("Empty parameter") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users/{}",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Reject unopened parameter brace
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject unopened parameter brace";
-
-        expectInvalidArgument(testName, [&] {
-            app.mapGet("/routing/users/id}", [](mach::Context&) {
-            });
-        });
+    SECTION("Unclosed parameter") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users/{id",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Reject empty parameter name
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject empty parameter name";
-
-        expectInvalidArgument(testName, [&] {
-            app.mapGet("/routing/users/{}", [](mach::Context&) {
-            });
-        });
+    SECTION("Unopened parameter") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users/id}",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Reject empty constrained parameter name
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject empty constrained parameter name";
-
-        expectInvalidArgument(testName, [&] {
-            app.mapGet("/routing/users/{:int}", [](mach::Context&) {
-            });
-        });
+    SECTION("Extra closing brace") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users/{id}}",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Reject empty constraint name
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject empty constraint name";
-
-        expectInvalidArgument(testName, [&] {
-            app.mapGet("/routing/users/{id:}", [](mach::Context&) {
-            });
-        });
+    SECTION("Nested parameter") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users/{{id}}",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Reject unknown constraint name
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject unknown constraint name";
-
-        expectInvalidArgument(testName, [&] {
-            app.mapGet("/routing/users/{id:banana}", [](mach::Context&) {
-            });
-        });
+    SECTION("Mixed nested braces") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users/{id:{int}}",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Reject duplicate parameter names
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject duplicate parameter names";
-
-        expectInvalidArgument(testName, [&] {
-            app.mapGet("/routing/users/{id}/orders/{id}", [](mach::Context&) {
-            });
-        });
+    SECTION("Adjacent empty parameter") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users/{id}{}",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Reject nested parameter braces
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject nested parameter braces";
-
-        expectInvalidArgument(testName, [&] {
-            app.mapGet("/routing/users/{{id}}", [](mach::Context&) {
-            });
-        });
+    SECTION("Static prefix") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users/user-{id}",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Reject multiple opening braces in one segment
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject multiple opening braces in one segment";
-
-        expectInvalidArgument(testName, [&] {
-            app.mapGet("/routing/users/{id{name}", [](mach::Context&) {
-            });
-        });
+    SECTION("Static suffix") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users/{id}.json",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Reject multiple closing braces in one segment
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject multiple closing braces in one segment";
-
-        expectInvalidArgument(testName, [&] {
-            app.mapGet("/routing/users/{id}}", [](mach::Context&) {
-            });
-        });
+    SECTION("Text after parameter") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users/{id}name",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Reject parameter mixed with static prefix
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject parameter mixed with static prefix";
-
-        expectInvalidArgument(testName, [&] {
-            app.mapGet("/routing/users/user-{id}", [](mach::Context&) {
-            });
-        });
+    SECTION("Whitespace in parameter name") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users/{user id}",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Reject parameter mixed with static suffix
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject parameter mixed with static suffix";
-
-        expectInvalidArgument(testName, [&] {
-            app.mapGet("/routing/users/{id}.json", [](mach::Context&) {
-            });
-        });
+    SECTION("Duplicate parameter names") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users/{id}/posts/{id}",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Reject parameter with too many colons
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject parameter with too many colons";
+    SECTION("Duplicate parameter names regardless of constraint") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users/{id:int}/posts/{id}",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
+    }
+}
 
-        expectInvalidArgument(testName, [&] {
-            app.mapGet("/routing/users/{id:int:extra}", [](mach::Context&) {
-            });
-        });
+TEST_CASE("Invalid route constraints are rejected") {
+    auto app = mach::AppBuilder().build();
+
+    SECTION("Empty parameter name") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users/{:int}",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Reject parameter with whitespace in name
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject parameter with whitespace in name";
-
-        expectInvalidArgument(testName, [&] {
-            app.mapGet("/routing/users/{user id}", [](mach::Context&) {
-            });
-        });
+    SECTION("Empty constraint") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users/{id:}",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Reject parameter with whitespace in constraint
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject parameter with whitespace in constraint";
-
-        expectInvalidArgument(testName, [&] {
-            app.mapGet("/routing/users/{id: int}", [](mach::Context&) {
-            });
-        });
+    SECTION("Unknown constraint") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users/{id:banana}",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Accept trailing slash
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Accept trailing slash";
-
-        expectValid(testName, [&] {
-            app.mapGet("/routing/trailing-slash/", [](mach::Context&) {
-            });
-        });
+    SECTION("Too many colons") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users/{id:int:extra}",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    // -------------------------
-    // Reject repeated slash
-    // -------------------------
-    {
-        constexpr std::string_view testName = "Reject repeated slash";
-
-        expectInvalidArgument(testName, [&] {
-            app.mapGet("/routing//double-slash", [](mach::Context&) {
-            });
-        });
+    SECTION("Whitespace in constraint") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users/{id: int}",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
     }
 
-    return 0;
+    SECTION("Constraint contains invalid character") {
+        REQUIRE_THROWS_AS(
+            app.mapGet(
+                "/users/{name:i#nt}",
+                [](mach::Context&) {
+                }),
+            std::invalid_argument);
+    }
+}
+
+// -----------------------------------------------------------------------------
+// Runtime matching
+// -----------------------------------------------------------------------------
+
+TEST_CASE("Root and static routes are matched") {
+    ensureServerRunning();
+
+    SECTION("Root route") {
+        const auto response = httpClient().get("/");
+
+        REQUIRE(response.statusCode() == 200);
+        REQUIRE(response.body() == "root");
+    }
+
+    SECTION("Static route") {
+        const auto response = httpClient().get("/static");
+
+        REQUIRE(response.statusCode() == 200);
+        REQUIRE(response.body() == "static");
+    }
+}
+
+TEST_CASE("Route parameters are extracted") {
+    ensureServerRunning();
+
+    SECTION("Single parameter") {
+        const auto response = httpClient().get("/users/123");
+
+        REQUIRE(response.statusCode() == 200);
+        REQUIRE(response.body() == "123");
+    }
+
+    SECTION("Multiple parameters") {
+        const auto response = httpClient().get("/users/asaf/posts/42");
+
+        REQUIRE(response.statusCode() == 200);
+        REQUIRE(response.body() == "asaf:42");
+    }
+}
+
+TEST_CASE("Static routes take precedence over parameter routes") {
+    ensureServerRunning();
+
+    const auto response = httpClient().get("/precedence/me");
+
+    REQUIRE(response.statusCode() == 200);
+    REQUIRE(response.body() == "static");
+}
+
+TEST_CASE("Integer constraints match valid integers") {
+    ensureServerRunning();
+
+    SECTION("Positive integer") {
+        const auto response = httpClient().get("/orders/123");
+
+        REQUIRE(response.statusCode() == 200);
+        REQUIRE(response.body() == "123");
+    }
+
+    SECTION("Negative integer") {
+        const auto response = httpClient().get("/orders/-123");
+
+        REQUIRE(response.statusCode() == 200);
+        REQUIRE(response.body() == "-123");
+    }
+}
+
+TEST_CASE("Integer constraints reject invalid values") {
+    ensureServerRunning();
+
+    SECTION("Non-numeric value") {
+        const auto response = httpClient().get("/orders/abc");
+
+        REQUIRE(response.statusCode() == 404);
+    }
+
+    SECTION("Partially numeric value") {
+        const auto response = httpClient().get("/orders/12abc");
+
+        REQUIRE(response.statusCode() == 404);
+    }
+
+    SECTION("Explicit positive sign") {
+        const auto response = httpClient().get("/orders/+123");
+
+        REQUIRE(response.statusCode() == 404);
+    }
+}
+
+TEST_CASE("Unknown routes return Not Found") {
+    ensureServerRunning();
+
+    const auto response = httpClient().get("/does-not-exist");
+
+    REQUIRE(response.statusCode() == 404);
+}
+
+TEST_CASE("Unsupported methods return Method Not Allowed") {
+    ensureServerRunning();
+
+    const auto response = httpClient().post("/get-only");
+
+    REQUIRE(response.statusCode() == 405);
+}
+
+TEST_CASE("Routes are matched by HTTP method") {
+    ensureServerRunning();
+
+    const auto response = httpClient().post("/post-only");
+
+    REQUIRE(response.statusCode() == 200);
+    REQUIRE(response.body() == "POST");
+}
+
+TEST_CASE("Routing falls back from a failed static branch") {
+    ensureServerRunning();
+
+    const auto response = httpClient().get("/me/posts");
+
+    REQUIRE(response.statusCode() == 200);
+    REQUIRE(response.body() == "me");
+}
+
+TEST_CASE("Routing can backtrack across multiple branches") {
+    ensureServerRunning();
+
+    const auto response = httpClient().get("/me/posts/archive/comments");
+
+    REQUIRE(response.statusCode() == 200);
+    REQUIRE(response.body() == "me:archive");
 }

@@ -17,6 +17,8 @@ target_link_libraries(
         mach
 )
 
+include(Catch)
+
 function(add_mach_test test_name)
     add_executable(
         "${test_name}"
@@ -44,39 +46,19 @@ function(add_mach_test test_name)
 endfunction()
 
 add_mach_test(
-    RouteTrieTests
-    routing/RouteTrieTests.cpp
-)
-
-add_mach_test(
-    RouteParametersTests
-    routing/RouteParametersTests.cpp
-)
-
-add_mach_test(
-    ConstrainedRoutesTests
-    routing/ConstrainedRoutesTests.cpp
-)
-
-add_mach_test(
-    RouteSyntaxTests
-    routing/RouteSyntaxTests.cpp
-)
-
-add_mach_test(
     RoutingTests
     routing/RoutingTests.cpp
 )
 
-add_mach_test(
-    RoutingRuntimeTests
-    routing/RoutingRuntimeTests.cpp
+target_link_libraries(
+    RoutingTests
+    PRIVATE
+        mach
+        mach_test_support
+        Catch2::Catch2WithMain
 )
 
-add_mach_test(
-    RouteRegistrationAmbiguityTests
-    routing/RouteRegistrationAmbiguityTests.cpp
-)
+catch_discover_tests(RoutingTests)
 
 add_mach_test(
     BasicDITests
