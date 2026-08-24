@@ -1,13 +1,37 @@
+add_library(mach_test_support STATIC
+    support/BeastHttpClient.cpp
+)
+
+target_include_directories(
+    mach_test_support
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/support
+
+    PRIVATE
+        ${MACH_BOOST_INCLUDE_DIR}
+)
+
+target_link_libraries(
+    mach_test_support
+    PRIVATE
+        mach
+)
+
 function(add_mach_test test_name)
-    add_executable("${test_name}"
+    add_executable(
+        "${test_name}"
         ${ARGN}
     )
 
-    target_link_libraries("${test_name}"
-        PRIVATE mach
+    target_link_libraries(
+        "${test_name}"
+        PRIVATE
+            mach
+            mach_test_support
     )
 
-    target_include_directories("${test_name}"
+    target_include_directories(
+        "${test_name}"
         PRIVATE
             ${CMAKE_SOURCE_DIR}/src
             ${CMAKE_CURRENT_SOURCE_DIR}
@@ -50,6 +74,11 @@ add_mach_test(
 )
 
 add_mach_test(
+    RouteRegistrationAmbiguityTests
+    routing/RouteRegistrationAmbiguityTests.cpp
+)
+
+add_mach_test(
     BasicDITests
     di/BasicDITests.cpp
 )
@@ -77,11 +106,6 @@ add_mach_test(
 add_mach_test(
     BasicMiddlewareTests
     middleware/BasicMiddlewareTests.cpp
-)
-
-add_mach_test(
-    RouteRegistrationAmbiguityTests
-    routing/RouteRegistrationAmbiguityTests.cpp
 )
 
 add_mach_test(
