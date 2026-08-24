@@ -184,7 +184,7 @@ void printTestingInstructions() {
 }
 
 int main() {
-    mach::AppBuilder builder(std::move(testing::serverOptions));
+    mach::AppBuilder builder;
 
     auto app = builder.build();
 

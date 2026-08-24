@@ -8,7 +8,7 @@ static void doNothing(mach::Context& context) {
 }
 
 int main() {
-    mach::AppBuilder builder(std::move(testing::serverOptions));
+    mach::AppBuilder builder;
     auto app = builder.build();
 
     int count = 0;

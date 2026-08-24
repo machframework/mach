@@ -164,11 +164,16 @@ namespace mach
         mach::Reply<std::string> badRequest(const char* value);
 
         /**
-         * Creates a 400 Bad Request response.
+         * Creates a 400 Bad Request response with no value.
+         *
+         * @tparam T The type of the response body. Defaults to void.
          *
          * @return A 400 Bad Request reply with no value.
          */
-        mach::Reply<> badRequest();
+        template <typename T = void>
+        Reply<T> badRequest() {
+            return Reply<T>(http::StatusCode::BadRequest);
+        }
         
         /**
          * Creates a 401 Unauthorized response containing the specified value.
@@ -191,11 +196,16 @@ namespace mach
         mach::Reply<std::string> unauthorized(const char* value);
 
         /**
-         * Creates a 401 Unauthorized response.
+         * Creates a 401 Unauthorized response with no value.
+         *
+         * @tparam T The type of the response body. Defaults to void.
          *
          * @return A 401 Unauthorized reply with no value.
          */
-        mach::Reply<> unauthorized();
+        template <typename T = void>
+        Reply<T> unauthorized() {
+            return Reply<T>(http::StatusCode::Unauthorized);
+        }
 
         /**
          * Creates a 403 Forbidden response containing the specified value.
@@ -218,11 +228,16 @@ namespace mach
         mach::Reply<std::string> forbidden(const char* value);
 
         /**
-         * Creates a 403 Forbidden response.
+         * Creates a 403 Forbidden response with no value.
+         *
+         * @tparam T The type of the response body. Defaults to void.
          *
          * @return A 403 Forbidden reply with no value.
          */
-        mach::Reply<> forbidden();
+        template <typename T = void>
+        Reply<T> forbidden() {
+            return Reply<T>(http::StatusCode::Forbidden);
+        }
 
         /**
          * Creates a 404 Not Found response containing the specified value.
@@ -245,11 +260,16 @@ namespace mach
         mach::Reply<std::string> notFound(const char* value);
 
         /**
-         * Creates a 404 Not Found response.
+         * Creates a 404 Not Found response with no value.
+         *
+         * @tparam T The type of the response body. Defaults to void.
          *
          * @return A 404 Not Found reply with no value.
          */
-        mach::Reply<> notFound();
+        template <typename T = void>
+        Reply<T> notFound() {
+            return Reply<T>(http::StatusCode::NotFound);
+        }
 
         /**
          * Creates a 409 Conflict response containing the specified value.
@@ -272,11 +292,16 @@ namespace mach
         mach::Reply<std::string> conflict(const char* value);
 
         /**
-         * Creates a 409 Conflict response.
+         * Creates a 409 Conflict response with no value.
+         *
+         * @tparam T The type of the response body. Defaults to void.
          *
          * @return A 409 Conflict reply with no value.
          */
-        mach::Reply<void> conflict();
+        template <typename T = void>
+        Reply<T> conflict() {
+            return Reply<T>(http::StatusCode::Conflict);
+        }
 
     private:
         template <typename TController, typename TResult, typename... TArgs>

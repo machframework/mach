@@ -118,7 +118,7 @@ public:
 #endif
 
 int main() {
-    auto builder = mach::AppBuilder(std::move(testing::serverOptions));
+    auto builder = mach::AppBuilder();
 
 #if MACH_MIDDLEWARE_COMPILE_FAILURE_TEST == 0
 

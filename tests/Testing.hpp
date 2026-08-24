@@ -1,20 +1,12 @@
 #pragma once
 
 #include <iostream>
-#include <thread>
-
-#include <mach/AppOptions.hpp>
 
 namespace testing
 {
     inline constexpr const char* GREEN = "\033[32m";
     inline constexpr const char* RED = "\033[31m";
     inline constexpr const char* RESET = "\033[0m";
-
-    inline unsigned int THREADS = std::thread::hardware_concurrency();
-
-    inline auto serverOptions =
-        mach::ServerOptions{.host = "127.0.0.1", .port = 3143, .threadCount = THREADS};
 
     inline void fail(std::string_view testName, std::string_view message) {
         std::cerr << testing::RED << "[FAIL] " << testName << ": " << message << testing::RESET

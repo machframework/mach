@@ -7,7 +7,7 @@
 #include "Testing.hpp"
 
 int main() {
-    auto app = mach::AppBuilder(std::move(testing::serverOptions)).build();
+    auto app = mach::AppBuilder().build();
 
     // -------------------------
     // Missing leading '/'

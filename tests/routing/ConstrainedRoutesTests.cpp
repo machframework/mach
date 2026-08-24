@@ -29,7 +29,7 @@ bool requireEqual(
 }
 
 int main() {
-    auto app = mach::AppBuilder(std::move(testing::serverOptions)).build();
+    auto app = mach::AppBuilder().build();
 
     auto expectInvalidArgument = [](std::string_view testName, auto&& action) {
         try {

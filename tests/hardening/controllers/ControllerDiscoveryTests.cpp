@@ -109,7 +109,7 @@ namespace
         resetControllers();
 
         try {
-            mach::AppBuilder builder(testing::serverOptions);
+            mach::AppBuilder builder;
 
             builder.addController<FirstController>();
 
@@ -132,7 +132,7 @@ namespace
         resetControllers();
 
         try {
-            mach::AppBuilder builder(testing::serverOptions);
+            mach::AppBuilder builder;
 
             builder.addController<FirstController>();
 
@@ -158,7 +158,7 @@ namespace
         resetControllers();
 
         try {
-            mach::AppBuilder builder(testing::serverOptions);
+            mach::AppBuilder builder;
 
             builder.addController<FirstController>();
             builder.addController<SecondController>();
@@ -194,7 +194,7 @@ namespace
         resetControllers();
 
         try {
-            mach::AppBuilder builder(testing::serverOptions);
+            mach::AppBuilder builder;
 
             builder.addController<FirstController>();
             builder.addController<SecondController>();
@@ -221,7 +221,7 @@ namespace
         resetControllers();
 
         try {
-            mach::AppBuilder builder(testing::serverOptions);
+            mach::AppBuilder builder;
 
             builder.addController<SecondController>();
 

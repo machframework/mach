@@ -105,7 +105,7 @@ curl.exe --% -i -X POST -H "Content-Type: application/json" --data-binary "{\"na
 }
 
 int main() {
-    mach::AppBuilder builder(std::move(testing::serverOptions));
+    mach::AppBuilder builder;
 
     builder.addController<ContentTypeController>();
 

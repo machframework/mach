@@ -34,7 +34,7 @@ public:
 int main() {
     mach::installTerminateHandler();
 
-    auto builder = mach::AppBuilder(std::move(testing::serverOptions));
+    auto builder = mach::AppBuilder();
     builder.addController<GeneralController>();
 
     auto app = builder.build();

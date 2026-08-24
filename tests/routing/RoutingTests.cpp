@@ -9,7 +9,7 @@
 #include <string_view>
 
 int main() {
-    auto app = mach::AppBuilder(std::move(testing::serverOptions)).build();
+    auto app = mach::AppBuilder().build();
 
     auto pass = [](std::string_view testName) {
         std::cout << testing::GREEN << "[SUCCESS] " << testName << testing::RESET << std::endl;

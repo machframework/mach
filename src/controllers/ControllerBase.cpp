@@ -42,42 +42,21 @@ namespace mach
         return mach::badRequest(value);
     }
 
-    mach::Reply<> ControllerBase::badRequest() {
-        return mach::badRequest();
-    }
-
     mach::Reply<std::string> ControllerBase::unauthorized(const char* value) {
         return mach::unauthorized(value);
-    }
-
-    mach::Reply<> ControllerBase::unauthorized() {
-        return mach::unauthorized();
     }
 
     mach::Reply<std::string> ControllerBase::forbidden(const char* value) {
         return mach::forbidden(value);
     }
 
-    mach::Reply<> ControllerBase::forbidden() {
-        return mach::forbidden();
-    }
-
     mach::Reply<std::string> ControllerBase::notFound(const char* value) {
         return mach::notFound(value);
-    }
-
-    mach::Reply<> ControllerBase::notFound() {
-        return mach::notFound();
     }
 
     mach::Reply<std::string> ControllerBase::conflict(const char* value) {
         return mach::conflict(value);
     }
-
-    mach::Reply<void> ControllerBase::conflict() {
-        return mach::conflict();
-    }
-
 
     void ControllerBase::setContext(mach::Context& context) noexcept {
         m_context = &context;

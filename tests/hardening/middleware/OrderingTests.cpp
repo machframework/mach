@@ -36,7 +36,7 @@ public:
 };
 
 int main() {
-    auto builder = mach::AppBuilder(std::move(testing::serverOptions));
+    auto builder = mach::AppBuilder();
 
     builder.use<A>().use<B>().use<C>();
 

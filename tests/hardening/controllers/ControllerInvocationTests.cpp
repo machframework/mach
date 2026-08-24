@@ -87,7 +87,7 @@ namespace
 }
 
 int main() {
-    auto app = mach::AppBuilder(testing::serverOptions)
+    auto app = mach::AppBuilder()
                    .addScoped<InvocationService>()
                    .addController<InvocationController, InvocationService>()
                    .build();

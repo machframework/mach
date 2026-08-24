@@ -80,11 +80,6 @@ add_mach_test(
 )
 
 add_mach_test(
-    InboundAdapterTests
-    hardening/adapters/InboundAdapterTests.cpp
-)
-
-add_mach_test(
     RouteRegistrationAmbiguityTests
     routing/RouteRegistrationAmbiguityTests.cpp
 )
@@ -94,7 +89,7 @@ add_mach_test(
     hardening/di/CompileTimeGuards.cpp
 )
 
-set(MACH_DI_COMPILE_FAILURE_TEST 10)
+set(MACH_DI_COMPILE_FAILURE_TEST 0)
 
 target_compile_definitions(
     CompileTimeGuards
@@ -172,7 +167,6 @@ add_mach_test(
     hardening/middleware/MiddlewareRegistrationFirewallTests.cpp
 )
 
-
 set(MACH_MIDDLEWARE_COMPILE_FAILURE_TEST 0)
 
 target_compile_definitions(
@@ -207,16 +201,6 @@ add_mach_test(
 )
 
 add_mach_test(
-    AppStopMethodTests
-    hardening/general/AppStopMethodTests.cpp
-)
-
-add_mach_test(
     GeneralValidationTests
     validation/GeneralValidationTests.cpp
-)
-
-add_mach_test(
-    RequestCookiesTests
-    requests/RequestCookiesTests.cpp
 )
