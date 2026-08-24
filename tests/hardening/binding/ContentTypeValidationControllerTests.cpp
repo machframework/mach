@@ -10,7 +10,7 @@
 #include <mach/controllers/ControllerBase.hpp>
 #include <mach/controllers/ControllerBuilder.hpp>
 
-#include "Testing.hpp"
+#include "support/Testing.hpp"
 
 struct CreateControllerUserRequest {
     std::string name;

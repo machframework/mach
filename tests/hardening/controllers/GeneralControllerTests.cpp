@@ -6,7 +6,7 @@
 #include <mach/controllers/ControllerBuilder.hpp>
 #include <mach/diagnostics/TerminateHandler.hpp>
 
-#include "Testing.hpp"
+#include "support/Testing.hpp"
 
 class GeneralController : public mach::ControllerBase {
 

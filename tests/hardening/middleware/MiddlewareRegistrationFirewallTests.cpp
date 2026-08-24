@@ -6,7 +6,7 @@
 #include <mach/controllers/ControllerBase.hpp>
 #include <mach/middleware/Next.hpp>
 
-#include "Testing.hpp"
+#include "support/Testing.hpp"
 
 // ============================================================
 // Valid middleware types

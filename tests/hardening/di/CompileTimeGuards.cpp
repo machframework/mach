@@ -5,7 +5,7 @@
 #include <mach/detail/di/Container.hpp>
 #include <mach/detail/di/ServiceLifetime.hpp>
 
-#include "Testing.hpp"
+#include "support/Testing.hpp"
 
 #ifndef MACH_DI_COMPILE_FAILURE_TEST
 #define MACH_DI_COMPILE_FAILURE_TEST 0

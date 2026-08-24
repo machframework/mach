@@ -7,7 +7,7 @@
 #include <mach/controllers/ControllerBuilder.hpp>
 #include <mach/diagnostics/TerminateHandler.hpp>
 
-#include "Testing.hpp"
+#include "support/Testing.hpp"
 
 struct Person {
     std::string name;

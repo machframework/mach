@@ -5,7 +5,7 @@
 #include <mach/detail/di/Scope.hpp>
 #include <mach/detail/di/ServiceLifetime.hpp>
 
-#include "Testing.hpp"
+#include "support/Testing.hpp"
 
 namespace di = mach::detail::di;
 
