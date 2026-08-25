@@ -103,41 +103,25 @@ target_compile_definitions(
         MACH_DI_COMPILE_FAILURE_TEST=${MACH_DI_COMPILE_FAILURE_TEST}
 )
 
-
 add_mach_test(
-    BasicControllerTests
-    controllers/BasicControllerTests.cpp
+    ControllerTests
+    controllers/ControllerTests.cpp
 )
+
+target_link_libraries(
+    ControllerTests
+    PRIVATE
+        mach
+        mach_test_support
+        Catch2::Catch2WithMain
+)
+
+catch_discover_tests(ControllerTests)
+
 
 add_mach_test(
     BasicMiddlewareTests
     middleware/BasicMiddlewareTests.cpp
-)
-
-
-add_mach_test(
-    GeneralControllerTests
-    hardening/controllers/GeneralControllerTests.cpp
-)
-
-add_mach_test(
-    ControllerResolutionTests
-    hardening/controllers/ControllerResolutionTests.cpp
-)
-
-add_mach_test(
-    ActionParameterTests
-    hardening/controllers/ActionParameterTests.cpp
-)
-
-add_mach_test(
-    ControllerDiscoveryTests
-    hardening/controllers/ControllerDiscoveryTests.cpp
-)
-
-add_mach_test(
-    ControllerInvocationTests
-    hardening/controllers/ControllerInvocationTests.cpp
 )
 
 add_mach_test(
