@@ -166,8 +166,17 @@ target_link_libraries(
 
 catch_discover_tests(BindingTests)
 
-
 add_mach_test(
-    GeneralValidationTests
-    validation/GeneralValidationTests.cpp
+    ValidationTests
+    validation/ValidationTests.cpp
 )
+
+target_link_libraries(
+    ValidationTests
+    PRIVATE
+        mach
+        mach_test_support
+        Catch2::Catch2WithMain
+)
+
+catch_discover_tests(ValidationTests)
