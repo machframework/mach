@@ -76,26 +76,6 @@ target_link_libraries(
 catch_discover_tests(DITests)
 
 add_mach_test(
-    BasicDITests
-    di/BasicDITests.cpp
-)
-
-add_mach_test(
-    DILifetimeTests
-    di/DILifetimeTests.cpp
-)
-
-add_mach_test(
-    ContainerTests
-    di/ContainerTests.cpp
-)
-
-add_mach_test(
-    CompileDITests
-    di/CompileDITests.cpp
-)
-
-add_mach_test(
     BasicControllerTests
     controllers/BasicControllerTests.cpp
 )
