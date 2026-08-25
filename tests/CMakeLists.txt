@@ -146,11 +146,11 @@ target_compile_definitions(
         MACH_MIDDLEWARE_COMPILE_FAILURE_TEST=${MACH_MIDDLEWARE_COMPILE_FAILURE_TEST}
 )
 
-
 add_mach_test(
-    CompileTimeRegistrationTests
-    hardening/minimal-api/CompileTimeRegistrationTests.cpp
+    MinimalApiCompileTimeTests
+    minimal-api/MinimalApiCompileTimeTests.cpp
 )
+
 
 add_mach_test(
     ObjectBindingTests
