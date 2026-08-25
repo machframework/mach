@@ -4,12 +4,15 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 
 namespace testing::http
 {
     class BeastHttpClient {
 
     public:
+        using Headers = std::unordered_map<std::string, std::string>;
+
         class Response {
 
         public:
@@ -35,12 +38,32 @@ namespace testing::http
         BeastHttpClient(const BeastHttpClient&) = delete;
         BeastHttpClient& operator=(const BeastHttpClient&) = delete;
 
-        [[nodiscard]] Response get(std::string_view target);
-        [[nodiscard]] Response post(std::string_view target, std::string_view body = "");
-        [[nodiscard]] Response put(std::string_view target, std::string_view body = "");
-        [[nodiscard]] Response patch(std::string_view target, std::string_view body = "");
-        [[nodiscard]] Response del(std::string_view target);
-        [[nodiscard]] Response head(std::string_view target);
+        [[nodiscard]]
+        Response get(std::string_view target, const Headers& headers = {});
+
+        [[nodiscard]]
+        Response post(
+            std::string_view target,
+            std::string_view body = "",
+            const Headers& headers = {});
+
+        [[nodiscard]]
+        Response put(
+            std::string_view target,
+            std::string_view body = "",
+            const Headers& headers = {});
+
+        [[nodiscard]]
+        Response patch(
+            std::string_view target,
+            std::string_view body = "",
+            const Headers& headers = {});
+
+        [[nodiscard]]
+        Response del(std::string_view target, const Headers& headers = {});
+
+        [[nodiscard]]
+        Response head(std::string_view target, const Headers& headers = {});
 
     private:
         class Impl;

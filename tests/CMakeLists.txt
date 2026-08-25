@@ -151,26 +151,21 @@ add_mach_test(
     minimal-api/MinimalApiCompileTimeTests.cpp
 )
 
-
 add_mach_test(
-    ObjectBindingTests
-    hardening/binding/ObjectBindingTests.cpp
+    BindingTests
+    binding/BindingTests.cpp
 )
 
-add_mach_test(
-    MoveOnlyTypeBindingTests
-    hardening/binding/MoveOnlyTypeBindingTests.cpp
+target_link_libraries(
+    BindingTests
+    PRIVATE
+        mach
+        mach_test_support
+        Catch2::Catch2WithMain
 )
 
-add_mach_test(
-    ContentTypeValidationRuntimeTests
-    hardening/binding/ContentTypeValidationRuntimeTests.cpp
-)
+catch_discover_tests(BindingTests)
 
-add_mach_test(
-    ContentTypeValidationControllerTests
-    hardening/binding/ContentTypeValidationControllerTests.cpp
-)
 
 add_mach_test(
     GeneralValidationTests

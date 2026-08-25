@@ -20,157 +20,124 @@ namespace testing::http
     public:
         Impl(std::string host, std::uint16_t port);
 
-        Response get(std::string_view target);
-        Response post(std::string_view target, std::string_view body);
-        Response put(std::string_view target, std::string_view body);
-        Response patch(std::string_view target, std::string_view body);
-        Response del(std::string_view target);
-        Response head(std::string_view target);
+        Response get(std::string_view target, const Headers& headers);
+
+        Response post(std::string_view target, std::string_view body, const Headers& headers);
+
+        Response put(std::string_view target, std::string_view body, const Headers& headers);
+
+        Response patch(std::string_view target, std::string_view body, const Headers& headers);
+
+        Response del(std::string_view target, const Headers& headers);
+
+        Response head(std::string_view target, const Headers& headers);
 
     private:
-        void ensureConnected();
-        std::string m_host;
-        std::string port_;
+        Response request(
+            http::verb method,
+            std::string_view target,
+            std::string_view body,
+            const Headers& headers);
 
-        asio::io_context ioContext_;
-        tcp::resolver resolver_;
+        void ensureConnected();
+
+        std::string m_host;
+        std::string m_port;
+
+        asio::io_context m_ioContext;
+        tcp::resolver m_resolver;
         beast::tcp_stream m_stream;
     };
 
     BeastHttpClient::Impl::Impl(std::string host, std::uint16_t port)
-        : m_host(std::move(host)), port_(std::to_string(port)), resolver_(ioContext_),
-          m_stream(ioContext_) {}
+        : m_host(std::move(host)), m_port(std::to_string(port)), m_resolver(m_ioContext),
+          m_stream(m_ioContext) {}
 
-    BeastHttpClient::Response BeastHttpClient::Impl::get(std::string_view target) {
+    BeastHttpClient::Response BeastHttpClient::Impl::request(
+        http::verb method,
+        std::string_view target,
+        std::string_view body,
+        const Headers& headers) {
+
         ensureConnected();
 
-        http::request<http::empty_body> request{http::verb::get, target, 11};
+        http::request<http::string_body> request{method, target, 11};
 
         request.set(http::field::host, m_host);
         request.set(http::field::user_agent, "Mach Test Client");
 
+        for (const auto& [name, value] : headers) {
+            request.set(name, value);
+        }
+
+        request.body() = body;
+        request.prepare_payload();
+
         http::write(m_stream, request);
 
         beast::flat_buffer buffer;
+
+        if (method == http::verb::head) {
+            http::response_parser<http::string_body> parser;
+            parser.skip(true);
+
+            http::read(m_stream, buffer, parser);
+
+            auto response = parser.release();
+
+            return Response{static_cast<int>(response.result_int()), std::move(response.body())};
+        }
+
         http::response<http::string_body> response;
 
         http::read(m_stream, buffer, response);
 
         return Response{static_cast<int>(response.result_int()), std::move(response.body())};
+    }
+
+    BeastHttpClient::Response BeastHttpClient::Impl::get(
+        std::string_view target,
+        const Headers& headers) {
+
+        return request(http::verb::get, target, "", headers);
     }
 
     BeastHttpClient::Response BeastHttpClient::Impl::post(
         std::string_view target,
-        std::string_view body) {
+        std::string_view body,
+        const Headers& headers) {
 
-        ensureConnected();
-
-        http::request<http::string_body> request{http::verb::post, target, 11};
-
-        request.set(http::field::host, m_host);
-        request.set(http::field::user_agent, "Mach Test Client");
-        request.set(http::field::content_type, "application/json");
-
-        request.body() = body;
-        request.prepare_payload();
-
-        http::write(m_stream, request);
-
-        beast::flat_buffer buffer;
-        http::response<http::string_body> response;
-
-        http::read(m_stream, buffer, response);
-
-        return Response{static_cast<int>(response.result_int()), std::move(response.body())};
+        return request(http::verb::post, target, body, headers);
     }
 
     BeastHttpClient::Response BeastHttpClient::Impl::put(
         std::string_view target,
-        std::string_view body) {
+        std::string_view body,
+        const Headers& headers) {
 
-        ensureConnected();
-
-        http::request<http::string_body> request{http::verb::put, target, 11};
-
-        request.set(http::field::host, m_host);
-        request.set(http::field::user_agent, "Mach Test Client");
-        request.set(http::field::content_type, "application/json");
-
-        request.body() = body;
-        request.prepare_payload();
-
-        http::write(m_stream, request);
-
-        beast::flat_buffer buffer;
-        http::response<http::string_body> response;
-
-        http::read(m_stream, buffer, response);
-
-        return Response{static_cast<int>(response.result_int()), std::move(response.body())};
+        return request(http::verb::put, target, body, headers);
     }
 
     BeastHttpClient::Response BeastHttpClient::Impl::patch(
         std::string_view target,
-        std::string_view body) {
+        std::string_view body,
+        const Headers& headers) {
 
-        ensureConnected();
-
-        http::request<http::string_body> request{http::verb::patch, target, 11};
-
-        request.set(http::field::host, m_host);
-        request.set(http::field::user_agent, "Mach Test Client");
-        request.set(http::field::content_type, "application/json");
-
-        request.body() = body;
-        request.prepare_payload();
-
-        http::write(m_stream, request);
-
-        beast::flat_buffer buffer;
-        http::response<http::string_body> response;
-
-        http::read(m_stream, buffer, response);
-
-        return Response{static_cast<int>(response.result_int()), std::move(response.body())};
+        return request(http::verb::patch, target, body, headers);
     }
 
-    BeastHttpClient::Response BeastHttpClient::Impl::del(std::string_view target) {
-        ensureConnected();
+    BeastHttpClient::Response BeastHttpClient::Impl::del(
+        std::string_view target,
+        const Headers& headers) {
 
-        http::request<http::empty_body> request{http::verb::delete_, target, 11};
-
-        request.set(http::field::host, m_host);
-        request.set(http::field::user_agent, "Mach Test Client");
-
-        http::write(m_stream, request);
-
-        beast::flat_buffer buffer;
-        http::response<http::string_body> response;
-
-        http::read(m_stream, buffer, response);
-
-        return Response{static_cast<int>(response.result_int()), std::move(response.body())};
+        return request(http::verb::delete_, target, "", headers);
     }
 
-    BeastHttpClient::Response BeastHttpClient::Impl::head(std::string_view target) {
-        ensureConnected();
+    BeastHttpClient::Response BeastHttpClient::Impl::head(
+        std::string_view target,
+        const Headers& headers) {
 
-        http::request<http::empty_body> request{http::verb::head, target, 11};
-
-        request.set(http::field::host, m_host);
-        request.set(http::field::user_agent, "Mach Test Client");
-
-        http::write(m_stream, request);
-
-        beast::flat_buffer buffer;
-        http::response_parser<http::string_body> parser;
-        parser.skip(true);
-
-        http::read(m_stream, buffer, parser);
-
-        auto response = parser.release();
-
-        return Response{static_cast<int>(response.result_int()), std::move(response.body())};
+        return request(http::verb::head, target, "", headers);
     }
 
     void BeastHttpClient::Impl::ensureConnected() {
@@ -178,7 +145,8 @@ namespace testing::http
             return;
         }
 
-        const auto endpoints = resolver_.resolve(m_host, port_);
+        const auto endpoints = m_resolver.resolve(m_host, m_port);
+
         m_stream.connect(endpoints);
     }
 
@@ -202,34 +170,48 @@ namespace testing::http
 
     BeastHttpClient& BeastHttpClient::operator=(BeastHttpClient&&) noexcept = default;
 
-    BeastHttpClient::Response BeastHttpClient::get(std::string_view target) {
-        return m_impl->get(target);
+    BeastHttpClient::Response BeastHttpClient::get(
+        std::string_view target,
+        const Headers& headers) {
+
+        return m_impl->get(target, headers);
     }
 
     BeastHttpClient::Response BeastHttpClient::post(
         std::string_view target,
-        std::string_view body) {
+        std::string_view body,
+        const Headers& headers) {
 
-        return m_impl->post(target, body);
+        return m_impl->post(target, body, headers);
     }
 
-    BeastHttpClient::Response BeastHttpClient::put(std::string_view target, std::string_view body) {
+    BeastHttpClient::Response BeastHttpClient::put(
+        std::string_view target,
+        std::string_view body,
+        const Headers& headers) {
 
-        return m_impl->put(target, body);
+        return m_impl->put(target, body, headers);
     }
 
     BeastHttpClient::Response BeastHttpClient::patch(
         std::string_view target,
-        std::string_view body) {
+        std::string_view body,
+        const Headers& headers) {
 
-        return m_impl->patch(target, body);
+        return m_impl->patch(target, body, headers);
     }
 
-    BeastHttpClient::Response BeastHttpClient::del(std::string_view target) {
-        return m_impl->del(target);
+    BeastHttpClient::Response BeastHttpClient::del(
+        std::string_view target,
+        const Headers& headers) {
+
+        return m_impl->del(target, headers);
     }
 
-    BeastHttpClient::Response BeastHttpClient::head(std::string_view target) {
-        return m_impl->head(target);
+    BeastHttpClient::Response BeastHttpClient::head(
+        std::string_view target,
+        const Headers& headers) {
+
+        return m_impl->head(target, headers);
     }
 }
