@@ -54,13 +54,22 @@ namespace
         return parameters;
     }
 
+    std::string_view extractParameterName(std::string_view parameter) {
+        const auto colon = parameter.find(':');
+
+        return parameter.substr(
+            1,
+            (colon == std::string_view::npos ? parameter.size() - 1 : colon) - 1);
+    }
+
     bool containsDuplicateParameters(
         const std::vector<std::string_view>& parameters,
         std::string_view& duplicate) {
         std::unordered_set<std::string_view> seen;
 
         for (const auto& param : parameters) {
-            if (!seen.insert(param).second) {
+            const auto name = extractParameterName(param);
+            if (!seen.insert(name).second) {
                 duplicate = param;
                 return true;
             }

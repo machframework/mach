@@ -1,6 +1,6 @@
 {
   "name": "mach",
-  "version": "0.7.0",
+  "version": "0.9.0",
   "dependencies": [
     "boost-asio",
     "boost-beast",
@@ -8,5 +8,13 @@
     "nlohmann-json",
     "spdlog"
   ],
+  "features": {
+    "tests": {
+      "description": "Build Mach tests",
+      "dependencies": [
+        "catch2"
+      ]
+    }
+  },
   "builtin-baseline": "256acc64012b23a13041d8705805e1f23b43a024"
 }

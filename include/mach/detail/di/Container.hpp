@@ -38,11 +38,23 @@ namespace mach::detail::di
         void reserveInternal();
 
     private:
+        void validateNoCircularDependencies() const;
+
+        void validateNoCircularDependencies(
+            std::type_index type,
+            const ServiceDescriptor& descriptor,
+            std::vector<std::type_index>& stack) const;
+
         std::optional<std::type_index> findScopedDependency(
             const ServiceDescriptor& descriptor) const;
 
         std::optional<std::type_index> findInaccessibleDependency(
             const ServiceDescriptor& descriptor) const;
+
+        std::string buildCircularDependencyMessage(
+            std::vector<std::type_index>::const_iterator cycleStart,
+            std::type_index repeatedType,
+            const std::vector<std::type_index>& resolutionStack) const;
 
         std::unordered_map<std::type_index, ServiceDescriptor> m_serviceRegistry;
         std::unordered_set<std::type_index> m_reservedTypes;
