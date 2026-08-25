@@ -61,6 +61,21 @@ target_link_libraries(
 catch_discover_tests(RoutingTests)
 
 add_mach_test(
+    DITests
+    di/DITests.cpp
+)
+
+target_link_libraries(
+    DITests
+    PRIVATE
+        mach
+        mach_test_support
+        Catch2::Catch2WithMain
+)
+
+catch_discover_tests(DITests)
+
+add_mach_test(
     BasicDITests
     di/BasicDITests.cpp
 )
