@@ -25,33 +25,11 @@ namespace
             parentType.name(),
             missingType.name());
     }
-
-    std::string buildCircularDependencyMessage(
-        std::vector<std::type_index>::const_iterator cycleStart,
-        std::type_index repeatedType,
-        const std::vector<std::type_index>& resolutionStack) {
-        std::string message = "Mach DI error: circular dependency detected: ";
-
-        for (auto& it = cycleStart; it != resolutionStack.end(); ++it) {
-            message += it->name();
-            message += " -> ";
-        }
-
-        message += repeatedType.name();
-
-        return message;
-    }
 }
 
 namespace mach::detail::di
 {
     std::shared_ptr<void> Scope::resolve(std::type_index type) {
-        if (const auto cycleStart = std::ranges::find(m_resolutionStack, type);
-            cycleStart != m_resolutionStack.end()) {
-            throw std::logic_error(
-                buildCircularDependencyMessage(cycleStart, type, m_resolutionStack));
-        }
-
         ResolutionGuard guard(m_resolutionStack, type);
 
         if (m_scopedInstances.contains(type)) {

@@ -19,6 +19,8 @@ namespace mach::detail::di
     }
 
     void Container::finalizeRegistrations() {
+        validateNoCircularDependencies();
+
         for (const auto& [type, descriptor] : m_serviceRegistry) {
             if (descriptor.access == ServiceAccess::User) {
                 if (const auto internalDependency = findInaccessibleDependency(descriptor)) {
@@ -51,6 +53,37 @@ namespace mach::detail::di
         });
 
         return entry.instance;
+    }
+
+    void Container::validateNoCircularDependencies() const {
+        std::vector<std::type_index> stack;
+
+        for (const auto& [type, descriptor] : m_serviceRegistry) {
+            validateNoCircularDependencies(type, descriptor, stack);
+        }
+    }
+
+    void Container::validateNoCircularDependencies(
+        std::type_index type,
+        const ServiceDescriptor& descriptor,
+        std::vector<std::type_index>& stack) const {
+        if (const auto cycleStart = std::ranges::find(stack, type); cycleStart != stack.end()) {
+            throw std::logic_error(buildCircularDependencyMessage(cycleStart, type, stack));
+        }
+
+        stack.push_back(type);
+
+        for (const auto& dependencyType : descriptor.dependencies) {
+            const auto dependency = m_serviceRegistry.find(dependencyType);
+
+            if (dependency == m_serviceRegistry.end()) {
+                continue;
+            }
+
+            validateNoCircularDependencies(dependencyType, dependency->second, stack);
+        }
+
+        stack.pop_back();
     }
 
     std::optional<std::type_index> Container::findScopedDependency(
@@ -91,5 +124,21 @@ namespace mach::detail::di
         }
 
         return std::nullopt;
+    }
+
+    std::string Container::buildCircularDependencyMessage(
+        std::vector<std::type_index>::const_iterator cycleStart,
+        std::type_index repeatedType,
+        const std::vector<std::type_index>& resolutionStack) const {
+        std::string message = "Mach DI error: circular dependency detected: ";
+
+        for (auto& it = cycleStart; it != resolutionStack.end(); ++it) {
+            message += it->name();
+            message += " -> ";
+        }
+
+        message += repeatedType.name();
+
+        return message;
     }
 }
