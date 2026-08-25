@@ -76,6 +76,35 @@ target_link_libraries(
 catch_discover_tests(DITests)
 
 add_mach_test(
+    DIThreadSafetyTests
+    di/DIThreadSafetyTests.cpp
+)
+
+target_link_libraries(
+    DIThreadSafetyTests
+    PRIVATE
+        mach
+        mach_test_support
+        Catch2::Catch2WithMain
+)
+
+catch_discover_tests(DIThreadSafetyTests)
+
+add_mach_test(
+    DICompileTimeTests
+    di/DICompileTimeTests.cpp
+)
+
+set(MACH_DI_COMPILE_FAILURE_TEST 0)
+
+target_compile_definitions(
+    DICompileTimeTests
+    PRIVATE
+        MACH_DI_COMPILE_FAILURE_TEST=${MACH_DI_COMPILE_FAILURE_TEST}
+)
+
+
+add_mach_test(
     BasicControllerTests
     controllers/BasicControllerTests.cpp
 )
@@ -85,53 +114,6 @@ add_mach_test(
     middleware/BasicMiddlewareTests.cpp
 )
 
-add_mach_test(
-    CompileTimeGuards
-    hardening/di/CompileTimeGuards.cpp
-)
-
-set(MACH_DI_COMPILE_FAILURE_TEST 0)
-
-target_compile_definitions(
-    CompileTimeGuards
-    PRIVATE
-        MACH_DI_COMPILE_FAILURE_TEST=${MACH_DI_COMPILE_FAILURE_TEST}
-)
-
-add_mach_test(
-    AdvancedLifetimeTests
-    hardening/di/AdvancedLifetimeTests.cpp
-)
-
-add_mach_test(
-    DIInvalidLifetimeTests
-    hardening/di/DIInvalidLifetimeTests.cpp
-)
-
-add_mach_test(
-    DIThreadSafetyTests
-    hardening/di/DIThreadSafetyTests.cpp
-)
-
-add_mach_test(
-    ConstructionExceptionSafety
-    hardening/di/ConstructionExceptionSafety.cpp
-)
-
-add_mach_test(
-    ResourceCleanupTests
-    hardening/di/ResourceCleanupTests.cpp
-)
-
-add_mach_test(
-    ImmovableServiceTests
-    hardening/di/ImmovableServiceTests.cpp
-)
-
-add_mach_test(
-    DIReservedServiceTests
-    hardening/di/DIReservedServiceTests.cpp
-)
 
 add_mach_test(
     GeneralControllerTests
