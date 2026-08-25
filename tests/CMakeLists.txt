@@ -118,29 +118,34 @@ target_link_libraries(
 
 catch_discover_tests(ControllerTests)
 
-
 add_mach_test(
-    BasicMiddlewareTests
-    middleware/BasicMiddlewareTests.cpp
+    MiddlewareTests
+    middleware/MiddlewareTests.cpp
 )
 
-add_mach_test(
-    OrderingTests
-    hardening/middleware/OrderingTests.cpp
+target_link_libraries(
+    MiddlewareTests
+    PRIVATE
+        mach
+        mach_test_support
+        Catch2::Catch2WithMain
 )
 
+catch_discover_tests(MiddlewareTests)
+
 add_mach_test(
-    MiddlewareRegistrationFirewallTests
-    hardening/middleware/MiddlewareRegistrationFirewallTests.cpp
+    MiddlewareCompileTimeTests
+    middleware/MiddlewareCompileTimeTests.cpp
 )
 
 set(MACH_MIDDLEWARE_COMPILE_FAILURE_TEST 0)
 
 target_compile_definitions(
-    MiddlewareRegistrationFirewallTests
+    MiddlewareCompileTimeTests
     PRIVATE
         MACH_MIDDLEWARE_COMPILE_FAILURE_TEST=${MACH_MIDDLEWARE_COMPILE_FAILURE_TEST}
 )
+
 
 add_mach_test(
     CompileTimeRegistrationTests
