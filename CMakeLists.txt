@@ -141,6 +141,8 @@ if(MACH_CAN_INSTALL)
         "${CMAKE_INSTALL_LIBDIR}/cmake/Mach"
     )
 
+    set(MACH_VCPKG_TRIPLET "${VCPKG_TARGET_TRIPLET}")
+
     install(
         TARGETS mach
         EXPORT MachTargets
