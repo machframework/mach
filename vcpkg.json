@@ -15,6 +15,5 @@
         "catch2"
       ]
     }
-  },
-  "builtin-baseline": "256acc64012b23a13041d8705805e1f23b43a024"
+  }
 }
