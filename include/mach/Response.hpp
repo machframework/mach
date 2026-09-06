@@ -60,7 +60,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        http::Version version() const noexcept;
+        [[nodiscard]] http::Version version() const noexcept;
 
         /**
          * Returns the status code of the HTTP response (e.g. 200 OK, 404 Not Found).
@@ -69,7 +69,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        http::StatusCode status() const noexcept;
+        [[nodiscard]] http::StatusCode status() const noexcept;
 
         /**
          * Returns the body of the HTTP response.
@@ -80,7 +80,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        const std::string& body() const noexcept;
+        [[nodiscard]] const std::string& body() const noexcept;
 
         /**
          * Returns the value of an HTTP header if it exists.
@@ -93,7 +93,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        std::optional<std::string_view> header(std::string_view name) const;
+        [[nodiscard]] std::optional<std::string_view> header(std::string_view name) const;
 
         /**
          * Returns whether a given HTTP header exists in the request.
@@ -104,7 +104,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        bool containsHeader(std::string_view name) const noexcept;
+        [[nodiscard]] bool containsHeader(std::string_view name) const noexcept;
 
         /**
          * Sets the HTTP status code of the response.
@@ -150,7 +150,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        bool containsCookie(std::string_view name) const noexcept;
+        [[nodiscard]] bool containsCookie(std::string_view name) const noexcept;
 
         /**
          * Returns a cookie if it exists.
@@ -163,7 +163,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        std::optional<mach::http::Cookie> cookie(std::string_view name) const;
+        [[nodiscard]] std::optional<mach::http::Cookie> cookie(std::string_view name) const;
 
         /**
          * Adds a cookie to the response.

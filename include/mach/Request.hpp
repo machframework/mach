@@ -55,7 +55,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        http::Method method() const noexcept;
+        [[nodiscard]] http::Method method() const noexcept;
 
         /**
          * Returns the HTTP version used in the request (e.g. 1.0, 1.1, 2.0, 3.0).
@@ -65,7 +65,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        http::Version version() const noexcept;
+        [[nodiscard]] http::Version version() const noexcept;
 
         /**
          * Returns the targed (URL) of the request (e.g. /users).
@@ -74,7 +74,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        std::string_view target() const noexcept;
+        [[nodiscard]] std::string_view target() const noexcept;
 
         /**
          * Returns the body of the HTTP request.
@@ -83,7 +83,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        const std::string& body() const noexcept;
+        [[nodiscard]] const std::string& body() const noexcept;
 
         /**
          * Returns whether a given HTTP header exists in the request.
@@ -96,7 +96,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        bool containsHeader(std::string_view name) const;
+        [[nodiscard]] bool containsHeader(std::string_view name) const;
 
         /**
          * Returns the value of an HTTP header if it exists.
@@ -109,7 +109,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        std::optional<std::string_view> header(std::string_view name) const;
+        [[nodiscard]] std::optional<std::string_view> header(std::string_view name) const;
 
         /**
          * Returns the value of a route parameter.
@@ -123,7 +123,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        std::string_view routeParam(std::string_view name) const;
+        [[nodiscard]] std::string_view routeParam(std::string_view name) const;
 
         /**
          * Returns the value of a route parameter converted to the specified type.
@@ -141,7 +141,7 @@ namespace mach
          * @thread_safety This function is thread-safe.
          */
         template <typename T>
-        T routeParam(std::string_view name) const;
+        [[nodiscard]] T routeParam(std::string_view name) const;
 
         /**
          * Returns whether a given cookie exists in the request.
@@ -154,7 +154,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        bool containsCookie(std::string_view name) const;
+        [[nodiscard]] bool containsCookie(std::string_view name) const;
 
         /**
          * Returns the value of an HTTP cookie if it exists.
@@ -167,7 +167,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        std::optional<std::string_view> cookie(std::string_view name) const;
+        [[nodiscard]] std::optional<std::string_view> cookie(std::string_view name) const;
 
         /**
          * Returns whether a given query parameter exists in the request.
@@ -180,7 +180,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        bool containsQuery(std::string_view name) const;
+        [[nodiscard]] bool containsQuery(std::string_view name) const;
 
         /**
          * Returns the value of a query parameter.
@@ -194,7 +194,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        std::optional<std::string_view> query(std::string_view name) const;
+        [[nodiscard]] std::optional<std::string_view> query(std::string_view name) const;
 
         /**
          * Returns the value of a query parameter converted to the specified type.
@@ -211,7 +211,7 @@ namespace mach
          * @thread_safety This function is thread-safe.
          */
         template <typename T>
-        std::optional<T> query(std::string_view name) const;
+        [[nodiscard]] std::optional<T> query(std::string_view name) const;
 
     private:
         Request(

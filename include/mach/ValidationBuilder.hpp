@@ -49,7 +49,7 @@ namespace mach
          * returned builder.
          */
         template <typename Field>
-        validation::FieldValidationBuilder<T, Field> field(Field T::* field);
+        [[nodiscard]] validation::FieldValidationBuilder<T, Field> field(Field T::* field);
 
     private:
         void validate(const T& instance, detail::validation::ValidationResult& result) const;
