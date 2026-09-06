@@ -7,6 +7,10 @@ project(
     LANGUAGES CXX
 )
 
+if(MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
@@ -140,6 +144,8 @@ if(MACH_CAN_INSTALL)
         MACH_CMAKE_INSTALL_DIR
         "${CMAKE_INSTALL_LIBDIR}/cmake/Mach"
     )
+
+    set(MACH_VCPKG_TRIPLET "${VCPKG_TARGET_TRIPLET}")
 
     install(
         TARGETS mach
