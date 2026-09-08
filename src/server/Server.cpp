@@ -63,8 +63,11 @@ namespace mach::detail::server
         std::vector<std::thread> threads;
         threads.reserve(m_appOptions.threadCount - 1);
 
-        m_logger
-            .info("Starting Mach server on http://{}:{} with {} threads", host(), port(), threadCount());
+        m_logger.info(
+            "Starting Mach server at http://{}:{} with {} threads",
+            host(),
+            port(),
+            threadCount());
 
         std::mutex exceptionMutex;
         std::exception_ptr iocException = nullptr;
