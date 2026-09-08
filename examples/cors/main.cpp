@@ -3,7 +3,7 @@
 #include <mach/mach.hpp>
 
 int main() {
-    auto builder = mach::AppBuilder();
+    mach::AppBuilder builder;
 
     builder.addCors([](mach::CorsBuilder& cors) {
         cors.allowOrigin("https://example.com")

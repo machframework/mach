@@ -1,7 +1,7 @@
 #include <mach/mach.hpp>
 
 int main() {
-    auto builder = mach::AppBuilder();
+    mach::AppBuilder builder;
 
     builder.addCsrf([](mach::CsrfBuilder& csrf) {
         csrf.cookieName("__Host-csrf-token").headerName("X-CSRF-Token");

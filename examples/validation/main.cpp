@@ -19,7 +19,7 @@ struct RegisterRequest {
 MACH_DEFINE_JSON(RegisterRequest, username, email, age)
 
 int main() {
-    auto builder = mach::AppBuilder();
+    mach::AppBuilder builder;
     auto app = builder.build();
 
     app.mapPost("/register", [](RegisterRequest request) {

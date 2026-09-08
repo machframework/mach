@@ -30,7 +30,7 @@ struct LargeRequest {
 MACH_DEFINE_JSON(LargeRequest, batchName, items)
 
 int main() {
-    auto builder = mach::AppBuilder();
+    mach::AppBuilder builder;
 
     builder.configureApp([](mach::AppOptions& options) {
         options.host = "127.0.0.1";

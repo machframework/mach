@@ -32,7 +32,7 @@ private:
 };
 
 int main() {
-    auto builder = mach::AppBuilder();
+    mach::AppBuilder builder;
 
     builder.addSingleton<GreetingService>();
     builder.addController<GreetingController, GreetingService>();

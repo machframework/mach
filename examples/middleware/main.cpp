@@ -20,7 +20,7 @@ private:
 };
 
 int main() {
-    auto builder = mach::AppBuilder();
+    mach::AppBuilder builder;
 
     builder.use<LoggingMiddleware, mach::Logger>();
 

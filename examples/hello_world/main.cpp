@@ -1,7 +1,7 @@
 #include <mach/mach.hpp>
 
 int main() {
-    auto builder = mach::AppBuilder();
+    mach::AppBuilder builder;
     auto app = builder.build();
 
     app.mapGet("/", [] {

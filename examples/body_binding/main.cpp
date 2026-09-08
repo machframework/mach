@@ -19,7 +19,7 @@ struct UserProfile {
 MACH_DEFINE_JSON(UserProfile, name, age, adult)
 
 int main() {
-    auto builder = mach::AppBuilder();
+    mach::AppBuilder builder;
     auto app = builder.build();
 
     app.mapPost("/users", [](CreateUserRequest request) {

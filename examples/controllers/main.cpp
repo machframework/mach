@@ -30,7 +30,7 @@ private:
 };
 
 int main() {
-    auto builder = mach::AppBuilder();
+    mach::AppBuilder builder;
 
     builder.addController<HomeController, mach::Logger>();
 

@@ -87,13 +87,13 @@ namespace
 
     void instantiateValidRegistrations() {
         {
-            auto builder = mach::AppBuilder();
+            mach::AppBuilder builder;
 
             builder.use<ValidMiddleware>();
         }
 
         {
-            auto builder = mach::AppBuilder();
+            mach::AppBuilder builder;
 
             builder.addScoped<Dependency>();
             builder.use<MiddlewareWithDependency, Dependency>();
@@ -101,7 +101,7 @@ namespace
     }
 
     void instantiateExpectedCompileFailure() {
-        auto builder = mach::AppBuilder();
+        mach::AppBuilder builder;
 
 #if MACH_MIDDLEWARE_COMPILE_FAILURE_TEST == 1
 
