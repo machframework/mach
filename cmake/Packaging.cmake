@@ -25,6 +25,11 @@ if(WIN32)
         )
     endif()
 
+    set(
+    CPACK_WIX_PATCH_FILE
+    "${CMAKE_SOURCE_DIR}/packaging/windows/PathPatch.xml"
+    )
+
     install(
         PROGRAMS "${MACH_CLI_EXECUTABLE}"
         DESTINATION "${CMAKE_INSTALL_BINDIR}"
