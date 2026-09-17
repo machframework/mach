@@ -191,12 +191,16 @@ if(MACH_CAN_INSTALL)
 
 endif()
 
+if(MACH_CAN_INSTALL)
+    include(cmake/Packaging.cmake)
+endif()
+
 # -------------------------
 # Optional components
 # -------------------------
-option(MACH_BUILD_EXAMPLES "Build Mach examples" ON)
-option(MACH_BUILD_TESTS "Build Mach tests" ON)
-option(MACH_BUILD_BENCHMARKS "Build Mach benchmarks" ON)
+option(MACH_BUILD_EXAMPLES "Build Mach examples" OFF)
+option(MACH_BUILD_TESTS "Build Mach tests" OFF)
+option(MACH_BUILD_BENCHMARKS "Build Mach benchmarks" OFF)
 
 if(MACH_BUILD_EXAMPLES)
     add_subdirectory(examples)

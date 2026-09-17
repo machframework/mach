@@ -2,18 +2,41 @@
 
 include(CMakeFindDependencyMacro)
 
-set(_mach_saved_prefix_path "${CMAKE_PREFIX_PATH}")
+# Prefer dependencies already available to the consuming project.
+find_package(nlohmann_json CONFIG QUIET)
+find_package(fmt CONFIG QUIET)
+find_package(spdlog CONFIG QUIET)
 
-list(PREPEND CMAKE_PREFIX_PATH
-    "${PACKAGE_PREFIX_DIR}/vcpkg_installed/@MACH_VCPKG_TRIPLET@"
+# Fall back to the dependencies installed with Mach.
+set(_mach_dependency_prefix
+    "${PACKAGE_PREFIX_DIR}/dependencies/@MACH_VCPKG_TRIPLET@"
 )
 
-find_dependency(nlohmann_json CONFIG REQUIRED)
-find_dependency(fmt CONFIG REQUIRED)
-find_dependency(spdlog CONFIG REQUIRED)
+if(NOT nlohmann_json_FOUND)
+    find_dependency(
+        nlohmann_json CONFIG REQUIRED
+        PATHS "${_mach_dependency_prefix}"
+        NO_DEFAULT_PATH
+    )
+endif()
 
-set(CMAKE_PREFIX_PATH "${_mach_saved_prefix_path}")
-unset(_mach_saved_prefix_path)
+if(NOT fmt_FOUND)
+    find_dependency(
+        fmt CONFIG REQUIRED
+        PATHS "${_mach_dependency_prefix}"
+        NO_DEFAULT_PATH
+    )
+endif()
+
+if(NOT spdlog_FOUND)
+    find_dependency(
+        spdlog CONFIG REQUIRED
+        PATHS "${_mach_dependency_prefix}"
+        NO_DEFAULT_PATH
+    )
+endif()
+
+unset(_mach_dependency_prefix)
 
 include("${CMAKE_CURRENT_LIST_DIR}/MachTargets.cmake")
 
