@@ -8,6 +8,10 @@ if(WIN32)
     set(CPACK_GENERATOR "WIX")
     set(CPACK_WIX_ROOT "C:/Program Files (x86)/WiX Toolset v3.14")
 
+    set(
+    CPACK_WIX_UPGRADE_GUID
+    "97A0CA68-0215-4513-A8B3-F4DBB6BB6977"
+    )
 
     install(
     DIRECTORY
