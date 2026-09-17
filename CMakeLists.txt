@@ -192,7 +192,16 @@ if(MACH_CAN_INSTALL)
 endif()
 
 if(MACH_CAN_INSTALL)
+
+    set(
+        MACH_CLI_EXECUTABLE
+        ""
+        CACHE FILEPATH
+        "Path to the prebuilt Mach CLI executable"
+    )
+
     include(cmake/Packaging.cmake)
+
 endif()
 
 # -------------------------

@@ -13,6 +13,24 @@ if(WIN32)
     "97A0CA68-0215-4513-A8B3-F4DBB6BB6977"
     )
 
+    if(NOT MACH_CLI_EXECUTABLE)
+    message(FATAL_ERROR
+        "MACH_CLI_EXECUTABLE must be provided when creating the Windows package."
+    )
+    endif()
+
+    if(NOT EXISTS "${MACH_CLI_EXECUTABLE}")
+        message(FATAL_ERROR
+            "Mach CLI executable not found: ${MACH_CLI_EXECUTABLE}"
+        )
+    endif()
+
+    install(
+        PROGRAMS "${MACH_CLI_EXECUTABLE}"
+        DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        RENAME "mach.exe"
+    )
+
     install(
     DIRECTORY
         "${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/debug/"
