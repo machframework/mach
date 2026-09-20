@@ -1,5 +1,11 @@
 set(CPACK_PACKAGE_NAME "Mach")
 set(CPACK_PACKAGE_VENDOR "Mach")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
+    "A modern C++ web framework"
+)
+set(CPACK_PACKAGE_HOMEPAGE_URL
+    "https://machframework.dev"
+)
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
 
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "Mach")
