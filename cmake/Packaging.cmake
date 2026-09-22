@@ -177,5 +177,6 @@ elseif(UNIX AND NOT APPLE)
         DIRECTORY "${MACH_CLI_TEMPLATE_DIR}/"
         DESTINATION "${CMAKE_INSTALL_DATADIR}/mach/templates"
     )
+endif()
 
 include(CPack)
