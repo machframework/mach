@@ -115,9 +115,18 @@ if(WIN32)
             "dependencies/${VCPKG_TARGET_TRIPLET}/share"
     )
 
+    if(WIN32)
+        set(MACH_DEBUG_LIBRARY_PATH "lib/machd.lib")
+    elseif(UNIX AND NOT APPLE)
+        set(
+            MACH_DEBUG_LIBRARY_PATH
+            "${CMAKE_INSTALL_LIBDIR}/libmachd.a"
+        )
+    endif()
+
     configure_file(
-        "${CMAKE_SOURCE_DIR}/cmake/MachTargets-debug.cmake.in"
-        "${CMAKE_BINARY_DIR}/MachTargets-debug.cmake"
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/MachTargets-debug.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/MachTargets-debug.cmake"
         @ONLY
     )
 

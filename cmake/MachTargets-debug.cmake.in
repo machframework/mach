@@ -4,5 +4,5 @@ set_property(TARGET Mach::Mach APPEND PROPERTY
 
 set_target_properties(Mach::Mach PROPERTIES
     IMPORTED_LOCATION_DEBUG
-        "${_IMPORT_PREFIX}/lib/machd.lib"
+        "${_IMPORT_PREFIX}/@MACH_DEBUG_LIBRARY_PATH@"
 )
