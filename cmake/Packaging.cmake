@@ -90,6 +90,23 @@ if(WIN32)
             "dependencies/${VCPKG_TARGET_TRIPLET}/share"
     )
 
+    if(NOT MACH_CLI_TEMPLATE_DIR)
+    message(FATAL_ERROR
+        "MACH_CLI_TEMPLATE_DIR must be provided when creating the Windows package."
+    )
+    endif()
+
+    if(NOT EXISTS "${MACH_CLI_TEMPLATE_DIR}")
+        message(FATAL_ERROR
+            "Mach CLI template directory not found: ${MACH_CLI_TEMPLATE_DIR}"
+        )
+    endif()
+
+    install(
+    DIRECTORY "${MACH_CLI_TEMPLATE_DIR}/"
+    DESTINATION "templates"
+    )
+
     configure_file(
     "${CMAKE_SOURCE_DIR}/cmake/MachTargets-debug.cmake.in"
     "${CMAKE_BINARY_DIR}/MachTargets-debug.cmake"
