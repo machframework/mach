@@ -9,7 +9,7 @@ find_package(spdlog CONFIG QUIET)
 
 # Fall back to the dependencies installed with Mach.
 set(_mach_dependency_prefix
-    "${PACKAGE_PREFIX_DIR}/dependencies/@MACH_VCPKG_TRIPLET@"
+    "${PACKAGE_PREFIX_DIR}/@MACH_DEPENDENCY_INSTALL_DIR@"
 )
 
 if(NOT nlohmann_json_FOUND)
