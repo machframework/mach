@@ -6,7 +6,13 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
 set(CPACK_PACKAGE_HOMEPAGE_URL
     "https://machframework.dev"
 )
+
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+
+set(
+    CPACK_RESOURCE_FILE_LICENSE
+    "${CMAKE_SOURCE_DIR}/packaging/windows/LICENSE.rtf"
+)
 
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "Mach")
 
@@ -17,6 +23,21 @@ if(WIN32)
     set(
     CPACK_WIX_UPGRADE_GUID
     "97A0CA68-0215-4513-A8B3-F4DBB6BB6977"
+    )
+
+    set(
+    CPACK_WIX_PRODUCT_ICON
+    "${CMAKE_SOURCE_DIR}/packaging/windows/assets/mach.ico"
+    )
+
+    set(
+    CPACK_WIX_UI_BANNER
+    "${CMAKE_SOURCE_DIR}/packaging/windows/assets/new-banner.bmp"
+    )
+
+    set(
+    CPACK_WIX_UI_DIALOG
+    "${CMAKE_SOURCE_DIR}/packaging/windows/assets/new-dialog.bmp"
     )
 
     if(NOT MACH_CLI_EXECUTABLE)
