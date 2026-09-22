@@ -204,6 +204,17 @@ elseif(UNIX AND NOT APPLE)
         DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     )
 
+    configure_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/MachTargets-debug.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/MachTargets-debug.cmake"
+        @ONLY
+    )
+
+    install(
+        FILES "${CMAKE_BINARY_DIR}/MachTargets-debug.cmake"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Mach"
+    )
+
     install(
         DIRECTORY
             "${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/include/"
