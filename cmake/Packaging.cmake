@@ -1,49 +1,61 @@
+# Shared package metadata
+
 set(CPACK_PACKAGE_NAME "Mach")
 set(CPACK_PACKAGE_VENDOR "Mach")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
+set(
+    CPACK_PACKAGE_DESCRIPTION_SUMMARY
     "A modern C++ web framework"
 )
-set(CPACK_PACKAGE_HOMEPAGE_URL
+set(
+    CPACK_PACKAGE_HOMEPAGE_URL
     "https://machframework.dev"
 )
 
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
 
-set(
-    CPACK_RESOURCE_FILE_LICENSE
-    "${CMAKE_SOURCE_DIR}/packaging/windows/LICENSE.rtf"
-)
 
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "Mach")
+# Windows
 
 if(WIN32)
     set(CPACK_GENERATOR "WIX")
     set(CPACK_WIX_ROOT "C:/Program Files (x86)/WiX Toolset v3.14")
 
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY "Mach")
+
     set(
-    CPACK_WIX_UPGRADE_GUID
-    "97A0CA68-0215-4513-A8B3-F4DBB6BB6977"
+        CPACK_RESOURCE_FILE_LICENSE
+        "${CMAKE_SOURCE_DIR}/packaging/windows/LICENSE.rtf"
     )
 
     set(
-    CPACK_WIX_PRODUCT_ICON
-    "${CMAKE_SOURCE_DIR}/packaging/windows/assets/mach.ico"
+        CPACK_WIX_UPGRADE_GUID
+        "97A0CA68-0215-4513-A8B3-F4DBB6BB6977"
     )
 
     set(
-    CPACK_WIX_UI_BANNER
-    "${CMAKE_SOURCE_DIR}/packaging/windows/assets/banner.bmp"
+        CPACK_WIX_PRODUCT_ICON
+        "${CMAKE_SOURCE_DIR}/packaging/windows/assets/mach.ico"
     )
 
     set(
-    CPACK_WIX_UI_DIALOG
-    "${CMAKE_SOURCE_DIR}/packaging/windows/assets/dialog.bmp"
+        CPACK_WIX_UI_BANNER
+        "${CMAKE_SOURCE_DIR}/packaging/windows/assets/banner.bmp"
+    )
+
+    set(
+        CPACK_WIX_UI_DIALOG
+        "${CMAKE_SOURCE_DIR}/packaging/windows/assets/dialog.bmp"
+    )
+
+    set(
+        CPACK_WIX_PATCH_FILE
+        "${CMAKE_SOURCE_DIR}/packaging/windows/PathPatch.xml"
     )
 
     if(NOT MACH_CLI_EXECUTABLE)
-    message(FATAL_ERROR
-        "MACH_CLI_EXECUTABLE must be provided when creating the Windows package."
-    )
+        message(FATAL_ERROR
+            "MACH_CLI_EXECUTABLE must be provided when creating the Windows package."
+        )
     endif()
 
     if(NOT EXISTS "${MACH_CLI_EXECUTABLE}")
@@ -52,10 +64,17 @@ if(WIN32)
         )
     endif()
 
-    set(
-    CPACK_WIX_PATCH_FILE
-    "${CMAKE_SOURCE_DIR}/packaging/windows/PathPatch.xml"
-    )
+    if(NOT MACH_CLI_TEMPLATE_DIR)
+        message(FATAL_ERROR
+            "MACH_CLI_TEMPLATE_DIR must be provided when creating the Windows package."
+        )
+    endif()
+
+    if(NOT EXISTS "${MACH_CLI_TEMPLATE_DIR}")
+        message(FATAL_ERROR
+            "Mach CLI template directory not found: ${MACH_CLI_TEMPLATE_DIR}"
+        )
+    endif()
 
     install(
         PROGRAMS "${MACH_CLI_EXECUTABLE}"
@@ -64,11 +83,17 @@ if(WIN32)
     )
 
     install(
-    DIRECTORY
-        "${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/debug/"
-    DESTINATION
-        "dependencies/${VCPKG_TARGET_TRIPLET}/debug"
+        DIRECTORY "${MACH_CLI_TEMPLATE_DIR}/"
+        DESTINATION "templates"
     )
+
+    install(
+        DIRECTORY
+            "${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/debug/"
+        DESTINATION
+            "dependencies/${VCPKG_TARGET_TRIPLET}/debug"
+    )
+
     install(
         DIRECTORY
             "${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/include/"
@@ -90,27 +115,10 @@ if(WIN32)
             "dependencies/${VCPKG_TARGET_TRIPLET}/share"
     )
 
-    if(NOT MACH_CLI_TEMPLATE_DIR)
-    message(FATAL_ERROR
-        "MACH_CLI_TEMPLATE_DIR must be provided when creating the Windows package."
-    )
-    endif()
-
-    if(NOT EXISTS "${MACH_CLI_TEMPLATE_DIR}")
-        message(FATAL_ERROR
-            "Mach CLI template directory not found: ${MACH_CLI_TEMPLATE_DIR}"
-        )
-    endif()
-
-    install(
-    DIRECTORY "${MACH_CLI_TEMPLATE_DIR}/"
-    DESTINATION "templates"
-    )
-
     configure_file(
-    "${CMAKE_SOURCE_DIR}/cmake/MachTargets-debug.cmake.in"
-    "${CMAKE_BINARY_DIR}/MachTargets-debug.cmake"
-    @ONLY
+        "${CMAKE_SOURCE_DIR}/cmake/MachTargets-debug.cmake.in"
+        "${CMAKE_BINARY_DIR}/MachTargets-debug.cmake"
+        @ONLY
     )
 
     install(
@@ -122,6 +130,52 @@ if(WIN32)
         FILES "${CMAKE_BINARY_DIR}/MachTargets-debug.cmake"
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Mach"
     )
-endif()
+
+
+# Linux
+
+elseif(UNIX AND NOT APPLE)
+    set(CPACK_GENERATOR "DEB")
+
+    set(CPACK_PACKAGING_INSTALL_PREFIX "/usr")
+
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Mach")
+    set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
+    set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+
+    if(NOT MACH_CLI_EXECUTABLE)
+        message(FATAL_ERROR
+            "MACH_CLI_EXECUTABLE must be provided when creating the Linux package."
+        )
+    endif()
+
+    if(NOT EXISTS "${MACH_CLI_EXECUTABLE}")
+        message(FATAL_ERROR
+            "Mach CLI executable not found: ${MACH_CLI_EXECUTABLE}"
+        )
+    endif()
+
+    if(NOT MACH_CLI_TEMPLATE_DIR)
+        message(FATAL_ERROR
+            "MACH_CLI_TEMPLATE_DIR must be provided when creating the Linux package."
+        )
+    endif()
+
+    if(NOT EXISTS "${MACH_CLI_TEMPLATE_DIR}")
+        message(FATAL_ERROR
+            "Mach CLI template directory not found: ${MACH_CLI_TEMPLATE_DIR}"
+        )
+    endif()
+
+    install(
+        PROGRAMS "${MACH_CLI_EXECUTABLE}"
+        DESTINATION "${CMAKE_INSTALL_BINDIR}"
+        RENAME "mach"
+    )
+
+    install(
+        DIRECTORY "${MACH_CLI_TEMPLATE_DIR}/"
+        DESTINATION "${CMAKE_INSTALL_DATADIR}/mach/templates"
+    )
 
 include(CPack)
