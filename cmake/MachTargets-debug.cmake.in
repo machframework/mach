@@ -1,0 +1,8 @@
+set_property(TARGET Mach::Mach APPEND PROPERTY
+    IMPORTED_CONFIGURATIONS DEBUG
+)
+
+set_target_properties(Mach::Mach PROPERTIES
+    IMPORTED_LOCATION_DEBUG
+        "${_IMPORT_PREFIX}/lib/machd.lib"
+)

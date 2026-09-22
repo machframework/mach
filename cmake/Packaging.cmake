@@ -32,12 +32,12 @@ if(WIN32)
 
     set(
     CPACK_WIX_UI_BANNER
-    "${CMAKE_SOURCE_DIR}/packaging/windows/assets/new-banner.bmp"
+    "${CMAKE_SOURCE_DIR}/packaging/windows/assets/banner.bmp"
     )
 
     set(
     CPACK_WIX_UI_DIALOG
-    "${CMAKE_SOURCE_DIR}/packaging/windows/assets/new-dialog.bmp"
+    "${CMAKE_SOURCE_DIR}/packaging/windows/assets/dialog.bmp"
     )
 
     if(NOT MACH_CLI_EXECUTABLE)
@@ -88,6 +88,22 @@ if(WIN32)
             "${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/share/"
         DESTINATION
             "dependencies/${VCPKG_TARGET_TRIPLET}/share"
+    )
+
+    configure_file(
+    "${CMAKE_SOURCE_DIR}/cmake/MachTargets-debug.cmake.in"
+    "${CMAKE_BINARY_DIR}/MachTargets-debug.cmake"
+    @ONLY
+    )
+
+    install(
+        FILES "${CMAKE_BINARY_DIR}/Debug/machd.lib"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    )
+
+    install(
+        FILES "${CMAKE_BINARY_DIR}/MachTargets-debug.cmake"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Mach"
     )
 endif()
 
