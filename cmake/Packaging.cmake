@@ -176,6 +176,18 @@ elseif(UNIX AND NOT APPLE)
         )
     endif()
 
+    if(NOT MACH_DEBUG_BUILD_DIR)
+        message(FATAL_ERROR
+            "MACH_DEBUG_BUILD_DIR must be provided when creating the Linux package."
+        )
+    endif()
+
+    if(NOT EXISTS "${MACH_DEBUG_BUILD_DIR}/libmachd.a")
+        message(FATAL_ERROR
+            "Mach Debug library not found: ${MACH_DEBUG_BUILD_DIR}/libmachd.a"
+        )
+    endif()
+
     install(
         PROGRAMS "${MACH_CLI_EXECUTABLE}"
         DESTINATION "${CMAKE_INSTALL_BINDIR}"
@@ -185,6 +197,11 @@ elseif(UNIX AND NOT APPLE)
     install(
         DIRECTORY "${MACH_CLI_TEMPLATE_DIR}/"
         DESTINATION "${CMAKE_INSTALL_DATADIR}/mach/templates"
+    )
+
+    install(
+        FILES "${MACH_DEBUG_BUILD_DIR}/libmachd.a"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
     )
 
     install(
