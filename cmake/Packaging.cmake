@@ -177,6 +177,34 @@ elseif(UNIX AND NOT APPLE)
         DIRECTORY "${MACH_CLI_TEMPLATE_DIR}/"
         DESTINATION "${CMAKE_INSTALL_DATADIR}/mach/templates"
     )
+
+    install(
+        DIRECTORY
+            "${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/include/"
+        DESTINATION
+            "${MACH_DEPENDENCY_INSTALL_DIR}/include"
+    )
+
+    install(
+        DIRECTORY
+            "${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/lib/"
+        DESTINATION
+            "${MACH_DEPENDENCY_INSTALL_DIR}/lib"
+    )
+
+    install(
+        DIRECTORY
+            "${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/debug/"
+        DESTINATION
+            "${MACH_DEPENDENCY_INSTALL_DIR}/debug"
+    )
+
+    install(
+        DIRECTORY
+            "${CMAKE_BINARY_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/share/"
+        DESTINATION
+            "${MACH_DEPENDENCY_INSTALL_DIR}/share"
+    )
 endif()
 
 include(CPack)
