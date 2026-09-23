@@ -170,6 +170,18 @@ if(MACH_CAN_INSTALL)
         DESTINATION "${MACH_CMAKE_INSTALL_DIR}"
     )
 
+    if(WIN32)
+    set(
+        MACH_DEPENDENCY_INSTALL_DIR
+        "dependencies/${VCPKG_TARGET_TRIPLET}"
+    )
+    elseif(UNIX AND NOT APPLE)
+        set(
+            MACH_DEPENDENCY_INSTALL_DIR
+            "${CMAKE_INSTALL_LIBDIR}/mach/dependencies/${VCPKG_TARGET_TRIPLET}"
+        )
+    endif()
+
     configure_package_config_file(
         "${CMAKE_CURRENT_SOURCE_DIR}/cmake/MachConfig.cmake.in"
         "${CMAKE_CURRENT_BINARY_DIR}/MachConfig.cmake"
@@ -191,12 +203,25 @@ if(MACH_CAN_INSTALL)
 
 endif()
 
+if(MACH_CAN_INSTALL)
+
+    set(
+        MACH_CLI_EXECUTABLE
+        ""
+        CACHE FILEPATH
+        "Path to the prebuilt Mach CLI executable"
+    )
+
+    include(cmake/Packaging.cmake)
+
+endif()
+
 # -------------------------
 # Optional components
 # -------------------------
-option(MACH_BUILD_EXAMPLES "Build Mach examples" ON)
-option(MACH_BUILD_TESTS "Build Mach tests" ON)
-option(MACH_BUILD_BENCHMARKS "Build Mach benchmarks" ON)
+option(MACH_BUILD_EXAMPLES "Build Mach examples" OFF)
+option(MACH_BUILD_TESTS "Build Mach tests" OFF)
+option(MACH_BUILD_BENCHMARKS "Build Mach benchmarks" OFF)
 
 if(MACH_BUILD_EXAMPLES)
     add_subdirectory(examples)

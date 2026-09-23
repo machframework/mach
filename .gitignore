@@ -658,3 +658,10 @@ FodyWeavers.xsd
 # Additional files built by Visual Studio
 
 # End of https://www.toptal.com/developers/gitignore/api/c++,cmake,visualstudio,visualstudiocode,clion,jetbrains
+
+# CPack / packaging output
+build-package/
+_CPack_Packages/
+
+# Temporary extracted WiX sources
+wix-extracted/
