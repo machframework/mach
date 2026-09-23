@@ -152,6 +152,14 @@ elseif(UNIX AND NOT APPLE)
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Mach")
     set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
     set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+    
+    set(
+        CPACK_DEBIAN_PACKAGE_DESCRIPTION
+        "Mach is a modern C++20 web framework for building fast HTTP applications.
+ 	It provides routing, controllers, minimal APIs, middleware, validation,
+ 	configuration, logging, JSON support, and a command-line interface for
+ 	creating, building, and running Mach applications."
+    )
 
     if(NOT MACH_CLI_EXECUTABLE)
         message(FATAL_ERROR
