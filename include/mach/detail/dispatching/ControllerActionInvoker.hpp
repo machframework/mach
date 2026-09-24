@@ -74,9 +74,8 @@ namespace mach::detail::dispatching
                 if constexpr (parameterCount == 0) {
                     return std::invoke(m_action, controller);
                 } else {
-                    // TEMPORARY: body param is always first
+                    // The request body is the first controller handler parameter.
                     using DeclaredBodyType = std::tuple_element_t<0, std::tuple<TArgs...>>;
-
                     using BodyType = std::remove_cvref_t<DeclaredBodyType>;
 
                     constexpr bool passedByValue = std::same_as<DeclaredBodyType, BodyType>;

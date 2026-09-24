@@ -30,9 +30,6 @@ namespace mach
      *
      * Thread safety:
      * - Not thread-safe. Controller configuration should be performed from one thread.
-     *
-     * Stability:
-     * - This API is still experimental and may change before Mach's first stable release.
      */
     template <typename TController>
     class ControllerBuilder {

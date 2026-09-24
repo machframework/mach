@@ -33,9 +33,6 @@ namespace mach
      *
      * Thread safety:
      * - Not thread-safe. Application configuration should be performed from one thread.
-     *
-     * Stability:
-     * - This API is still experimental and may change before Mach's first stable release.
      */
     class AppBuilder {
 

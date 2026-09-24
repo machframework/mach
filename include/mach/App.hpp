@@ -31,9 +31,6 @@ namespace mach
      *
      * Thread safety:
      * - Not thread-safe.
-     *
-     * Stability:
-     * - This API is still experimental and may change before Mach's first stable release.
      */
     class App {
 
