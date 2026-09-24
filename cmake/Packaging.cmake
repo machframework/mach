@@ -34,7 +34,7 @@ if(WIN32)
 
     set(
         CPACK_WIX_PRODUCT_ICON
-        "${CMAKE_SOURCE_DIR}/packaging/windows/assets/mach.ico"
+        "${CMAKE_SOURCE_DIR}/packaging/windows/assets/favicon.ico"
     )
 
     set(
