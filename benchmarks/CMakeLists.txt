@@ -33,3 +33,8 @@ add_mach_bench(
     RequestBenchmarks
     request/RequestBenchmarks.cpp
 )
+
+add_mach_bench(
+    FrameworkBenchmarks
+    framework/main.cpp
+)

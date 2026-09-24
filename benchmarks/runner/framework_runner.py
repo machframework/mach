@@ -79,7 +79,7 @@ BENCHMARKS = [
 # Separate soak tests. These are intentionally not part of the performance
 # summary and are disabled by default. Set RUN_STABILITY_TESTS = True when
 # doing the final stability pass.
-RUN_STABILITY_TESTS = False
+RUN_STABILITY_TESTS = True
 STABILITY_DURATION = "10m"
 STABILITY_BENCHMARKS = [
     "plaintext",
@@ -301,6 +301,7 @@ def parse_wrk(output):
 
 
 RESULT_FIELDS = [
+    "session_id",
     "timestamp",
     "git_commit",
     "benchmark",
@@ -326,6 +327,9 @@ RESULT_FIELDS = [
 
 
 SUMMARY_FIELDS = [
+    "session_id",
+    "timestamp",
+    "git_commit",
     "benchmark",
     "method",
     "path",
@@ -375,18 +379,25 @@ def median_present(rows, key):
     return statistics.median(values) if values else None
 
 
-def write_summary(all_results):
+def write_summary(all_results, session_id, commit):
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    exists = SUMMARY_PATH.exists()
+    timestamp = datetime.now().isoformat(timespec="seconds")
 
-    with SUMMARY_PATH.open("w", newline="") as file:
+    with SUMMARY_PATH.open("a", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=SUMMARY_FIELDS)
-        writer.writeheader()
+
+        if not exists:
+            writer.writeheader()
 
         for benchmark in BENCHMARKS:
             rows = all_results[benchmark["name"]]
             rps_values = [row["rps"] for row in rows]
 
             writer.writerow({
+                "session_id": session_id,
+                "timestamp": timestamp,
+                "git_commit": commit,
                 "benchmark": benchmark["name"],
                 "method": benchmark["method"],
                 "path": benchmark["path"],
@@ -421,7 +432,7 @@ def write_summary(all_results):
 # ---------------- PERFORMANCE RUNNER ----------------
 
 
-def run_benchmark(benchmark, commit):
+def run_benchmark(benchmark, commit, session_id):
     print()
     print("=" * 72)
     print(
@@ -461,6 +472,7 @@ def run_benchmark(benchmark, commit):
             parsed = parse_wrk(output)
 
             row = {
+                "session_id": session_id,
                 "timestamp": datetime.now().isoformat(timespec="seconds"),
                 "git_commit": commit,
                 "benchmark": benchmark["name"],
@@ -505,7 +517,7 @@ def run_benchmark(benchmark, commit):
 # ---------------- STABILITY ----------------
 
 
-def run_stability_test(benchmark, commit):
+def run_stability_test(benchmark, commit, session_id):
     print()
     print("=" * 72)
     print(
@@ -535,6 +547,7 @@ def run_stability_test(benchmark, commit):
         parsed = parse_wrk(output)
 
         append_result({
+            "session_id": session_id,
             "timestamp": datetime.now().isoformat(timespec="seconds"),
             "git_commit": commit,
             "benchmark": benchmark["name"],
@@ -586,8 +599,10 @@ def main():
         )
 
     commit = get_git_commit()
+    session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     print("Mach framework benchmark")
+    print(f"Session ID:       {session_id}")
     print(f"Git commit:       {commit}")
     print(f"Threads:          {THREADS}")
     print(f"Connections:      {CONNECTIONS}")
@@ -602,12 +617,13 @@ def main():
         all_results[benchmark["name"]] = run_benchmark(
             benchmark,
             commit,
+            session_id,
         )
 
         if index != len(BENCHMARKS) - 1:
             time.sleep(BETWEEN_BENCHMARKS_SECONDS)
 
-    write_summary(all_results)
+    write_summary(all_results, session_id, commit)
 
     print(f"\n[INFO] Raw results: {CSV_PATH}")
     print(f"[INFO] Summary:     {SUMMARY_PATH}")
@@ -620,7 +636,7 @@ def main():
 
         for name in STABILITY_BENCHMARKS:
             time.sleep(BETWEEN_BENCHMARKS_SECONDS)
-            run_stability_test(selected[name], commit)
+            run_stability_test(selected[name], commit, session_id)
 
 
 if __name__ == "__main__":
