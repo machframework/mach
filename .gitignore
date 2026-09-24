@@ -665,3 +665,7 @@ _CPack_Packages/
 
 # Temporary extracted WiX sources
 wix-extracted/
+
+# Build instructions
+BUILD_WINDOWS.md
+BUILD_LINUX.md
