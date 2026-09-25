@@ -203,7 +203,13 @@ if(MACH_CAN_INSTALL)
 
 endif()
 
-if(MACH_CAN_INSTALL)
+option(
+    MACH_BUILD_PACKAGE
+    "Enable Mach standalone package generation"
+    OFF
+)
+
+if(MACH_CAN_INSTALL AND MACH_BUILD_PACKAGE)
 
     set(
         MACH_CLI_EXECUTABLE
