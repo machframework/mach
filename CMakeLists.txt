@@ -7,10 +7,6 @@ project(
     LANGUAGES CXX
 )
 
-if(MSVC)
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-endif()
-
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
