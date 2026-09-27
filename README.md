@@ -1,6 +1,8 @@
 # Mach
 
 ![C++20](https://img.shields.io/badge/C%2B%2B-20-blue)
+[![GitHub Release](https://img.shields.io/github/v/release/machframework/mach)](https://github.com/machframework/mach/releases/latest)
+[![License](https://img.shields.io/github/license/machframework/mach)](https://github.com/machframework/mach/blob/main/LICENSE)
 
 A modern C++ web framework.
 
