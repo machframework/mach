@@ -39,7 +39,7 @@ sudo apt update
 sudo apt install build-essential cmake
 ```
 
-See the [Installation Guide](https://machframework.dev/) for detailed installation instructions.
+See the [Installation Guide](https://machframework.dev/getting-started/installation) for detailed installation instructions.
 
 ## Quick Start
 
@@ -107,7 +107,7 @@ Full documentation, guides, tutorials, and the API reference are available at:
 
 Mach is designed to provide high HTTP throughput while keeping its API simple and expressive.
 
-See the [benchmarks](https://machframework.dev/) for results and methodology.
+See the [benchmarks](https://machframework.dev/benchmarks) for results and methodology.
 
 ## License
 
