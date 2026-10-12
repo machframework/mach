@@ -1,10 +1,97 @@
+# Contributing to Mach
+
+Thank you for your interest in contributing to Mach!
+
+Contributions of all kinds are welcome, including bug fixes, new features, performance improvements, documentation, and tests. This guide describes how to contribute and the coding standards used throughout the project.
+
+Please review these guidelines before submitting a contribution. All pull requests are reviewed for correctness, maintainability, and alignment with Mach's architecture and design principles.
+
+## Getting Started
+
+1. Explore the repository, documentation, and [existing GitHub issues](https://github.com/machframework/mach/issues).
+2. Review the [Mach roadmap](https://machframework.dev/roadmap/) to understand current priorities.
+3. Find an issue that interests you, or propose a change using a new issue.
+4. Discuss your intended contribution before starting work, as described below.
+5. Fork the repository and create a dedicated branch for your changes.
+6. Follow the coding conventions in this guide, then build and test your changes.
+7. Open a pull request for review.
+
+You do not need permission to fork Mach, experiment with its code, or develop independent modifications.
+
+## Working on Issues
+
+Before starting work, check whether a relevant issue already exists and communicate your intentions on GitHub.
+
+### Issue Assignments
+
+- **Unassigned issues** are generally available for contributions. Comment on the issue to discuss taking it on before beginning work.
+- **Assigned issues** already have someone responsible for the work. Please coordinate before implementing the same task.
+- **Issues labeled `help wanted`** are particularly suitable for external contributions.
+- Issue assignments should be made once a contributor has agreed to take responsibility for the work.
+
+If you'd like to help with an assigned issue, leave a comment or email the maintainer at [asaf@machframework.dev](mailto:asaf@machframework.dev).
+
+### Sub-Issues
+
+- Large features may be divided into sub-issues, with different contributors responsible for separate tasks.
+- An assignment on a parent issue does not imply ownership of all its sub-issues.
+- Check the assignment and discussion on the specific sub-issue before beginning work.
+
+### Proposing Changes
+
+Before beginning any contribution, including minor bug fixes and documentation improvements:
+
+- Check whether an existing issue covers the proposed change.
+- Comment on that issue, or open a new one, to explain what you'd like to do.
+- For significant features, architectural changes, or modifications to public APIs, discuss the proposed implementation approach before starting development.
+
+These discussions help coordinate development, avoid duplicated effort, and keep changes aligned with Mach's architecture and roadmap. Prior discussion or issue assignment does not guarantee that a contribution will be merged.
+
+## Pull Requests
+
+Contributions to the official Mach repository should be submitted through pull requests.
+
+### Before Submitting
+
+- Follow the coding conventions outlined in this document.
+- Verify that the project builds successfully with your changes.
+- Run relevant existing tests and add or update tests for changes in behavior.
+- Document new or modified public APIs.
+- Keep the pull request focused; exclude unrelated changes.
+- Avoid unintended breaking changes to existing public APIs.
+
+### Pull Request Description
+
+Each pull request should include:
+
+- A concise summary of the changes.
+- A link to the relevant GitHub issue, if applicable.
+- Important implementation decisions or trade-offs, when relevant.
+- The tests performed and the platform(s) used.
+- Any known limitations or remaining considerations.
+
+### Code Review
+
+- All pull requests require maintainer review before merging.
+- Contributors may be asked to address correctness, maintainability, performance, consistency, or architectural concerns.
+- Address review feedback with additional commits or discuss alternatives in the pull request.
+- Final approval and merging are at the maintainer's discretion. A contribution may be declined if it does not meet project standards or align with the project's direction.
+
+### Public API Compatibility
+
+Mach follows semantic versioning.
+
+- Preserve backward compatibility in existing public APIs unless a breaking change has been explicitly approved.
+- Follow established naming, design, and documentation conventions for new public APIs.
+- Discuss significant public API changes before implementation.
+
+---
+
 ## General Principles
 
 - Prefer readability and maintainability over premature optimization.
 - Prefer explicit behavior over implicit behavior.
 - Prefer simple solutions over unnecessary abstraction.
-
----
 
 ## Naming Conventions
 
@@ -22,8 +109,11 @@
 ## Project Structure
 
 - Public headers belong under `include/mach/`.
-- Internal implementation belongs under `src/`.
+- Private headers and implementation files should be placed under `src/` whenever possible.
+- Internal headers that must be accessible to public headers belong under `include/mach/detail/`.
+- Types and functions declared in these internal headers should use the `mach::detail` namespace or one of its nested namespaces.
 - User-facing APIs should generally not expose implementation details.
+- Code under `mach::detail` is considered internal and is not subject to public API compatibility guarantees.
 
 ## Header and Source Files
 
@@ -40,25 +130,28 @@
 
 ## Include Order
 
-- Headers should be grouped in the following order:
-  1. Current translation unit header
-  2. Standard library headers
-  3. Third-party library headers
-  4. Project headers
-  5. Lexical order
+Headers should be grouped in the following order:
 
-Each group should be separated by a blank line.
+1. Current translation unit header (if applicable)
+2. Standard library headers
+3. Third-party library headers
+4. Project headers
+
+Each group should be separated by a blank line, and headers within each group should be ordered lexicographically.
 
 Example:
 
 ```cpp
 #include "CurrentFile.hpp"
 
+#include <chrono>
 #include <string>
+#include <vector>
 
-#include <thirdparty/library.hpp>
+#include <boost/asio.hpp>
 
-#include "project/module/Header.hpp"
+#include "mach/App.hpp"
+#include "mach/Request.hpp"
 ```
 
 ## File Layout
@@ -77,15 +170,13 @@ Example:
 Example:
 
 ```cpp
-namespace project::module {
+namespace project::module
+{
+    using std::string;
+    using std::vector;
+
+    // Avoid: using namespace std;
 }
-
-using std::string;
-using std::vector;
-
-//instead of:
-
-using namespace std;
 ```
 
 ## Type Aliases
@@ -96,19 +187,20 @@ using namespace std;
 
 ## Braces
 
-- Opening braces should use the same-line (K&R) style.
+- Opening braces should use the same-line (K&R) style, except for namespace declarations.
+- Namespace declarations should place the opening brace on a separate line.
 
 Example:
 
 ```cpp
-class Router {
-public:
-    void addRoute() {
-        if (condition) {
-            // ...
+namespace mach::detail
+{
+    void initialize() {
+        if (isReady()) {
+            start();
         }
     }
-};
+}
 ```
 
 ## Control Statements
@@ -119,13 +211,13 @@ Example:
 
 ```cpp
 if (condition) {
-    //...
+    // ...
 }
 
-//instead of:
+// Instead of:
 
 if (condition)
-    //...
+    // ...
 ```
 
 ## Blank Lines
@@ -153,14 +245,14 @@ Type& reference;
 
 ## Const Usage
 
-- `const` should be used whenever a value is not intended to be modified.
+- Prefer `const` for values and references that should not be modified, particularly when it communicates an important invariant or constraint.
 - Function parameters that are passed by reference and not modified should use `const Type&`.
 - `const` should use the west-const style (`const Type`).
 
 ## Auto Usage
 
-- auto should be used when the type is obvious from the right-hand side.
-- auto should be used when the explicit type is unnecessarily verbose.
+- `auto` should be used when the type is obvious from the right-hand side.
+- `auto` should be used when the explicit type is unnecessarily verbose.
 - Explicit types should be preferred when they improve readability or clarify intent.
 
 Example:
@@ -208,8 +300,10 @@ void execute() override;
 ## Noexcept Usage
 
 - `noexcept` should be used when a function is guaranteed not to throw.
-- Destructors and move operations should use `noexcept` when possible.
-- `noexcept` should not be added only for theoretical performance benefits.
+- Move constructors and move assignment operators should use `noexcept` when they can guarantee not to throw.
+- Destructors should not allow exceptions to escape.
+- `noexcept` should not be added solely for theoretical performance benefits.
+- Functions marked `noexcept` must not allow exceptions to escape, as doing so results in program termination.
 
 ## Function Parameters
 
@@ -219,12 +313,14 @@ void execute() override;
 
 ## Performance
 
-- Prefer passing large objects by `const Type&` instead of by value.
-- Prefer `std::string_view` for read-only string parameters when ownership is not needed.
+- Prefer passing large objects by `const Type&` instead of by value when ownership is not required.
+- Prefer `std::string_view` for read-only string parameters when ownership is not needed and the referenced data remains valid.
 - Prefer move semantics when transferring ownership or consuming values.
+- Avoid unnecessary use of `std::move`, particularly on `const` objects or values that should remain unchanged.
 - Avoid unnecessary heap allocation.
 - Avoid unnecessary copies, especially in request/response paths.
 - Prefer reserving container capacity when the expected size is known.
+- Avoid blocking operations in asynchronous execution paths.
 - Optimize only after correctness, clarity, and profiling.
 
 ## Ownership and Lifetime
@@ -254,48 +350,76 @@ void execute() override;
 
 ## Documentation
 
-- Public user-facing APIs should include documentation comments as shown in the example below.
-- Internal/private functions should only be documented when their behavior, reasoning, ownership, lifetime, threading, or performance details are non-obvious.
+- Public user-facing classes, structs, and methods should include documentation comments.
+- Public classes and structs should document their purpose, responsibilities, ownership, and thread-safety characteristics when applicable.
+- Public methods should document their behavior, parameters, return values, exceptions, and thread-safety characteristics when applicable.
+- Internal/private classes and methods do not require the same formal documentation format, but non-obvious behavior, design decisions, ownership, lifetime, threading, and performance considerations should still be documented.
 - Comments should explain intent and important constraints, not restate obvious code.
 - Code should prioritize readability and self-documenting naming whenever possible.
 - Comments should generally be placed above the relevant line or block instead of inline.
 - Inline comments should only be used for short clarifications that improve readability.
 
-Example:
+Class documentation example:
 
 ```cpp
 /**
- * Short summary of what the function does.
+ * Represents a built Mach application.
  *
- * More detailed explanation if needed (why, not how).
+ * Used to register routes and start the underlying HTTP server after
+ * application configuration has been finalized by AppBuilder.
  *
- * @param parameter Description of the parameter.
+ * Ownership:
+ * - Owns the application's runtime state.
+ * - Should be treated as the root runtime object of a Mach application.
  *
- * @return Description of the return value.
- *
- * @throws Description of any exceptions thrown (if applicable).
- *
- * @thread_safety Whether this function is thread-safe or requires external synchronization.
- *
- * @ownership Notes about ownership / lifetime transfer (if applicable).
- *
- * @notes Any important constraints, invariants, or side effects.
+ * Thread safety:
+ * - Not thread-safe.
  */
 ```
 
----
+Method documentation example:
+
+```cpp
+/**
+ * Registers a PUT request handler.
+ *
+ * @param pattern The route pattern to match (e.g. "/api/users").
+ * @param handler The function invoked when the route is matched.
+ *
+ * @throws std::logic_error If a route with the same method and pattern
+ *         has already been registered.
+ *
+ * @thread_safety This function is not thread-safe.
+ */
+```
 
 ## Commit Messages
 
-- Commit messages should follow the conventional commit style.
+- Commit messages should follow the Conventional Commits format: `type: description`.
+- Descriptions should use the imperative mood (e.g., `add` instead of `added` or `adds`).
+- Descriptions should begin with a lowercase letter.
+- Descriptions should be concise and clearly explain the change.
+- Commit message subjects should not end with a period.
 
 Supported prefixes include:
 
-- `feat`
-- `fix`
-- `docs`
-- `perf`
-- `refactor`
-- `test`
-- `build`
-- `chore`
+- `feat` - New features.
+- `fix` - Bug fixes.
+- `docs` - Documentation changes.
+- `perf` - Performance improvements.
+- `refactor` - Code restructuring without changing behavior.
+- `test` - Adding or updating tests.
+- `bench` - Benchmark additions and improvements (Mach-specific convention).
+- `build` - Build system and dependency changes.
+- `chore` - Maintenance tasks that do not fit other categories.
+
+Examples:
+
+```text
+feat: add configurable HTTP request limits
+fix: prevent duplicate route registration
+docs: update installation guide
+refactor: simplify request dispatch logic
+test: add request binding tests
+bench: add HTTP throughput benchmarks
+```
