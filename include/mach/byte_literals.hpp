@@ -3,6 +3,14 @@
 
 #include <mach/detail/core/byte_literals.hpp>
 
+/**
+ * Provides compile-time byte-size literals using SI and IEC units.
+ *
+ * All literals return std::size_t and reject values exceeding its
+ * maximum representable value at compile time.
+ *
+ * Use `using namespace mach::literals;` to access the literals directly.
+ */
 namespace mach::literals
 {
     consteval std::size_t operator"" _B(unsigned long long value) {
