@@ -2,4 +2,4 @@
 
 using namespace mach::literals;
 
-constexpr auto overflow = 1_MiB;
+constexpr auto overflow = 18446744073709551615_MiB;
