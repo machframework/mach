@@ -24,3 +24,5 @@
 
 #include <mach/CorsBuilder.hpp>
 #include <mach/CsrfBuilder.hpp>
+
+#include <mach/byte_literals.hpp>	
