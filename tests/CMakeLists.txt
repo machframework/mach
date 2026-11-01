@@ -180,3 +180,18 @@ target_link_libraries(
 )
 
 catch_discover_tests(ValidationTests)
+
+add_mach_test(
+    ByteLiteralsTests
+    core/ByteLiteralsTests.cpp
+)
+
+target_link_libraries(
+    ByteLiteralsTests
+    PRIVATE
+        mach
+        mach_test_support
+        Catch2::Catch2WithMain
+)
+
+catch_discover_tests(ByteLiteralsTests)
