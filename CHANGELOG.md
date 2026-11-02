@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Add SI and IEC byte-size literals.
+- Add configurable HTTP request body, header, and target size limits.
+- Add fluent application configuration methods to `AppBuilder`.
+- Automatically install the termination handler when building an application, with an option to disable it.
+
+### Deprecated
+
+- Deprecate manual termination handler installation.
+
 ### Fixed
 
 - Respect the configured MSVC runtime during builds.
@@ -27,5 +38,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Windows and Ubuntu installation packages.
 - Documentation, examples, and performance benchmarks.
 
-[Unreleased]: https://github.com/machframework/mach/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/machframework/mach/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/machframework/mach/releases/tag/v1.0.0
