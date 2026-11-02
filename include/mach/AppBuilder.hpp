@@ -246,6 +246,23 @@ namespace mach
         AppBuilder& maxRequestTargetSize(std::size_t value);
 
         /**
+         * Enables or disables automatic installation of Mach's global termination handler.
+         *
+         * When enabled, AppBuilder::build() installs Mach's termination handler,
+         * allowing fatal errors to be logged before the application terminates.
+         *
+         * Automatic installation is enabled by default.
+         *
+         * @param enabled Whether to install the termination handler automatically.
+         *
+         * @return A reference to the current AppBuilder instance, allowing
+         *         method chaining.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        AppBuilder& installTerminateHandler(bool enabled);
+
+        /**
          * Configures the application's server settings.
          *
          * The provided callback is invoked immediately and receives a mutable
@@ -356,6 +373,7 @@ namespace mach
         LoggerOptions m_loggerOptions;
         std::optional<detail::cors::CorsOptions> m_corsOptions;
         std::optional<detail::csrf::CsrfOptions> m_csrfOptions;
+        bool m_installTerminateHandler = true;
 
         template <typename T, typename... Deps>
         AppBuilder& use(detail::di::ServiceAccess access);
