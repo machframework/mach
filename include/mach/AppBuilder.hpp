@@ -141,13 +141,108 @@ namespace mach
         template <typename T, typename... Deps>
         AppBuilder& use();
 
+        /**
+         * Sets the host address the application will bind to.
+         *
+         * Defaults to "127.0.0.1". The host must not be empty or contain
+         * whitespace or control characters.
+         *
+         * @param value The host address.
+         *
+         * @return A reference to the current AppBuilder instance, allowing
+         *         method chaining.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
         AppBuilder& host(std::string value);
+
+        /**
+         * Sets the port the application will listen on.
+         *
+         * Defaults to 3143. The port must be between 1 and 65535.
+         *
+         * @param value The port number.
+         *
+         * @return A reference to the current AppBuilder instance, allowing
+         *         method chaining.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
         AppBuilder& port(std::uint16_t value);
+
+        /**
+         * Sets the number of worker threads used by the application.
+         *
+         * Defaults to 4. The thread count must be at least 1.
+         *
+         * @param value The number of worker threads.
+         *
+         * @return A reference to the current AppBuilder instance, allowing
+         *         method chaining.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
         AppBuilder& threadCount(std::size_t value);
+
+        /**
+         * Sets the timeout for HTTP requests.
+         *
+         * Defaults to 30 seconds. The timeout must be greater than zero.
+         *
+         * @param value The request timeout duration.
+         *
+         * @return A reference to the current AppBuilder instance, allowing
+         *         method chaining.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
         AppBuilder& requestTimeout(std::chrono::seconds value);
 
+        /**
+         * Sets the maximum allowed size of an HTTP request body.
+         *
+         * Defaults to 1 MiB. A value of 0 disallows nonempty request bodies.
+         * Requests exceeding this limit receive an HTTP 413 response.
+         *
+         * @param value The maximum body size in bytes.
+         *
+         * @return A reference to the current AppBuilder instance, allowing
+         *         method chaining.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
         AppBuilder& maxRequestBodySize(std::size_t value);
+
+        /**
+         * Sets the maximum allowed size of HTTP request headers.
+         *
+         * Defaults to 16 KiB. The limit must be greater than zero and must
+         * not exceed UINT32_MAX. Requests exceeding this limit receive an
+         * HTTP 431 response.
+         *
+         * @param value The maximum header size in bytes.
+         *
+         * @return A reference to the current AppBuilder instance, allowing
+         *         method chaining.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
         AppBuilder& maxRequestHeaderSize(std::size_t value);
+
+        /**
+         * Sets the maximum allowed size of an HTTP request target (URL).
+         *
+         * Defaults to 8 KiB. The limit must be greater than zero.
+         * Requests exceeding this limit receive an HTTP 414 response.
+         * The request header limit may reject oversized targets first.
+         *
+         * @param value The maximum request target size in bytes.
+         *
+         * @return A reference to the current AppBuilder instance, allowing
+         *         method chaining.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
         AppBuilder& maxRequestTargetSize(std::size_t value);
 
         /**
