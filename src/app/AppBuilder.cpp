@@ -37,6 +37,25 @@ namespace
             throw std::invalid_argument("Thread count must be at least 1.");
         }
     }
+
+    void validateRequestTimeout(std::chrono::seconds timeout) {
+        if (timeout <= std::chrono::seconds::zero()) {
+            throw std::invalid_argument("Request timeout must be greater than zero.");
+        }
+    }
+
+    void validateMaxRequestHeaderSize(std::size_t size) {
+        if (size == 0 || size > std::numeric_limits<std::uint32_t>::max()) {
+            throw std::invalid_argument(
+                "Request header size limit must be between 1 and UINT32_MAX.");
+        }
+    }
+
+    void validateMaxRequestTargetSize(std::size_t size) {
+        if (size == 0) {
+            throw std::invalid_argument("Request target size limit must be greater than zero.");
+        }
+    }
 }
 
 namespace mach
@@ -105,6 +124,10 @@ namespace mach
             validateHost(m_appOptions.host);
             validatePort(m_appOptions.port);
             validateThreadCount(m_appOptions.threadCount);
+            validateRequestTimeout(m_appOptions.requestTimeout);
+
+            validateMaxRequestHeaderSize(m_appOptions.maxRequestHeaderSize);
+            validateMaxRequestTargetSize(m_appOptions.maxRequestTargetSize);
         } catch (const std::exception& ex) {
             loggerInstance.error("Failed to build Mach application: {}", ex.what());
             throw;
