@@ -3,6 +3,7 @@
 #include <stdexcept>
 
 #include <mach/Logger.hpp>
+#include <mach/diagnostics/TerminateHandler.hpp>
 
 #include <mach/detail/binding/BodyBinder.hpp>
 #include <mach/detail/cors/CorsOptions.hpp>
@@ -109,6 +110,11 @@ namespace mach
         return *this;
     }
 
+    AppBuilder& AppBuilder::installTerminateHandler(bool enabled) {
+        m_installTerminateHandler = enabled;
+        return *this;
+    }
+
     AppBuilder& AppBuilder::addCsrf() {
         if (!m_csrfOptions) {
             m_csrfOptions = detail::csrf::CsrfOptions{};
@@ -173,6 +179,10 @@ namespace mach
         // map controllers
         for (const auto& mapper : m_controllerMappers) {
             mapper(app);
+        }
+
+        if (m_installTerminateHandler) {
+            mach::installTerminateHandler();
         }
 
         return std::move(app);

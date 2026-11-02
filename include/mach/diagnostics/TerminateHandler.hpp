@@ -13,6 +13,8 @@ namespace mach
      * once during application startup.
      *
      * @thread_safety This function is not thread-safe.
+     * 
+     * @TODO: mark as deprecated
      */
     void installTerminateHandler() noexcept;
 }

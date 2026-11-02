@@ -245,6 +245,8 @@ namespace mach
          */
         AppBuilder& maxRequestTargetSize(std::size_t value);
 
+        AppBuilder& installTerminateHandler(bool enabled);
+
         /**
          * Configures the application's server settings.
          *
@@ -356,6 +358,7 @@ namespace mach
         LoggerOptions m_loggerOptions;
         std::optional<detail::cors::CorsOptions> m_corsOptions;
         std::optional<detail::csrf::CsrfOptions> m_csrfOptions;
+        bool m_installTerminateHandler = true;
 
         template <typename T, typename... Deps>
         AppBuilder& use(detail::di::ServiceAccess access);
