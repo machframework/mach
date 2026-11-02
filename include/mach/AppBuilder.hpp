@@ -141,6 +141,15 @@ namespace mach
         template <typename T, typename... Deps>
         AppBuilder& use();
 
+        AppBuilder& host(std::string value);
+        AppBuilder& port(std::uint16_t value);
+        AppBuilder& threadCount(std::size_t value);
+        AppBuilder& requestTimeout(std::chrono::seconds value);
+
+        AppBuilder& maxRequestBodySize(std::size_t value);
+        AppBuilder& maxRequestHeaderSize(std::size_t value);
+        AppBuilder& maxRequestTargetSize(std::size_t value);
+
         /**
          * Configures the application's server settings.
          *

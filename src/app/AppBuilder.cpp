@@ -55,6 +55,41 @@ namespace mach
             detail::di::ServiceAccess::Internal);
     }
 
+    AppBuilder& AppBuilder::host(std::string value) {
+        m_appOptions.host = std::move(value);
+        return *this;
+    }
+
+    AppBuilder& AppBuilder::port(std::uint16_t value) {
+        m_appOptions.port = value;
+        return *this;
+    }
+
+    AppBuilder& AppBuilder::threadCount(std::size_t value) {
+        m_appOptions.threadCount = value;
+        return *this;
+    }
+
+    AppBuilder& AppBuilder::requestTimeout(std::chrono::seconds value) {
+        m_appOptions.requestTimeout = value;
+        return *this;
+    }
+
+    AppBuilder& AppBuilder::maxRequestBodySize(std::size_t value) {
+        m_appOptions.maxRequestBodySize = value;
+        return *this;
+    }
+
+    AppBuilder& AppBuilder::maxRequestHeaderSize(std::size_t value) {
+        m_appOptions.maxRequestHeaderSize = value;
+        return *this;
+    }
+
+    AppBuilder& AppBuilder::maxRequestTargetSize(std::size_t value) {
+        m_appOptions.maxRequestTargetSize = value;
+        return *this;
+    }
+
     AppBuilder& AppBuilder::addCsrf() {
         if (!m_csrfOptions) {
             m_csrfOptions = detail::csrf::CsrfOptions{};
