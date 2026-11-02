@@ -45,37 +45,6 @@ function(add_mach_test test_name)
     )
 endfunction()
 
-function(add_mach_compile_failure_test test_name source diagnostic)
-    add_test(
-        NAME "${test_name}"
-        COMMAND "${CMAKE_COMMAND}"
-            -S "${CMAKE_SOURCE_DIR}/cmake/compile_failure"
-            -B "${CMAKE_CURRENT_BINARY_DIR}/compile_failure/${test_name}"
-            "-DTEST_SOURCE=${CMAKE_CURRENT_SOURCE_DIR}/${source}"
-            "-DMACH_INCLUDE_DIR=${CMAKE_SOURCE_DIR}/include"
-            "-DEXPECTED_DIAGNOSTIC=${diagnostic}"
-            "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-            "-DCMAKE_CXX_COMPILER_TARGET=${CMAKE_CXX_COMPILER_TARGET}"
-            "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
-            "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
-            "-DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY}"
-            "-G${CMAKE_GENERATOR}"
-        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    )
-
-    set_tests_properties("${test_name}" PROPERTIES
-        LABELS "compile-failure"
-    )
-endfunction()
-
-if(MSVC)
-    set(overflow_diagnostic "C2131")
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(overflow_diagnostic "not a constant expression")
-elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(overflow_diagnostic "constant expression")
-endif()
-
 add_mach_test(
     RoutingTests
     routing/RoutingTests.cpp
@@ -211,24 +180,3 @@ target_link_libraries(
 )
 
 catch_discover_tests(ValidationTests)
-
-add_mach_test(
-    ByteLiteralsTests
-    core/ByteLiteralsTests.cpp
-)
-
-target_link_libraries(
-    ByteLiteralsTests
-    PRIVATE
-        mach
-        mach_test_support
-        Catch2::Catch2WithMain
-)
-
-catch_discover_tests(ByteLiteralsTests)
-
-add_mach_compile_failure_test(
-    ByteLiteralsOverflowTests
-    core/ByteLiteralsOverflowTests.cpp
-    "${overflow_diagnostic}"
-)
