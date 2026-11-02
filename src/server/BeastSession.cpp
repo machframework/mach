@@ -60,9 +60,8 @@ namespace mach::detail::server
         beast::error_code ec;
 
         http::request_parser<http::string_body> parser;
-        parser.body_limit(1024 * 1024);
-        parser.header_limit(16 * 1024);
-        constexpr std::size_t maxTargetSize = 8 * 1024;
+        parser.body_limit(m_appOptions.maxRequestBodySize);
+        parser.header_limit(m_appOptions.maxRequestHeaderSize);
 
         // Read a request
         co_await http::async_read(
@@ -92,7 +91,7 @@ namespace mach::detail::server
 
         auto req = parser.release();
 
-        if (req.target().size() > maxTargetSize) {
+        if (req.target().size() > m_appOptions.maxRequestTargetSize) {
             co_return co_await send_response(
                 makeReadErrorResponse(mach::http::StatusCode::UriTooLong));
         }

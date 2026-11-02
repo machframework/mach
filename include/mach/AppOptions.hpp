@@ -3,6 +3,8 @@
 #include <chrono>
 #include <string>
 
+#include <mach/byte_literals.hpp>
+
 namespace mach
 {
     /**
@@ -20,5 +22,9 @@ namespace mach
         std::size_t threadCount = 4;
 
         std::chrono::seconds requestTimeout = std::chrono::seconds(30);
+
+        std::size_t maxRequestBodySize = literals::operator""_MiB(1);
+        std::size_t maxRequestHeaderSize = literals::operator""_KiB(16);
+        std::size_t maxRequestTargetSize = literals::operator""_KiB(8);
     };
 }
