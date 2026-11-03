@@ -232,3 +232,8 @@ add_mach_compile_failure_test(
     core/ByteLiteralsOverflowTests.cpp
     "${overflow_diagnostic}"
 )
+
+add_mach_test(
+    BindingTypesTests
+    binding/BindingTypesTests.cpp
+)
