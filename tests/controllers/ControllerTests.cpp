@@ -480,8 +480,10 @@ TEST_CASE("Controller actions can access route parameters") {
 TEST_CASE("Controller action parameters are bound from request bodies") {
     ensureServerRunning();
 
-    const auto response =
-        httpClient().post("/invocation/body", R"({"name":"Asaf","age":17,"male":true})");
+    const auto response = httpClient().post(
+        "/invocation/body",
+        R"({"name":"Asaf","age":17,"male":true})",
+        {{"Content-Type", "application/json"}});
 
     REQUIRE(response.statusCode() == 200);
     REQUIRE(response.body() == "17");
