@@ -1,10 +1,11 @@
 #pragma once
 
+#include <mach/detail/binding/BindingValueConcept.hpp>
 #include <mach/detail/core/FixedString.hpp>
 
 namespace mach
 {
-    template <typename T, detail::FixedString Name>
+    template <detail::binding::BindingValue T, detail::FixedString Name>
     class Query {
 
     private:

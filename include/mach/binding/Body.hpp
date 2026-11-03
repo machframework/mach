@@ -1,8 +1,10 @@
 #pragma once
 
+#include <mach/detail/binding/BindingValueConcept.hpp>
+
 namespace mach
 {
-    template <typename T>
+    template <detail::binding::BindingValue T>
     class Body {
 
     private:
