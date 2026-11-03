@@ -4,8 +4,11 @@
 
 #include <mach/Json.hpp>
 #include <mach/Request.hpp>
+#include <mach/exceptions/HttpException.hpp>
+#include <mach/http/StatusCode.hpp>
 
 #include <mach/detail/binding/BindingConcepts.hpp>
+#include <mach/detail/binding/BindingConversion.hpp>
 #include <mach/detail/core/FixedString.hpp>
 #include <mach/detail/exceptions/RequestBindingException.hpp>
 
@@ -48,17 +51,51 @@ namespace mach::detail::binding
 
     template <typename T>
     [[nodiscard]] T RequestBinder::bindBody(const mach::Request& request) {
-        // todo: implement
+        // TODO: Move JSON deserialization logic from the legacy bind() method here.
+
+        // TODO: Add Content-Type validation.
+        if (const auto contentType = request.header("content-type");
+            !request.body().empty() &&
+            (!contentType || !http::matchesMediaType(*contentType, "application/json") ||
+             http::hasUnsupportedCharset(*contentType))) {
+            throw mach::HttpException(
+                mach::http::StatusCode::UnsupportedMediaType,
+                "Unsupported Media Type: The request body must be JSON.");
+        }
+
+        return bind<T>(request.body());
     }
 
     template <typename T, detail::FixedString Name>
     [[nodiscard]] T RequestBinder::bindParam(const mach::Request& request) {
-        // todo: implement
+        try {
+            return convertBindingValue<T>(request.routeParam(std::string_view{Name}));
+        } catch (const nlohmann::json::exception&) {
+            throw RequestBindingException("The route parameter contains invalid JSON.");
+        } catch (const std::invalid_argument&) {
+            throw RequestBindingException("The route parameter has an invalid value.");
+        }
     }
 
     template <typename T, detail::FixedString Name>
     [[nodiscard]] T RequestBinder::bindQuery(const mach::Request& request) {
-        // todo: implement
+        const auto value = request.query(std::string_view{Name});
+
+        if (!value) {
+            if constexpr (detail::traits::isOptional_v<T>) {
+                return std::nullopt;
+            } else {
+                throw RequestBindingException("The required query parameter is missing.");
+            }
+        }
+
+        try {
+            return convertBindingValue<T>(*value);
+        } catch (const nlohmann::json::exception&) {
+            throw RequestBindingException("The query parameter contains invalid JSON.");
+        } catch (const std::invalid_argument&) {
+            throw RequestBindingException("The query parameter has an invalid value.");
+        }
     }
 
     template <typename T>
