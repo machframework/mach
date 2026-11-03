@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <string_view>
 
-#include <mach/detail/binding/BodyBinder.hpp>
+#include <mach/detail/binding/RequestBinder.hpp>
 #include <mach/detail/di/Container.hpp>
 #include <mach/detail/di/Scope.hpp>
 #include <mach/detail/di/ServiceLifetime.hpp>
@@ -306,7 +306,7 @@ namespace
     // Reserved services
     // -------------------------------------------------------------------------
 
-    using mach::detail::binding::BodyBinder;
+    using mach::detail::binding::RequestBinder;
     using mach::detail::routing::Router;
 }
 
@@ -782,10 +782,10 @@ TEST_CASE("DI protects reserved internal services") {
     SECTION("BodyBinder cannot be registered by user") {
         di::Container container;
 
-        container.reserveInternal<BodyBinder>();
+        container.reserveInternal<RequestBinder>();
 
         REQUIRE_THROWS_AS(
-            container.addService<BodyBinder>(di::ServiceLifetime::Singleton),
+            container.addService<RequestBinder>(di::ServiceLifetime::Singleton),
             std::logic_error);
     }
 }

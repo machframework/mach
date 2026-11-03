@@ -10,7 +10,7 @@
 #include <mach/ValidationBuilder.hpp>
 #include <mach/exceptions/BadRequestException.hpp>
 
-#include <mach/detail/binding/BodyBinder.hpp>
+#include <mach/detail/binding/RequestBinder.hpp>
 #include <mach/detail/binding/JsonConcepts.hpp>
 #include <mach/detail/controllers/ControllerTraits.hpp>
 #include <mach/detail/dispatching/IEndpointInvoker.hpp>
@@ -92,7 +92,7 @@ namespace mach::detail::dispatching
                         "JSON.");
 
                     if constexpr (passedByValue && jsonDeserializable) {
-                        auto& binder = execution.scope.resolve<binding::BodyBinder>();
+                        auto& binder = execution.scope.resolve<binding::RequestBinder>();
                         BodyType body = binder.bind<BodyType>(stringBody);
 
                         if constexpr (requires(mach::ValidationBuilder<BodyType>& builder) {

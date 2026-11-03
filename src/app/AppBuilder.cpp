@@ -5,7 +5,7 @@
 #include <mach/Logger.hpp>
 #include <mach/diagnostics/TerminateHandler.hpp>
 
-#include <mach/detail/binding/BodyBinder.hpp>
+#include <mach/detail/binding/RequestBinder.hpp>
 #include <mach/detail/cors/CorsOptions.hpp>
 #include <mach/detail/exceptions/ExceptionMiddleware.hpp>
 #include <mach/detail/routing/Router.hpp>
@@ -146,7 +146,7 @@ namespace mach
             std::move(loggerInstance),
             detail::di::ServiceAccess::User);
 
-        m_container.addService<detail::binding::BodyBinder>(
+        m_container.addService<detail::binding::RequestBinder>(
             detail::di::ServiceLifetime::Singleton,
             detail::di::ServiceAccess::Internal);
 

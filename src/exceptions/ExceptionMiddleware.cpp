@@ -9,7 +9,7 @@
 #include <mach/http/StatusCode.hpp>
 #include <mach/middleware/Next.hpp>
 
-#include <mach/detail/exceptions/BodyBindingException.hpp>
+#include <mach/detail/exceptions/RequestBindingException.hpp>
 
 namespace mach::detail::exceptions
 {
@@ -18,7 +18,7 @@ namespace mach::detail::exceptions
     void ExceptionMiddleware::invoke(mach::Context& context, mach::Next& next) {
         try {
             next();
-        } catch (const BodyBindingException& ex) {
+        } catch (const RequestBindingException& ex) {
             m_logger.error("{}", ex.what());
 
             context.response = Response{};

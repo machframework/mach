@@ -19,7 +19,7 @@
 #include <mach/controllers/ControllerBuilder.hpp>
 #include <mach/results/Results.hpp>
 
-#include <mach/detail/binding/BodyBinder.hpp>
+#include <mach/detail/binding/RequestBinder.hpp>
 
 #include "support/BeastHttpClient.hpp"
 
@@ -439,7 +439,7 @@ TEST_CASE("Controller action parameters use body binding") {
 // -----------------------------------------------------------------------------
 
 TEST_CASE("BodyBinder supports structured object binding") {
-    mach::detail::binding::BodyBinder binder;
+    mach::detail::binding::RequestBinder binder;
 
     SECTION("Nested object") {
         const auto dto = binder.bind<UserDto>(
@@ -523,7 +523,7 @@ TEST_CASE("BodyBinder supports structured object binding") {
 // -----------------------------------------------------------------------------
 
 TEST_CASE("BodyBinder supports move-only DTOs") {
-    mach::detail::binding::BodyBinder binder;
+    mach::detail::binding::RequestBinder binder;
 
     auto dto = binder.bind<MoveOnlyDto>(
         R"({

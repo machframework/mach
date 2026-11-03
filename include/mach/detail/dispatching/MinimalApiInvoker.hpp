@@ -99,7 +99,7 @@ namespace mach::detail::dispatching
                             "JSON.");
 
                         if constexpr (binding::JsonDeserializable<ValueType>) {
-                            auto& binder = execution.scope.resolve<binding::BodyBinder>();
+                            auto& binder = execution.scope.resolve<binding::RequestBinder>();
                             ValueType body = binder.bind<ValueType>(context.request.body());
 
                             if constexpr (requires(mach::ValidationBuilder<ValueType>& builder) {
@@ -155,7 +155,7 @@ namespace mach::detail::dispatching
                     "mach::Context& or const mach::Context&.");
 
                 if constexpr (firstIsValidContext != secondIsValidContext) {
-                    auto& binder = execution.scope.resolve<binding::BodyBinder>();
+                    auto& binder = execution.scope.resolve<binding::RequestBinder>();
 
                     if constexpr (firstIsValidContext) {
                         using DeclaredBodyType = std::tuple_element_t<1, std::tuple<TArgs...>>;
