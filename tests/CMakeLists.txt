@@ -268,3 +268,8 @@ target_link_libraries(
 )
 
 catch_discover_tests(RequestBinderTests)
+
+add_mach_test(
+    BindingTypesCompileTimeTests
+    binding/BindingTypesCompileTimeTests.cpp
+)
