@@ -9,6 +9,7 @@
 
 #include <mach/detail/binding/BindingConcepts.hpp>
 #include <mach/detail/binding/BindingConversion.hpp>
+#include <mach/detail/binding/JsonConcepts.hpp>
 #include <mach/detail/core/FixedString.hpp>
 #include <mach/detail/exceptions/RequestBindingException.hpp>
 #include <mach/detail/http/ContentType.hpp>
@@ -20,10 +21,10 @@ namespace mach::detail::binding
     class RequestBinder {
 
     public:
-        template <typename T>
-        [[nodiscard]] T bind(std::string_view body);
-
         template <mach::detail::binding::Binding T>
+        [[nodiscard]] T bind(const mach::Request& request);
+        
+        template <binding::JsonDeserializable T>
         [[nodiscard]] T bind(const mach::Request& request);
 
     private:
@@ -35,6 +36,8 @@ namespace mach::detail::binding
 
         template <typename T, detail::FixedString Name>
         [[nodiscard]] T bindQuery(const mach::Request& request);
+
+        static void validateJsonContentType(const mach::Request& request);
     };
 
     template <mach::detail::binding::Binding T>
@@ -52,19 +55,8 @@ namespace mach::detail::binding
 
     template <typename T>
     [[nodiscard]] T RequestBinder::bindBody(const mach::Request& request) {
-        // TODO: Move JSON deserialization logic from the legacy bind() method here.
-
-        // TODO: Add Content-Type validation.
-        if (const auto contentType = request.header("content-type");
-            !request.body().empty() &&
-            (!contentType || !http::matchesMediaType(*contentType, "application/json") ||
-             http::hasUnsupportedCharset(*contentType))) {
-            throw mach::HttpException(
-                mach::http::StatusCode::UnsupportedMediaType,
-                "Unsupported Media Type: The request body must be JSON.");
-        }
-
-        return bind<T>(request.body());
+        validateJsonContentType(request);
+        return bind<T>(request);
     }
 
     template <typename T, detail::FixedString Name>
@@ -99,8 +91,12 @@ namespace mach::detail::binding
         }
     }
 
-    template <typename T>
-    T RequestBinder::bind(std::string_view body) {
+    template <binding::JsonDeserializable T>
+    T RequestBinder::bind(const mach::Request& request) {
+        validateJsonContentType(request);
+        
+        const auto& body = request.body();
+
         if (body.empty()) {
             throw RequestBindingException("The request body is required.");
         }
@@ -117,6 +113,21 @@ namespace mach::detail::binding
         } catch (const nlohmann::json::exception&) {
             throw RequestBindingException(
                 "The request body could not be bound to the requested type.");
+        }
+    }
+
+    inline void RequestBinder::validateJsonContentType(const mach::Request& request) {
+        if (request.body().empty()) {
+            return;
+        }
+
+        const auto contentType = request.header("content-type");
+
+        if (!contentType || !http::matchesMediaType(*contentType, "application/json") ||
+            http::hasUnsupportedCharset(*contentType)) {
+            throw mach::HttpException(
+                mach::http::StatusCode::UnsupportedMediaType,
+                "Unsupported Media Type: The request body must be JSON.");
         }
     }
 }

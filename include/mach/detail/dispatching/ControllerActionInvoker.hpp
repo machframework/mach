@@ -93,7 +93,7 @@ namespace mach::detail::dispatching
 
                     if constexpr (passedByValue && jsonDeserializable) {
                         auto& binder = execution.scope.resolve<binding::RequestBinder>();
-                        BodyType body = binder.bind<BodyType>(stringBody);
+                        BodyType body = binder.bind<BodyType>(execution.context.request);
 
                         if constexpr (requires(mach::ValidationBuilder<BodyType>& builder) {
                                           { body.validate(builder) } -> std::same_as<void>;
