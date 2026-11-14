@@ -8,6 +8,12 @@
 
 namespace mach::detail::binding
 {
+    enum class BindingSource {
+        Body,
+        Param,
+        Query
+    };
+
     template <typename T>
     struct BindingTraits {
         static constexpr bool is_binding = false;
@@ -17,6 +23,7 @@ namespace mach::detail::binding
     struct BindingTraits<Body<T>> {
         static constexpr bool is_binding = true;
         using value_type = T;
+        static constexpr BindingSource source = BindingSource::Body;
     };
 
     template <typename T, FixedString Name>
@@ -24,6 +31,7 @@ namespace mach::detail::binding
         static constexpr bool is_binding = true;
         using value_type = T;
         static constexpr auto name = Name;
+        static constexpr BindingSource source = BindingSource::Param;
     };
 
     template <typename T, FixedString Name>
@@ -31,5 +39,6 @@ namespace mach::detail::binding
         static constexpr bool is_binding = true;
         using value_type = T;
         static constexpr auto name = Name;
+        static constexpr BindingSource source = BindingSource::Query;
     };
 }

@@ -11,7 +11,7 @@
 #include <mach/detail/dispatching/IEndpointInvoker.hpp>
 #include <mach/detail/http/ContentType.hpp>
 #include <mach/detail/results/ResultTraits.hpp>
-#include <mach/detail/serailization/Serializer.hpp>
+#include <mach/detail/serialization/Serializer.hpp>
 #include <mach/detail/validation/ValidationResult.hpp>
 #include <mach/detail/validation/ValidationUtils.hpp>
 
@@ -99,7 +99,7 @@ namespace mach::detail::dispatching
                             "JSON.");
 
                         if constexpr (binding::JsonDeserializable<ValueType>) {
-                            auto& binder = execution.scope.resolve<binding::BodyBinder>();
+                            auto& binder = execution.scope.resolve<binding::RequestBinder>();
                             ValueType body = binder.bind<ValueType>(context.request.body());
 
                             if constexpr (requires(mach::ValidationBuilder<ValueType>& builder) {
@@ -155,7 +155,7 @@ namespace mach::detail::dispatching
                     "mach::Context& or const mach::Context&.");
 
                 if constexpr (firstIsValidContext != secondIsValidContext) {
-                    auto& binder = execution.scope.resolve<binding::BodyBinder>();
+                    auto& binder = execution.scope.resolve<binding::RequestBinder>();
 
                     if constexpr (firstIsValidContext) {
                         using DeclaredBodyType = std::tuple_element_t<1, std::tuple<TArgs...>>;

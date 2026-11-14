@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <string_view>
 
 namespace mach::detail
 {
@@ -13,6 +14,10 @@ namespace mach::detail
             for (std::size_t i = 0; i < N; ++i) {
                 data[i] = str[i];
             }
+        }
+
+        constexpr operator std::string_view() const noexcept {
+            return {data, sizeof(data) - 1};
         }
     };
 }
