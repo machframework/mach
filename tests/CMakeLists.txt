@@ -1,5 +1,6 @@
 add_library(mach_test_support STATIC
     support/BeastHttpClient.cpp
+    support/TestRequestBuilder.cpp
 )
 
 target_include_directories(
@@ -237,3 +238,33 @@ add_mach_test(
     BindingTypesTests
     binding/BindingTypesTests.cpp
 )
+
+add_mach_test(
+    TestRequestBuilderTests
+    http/TestRequestBuilderTests.cpp
+)
+
+target_link_libraries(
+    TestRequestBuilderTests
+    PRIVATE
+        mach
+        mach_test_support
+        Catch2::Catch2WithMain
+)
+
+catch_discover_tests(TestRequestBuilderTests)
+
+add_mach_test(
+    RequestBinderTests
+    binding/RequestBinderTests.cpp
+)
+
+target_link_libraries(
+    RequestBinderTests
+    PRIVATE
+        mach
+        mach_test_support
+        Catch2::Catch2WithMain
+)
+
+catch_discover_tests(RequestBinderTests)

@@ -11,6 +11,7 @@
 #include <mach/detail/binding/BindingConversion.hpp>
 #include <mach/detail/core/FixedString.hpp>
 #include <mach/detail/exceptions/RequestBindingException.hpp>
+#include <mach/detail/http/ContentType.hpp>
 
 namespace mach::detail::binding
 {
