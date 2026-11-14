@@ -1,3 +1,7 @@
+#include <climits>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -11,9 +15,6 @@
 #include <mach/Json.hpp>
 
 #include "support/TestRequestBuilder.hpp"
-
-#include <string>
-#include <utility>
 
 struct CreateUserRequest {
     std::string name;
@@ -149,4 +150,58 @@ TEST_CASE("RequestBinder rejects JSON null for non-nullable types", "[binding][r
     RequestBinder binder;
 
     REQUIRE_THROWS_AS(binder.bind<mach::Body<int>>(context.request), RequestBindingException);
+}
+
+TEST_CASE("RequestBinder binds JSON arrays", "[binding][request-binder]") {
+    auto context = makeJsonRequest("[1, 2, 3]");
+    RequestBinder binder;
+
+    auto result = binder.bind<mach::Body<std::vector<int>>>(context.request);
+
+    REQUIRE(result.value() == std::vector<int>{1, 2, 3});
+}
+
+TEST_CASE("RequestBinder accepts JSON Content-Type with charset", "[binding][request-binder]") {
+    auto context = TestRequestBuilder{}
+                       .method(mach::http::Method::Post)
+                       .target("/users")
+                       .header("Content-Type", "application/json; charset=utf-8")
+                       .body("42")
+                       .build();
+
+    RequestBinder binder;
+
+    auto result = binder.bind<mach::Body<int>>(context.request);
+
+    REQUIRE(result.value() == 42);
+}
+
+TEST_CASE("RequestBinder rejects invalid DTO field types", "[binding][request-binder]") {
+    auto context = makeJsonRequest(R"({"name":"Alice","age":"invalid"})");
+
+    RequestBinder binder;
+
+    REQUIRE_THROWS_AS(
+        binder.bind<mach::Body<CreateUserRequest>>(context.request),
+        RequestBindingException);
+}
+
+TEST_CASE("RequestBinder binds integer boundary values", "[binding][request-binder]") {
+    RequestBinder binder;
+
+    SECTION("Minimum integer") {
+        auto context = makeJsonRequest(std::to_string(INT_MIN));
+
+        auto result = binder.bind<mach::Body<int>>(context.request);
+
+        REQUIRE(result.value() == INT_MIN);
+    }
+
+    SECTION("Maximum integer") {
+        auto context = makeJsonRequest(std::to_string(INT_MAX));
+
+        auto result = binder.bind<mach::Body<int>>(context.request);
+
+        REQUIRE(result.value() == INT_MAX);
+    }
 }
