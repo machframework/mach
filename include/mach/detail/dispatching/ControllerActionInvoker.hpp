@@ -10,6 +10,8 @@
 #include <mach/ValidationBuilder.hpp>
 #include <mach/exceptions/BadRequestException.hpp>
 
+#include <mach/detail/binding/BindingConcepts.hpp>
+#include <mach/detail/binding/BindingTraits.hpp>
 #include <mach/detail/binding/RequestBinder.hpp>
 #include <mach/detail/binding/JsonConcepts.hpp>
 #include <mach/detail/controllers/ControllerTraits.hpp>
@@ -41,6 +43,14 @@ namespace mach::detail::dispatching
 
     private:
         Action m_action;
+
+        static constexpr bool usesExplicitBindings =
+            (binding::Binding<std::remove_cvref_t<TArgs>> || ...);
+
+        template <typename T>
+        static decltype(auto) resolveArgument(
+            mach::Context& context,
+            binding::RequestBinder& binder);
     };
 
     template <typename TController, typename TResult, typename... TArgs>
@@ -53,77 +63,94 @@ namespace mach::detail::dispatching
 
         constexpr std::size_t parameterCount = sizeof...(TArgs);
 
-        static_assert(
-            parameterCount <= 1,
-            "Mach error: controller actions may accept at most one parameter, which is bound from "
-            "the request body.");
+        TResult res = [&]() -> TResult {
+            if constexpr (usesExplicitBindings) {
+                static_assert(
+                    ((binding::Binding<TArgs> && std::same_as<TArgs, std::remove_cvref_t<TArgs>>) &&
+                     ...),
+                    "Action arguments must be unqualified binding types passed by value.");
 
-        const auto& stringBody = context.request.body();
+                auto& binder = execution.scope.resolve<binding::RequestBinder>();
 
-        if (const auto contentType = context.request.header("content-type");
-            !stringBody.empty() &&
-            (!contentType || !http::matchesMediaType(*contentType, "application/json") ||
-             http::hasUnsupportedCharset(*contentType))) {
-            context.response = mach::Response{context.request.version()};
-            context.response.status(mach::http::StatusCode::UnsupportedMediaType);
-            return;
-        }
+                std::tuple<TArgs...> args{resolveArgument<TArgs>(execution.context, binder)...};
 
-        if constexpr (parameterCount <= 1) {
-            TResult res = [&]() -> TResult {
-                if constexpr (parameterCount == 0) {
-                    return std::invoke(m_action, controller);
-                } else {
-                    // The request body is the first controller handler parameter.
-                    using DeclaredBodyType = std::tuple_element_t<0, std::tuple<TArgs...>>;
-                    using BodyType = std::remove_cvref_t<DeclaredBodyType>;
+                return std::apply(
+                    [&](auto&&... unpackedArgs) -> TResult {
+                        return std::invoke(
+                            m_action,
+                            controller,
+                            std::forward<decltype(unpackedArgs)>(unpackedArgs)...);
+                    },
+                    std::move(args));
 
-                    constexpr bool passedByValue = std::same_as<DeclaredBodyType, BodyType>;
+            } else if constexpr (parameterCount == 0) {
+                return std::invoke(m_action, controller);
 
-                    constexpr bool jsonDeserializable = binding::JsonDeserializable<BodyType>;
+            } else {
+                // Legacy binding: the request body is the action's only parameter.
+                static_assert(
+                    parameterCount == 1,
+                    "Mach error: legacy controller actions must accept at most one body "
+                    "parameter.");
 
-                    static_assert(
-                        passedByValue,
-                        "Mach error: controller action body parameter must be passed by value.");
+                using DeclaredBodyType = std::tuple_element_t<0, std::tuple<TArgs...>>;
+                using BodyType = std::remove_cvref_t<DeclaredBodyType>;
 
-                    static_assert(
-                        jsonDeserializable,
-                        "Mach error: controller action parameter must be deserializable from "
-                        "JSON.");
+                constexpr bool passedByValue = std::same_as<DeclaredBodyType, BodyType>;
+                constexpr bool jsonDeserializable = binding::JsonDeserializable<BodyType>;
 
-                    if constexpr (passedByValue && jsonDeserializable) {
-                        auto& binder = execution.scope.resolve<binding::RequestBinder>();
-                        BodyType body = binder.bind<BodyType>(execution.context.request);
+                static_assert(
+                    passedByValue,
+                    "Mach error: controller action body parameter must be passed by value.");
 
-                        if constexpr (requires(mach::ValidationBuilder<BodyType>& builder) {
-                                          { body.validate(builder) } -> std::same_as<void>;
-                                      }) {
-                            mach::ValidationBuilder<BodyType> validationBuilder;
-                            validation::ValidationResult validationResult;
+                static_assert(
+                    jsonDeserializable,
+                    "Mach error: controller action parameter must be deserializable from JSON.");
 
-                            body.validate(validationBuilder);
-                            validationBuilder.validate(body, validationResult);
+                if constexpr (passedByValue && jsonDeserializable) {
+                    auto& binder = execution.scope.resolve<binding::RequestBinder>();
+                    BodyType body = binder.bind<BodyType>(execution.context.request);
 
-                            if (validationResult.hasErrors()) {
-                                throw BadRequestException(makeValidationError(validationResult));
-                            }
+                    if constexpr (requires(mach::ValidationBuilder<BodyType>& builder) {
+                                      { body.validate(builder) } -> std::same_as<void>;
+                                  }) {
+                        mach::ValidationBuilder<BodyType> validationBuilder;
+                        validation::ValidationResult validationResult;
+
+                        body.validate(validationBuilder);
+                        validationBuilder.validate(body, validationResult);
+
+                        if (validationResult.hasErrors()) {
+                            throw BadRequestException(makeValidationError(validationResult));
                         }
-
-                        return std::invoke(m_action, controller, std::move(body));
                     }
-                }
-            }();
 
-            context.response.status(res.statusCode());
-
-            using ValueType = TResult::ValueType;
-
-            if constexpr (!std::same_as<ValueType, void>) {
-                if (res.hasValue()) {
-                    context.response.body(serialization::Serializer::serialize(res.value()));
+                    return std::invoke(m_action, controller, std::move(body));
                 }
             }
+        }();
+
+        context.response.status(res.statusCode());
+
+        using ValueType = TResult::ValueType;
+
+        if constexpr (!std::same_as<ValueType, void>) {
+            if (res.hasValue()) {
+                context.response.body(serialization::Serializer::serialize(res.value()));
+            }
         }
+    }
+
+    template <typename THandler, typename TResult, typename... TArgs>
+    template <typename T>
+    decltype(auto) ControllerActionInvoker<THandler, TResult, TArgs...>::resolveArgument(
+        mach::Context& context,
+        binding::RequestBinder& binder) {
+        static_assert(
+            binding::Binding<T>,
+            "Action argument must be a binding type.");
+
+        return binder.bind<T>(context.request);
     }
 
     template <typename TController, typename TResult, typename TArgsTuple>
