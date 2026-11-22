@@ -288,3 +288,18 @@ target_link_libraries(
 )
 
 catch_discover_tests(MinimalApiBindingTests)
+
+add_mach_test(
+    ControllerBindingTests
+    binding/ControllerBindingTests.cpp
+)
+
+target_link_libraries(
+    ControllerBindingTests
+    PRIVATE
+        mach
+        mach_test_support
+        Catch2::Catch2WithMain
+)
+
+catch_discover_tests(ControllerBindingTests)
