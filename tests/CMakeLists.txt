@@ -273,3 +273,18 @@ add_mach_test(
     BindingTypesCompileTimeTests
     binding/BindingTypesCompileTimeTests.cpp
 )
+
+add_mach_test(
+    MinimalApiBindingTests
+    binding/MinimalApiBindingTests.cpp
+)
+
+target_link_libraries(
+    MinimalApiBindingTests
+    PRIVATE
+        mach
+        mach_test_support
+        Catch2::Catch2WithMain
+)
+
+catch_discover_tests(MinimalApiBindingTests)

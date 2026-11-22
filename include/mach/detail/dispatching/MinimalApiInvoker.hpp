@@ -79,7 +79,7 @@ namespace mach::detail::dispatching
                 if constexpr (parameterCount == 0) {
                     return std::invoke(m_handler);
                 } else {
-                    const auto& binder = execution.scope.resolve<binding::RequestBinder>();
+                    auto& binder = execution.scope.resolve<binding::RequestBinder>();
                     std::tuple<TArgs...> args{resolveArgument<TArgs>(execution.context, binder)...};
 
                     return std::apply(m_handler, std::move(args));
