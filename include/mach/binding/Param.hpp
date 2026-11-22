@@ -16,15 +16,33 @@ namespace mach
     class Param {
 
     public:
-        [[nodiscard]] const T& value() const noexcept {
-            return m_value;
-        }
+        [[nodiscard]] const T& value() const noexcept;
+        [[nodiscard]] const T& operator*() const noexcept;
+        [[nodiscard]] const T* operator->() const noexcept;
 
     private:
-        explicit Param(T value) : m_value(std::move(value)) {}
+        explicit Param(T value);
 
         T m_value;
 
         friend class detail::binding::RequestBinder;
     };
+
+    template <detail::binding::BindingValue T, detail::FixedString Name>
+    const T& Param<T, Name>::value() const noexcept {
+        return m_value;
+    }
+
+    template <detail::binding::BindingValue T, detail::FixedString Name>
+    const T& Param<T, Name>::operator*() const noexcept {
+        return m_value;
+    }
+
+    template <detail::binding::BindingValue T, detail::FixedString Name>
+    const T* Param<T, Name>::operator->() const noexcept {
+        return &m_value;
+    }
+
+    template <detail::binding::BindingValue T, detail::FixedString Name>
+    Param<T, Name>::Param(T value) : m_value(std::move(value)) {}
 }
