@@ -120,6 +120,19 @@ namespace
                         std::to_string(id.value()) + ":" + std::to_string(page.value()));
                 });
 
+            m_app.mapGet(
+                "/explicit/params/{userId}/{postId}",
+                [](mach::Param<int, "userId"> userId, mach::Param<int, "postId"> postId) {
+                    return mach::ok(
+                        std::to_string(userId.value()) + ":" + std::to_string(postId.value()));
+                });
+
+            m_app.mapGet(
+                "/explicit/queries",
+                [](mach::Query<int, "page"> page, mach::Query<std::string, "sort"> sort) {
+                    return mach::ok(std::to_string(page.value()) + ":" + sort.value());
+                });
+
             m_app.mapPost(
                 "/explicit/all/{id}",
                 [](mach::Query<int, "page"> page,
@@ -348,6 +361,27 @@ TEST_CASE("Minimal API combines explicit binding sources") {
             client().post("/explicit/all/42?page=3", R"({"name":"Alice","age":30})", jsonHeaders());
         REQUIRE(response.statusCode() == 200);
         REQUIRE(response.body() == "42:Alice:3");
+    }
+
+    SECTION("Multiple route parameters") {
+        const auto response = client().get("/explicit/params/42/7");
+        REQUIRE(response.statusCode() == 200);
+        REQUIRE(response.body() == "42:7");
+    }
+
+    SECTION("Multiple query parameters") {
+        const auto response = client().get("/explicit/queries?page=3&sort=desc");
+        REQUIRE(response.statusCode() == 200);
+        REQUIRE(response.body() == "3:desc");
+    }
+
+    SECTION("Invalid query in combined binding") {
+        const auto response = client().post(
+            "/explicit/all/42?page=invalid",
+            R"({"name":"Alice","age":30})",
+            jsonHeaders());
+
+        REQUIRE(response.statusCode() == 400);
     }
 }
 

@@ -30,6 +30,8 @@ namespace
         int id;
     };
 
+    MACH_DEFINE_JSON(UserDto, id);
+
     class CompileFailureController final : public mach::ControllerBase {
     public:
         inline static constexpr std::string_view route = "/compile-failure";
@@ -40,7 +42,10 @@ namespace
 
 #if MACH_CONTROLLER_COMPILE_FAILURE_CASE == 0
         // Positive compilation baseline.
-        mach::Reply<int> action(mach::Param<int, "id"> id) {
+        mach::Reply<int> action(
+            mach::Query<int, "page"> page,
+            mach::Body<UserDto> body,
+            mach::Param<int, "id"> id) {
             return ok(id.value());
         }
 

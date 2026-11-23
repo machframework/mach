@@ -24,7 +24,22 @@
 int main() {
     auto app = mach::AppBuilder().build();
 
-#if MACH_COMPILE_FAILURE_CASE == 1
+#if MACH_COMPILE_FAILURE_CASE == 0
+    app.mapGet("/users/{id}", [](mach::Param<int, "id"> id) {
+        return mach::ok();
+    });
+
+    app.mapGet(
+        "/users/{id}/posts",
+        [](mach::Context& context, mach::Param<int, "id"> id, mach::Query<int, "page"> page) {
+            return mach::ok();
+        });
+
+    app.mapPost("/users", [](mach::Body<std::string> body) {
+        return mach::ok();
+    });
+
+#elif MACH_COMPILE_FAILURE_CASE == 1
     // Expected: binding wrappers must be passed by value.
     app.mapGet("/users/{id}", [](mach::Param<int, "id">& id) {
         return mach::ok();

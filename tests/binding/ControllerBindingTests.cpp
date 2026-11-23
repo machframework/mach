@@ -43,10 +43,12 @@ namespace
 
             builder.mapGet("/param/int/{id}", &ExplicitBindingController::paramInt);
             builder.mapGet("/param/string/{name}", &ExplicitBindingController::paramString);
+            builder.mapGet("/params/{userId}/{postId}", &ExplicitBindingController::multipleParams);
 
             builder.mapGet("/query/int", &ExplicitBindingController::queryInt);
             builder.mapGet("/query/string", &ExplicitBindingController::queryString);
             builder.mapGet("/query/optional", &ExplicitBindingController::queryOptional);
+            builder.mapGet("/queries", &ExplicitBindingController::multipleQueries);
 
             builder.mapGet("/combined/{id}", &ExplicitBindingController::combined);
             builder.mapPost("/all/{id}", &ExplicitBindingController::all);
@@ -66,6 +68,7 @@ namespace
 
             builder.mapGet("/legacy/plain", &ExplicitBindingController::legacyPlain);
             builder.mapPost("/legacy/body", &ExplicitBindingController::legacyBody);
+
         }
 
         mach::Reply<std::string> ready() {
@@ -92,6 +95,12 @@ namespace
             return ok(name.value());
         }
 
+        mach::Reply<std::string> multipleParams(
+            mach::Param<int, "userId"> userId,
+            mach::Param<int, "postId"> postId) {
+            return ok(std::to_string(userId.value()) + ":" + std::to_string(postId.value()));
+        }
+
         mach::Reply<int> queryInt(mach::Query<int, "page"> page) {
             return ok(page.value());
         }
@@ -102,6 +111,12 @@ namespace
 
         mach::Reply<std::string> queryOptional(mach::Query<std::optional<int>, "page"> page) {
             return ok(page.value().has_value() ? std::to_string(*page.value()) : "none");
+        }
+
+        mach::Reply<std::string> multipleQueries(
+            mach::Query<int, "page"> page,
+            mach::Query<std::string, "sort"> sort) {
+            return ok(std::to_string(page.value()) + ":" + sort.value());
         }
 
         mach::Reply<std::string> combined(
@@ -335,6 +350,26 @@ TEST_CASE("Controller combines explicit binding sources") {
             jsonHeaders());
         REQUIRE(response.statusCode() == 200);
         REQUIRE(response.body() == "42:Alice:3");
+    }
+
+    SECTION("Multiple route parameters") {
+        const auto response = client().get("/controller-binding/params/42/7");
+        REQUIRE(response.statusCode() == 200);
+        REQUIRE(response.body() == "42:7");
+    }
+
+    SECTION("Multiple query parameters") {
+        const auto response = client().get("/controller-binding/queries?page=3&sort=desc");
+        REQUIRE(response.statusCode() == 200);
+        REQUIRE(response.body() == "3:desc");
+    }
+
+    SECTION("Combined binding with invalid query") {
+        const auto response = client().post(
+            "/controller-binding/all/42?page=invalid",
+            R"({"name":"Alice","age":30})",
+            jsonHeaders());
+        REQUIRE(response.statusCode() == 400);
     }
 }
 
