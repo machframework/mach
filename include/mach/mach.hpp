@@ -1,13 +1,15 @@
 #pragma once
 
-#include <mach/diagnostics/TerminateHandler.hpp>
-
 #include <mach/App.hpp>
 #include <mach/AppBuilder.hpp>
 
 #include <mach/Context.hpp>
 #include <mach/Request.hpp>
 #include <mach/Response.hpp>
+
+#include <mach/binding/Body.hpp>
+#include <mach/binding/Param.hpp>
+#include <mach/binding/Query.hpp>
 
 #include <mach/http/Method.hpp>
 #include <mach/http/StatusCode.hpp>
@@ -18,11 +20,12 @@
 #include <mach/Reply.hpp>
 #include <mach/results/Results.hpp>
 
-#include <mach/Logger.hpp>
-
 #include <mach/ValidationBuilder.hpp>
 
 #include <mach/CorsBuilder.hpp>
 #include <mach/CsrfBuilder.hpp>
 
-#include <mach/byte_literals.hpp>	
+#include <mach/Logger.hpp>
+#include <mach/diagnostics/TerminateHandler.hpp>
+
+#include <mach/byte_literals.hpp>
