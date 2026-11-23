@@ -1,0 +1,44 @@
+name: Linux CI
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  regression-tests:
+    name: ${{ matrix.compiler }}
+    runs-on: ubuntu-24.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - compiler: GCC
+            cc: gcc
+            cxx: g++
+          - compiler: Clang
+            cc: clang
+            cxx: clang++
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DMACH_BUILD_TESTS=ON \
+            -DMACH_BUILD_EXAMPLES=OFF \
+            -DMACH_BUILD_BENCHMARKS=OFF
+
+      - name: Build
+        run: cmake --build build --parallel 2
+
+      - name: Run regression tests
+        run: ctest --test-dir build --output-on-failure
