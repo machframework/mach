@@ -23,7 +23,7 @@ namespace mach::detail::binding
     public:
         template <mach::detail::binding::Binding T>
         [[nodiscard]] T bind(const mach::Request& request);
-        
+
         template <binding::JsonDeserializable T>
         [[nodiscard]] T bind(const mach::Request& request);
 
@@ -94,7 +94,7 @@ namespace mach::detail::binding
     template <binding::JsonDeserializable T>
     T RequestBinder::bind(const mach::Request& request) {
         validateJsonContentType(request);
-        
+
         const auto& body = request.body();
 
         if (body.empty()) {
