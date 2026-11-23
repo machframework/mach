@@ -5,8 +5,29 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
 project(MachCompileFailure LANGUAGES CXX)
 
-if(NOT DEFINED TEST_SOURCE OR NOT DEFINED EXPECTED_DIAGNOSTIC)
+if(NOT DEFINED TEST_SOURCE OR
+   NOT DEFINED EXPECTED_DIAGNOSTIC OR
+   EXPECTED_DIAGNOSTIC STREQUAL "")
     message(FATAL_ERROR "Missing compile-failure test parameters")
+endif()
+
+set(compile_definitions "-I${MACH_INCLUDE_DIR}")
+
+# Add external dependency include directories.
+foreach(include_dir IN LISTS DEPENDENCY_INCLUDE_DIRS)
+    if(NOT include_dir STREQUAL "")
+        list(APPEND compile_definitions "-I${include_dir}")
+    endif()
+endforeach()
+
+# Add test-specific preprocessor definitions.
+foreach(definition IN LISTS TEST_COMPILE_DEFINITIONS)
+    list(APPEND compile_definitions "-D${definition}")
+endforeach()
+
+# fmt requires UTF-8 support when compiling with MSVC.
+if(MSVC)
+    list(APPEND compile_definitions "/utf-8")
 endif()
 
 try_compile(
@@ -17,7 +38,7 @@ try_compile(
         "-DCMAKE_CXX_STANDARD=20"
         "-DCMAKE_CXX_STANDARD_REQUIRED=ON"
     COMPILE_DEFINITIONS
-        "-I${MACH_INCLUDE_DIR}"
+        ${compile_definitions}
     OUTPUT_VARIABLE output
 )
 

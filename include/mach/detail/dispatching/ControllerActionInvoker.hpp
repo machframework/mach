@@ -44,8 +44,7 @@ namespace mach::detail::dispatching
     private:
         Action m_action;
 
-        static constexpr bool usesExplicitBindings =
-            (binding::Binding<std::remove_cvref_t<TArgs>> || ...);
+        static constexpr bool usesExplicitBindings = (binding::BindingArgument<TArgs> || ...);
 
         template <typename T>
         static decltype(auto) resolveArgument(

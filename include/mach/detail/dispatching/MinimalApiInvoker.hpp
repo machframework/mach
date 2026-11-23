@@ -55,7 +55,7 @@ namespace mach::detail::dispatching
         static constexpr bool isContext =
             std::same_as<T, mach::Context&> || std::same_as<T, const mach::Context&>;
 
-        static constexpr bool usesExplicitBindings = (binding::Binding<std::remove_cvref_t<TArgs>> || ...);
+        static constexpr bool usesExplicitBindings = (binding::BindingArgument<TArgs> || ...);
 
         template <typename T>
         static decltype(auto) resolveArgument(
@@ -75,6 +75,10 @@ namespace mach::detail::dispatching
                      ...),
                     "Handler arguments must be Context&, const Context&, "
                     "or unqualified binding types passed by value.");
+
+                static_assert(
+                    (0 + ... + static_cast<std::size_t>(isContext<TArgs>)) <= 1,
+                    "Handler must not accept more than one Context parameter.");
 
                 if constexpr (parameterCount == 0) {
                     return std::invoke(m_handler);
