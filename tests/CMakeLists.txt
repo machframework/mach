@@ -47,6 +47,26 @@ function(add_mach_test test_name)
 endfunction()
 
 function(add_mach_compile_failure_test test_name source diagnostic)
+    get_target_property(
+    fmt_include_dirs
+    fmt::fmt
+    INTERFACE_INCLUDE_DIRECTORIES
+)
+
+get_target_property(
+    json_include_dirs
+    nlohmann_json::nlohmann_json
+    INTERFACE_INCLUDE_DIRECTORIES
+)
+
+set(dependency_include_dirs
+    ${fmt_include_dirs}
+    ${json_include_dirs}
+)
+
+list(FILTER dependency_include_dirs EXCLUDE REGEX "^$")
+list(REMOVE_DUPLICATES dependency_include_dirs)
+
     add_test(
         NAME "${test_name}"
         COMMAND "${CMAKE_COMMAND}"
@@ -55,11 +75,13 @@ function(add_mach_compile_failure_test test_name source diagnostic)
             "-DTEST_SOURCE=${CMAKE_CURRENT_SOURCE_DIR}/${source}"
             "-DMACH_INCLUDE_DIR=${CMAKE_SOURCE_DIR}/include"
             "-DEXPECTED_DIAGNOSTIC=${diagnostic}"
+            "-DTEST_COMPILE_DEFINITIONS=${ARGN}"
             "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
             "-DCMAKE_CXX_COMPILER_TARGET=${CMAKE_CXX_COMPILER_TARGET}"
             "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
             "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
             "-DCMAKE_MSVC_RUNTIME_LIBRARY=${CMAKE_MSVC_RUNTIME_LIBRARY}"
+            "-DDEPENDENCY_INCLUDE_DIRS=${dependency_include_dirs}"
             "-G${CMAKE_GENERATOR}"
         WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     )
@@ -273,3 +295,111 @@ add_mach_test(
     BindingTypesCompileTimeTests
     binding/BindingTypesCompileTimeTests.cpp
 )
+
+add_mach_test(
+    MinimalApiBindingTests
+    binding/MinimalApiBindingTests.cpp
+)
+
+target_link_libraries(
+    MinimalApiBindingTests
+    PRIVATE
+        mach
+        mach_test_support
+        Catch2::Catch2WithMain
+)
+
+catch_discover_tests(MinimalApiBindingTests)
+
+add_mach_test(
+    ControllerBindingTests
+    binding/ControllerBindingTests.cpp
+)
+
+target_link_libraries(
+    ControllerBindingTests
+    PRIVATE
+        mach
+        mach_test_support
+        Catch2::Catch2WithMain
+)
+
+catch_discover_tests(ControllerBindingTests)
+
+add_mach_test(
+    MinimalApiBindingCompileTimeTests
+    binding/MinimalApiBindingCompileFailureTests.cpp
+)
+
+target_compile_definitions(
+    MinimalApiBindingCompileTimeTests
+    PRIVATE
+        MACH_COMPILE_FAILURE_CASE=0
+)
+
+set(
+    minimal_api_binding_diagnostic
+    "Handler arguments must be Context&, const Context&, or unqualified binding types passed by value."
+)
+
+foreach(case RANGE 1 9)
+    if(case EQUAL 7)
+        set(
+            expected_diagnostic
+            "Handler must not accept more than one Context parameter."
+        )
+    else()
+        set(expected_diagnostic "${minimal_api_binding_diagnostic}")
+    endif()
+
+    add_mach_compile_failure_test(
+        MinimalApiBindingFailure${case}
+        binding/MinimalApiBindingCompileFailureTests.cpp
+        "${expected_diagnostic}"
+        MACH_COMPILE_FAILURE_CASE=${case}
+    )
+endforeach()
+
+add_mach_test(
+    ControllerBindingCompileTimeTests
+    binding/ControllerBindingCompileFailureTests.cpp
+)
+
+target_compile_definitions(
+    ControllerBindingCompileTimeTests
+    PRIVATE
+        MACH_CONTROLLER_COMPILE_FAILURE_CASE=0
+)
+
+set(
+    controller_binding_diagnostic
+    "Action arguments must be unqualified binding types passed by value"
+)
+
+foreach(case RANGE 1 11)
+    if(case EQUAL 4)
+        set(
+            expected_diagnostic
+            "Action arguments must be unqualified binding types passed by value."
+        )
+    elseif(case EQUAL 7 OR case EQUAL 8 OR case EQUAL 10)
+        set(
+            expected_diagnostic
+            "controller actions must not accept a Context parameter"
+        )
+    elseif(case EQUAL 9)
+        set(
+            expected_diagnostic
+            "legacy controller actions must accept at most one body parameter"
+        )
+    else()
+        set(expected_diagnostic "${controller_binding_diagnostic}")
+    endif()
+
+    add_mach_compile_failure_test(
+        ControllerBindingFailure${case}
+        binding/ControllerBindingCompileFailureTests.cpp
+        "${expected_diagnostic}"
+        MACH_CONTROLLER_COMPILE_FAILURE_CASE=${case}
+    )
+endforeach()

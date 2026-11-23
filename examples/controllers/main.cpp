@@ -1,3 +1,4 @@
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -10,9 +11,8 @@ public:
 
     inline static constexpr std::string_view route = "/home";
 
-    mach::Reply<int> doubleNumber() {
-        const int number = request().routeParam<int>("number");
-        return ok(number * 2);
+    mach::Reply<int> doubleNumber(mach::Param<int, "number"> number) {
+        return ok(*number * 2);
     }
 
     mach::Reply<std::string> sayHi() {
@@ -20,9 +20,26 @@ public:
         return ok("Hi from Mach!");
     }
 
+    mach::Reply<std::string> greet(
+        mach::Param<std::string, "name"> name,
+        mach::Query<std::optional<int>, "times"> times) {
+        std::string message;
+
+        for (int i = 0; i < times->value_or(1); ++i) {
+            if (!message.empty()) {
+                message += " ";
+            }
+
+            message += "Hello, " + *name + "!";
+        }
+
+        return ok(message);
+    }
+
     static void configure(mach::ControllerBuilder<HomeController>& routes) {
         routes.mapGet("/{number:int}", &HomeController::doubleNumber);
         routes.mapGet("/hi", &HomeController::sayHi);
+        routes.mapGet("/greet/{name}", &HomeController::greet);
     }
 
 private:

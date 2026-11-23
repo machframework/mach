@@ -22,10 +22,12 @@
 #include <mach/detail/binding/RequestBinder.hpp>
 
 #include "support/BeastHttpClient.hpp"
+#include "support/TestRequestBuilder.hpp"
 
 namespace
 {
     using testing::http::BeastHttpClient;
+    using testing::http::TestRequestBuilder;
 
     // -------------------------------------------------------------------------
     // Minimal API DTOs
@@ -196,6 +198,14 @@ namespace
 
     BeastHttpClient::Headers jsonHeaders() {
         return {{"Content-Type", "application/json"}};
+    }
+
+    mach::Context makeJsonContext(std::string body) {
+        return TestRequestBuilder{}
+            .method(mach::http::Method::Post)
+            .header("Content-Type", "application/json")
+            .body(std::move(body))
+            .build();
     }
 }
 
@@ -442,8 +452,7 @@ TEST_CASE("BodyBinder supports structured object binding") {
     mach::detail::binding::RequestBinder binder;
 
     SECTION("Nested object") {
-        const auto dto = binder.bind<UserDto>(
-            R"({
+        auto context = makeJsonContext(R"({
                     "name": "Asaf",
                     "email": "ignored@example.com",
                     "address": {
@@ -454,14 +463,15 @@ TEST_CASE("BodyBinder supports structured object binding") {
                     }
                 })");
 
+        const auto dto = binder.bind<UserDto>(context.request);
+
         REQUIRE(dto.name == "Asaf");
         REQUIRE(dto.address.city == "Gedera");
         REQUIRE(dto.address.street == "Herzl");
     }
 
     SECTION("Vector") {
-        const auto addresses = binder.bind<std::vector<AddressDto>>(
-            R"([
+        auto context = makeJsonContext(R"([
                     {
                         "city": "Gedera",
                         "street": "Herzl"
@@ -476,13 +486,14 @@ TEST_CASE("BodyBinder supports structured object binding") {
                     }
                 ])");
 
+        const auto addresses = binder.bind<std::vector<AddressDto>>(context.request);
+
         REQUIRE(addresses.size() == 3);
         REQUIRE(addresses.front().city == "Gedera");
     }
 
     SECTION("Set") {
-        const auto addresses = binder.bind<std::set<AddressDto>>(
-            R"([
+        auto context = makeJsonContext(R"([
                     {
                         "city": "Gedera",
                         "street": "Herzl"
@@ -493,12 +504,13 @@ TEST_CASE("BodyBinder supports structured object binding") {
                     }
                 ])");
 
+        const auto addresses = binder.bind<std::set<AddressDto>>(context.request);
+
         REQUIRE(addresses.size() == 2);
     }
 
     SECTION("Map") {
-        const auto addresses = binder.bind<std::map<std::string, AddressDto>>(
-            R"({
+        auto context = makeJsonContext(R"({
                     "home": {
                         "city": "Gedera",
                         "street": "Herzl"
@@ -513,6 +525,8 @@ TEST_CASE("BodyBinder supports structured object binding") {
                     }
                 })");
 
+        const auto addresses = binder.bind<std::map<std::string, AddressDto>>(context.request);
+
         REQUIRE(addresses.size() == 3);
         REQUIRE(addresses.at("home").city == "Gedera");
     }
@@ -525,11 +539,12 @@ TEST_CASE("BodyBinder supports structured object binding") {
 TEST_CASE("BodyBinder supports move-only DTOs") {
     mach::detail::binding::RequestBinder binder;
 
-    auto dto = binder.bind<MoveOnlyDto>(
-        R"({
+    auto context = makeJsonContext(R"({
                 "name": "Asaf",
                 "age": 18
             })");
+
+    auto dto = binder.bind<MoveOnlyDto>(context.request);
 
     REQUIRE(dto.name == "Asaf");
     REQUIRE(dto.age == 18);
