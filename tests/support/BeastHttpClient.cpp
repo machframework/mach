@@ -147,7 +147,13 @@ namespace testing::http
 
         const auto endpoints = m_resolver.resolve(m_host, m_port);
 
-        m_stream.connect(endpoints);
+        try {
+            m_stream.connect(endpoints);
+        } catch (...) {
+            beast::error_code ec;
+            m_stream.socket().close(ec);
+            throw;
+        }
     }
 
     BeastHttpClient::Response::Response(int statusCode, std::string body)
