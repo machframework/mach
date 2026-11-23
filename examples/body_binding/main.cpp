@@ -1,5 +1,4 @@
 #include <string>
-#include <utility>
 
 #include <mach/mach.hpp>
 
@@ -22,12 +21,9 @@ int main() {
     mach::AppBuilder builder;
     auto app = builder.build();
 
-    app.mapPost("/users", [](CreateUserRequest request) {
+    app.mapPost("/users", [](mach::Body<CreateUserRequest> body) {
         return mach::ok(
-            UserProfile{
-                .name = std::move(request.name),
-                .age = request.age,
-                .adult = request.age >= 18});
+            UserProfile{.name = body->name, .age = body->age, .adult = body->age >= 18});
     });
 
     return app.run();
