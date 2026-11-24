@@ -78,8 +78,10 @@ namespace testing::http
         return std::move(*this);
     }
 
-    mach::Context TestRequestBuilder::build() && {
-        m_impl->request.prepare_payload();
+    mach::Context TestRequestBuilder::build(bool preparePayload) && {
+        if (preparePayload) {
+            m_impl->request.prepare_payload();
+        }
 
         mach::detail::http::adapter::BeastRequestAdapter adapter;
         bool rejected = false;

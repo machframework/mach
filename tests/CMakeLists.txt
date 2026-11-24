@@ -403,3 +403,18 @@ foreach(case RANGE 1 11)
         MACH_CONTROLLER_COMPILE_FAILURE_CASE=${case}
     )
 endforeach()
+
+add_mach_test(
+    RequestHeadersTests
+    http/RequestHeadersTests.cpp
+)
+
+target_link_libraries(
+    RequestHeadersTests
+    PRIVATE
+        mach
+        mach_test_support
+        Catch2::Catch2WithMain
+)
+
+catch_discover_tests(RequestHeadersTests)

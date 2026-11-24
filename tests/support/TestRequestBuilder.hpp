@@ -28,7 +28,7 @@ namespace testing::http
 
         TestRequestBuilder&& header(std::string_view name, std::string_view value) &&;
 
-        [[nodiscard]] mach::Context build() &&;
+        [[nodiscard]] mach::Context build(bool preparePayload = true) &&;
 
     private:
         class Impl;
