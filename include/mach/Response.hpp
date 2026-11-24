@@ -52,6 +52,8 @@ namespace mach
     class Response {
 
     public:
+        // Response properties
+
         /**
          * Returns the HTTP version used in the response (e.g. 1.0, 1.1, 2.0, 3.0).
          * NOTE: Mach currently supports HTTP/1.0 and HTTP/1.1 only
@@ -76,35 +78,9 @@ namespace mach
          *
          * @return response body.
          *
-         * @throws std::bad_alloc If memory allocation fails while returning the string.
-         *
          * @thread_safety This function is thread-safe.
          */
         [[nodiscard]] const std::string& body() const noexcept;
-
-        /**
-         * Returns the value of an HTTP header if it exists.
-         *
-         * @param name Header name (case-insensitive).
-         *
-         * @return A view into the stored header value, or std::nullopt if not found.
-         *
-         * @throws std::bad_alloc If memory allocation fails while returning the string.
-         *
-         * @thread_safety This function is thread-safe.
-         */
-        [[nodiscard]] std::optional<std::string_view> header(std::string_view name) const;
-
-        /**
-         * Returns whether a given HTTP header exists in the request.
-         *
-         * @param name Header name (case-insensitive).
-         *
-         * @return Whether the header is found.
-         *
-         * @thread_safety This function is thread-safe.
-         */
-        [[nodiscard]] bool containsHeader(std::string_view name) const noexcept;
 
         /**
          * Sets the HTTP status code of the response.
@@ -112,7 +88,7 @@ namespace mach
          * @param status HTTP status code to set.
          *
          * @throws std::invalid_argument If the provided status code is not a valid HTTP status code
-         * 		   supported by Mach.
+         *         supported by Mach.
          *
          * @thread_safety This function is not thread-safe.
          */
@@ -127,6 +103,30 @@ namespace mach
          */
         void body(std::string body) noexcept;
 
+        // Generic header access
+
+        /**
+         * Returns whether a given HTTP header exists in the response.
+         *
+         * @param name Header name (case-insensitive).
+         *
+         * @return Whether the header is found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] bool containsHeader(std::string_view name) const noexcept;
+
+        /**
+         * Returns the value of an HTTP header if it exists.
+         *
+         * @param name Header name (case-insensitive).
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> header(std::string_view name) const;
+
         /**
          * Sets a header in the response.
          *
@@ -140,6 +140,253 @@ namespace mach
          * @thread_safety This function is not thread-safe.
          */
         void setHeader(std::string_view name, std::string_view value);
+
+        // Header convenience methods
+
+        /**
+         * Returns the value of the Content-Type header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> contentType() const;
+
+        /**
+         * Returns the value of the Content-Length header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> contentLength() const;
+
+        /**
+         * Returns the value of the Content-Encoding header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> contentEncoding() const;
+
+        /**
+         * Returns the value of the Content-Language header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> contentLanguage() const;
+
+        /**
+         * Returns the value of the Content-Disposition header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> contentDisposition() const;
+
+        /**
+         * Returns the value of the Content-Range header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> contentRange() const;
+
+        /**
+         * Returns the value of the Accept-Ranges header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> acceptRanges() const;
+
+        /**
+         * Returns the value of the Cache-Control header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> cacheControl() const;
+
+        /**
+         * Returns the value of the ETag header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> etag() const;
+
+        /**
+         * Returns the value of the Last-Modified header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> lastModified() const;
+
+        /**
+         * Returns the value of the Expires header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> expires() const;
+
+        /**
+         * Returns the value of the Vary header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> vary() const;
+
+        /**
+         * Returns the value of the Age header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> age() const;
+
+        /**
+         * Returns the value of the WWW-Authenticate header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> wwwAuthenticate() const;
+
+        /**
+         * Returns the value of the Location header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> location() const;
+
+        /**
+         * Returns the value of the Retry-After header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> retryAfter() const;
+
+        /**
+         * Returns the value of the Allow header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> allow() const;
+
+        /**
+         * Returns the value of the Link header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> link() const;
+
+        /**
+         * Returns the value of the Server header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> server() const;
+
+        /**
+         * Returns the value of the Date header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> date() const;
+
+        /**
+         * Returns the value of the Content-Security-Policy header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> contentSecurityPolicy() const;
+
+        /**
+         * Returns the value of the Content-Security-Policy-Report-Only header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> contentSecurityPolicyReportOnly() const;
+
+        /**
+         * Returns the value of the Strict-Transport-Security header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> strictTransportSecurity() const;
+
+        /**
+         * Returns the value of the X-Content-Type-Options header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> xContentTypeOptions() const;
+
+        /**
+         * Returns the value of the X-Frame-Options header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> xFrameOptions() const;
+
+        /**
+         * Returns the value of the Referrer-Policy header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> referrerPolicy() const;
+
+        /**
+         * Returns the value of the Permissions-Policy header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> permissionsPolicy() const;
+
+        // Cookies
 
         /**
          * Returns whether a given cookie exists in the response.
@@ -159,8 +406,6 @@ namespace mach
          *
          * @return The cookie if found, or std::nullopt otherwise.
          *
-         * @throws std::bad_alloc If memory allocation fails while returning the cookie.
-         *
          * @thread_safety This function is thread-safe.
          */
         [[nodiscard]] std::optional<mach::http::Cookie> cookie(std::string_view name) const;
@@ -169,8 +414,6 @@ namespace mach
          * Adds a cookie to the response.
          *
          * @param cookie Cookie to add.
-         *
-         * @throws std::bad_alloc If memory allocation fails while storing the cookie.
          *
          * @thread_safety This function is not thread-safe.
          */
@@ -183,8 +426,6 @@ namespace mach
          *
          * @param cookie Cookie to add.
          *
-         * @throws std::bad_alloc If memory allocation fails while storing the cookie.
-         *
          * @thread_safety This function is not thread-safe.
          */
         void addCookie(mach::http::Cookie&& cookie);
@@ -194,8 +435,6 @@ namespace mach
          *
          * @param name Cookie name.
          * @param value Cookie value.
-         *
-         * @throws std::bad_alloc If memory allocation fails while storing the cookie.
          *
          * @thread_safety This function is not thread-safe.
          */

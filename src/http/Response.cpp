@@ -38,6 +38,8 @@ namespace mach
     Response::Response(http::Version version, http::StatusCode status)
         : m_version(version), m_status(status) {}
 
+    // Response properties
+
     http::Version Response::version() const noexcept {
         return m_version;
     }
@@ -50,24 +52,6 @@ namespace mach
         return m_body;
     }
 
-    std::optional<std::string_view> Response::header(std::string_view name) const {
-        auto normalizedName = std::string(name);
-        detail::http::toLowercaseInPlace(normalizedName);
-
-        if (const auto it = m_headers.find(normalizedName); it != m_headers.end()) {
-            return it->second;
-        }
-
-        return std::nullopt;
-    }
-
-    bool Response::containsHeader(std::string_view name) const noexcept {
-        auto normalizedName = std::string(name);
-        detail::http::toLowercaseInPlace(normalizedName);
-
-        return m_headers.contains(normalizedName);
-    }
-
     void Response::status(http::StatusCode status) {
         if (!http::isValidStatusCode(status)) {
             throw std::invalid_argument("Invalid HTTP status code");
@@ -78,6 +62,26 @@ namespace mach
 
     void Response::body(std::string body) noexcept {
         m_body = std::move(body);
+    }
+
+    // Generic header access
+
+    bool Response::containsHeader(std::string_view name) const noexcept {
+        auto normalizedName = std::string(name);
+        detail::http::toLowercaseInPlace(normalizedName);
+
+        return m_headers.contains(normalizedName);
+    }
+
+    std::optional<std::string_view> Response::header(std::string_view name) const {
+        auto normalizedName = std::string(name);
+        detail::http::toLowercaseInPlace(normalizedName);
+
+        if (const auto it = m_headers.find(normalizedName); it != m_headers.end()) {
+            return it->second;
+        }
+
+        return std::nullopt;
     }
 
     void Response::setHeader(std::string_view name, std::string_view value) {
@@ -105,6 +109,118 @@ namespace mach
 
         m_headers.insert_or_assign(std::move(normalizedName), std::string(value));
     }
+
+    // Header convenience methods
+
+    std::optional<std::string_view> Response::contentType() const {
+        return this->header("Content-Type");
+    }
+
+    std::optional<std::string_view> Response::contentLength() const {
+        return this->header("Content-Length");
+    }
+
+    std::optional<std::string_view> Response::contentEncoding() const {
+        return this->header("Content-Encoding");
+    }
+
+    std::optional<std::string_view> Response::contentLanguage() const {
+        return this->header("Content-Language");
+    }
+
+    std::optional<std::string_view> Response::contentDisposition() const {
+        return this->header("Content-Disposition");
+    }
+
+    std::optional<std::string_view> Response::contentRange() const {
+        return this->header("Content-Range");
+    }
+
+    std::optional<std::string_view> Response::acceptRanges() const {
+        return this->header("Accept-Ranges");
+    }
+
+    std::optional<std::string_view> Response::cacheControl() const {
+        return this->header("Cache-Control");
+    }
+
+    std::optional<std::string_view> Response::etag() const {
+        return this->header("ETag");
+    }
+
+    std::optional<std::string_view> Response::lastModified() const {
+        return this->header("Last-Modified");
+    }
+
+    std::optional<std::string_view> Response::expires() const {
+        return this->header("Expires");
+    }
+
+    std::optional<std::string_view> Response::vary() const {
+        return this->header("Vary");
+    }
+
+    std::optional<std::string_view> Response::age() const {
+        return this->header("Age");
+    }
+
+    std::optional<std::string_view> Response::wwwAuthenticate() const {
+        return this->header("WWW-Authenticate");
+    }
+
+    std::optional<std::string_view> Response::location() const {
+        return this->header("Location");
+    }
+
+    std::optional<std::string_view> Response::retryAfter() const {
+        return this->header("Retry-After");
+    }
+
+    std::optional<std::string_view> Response::allow() const {
+        return this->header("Allow");
+    }
+
+    std::optional<std::string_view> Response::link() const {
+        return this->header("Link");
+    }
+
+    std::optional<std::string_view> Response::server() const {
+        return this->header("Server");
+    }
+
+    std::optional<std::string_view> Response::date() const {
+        return this->header("Date");
+    }
+
+    std::optional<std::string_view> Response::contentSecurityPolicy() const {
+        return this->header("Content-Security-Policy");
+    }
+
+    std::optional<std::string_view> Response::contentSecurityPolicyReportOnly() const {
+        return this->header("Content-Security-Policy-Report-Only");
+    }
+
+    std::optional<std::string_view> Response::strictTransportSecurity() const {
+        return this->header("Strict-Transport-Security");
+    }
+
+    std::optional<std::string_view> Response::xContentTypeOptions() const {
+        return this->header("X-Content-Type-Options");
+    }
+
+    std::optional<std::string_view> Response::xFrameOptions() const {
+        return this->header("X-Frame-Options");
+    }
+
+    std::optional<std::string_view> Response::referrerPolicy() const {
+        return this->header("Referrer-Policy");
+    }
+
+    std::optional<std::string_view> Response::permissionsPolicy() const {
+        return this->header("Permissions-Policy");
+    }
+
+    // Cookies
 
     bool Response::containsCookie(std::string_view name) const noexcept {
         return this->cookie(name).has_value();
