@@ -114,7 +114,7 @@ namespace mach
          *
          * @thread_safety This function is thread-safe.
          */
-        [[nodiscard]] bool containsHeader(std::string_view name) const noexcept;
+        [[nodiscard]] bool containsHeader(std::string_view name) const;
 
         /**
          * Returns the value of an HTTP header if it exists.

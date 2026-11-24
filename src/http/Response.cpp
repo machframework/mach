@@ -66,7 +66,7 @@ namespace mach
 
     // Generic header access
 
-    bool Response::containsHeader(std::string_view name) const noexcept {
+    bool Response::containsHeader(std::string_view name) const {
         auto normalizedName = std::string(name);
         detail::http::toLowercaseInPlace(normalizedName);
 
