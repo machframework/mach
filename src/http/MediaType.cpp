@@ -2,24 +2,10 @@
 
 #include <cstddef>
 
+#include "utility/HttpUtils.hpp"
+
 namespace
 {
-     constexpr bool isOws(char c) noexcept {
-         return c == ' ' || c == '\t';
-     }
-
-     constexpr std::string_view trimOws(std::string_view value) noexcept {
-         while (!value.empty() && isOws(value.front())) {
-             value.remove_prefix(1);
-         }
-
-         while (!value.empty() && isOws(value.back())) {
-             value.remove_suffix(1);
-         }
-
-         return value;
-     }
-
      constexpr char toAsciiLowercase(char c) noexcept {
          if (c >= 'A' && c <= 'Z') {
              return static_cast<char>(c + ('a' - 'A'));
@@ -130,7 +116,7 @@ namespace
      bool parseParameter(std::string_view& remaining, Parameter& parameter) noexcept {
          parameter = {};
 
-         remaining = trimOws(remaining);
+         remaining = mach::detail::http::trimOws(remaining);
 
          // Parse the parameter name.
          std::size_t nameLength = 0;
@@ -146,7 +132,7 @@ namespace
          parameter.name = remaining.substr(0, nameLength);
 
          remaining.remove_prefix(nameLength);
-         remaining = trimOws(remaining);
+         remaining = mach::detail::http::trimOws(remaining);
 
          // Consume the equals sign.
          if (remaining.empty() || remaining.front() != '=') {
@@ -154,7 +140,7 @@ namespace
          }
 
          remaining.remove_prefix(1);
-         remaining = trimOws(remaining);
+         remaining = mach::detail::http::trimOws(remaining);
 
          if (remaining.empty()) {
              return false;
@@ -212,7 +198,7 @@ namespace
              remaining.remove_prefix(valueLength);
          }
 
-         remaining = trimOws(remaining);
+         remaining = mach::detail::http::trimOws(remaining);
 
          return remaining.empty() || remaining.front() == ';';
      }
@@ -234,7 +220,7 @@ namespace
              }
 
              remaining.remove_prefix(1);
-             remaining = trimOws(remaining);
+             remaining = mach::detail::http::trimOws(remaining);
 
              // Ignore empty parameter segments.
              if (remaining.empty() || remaining.front() == ';') {
