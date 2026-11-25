@@ -12,7 +12,6 @@
 
 #include <mach/detail/core/TypeTraits.hpp>
 #include <mach/detail/dispatching/IEndpointInvoker.hpp>
-#include <mach/detail/http/ContentType.hpp>
 #include <mach/detail/results/ResultTraits.hpp>
 #include <mach/detail/serialization/Serializer.hpp>
 #include <mach/detail/validation/ValidationResult.hpp>

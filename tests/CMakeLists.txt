@@ -346,3 +346,8 @@ add_mach_catch_test(
     HttpDateTests
     http/HttpDateTests.cpp
 )
+
+add_mach_catch_test(
+    MediaTypeTests
+    http/MediaTypeTests.cpp
+)
