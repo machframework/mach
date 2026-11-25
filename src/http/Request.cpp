@@ -3,6 +3,8 @@
 #include <format>
 #include <stdexcept>
 
+#include <mach/detail/http/MediaType.hpp>
+
 #include "HttpUtils.hpp"
 
 namespace mach
@@ -142,6 +144,34 @@ namespace mach
 
     std::optional<std::string_view> Request::xForwardedProto() const {
         return this->header("X-Forwarded-Proto");
+    }
+
+    std::optional<std::string_view> Request::mediaType() const {
+        const auto value = this->contentType();
+        return value ? detail::http::extractMediaType(*value) : std::nullopt;
+    }
+
+    std::optional<std::string_view> Request::charset() const {
+        const auto value = this->contentType();
+        return value ? detail::http::extractCharset(*value) : std::nullopt;
+    }
+
+    bool Request::isContentType(std::string_view type) const {
+        const auto value = this->contentType();
+        return value && detail::http::matchesMediaType(*value, type);
+    }
+
+    bool Request::isJson() const {
+        const auto value = this->contentType();
+        return value && detail::http::isJsonMediaType(*value);
+    }
+
+    bool Request::isMultipartFormData() const {
+        return this->isContentType("multipart/form-data");
+    }
+
+    bool Request::isFormUrlEncoded() const {
+        return this->isContentType("application/x-www-form-urlencoded");
     }
 
     // Route parameters

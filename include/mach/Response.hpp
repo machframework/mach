@@ -780,6 +780,58 @@ namespace mach
          */
         void setPermissionsPolicy(std::string_view value);
 
+        /**
+         * Returns the media type specified by the Content-Type header.
+         *
+         * @return A view into the media type without parameters, or std::nullopt if absent or
+         * invalid.
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> mediaType() const;
+
+        /**
+         * Returns the charset specified by the Content-Type header.
+         *
+         * @return A view into the charset without surrounding quotes, or std::nullopt if absent or
+         * invalid.
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> charset() const;
+
+        /**
+         * Checks whether the media type matches the specified media type.
+         *
+         * @param type The media type to match (case-insensitive, without parameters).
+         * @return True if the media types match, otherwise false.
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] bool isContentType(std::string_view type) const;
+
+        /**
+         * Checks whether the Content-Type header specifies a JSON media type.
+         *
+         * @return True if the media type is application/json or has a +json subtype suffix,
+         * otherwise false.
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] bool isJson() const;
+
+        /**
+         * Checks whether the Content-Type header specifies multipart/form-data.
+         *
+         * @return True if the media type matches multipart/form-data, otherwise false.
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] bool isMultipartFormData() const;
+
+        /**
+         * Checks whether the Content-Type header specifies application/x-www-form-urlencoded.
+         *
+         * @return True if the media type matches application/x-www-form-urlencoded, otherwise
+         * false.
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] bool isFormUrlEncoded() const;
 
         // Cookies
 

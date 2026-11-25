@@ -5,6 +5,8 @@
 #include <stdexcept>
 #include <unordered_set>
 
+#include <mach/detail/http/MediaType.hpp>
+
 #include "HttpUtils.hpp"
 #include "utility/HttpDate.hpp"
 
@@ -375,6 +377,38 @@ namespace mach
 
     void Response::setPermissionsPolicy(std::string_view value) {
         this->setHeader("Permissions-Policy", value);
+    }
+
+    std::optional<std::string_view> Response::mediaType() const {
+        const auto value = this->contentType();
+
+        return value ? detail::http::extractMediaType(*value) : std::nullopt;
+    }
+
+    std::optional<std::string_view> Response::charset() const {
+        const auto value = this->contentType();
+
+        return value ? detail::http::extractCharset(*value) : std::nullopt;
+    }
+
+    bool Response::isContentType(std::string_view type) const {
+        const auto value = this->contentType();
+
+        return value && detail::http::matchesMediaType(*value, type);
+    }
+
+    bool Response::isJson() const {
+        const auto value = this->contentType();
+
+        return value && detail::http::isJsonMediaType(*value);
+    }
+
+    bool Response::isMultipartFormData() const {
+        return this->isContentType("multipart/form-data");
+    }
+
+    bool Response::isFormUrlEncoded() const {
+        return this->isContentType("application/x-www-form-urlencoded");
     }
 
     // Cookies

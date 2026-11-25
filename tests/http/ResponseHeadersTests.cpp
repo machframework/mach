@@ -486,3 +486,208 @@ TEST_CASE("Response Allow setter rejects invalid HTTP methods", "[response][head
     REQUIRE(result.has_value());
     CHECK(std::string(*result) == "GET");
 }
+
+// Media type inspection
+
+TEST_CASE(
+    "Response media type inspection handles missing Content-Type headers",
+    "[response][headers]") {
+    auto context = TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+
+    CHECK_FALSE(context.response.mediaType().has_value());
+    CHECK_FALSE(context.response.charset().has_value());
+    CHECK_FALSE(context.response.isContentType("application/json"));
+    CHECK_FALSE(context.response.isJson());
+    CHECK_FALSE(context.response.isMultipartFormData());
+    CHECK_FALSE(context.response.isFormUrlEncoded());
+}
+
+TEST_CASE("Response media type inspection extracts media type and charset", "[response][headers]") {
+    auto context = TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+    context.response.setContentType("Application/JSON; Charset=\"UTF-8\"");
+
+    const auto mediaType = context.response.mediaType();
+    const auto charset = context.response.charset();
+
+    REQUIRE(mediaType.has_value());
+    REQUIRE(charset.has_value());
+    CHECK(std::string(*mediaType) == "Application/JSON");
+    CHECK(std::string(*charset) == "UTF-8");
+}
+
+TEST_CASE(
+    "Response media type inspection performs case-insensitive exact matching",
+    "[response][headers]") {
+    auto context = TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+    context.response.setContentType("Application/JSON; charset=utf-8");
+
+    CHECK(context.response.isContentType("application/json"));
+    CHECK(context.response.isContentType("APPLICATION/JSON"));
+    CHECK_FALSE(context.response.isContentType("application/xml"));
+    CHECK_FALSE(context.response.isContentType("application/*"));
+    CHECK_FALSE(context.response.isContentType("application/json; charset=utf-8"));
+    CHECK_FALSE(context.response.isContentType(""));
+}
+
+TEST_CASE("Response media type inspection recognizes JSON media types", "[response][headers]") {
+    struct TestCase {
+        std::string_view contentType;
+        bool expected;
+    };
+
+    constexpr TestCase testCases[] = {
+        {"application/json", true},
+        {"Application/JSON", true},
+        {"application/json; charset=utf-8", true},
+        {"application/problem+json", true},
+        {"application/vnd.api+JSON", true},
+        {"application/+json", false},
+        {"application/jsonp", false},
+        {"text/json", false},
+        {"text/plain", false}};
+
+    for (const auto& testCase : testCases) {
+        CAPTURE(std::string(testCase.contentType));
+
+        auto context =
+            TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+        context.response.setContentType(testCase.contentType);
+
+        CHECK(context.response.isJson() == testCase.expected);
+    }
+}
+
+TEST_CASE("Response media type inspection recognizes form media types", "[response][headers]") {
+    struct TestCase {
+        std::string_view contentType;
+        bool multipart;
+        bool urlEncoded;
+    };
+
+    constexpr TestCase testCases[] = {
+        {"multipart/form-data", true, false},
+        {"multipart/form-data; boundary=abc123", true, false},
+        {"Multipart/Form-Data", true, false},
+        {"application/x-www-form-urlencoded", false, true},
+        {"application/x-www-form-urlencoded; charset=utf-8", false, true},
+        {"Application/X-WWW-Form-Urlencoded", false, true},
+        {"multipart/mixed", false, false},
+        {"application/json", false, false},
+        {"text/plain", false, false}};
+
+    for (const auto& testCase : testCases) {
+        CAPTURE(std::string(testCase.contentType));
+
+        auto context =
+            TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+        context.response.setContentType(testCase.contentType);
+
+        CHECK(context.response.isMultipartFormData() == testCase.multipart);
+        CHECK(context.response.isFormUrlEncoded() == testCase.urlEncoded);
+    }
+}
+
+TEST_CASE(
+    "Response media type inspection handles empty and malformed header values",
+    "[response][headers]") {
+    constexpr std::string_view invalidMediaTypes[] = {
+        "",
+        "application",
+        "application/",
+        "/json",
+        "application / json",
+        "application/json/extra",
+        "application/*"};
+
+    for (const auto contentType : invalidMediaTypes) {
+        CAPTURE(std::string(contentType));
+
+        auto context =
+            TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+        context.response.setContentType(contentType);
+
+        CHECK_FALSE(context.response.mediaType().has_value());
+        CHECK_FALSE(context.response.charset().has_value());
+        CHECK_FALSE(context.response.isContentType("application/json"));
+        CHECK_FALSE(context.response.isJson());
+        CHECK_FALSE(context.response.isMultipartFormData());
+        CHECK_FALSE(context.response.isFormUrlEncoded());
+    }
+
+    constexpr std::string_view invalidCharsets[] = {
+        "application/json; charset=",
+        "application/json; charset=\"\"",
+        "application/json; charset=utf-8; charset=utf-16"};
+
+    for (const auto contentType : invalidCharsets) {
+        CAPTURE(std::string(contentType));
+
+        auto context =
+            TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+        context.response.setContentType(contentType);
+
+        const auto mediaType = context.response.mediaType();
+        REQUIRE(mediaType.has_value());
+        CHECK(std::string(*mediaType) == "application/json");
+        CHECK_FALSE(context.response.charset().has_value());
+        CHECK(context.response.isContentType("application/json"));
+        CHECK(context.response.isJson());
+    }
+
+    auto context = TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+    context.response.setContentType("application/json");
+
+    CHECK_FALSE(context.response.charset().has_value());
+    CHECK(context.response.isJson());
+}
+
+TEST_CASE(
+    "Response media type inspection reflects Content-Type replacement",
+    "[response][headers]") {
+    auto context = TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+
+    context.response.setContentType("application/json; charset=utf-8");
+    {
+        const auto mediaType = context.response.mediaType();
+        const auto charset = context.response.charset();
+        REQUIRE(mediaType.has_value());
+        REQUIRE(charset.has_value());
+        CHECK(std::string(*mediaType) == "application/json");
+        CHECK(std::string(*charset) == "utf-8");
+    }
+    CHECK(context.response.isJson());
+
+    context.response.setContentType("multipart/form-data; boundary=abc123");
+    {
+        const auto mediaType = context.response.mediaType();
+        REQUIRE(mediaType.has_value());
+        CHECK(std::string(*mediaType) == "multipart/form-data");
+    }
+    CHECK_FALSE(context.response.charset().has_value());
+    CHECK_FALSE(context.response.isContentType("application/json"));
+    CHECK_FALSE(context.response.isJson());
+    CHECK(context.response.isMultipartFormData());
+    CHECK_FALSE(context.response.isFormUrlEncoded());
+
+    context.response.setHeader("content-type", "application/x-www-form-urlencoded; charset=UTF-8");
+    {
+        const auto mediaType = context.response.mediaType();
+        const auto charset = context.response.charset();
+        REQUIRE(mediaType.has_value());
+        REQUIRE(charset.has_value());
+        CHECK(std::string(*mediaType) == "application/x-www-form-urlencoded");
+        CHECK(std::string(*charset) == "UTF-8");
+    }
+    CHECK(context.response.isContentType("application/x-www-form-urlencoded"));
+    CHECK_FALSE(context.response.isJson());
+    CHECK_FALSE(context.response.isMultipartFormData());
+    CHECK(context.response.isFormUrlEncoded());
+
+    context.response.setContentType("");
+    CHECK_FALSE(context.response.mediaType().has_value());
+    CHECK_FALSE(context.response.charset().has_value());
+    CHECK_FALSE(context.response.isContentType("application/x-www-form-urlencoded"));
+    CHECK_FALSE(context.response.isJson());
+    CHECK_FALSE(context.response.isMultipartFormData());
+    CHECK_FALSE(context.response.isFormUrlEncoded());
+}
