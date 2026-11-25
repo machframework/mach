@@ -361,3 +361,8 @@ add_mach_catch_test(
     AuthorizationHeaderTests
     http/AuthorizationHeaderTests.cpp
 )
+
+add_mach_catch_test(
+    ContentDispositionTests
+    http/ContentDispositionTests.cpp
+)

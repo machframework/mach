@@ -7,6 +7,7 @@
 
 #include <mach/detail/http/MediaType.hpp>
 
+#include "ContentDisposition.hpp"
 #include "ContentLength.hpp"
 #include "utility/StringUtils.hpp"
 #include "utility/HttpDate.hpp"
@@ -415,6 +416,14 @@ namespace mach
     std::optional<std::uint64_t> Response::contentLengthBytes() const {
         const auto value = this->contentLength();
         return value ? detail::http::parseContentLength(*value) : std::nullopt;
+    }
+
+    void Response::setAttachment(std::string_view filename) {
+        this->setContentDisposition(detail::http::formatContentDisposition("attachment", filename));
+    }
+
+    void Response::setInline(std::string_view filename) {
+        this->setContentDisposition(detail::http::formatContentDisposition("inline", filename));
     }
 
     // Cookies

@@ -841,6 +841,24 @@ namespace mach
          */
         [[nodiscard]] std::optional<std::uint64_t> contentLengthBytes() const;
 
+        /**
+         * Sets the Content-Disposition header to attachment with the specified filename.
+         *
+         * @param filename The suggested filename.
+         * @throws std::invalid_argument If the filename is invalid.
+         * @thread_safety This function is not thread-safe.
+         */
+        void setAttachment(std::string_view filename);
+
+        /**
+         * Sets the Content-Disposition header to inline with the specified filename.
+         *
+         * @param filename The suggested filename.
+         * @throws std::invalid_argument If the filename is invalid.
+         * @thread_safety This function is not thread-safe.
+         */
+        void setInline(std::string_view filename);
+
 
         // Cookies
 

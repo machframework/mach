@@ -710,3 +710,208 @@ TEST_CASE(
     REQUIRE_FALSE(context.response.body().empty());
     CHECK_FALSE(context.response.contentLengthBytes().has_value());
 }
+
+// Content disposition helpers
+
+TEST_CASE("Response content disposition helpers format ASCII filenames", "[response][headers]") {
+    struct TestCase {
+        std::string_view filename;
+        std::string_view attachment;
+        std::string_view inlineDisposition;
+    };
+
+    constexpr TestCase testCases[] = {
+        {"report.pdf", "attachment; filename=\"report.pdf\"", "inline; filename=\"report.pdf\""},
+
+        {"annual report.pdf",
+         "attachment; filename=\"annual report.pdf\"",
+         "inline; filename=\"annual report.pdf\""},
+
+        {"report\"2026\".pdf",
+         "attachment; filename=\"report\\\"2026\\\".pdf\"",
+         "inline; filename=\"report\\\"2026\\\".pdf\""}};
+
+    for (const auto& testCase : testCases) {
+        CAPTURE(std::string(testCase.filename));
+
+        auto context =
+            TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+
+        context.response.setAttachment(testCase.filename);
+
+        auto result = context.response.contentDisposition();
+        REQUIRE(result.has_value());
+        CHECK(std::string(*result) == std::string(testCase.attachment));
+
+        context.response.setInline(testCase.filename);
+
+        result = context.response.contentDisposition();
+        REQUIRE(result.has_value());
+        CHECK(std::string(*result) == std::string(testCase.inlineDisposition));
+    }
+}
+
+TEST_CASE(
+    "Response content disposition helpers generate extended filenames",
+    "[response][headers]") {
+    struct TestCase {
+        std::string_view filename;
+        std::string_view attachment;
+        std::string_view inlineDisposition;
+    };
+
+    constexpr TestCase testCases[] = {
+        {"caf\xC3\xA9.pdf",
+         "attachment; filename=\"caf_.pdf\"; filename*=UTF-8''caf%C3%A9.pdf",
+         "inline; filename=\"caf_.pdf\"; filename*=UTF-8''caf%C3%A9.pdf"},
+
+        {"report%20.pdf",
+         "attachment; filename=\"report_20.pdf\"; filename*=UTF-8''report%2520.pdf",
+         "inline; filename=\"report_20.pdf\"; filename*=UTF-8''report%2520.pdf"},
+
+        {"report\xF0\x9F\x93\x84.pdf",
+         "attachment; filename=\"report_.pdf\"; filename*=UTF-8''report%F0%9F%93%84.pdf",
+         "inline; filename=\"report_.pdf\"; filename*=UTF-8''report%F0%9F%93%84.pdf"}};
+
+    for (const auto& testCase : testCases) {
+        CAPTURE(std::string(testCase.filename));
+
+        auto context =
+            TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+
+        context.response.setAttachment(testCase.filename);
+
+        auto result = context.response.contentDisposition();
+        REQUIRE(result.has_value());
+        CHECK(std::string(*result) == std::string(testCase.attachment));
+
+        context.response.setInline(testCase.filename);
+
+        result = context.response.contentDisposition();
+        REQUIRE(result.has_value());
+        CHECK(std::string(*result) == std::string(testCase.inlineDisposition));
+    }
+}
+
+TEST_CASE(
+    "Response content disposition helpers overwrite existing header values",
+    "[response][headers]") {
+    auto context = TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+
+    context.response.setHeader("content-disposition", "inline");
+
+    context.response.setAttachment("report.pdf");
+
+    auto result = context.response.header("Content-Disposition");
+    REQUIRE(result.has_value());
+    CHECK(std::string(*result) == "attachment; filename=\"report.pdf\"");
+
+    context.response.setInline("preview.pdf");
+
+    result = context.response.header("Content-Disposition");
+    REQUIRE(result.has_value());
+    CHECK(std::string(*result) == "inline; filename=\"preview.pdf\"");
+
+    context.response.setAttachment("download.pdf");
+
+    result = context.response.header("Content-Disposition");
+    REQUIRE(result.has_value());
+    CHECK(std::string(*result) == "attachment; filename=\"download.pdf\"");
+}
+
+TEST_CASE("Response content disposition helpers reject invalid filenames", "[response][headers]") {
+    constexpr std::string_view invalidValues[] = {
+        "",
+        ".",
+        "..",
+        "../report.pdf",
+        "directory\\report.pdf",
+        "report\r\nX-Injected: true",
+        "report\t.pdf",
+        std::string_view{"report\0.pdf", 11},
+        "\xFF.pdf",
+        "\xED\xA0\x80.pdf"};
+
+    for (const auto value : invalidValues) {
+        CAPTURE(std::string(value));
+
+        auto context =
+            TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+
+        CHECK_THROWS_AS(context.response.setAttachment(value), std::invalid_argument);
+
+        CHECK_FALSE(context.response.contentDisposition().has_value());
+
+        CHECK_THROWS_AS(context.response.setInline(value), std::invalid_argument);
+
+        CHECK_FALSE(context.response.contentDisposition().has_value());
+    }
+}
+
+TEST_CASE(
+    "Response content disposition helpers preserve existing headers on validation failure",
+    "[response][headers]") {
+    constexpr std::string_view invalidValues[] =
+        {"", "..", "directory/report.pdf", "report\r\n.pdf", "\xFF.pdf"};
+
+    for (const auto value : invalidValues) {
+        CAPTURE(std::string(value));
+
+        auto context =
+            TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+
+        context.response.setContentDisposition("attachment; filename=\"original.pdf\"");
+
+        CHECK_THROWS_AS(context.response.setAttachment(value), std::invalid_argument);
+
+        auto result = context.response.contentDisposition();
+        REQUIRE(result.has_value());
+        CHECK(std::string(*result) == "attachment; filename=\"original.pdf\"");
+
+        CHECK_THROWS_AS(context.response.setInline(value), std::invalid_argument);
+
+        result = context.response.contentDisposition();
+        REQUIRE(result.has_value());
+        CHECK(std::string(*result) == "attachment; filename=\"original.pdf\"");
+    }
+}
+
+TEST_CASE(
+    "Response content disposition helpers do not modify other response properties",
+    "[response][headers]") {
+    auto context = TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+
+    context.response.body("Hello, world!");
+    context.response.setContentType("text/plain");
+    context.response.setCacheControl("no-cache");
+
+    const auto originalStatus = context.response.status();
+
+    context.response.setAttachment("report.txt");
+
+    CHECK(context.response.body() == "Hello, world!");
+    CHECK(context.response.status() == originalStatus);
+
+    auto contentType = context.response.contentType();
+    auto cacheControl = context.response.cacheControl();
+
+    REQUIRE(contentType.has_value());
+    REQUIRE(cacheControl.has_value());
+    CHECK(std::string(*contentType) == "text/plain");
+    CHECK(std::string(*cacheControl) == "no-cache");
+    CHECK_FALSE(context.response.contentLength().has_value());
+
+    context.response.setInline("preview.txt");
+
+    CHECK(context.response.body() == "Hello, world!");
+    CHECK(context.response.status() == originalStatus);
+
+    contentType = context.response.contentType();
+    cacheControl = context.response.cacheControl();
+
+    REQUIRE(contentType.has_value());
+    REQUIRE(cacheControl.has_value());
+    CHECK(std::string(*contentType) == "text/plain");
+    CHECK(std::string(*cacheControl) == "no-cache");
+    CHECK_FALSE(context.response.contentLength().has_value());
+}
