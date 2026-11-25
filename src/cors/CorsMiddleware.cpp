@@ -7,7 +7,6 @@
 #include <mach/http/StatusCode.hpp>
 #include <mach/middleware/Next.hpp>
 
-#include "http/HttpUtils.hpp"
 #include "utility/StringUtils.hpp"
 
 namespace mach::detail::cors
@@ -124,7 +123,7 @@ namespace mach::detail::cors
                     header = trim(header);
 
                     auto normalizedHeader = std::string(header);
-                    http::toLowercaseInPlace(normalizedHeader);
+                    detail::toLowercaseInPlace(normalizedHeader);
 
                     if (!m_options.allowedHeaders.contains(normalizedHeader)) {
                         context.response.status(mach::http::StatusCode::Forbidden);

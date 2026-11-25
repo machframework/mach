@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -48,6 +49,8 @@ namespace mach
     class Request {
 
     public:
+        // Request properties
+
         /**
          * Returns the HTTP method used in the request (e.g. GET, POST, PUT).
          *
@@ -85,6 +88,9 @@ namespace mach
          */
         [[nodiscard]] const std::string& body() const noexcept;
 
+
+        // Generic header access
+
         /**
          * Returns whether a given HTTP header exists in the request.
          *
@@ -110,6 +116,296 @@ namespace mach
          * @thread_safety This function is thread-safe.
          */
         [[nodiscard]] std::optional<std::string_view> header(std::string_view name) const;
+
+
+        // Header convenience methods
+
+        /**
+         * Returns the value of the Content-Type header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> contentType() const;
+
+        /**
+         * Returns the value of the Content-Length header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> contentLength() const;
+
+        /**
+         * Returns the value of the Content-Encoding header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> contentEncoding() const;
+
+        /**
+         * Returns the value of the Content-Language header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> contentLanguage() const;
+
+        /**
+         * Returns the value of the Accept header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> accept() const;
+
+        /**
+         * Returns the value of the Accept-Encoding header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> acceptEncoding() const;
+
+        /**
+         * Returns the value of the Accept-Language header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> acceptLanguage() const;
+
+        /**
+         * Returns the value of the Authorization header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> authorization() const;
+
+        /**
+         * Returns the value of the Host header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> host() const;
+
+        /**
+         * Returns the value of the User-Agent header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> userAgent() const;
+
+        /**
+         * Returns the value of the Origin header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> origin() const;
+
+        /**
+         * Returns the value of the Referer header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> referer() const;
+
+        /**
+         * Returns the value of the Cache-Control header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> cacheControl() const;
+
+        /**
+         * Returns the value of the If-Match header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> ifMatch() const;
+
+        /**
+         * Returns the value of the If-None-Match header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> ifNoneMatch() const;
+
+        /**
+         * Returns the value of the If-Modified-Since header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> ifModifiedSince() const;
+
+        /**
+         * Returns the value of the If-Unmodified-Since header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> ifUnmodifiedSince() const;
+
+        /**
+         * Returns the value of the Range header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> range() const;
+
+        /**
+         * Returns the value of the If-Range header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> ifRange() const;
+
+        /**
+         * Returns the value of the Forwarded header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> forwarded() const;
+
+        /**
+         * Returns the value of the X-Forwarded-For header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> xForwardedFor() const;
+
+        /**
+         * Returns the value of the X-Forwarded-Host header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> xForwardedHost() const;
+
+        /**
+         * Returns the value of the X-Forwarded-Proto header.
+         *
+         * @return A view into the stored header value, or std::nullopt if not found.
+         *
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> xForwardedProto() const;
+
+        /**
+         * Returns the media type specified by the Content-Type header.
+         *
+         * @return A view into the media type without parameters, or std::nullopt if absent or
+         * invalid.
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> mediaType() const;
+
+        /**
+         * Returns the charset specified by the Content-Type header.
+         *
+         * @return A view into the charset without surrounding quotes, or std::nullopt if absent or
+         * invalid.
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> charset() const;
+
+        /**
+         * Checks whether the media type matches the specified media type.
+         *
+         * @param type The media type to match (case-insensitive, without parameters).
+         * @return True if the media types match, otherwise false.
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] bool isContentType(std::string_view type) const;
+
+        /**
+         * Checks whether the Content-Type header specifies a JSON media type.
+         *
+         * @return True if the media type is application/json or has a +json subtype suffix,
+         * otherwise false.
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] bool isJson() const;
+
+        /**
+         * Checks whether the Content-Type header specifies multipart/form-data.
+         *
+         * @return True if the media type matches multipart/form-data, otherwise false.
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] bool isMultipartFormData() const;
+
+        /**
+         * Checks whether the Content-Type header specifies application/x-www-form-urlencoded.
+         *
+         * @return True if the media type matches application/x-www-form-urlencoded, otherwise
+         * false.
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] bool isFormUrlEncoded() const;
+
+        /**
+         * Returns the Content-Length header value in bytes.
+         *
+         * @return The content length in bytes, or std::nullopt if absent or invalid.
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::uint64_t> contentLengthBytes() const;
+
+        /**
+         * Returns the authentication scheme specified by the Authorization header.
+         *
+         * @return A view into the authentication scheme, or std::nullopt if absent or invalid.
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> authorizationScheme() const;
+
+        /**
+         * Returns the Bearer token specified by the Authorization header.
+         *
+         * @return A view into the Bearer token, or std::nullopt if absent or invalid.
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> bearerToken() const;
+
+
+        // Route parameters
 
         /**
          * Returns the value of a route parameter.
@@ -143,6 +439,9 @@ namespace mach
         template <typename T>
         [[nodiscard]] T routeParam(std::string_view name) const;
 
+
+        // Cookies
+
         /**
          * Returns whether a given cookie exists in the request.
          *
@@ -168,6 +467,9 @@ namespace mach
          * @thread_safety This function is thread-safe.
          */
         [[nodiscard]] std::optional<std::string_view> cookie(std::string_view name) const;
+
+
+        // Query parameters
 
         /**
          * Returns whether a given query parameter exists in the request.

@@ -107,6 +107,9 @@ namespace mach::http
         case StatusCode::UriTooLong:
             return "URI Too Long";
 
+        case StatusCode::UnsupportedMediaType:
+            return "Unsupported Media Type";
+
         case StatusCode::RequestHeaderFieldsTooLarge:
             return "Request Header Fields Too Large";
 

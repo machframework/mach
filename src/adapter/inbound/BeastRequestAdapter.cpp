@@ -7,7 +7,6 @@
 
 #include <mach/http/StatusCode.hpp>
 
-#include "http/HttpUtils.hpp"
 #include "utility/StringUtils.hpp"
 
 namespace

@@ -12,7 +12,7 @@
 #include <mach/detail/binding/JsonConcepts.hpp>
 #include <mach/detail/core/FixedString.hpp>
 #include <mach/detail/exceptions/RequestBindingException.hpp>
-#include <mach/detail/http/ContentType.hpp>
+#include <mach/detail/http/MediaType.hpp>
 
 namespace mach::detail::binding
 {
@@ -124,7 +124,7 @@ namespace mach::detail::binding
         const auto contentType = request.header("content-type");
 
         if (!contentType || !http::matchesMediaType(*contentType, "application/json") ||
-            http::hasUnsupportedCharset(*contentType)) {
+            http::hasUnsupportedJsonCharset(*contentType)) {
             throw mach::HttpException(
                 mach::http::StatusCode::UnsupportedMediaType,
                 "Unsupported Media Type: The request body must be JSON.");
