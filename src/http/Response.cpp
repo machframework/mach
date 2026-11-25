@@ -220,6 +220,110 @@ namespace mach
         return this->header("Permissions-Policy");
     }
 
+    void Response::setContentType(std::string_view value) {
+        this->setHeader("Content-Type", value);
+    }
+
+    void Response::setContentEncoding(std::string_view value) {
+        this->setHeader("Content-Encoding", value);
+    }
+
+    void Response::setContentLanguage(std::string_view value) {
+        this->setHeader("Content-Language", value);
+    }
+
+    void Response::setContentDisposition(std::string_view value) {
+        this->setHeader("Content-Disposition", value);
+    }
+
+    void Response::setContentRange(std::string_view value) {
+        this->setHeader("Content-Range", value);
+    }
+
+    void Response::setAcceptRanges(std::string_view value) {
+        this->setHeader("Accept-Ranges", value);
+    }
+
+    void Response::setCacheControl(std::string_view value) {
+        this->setHeader("Cache-Control", value);
+    }
+
+    void Response::setEtag(std::string_view value) {
+        this->setHeader("ETag", value);
+    }
+
+    void Response::setLastModified(std::string_view value) {
+        this->setHeader("Last-Modified", value);
+    }
+
+    void Response::setExpires(std::string_view value) {
+        this->setHeader("Expires", value);
+    }
+
+    void Response::setVary(std::string_view value) {
+        this->setHeader("Vary", value);
+    }
+
+    void Response::setAge(std::string_view value) {
+        this->setHeader("Age", value);
+    }
+
+    void Response::setWwwAuthenticate(std::string_view value) {
+        this->setHeader("WWW-Authenticate", value);
+    }
+
+    void Response::setLocation(std::string_view value) {
+        this->setHeader("Location", value);
+    }
+
+    void Response::setRetryAfter(std::string_view value) {
+        this->setHeader("Retry-After", value);
+    }
+
+    void Response::setAllow(std::string_view value) {
+        this->setHeader("Allow", value);
+    }
+
+    void Response::setLink(std::string_view value) {
+        this->setHeader("Link", value);
+    }
+
+    void Response::setServer(std::string_view value) {
+        this->setHeader("Server", value);
+    }
+
+    void Response::setDate(std::string_view value) {
+        this->setHeader("Date", value);
+    }
+
+    void Response::setContentSecurityPolicy(std::string_view value) {
+        this->setHeader("Content-Security-Policy", value);
+    }
+
+    void Response::setContentSecurityPolicyReportOnly(std::string_view value) {
+        this->setHeader("Content-Security-Policy-Report-Only", value);
+    }
+
+    void Response::setStrictTransportSecurity(std::string_view value) {
+        this->setHeader("Strict-Transport-Security", value);
+    }
+
+    void Response::setXContentTypeOptions(std::string_view value) {
+        this->setHeader("X-Content-Type-Options", value);
+    }
+
+    void Response::setXFrameOptions(std::string_view value) {
+        this->setHeader("X-Frame-Options", value);
+    }
+
+    void Response::setReferrerPolicy(std::string_view value) {
+        this->setHeader("Referrer-Policy", value);
+    }
+
+    void Response::setPermissionsPolicy(std::string_view value) {
+        this->setHeader("Permissions-Policy", value);
+    }
+
     // Cookies
 
     bool Response::containsCookie(std::string_view name) const noexcept {

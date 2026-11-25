@@ -103,6 +103,7 @@ namespace mach
          */
         void body(std::string body) noexcept;
 
+
         // Generic header access
 
         /**
@@ -140,6 +141,7 @@ namespace mach
          * @thread_safety This function is not thread-safe.
          */
         void setHeader(std::string_view name, std::string_view value);
+
 
         // Header convenience methods
 
@@ -385,6 +387,319 @@ namespace mach
          * @thread_safety This function is thread-safe.
          */
         [[nodiscard]] std::optional<std::string_view> permissionsPolicy() const;
+
+        /**
+         * Sets the value of the Content-Type header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setContentType(std::string_view value);
+
+        /**
+         * Sets the value of the Content-Encoding header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setContentEncoding(std::string_view value);
+
+        /**
+         * Sets the value of the Content-Language header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setContentLanguage(std::string_view value);
+
+        /**
+         * Sets the value of the Content-Disposition header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setContentDisposition(std::string_view value);
+
+        /**
+         * Sets the value of the Content-Range header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setContentRange(std::string_view value);
+
+        /**
+         * Sets the value of the Accept-Ranges header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setAcceptRanges(std::string_view value);
+
+        /**
+         * Sets the value of the Cache-Control header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setCacheControl(std::string_view value);
+
+        /**
+         * Sets the value of the ETag header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setEtag(std::string_view value);
+
+        /**
+         * Sets the value of the Last-Modified header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setLastModified(std::string_view value);
+
+        /**
+         * Sets the value of the Expires header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setExpires(std::string_view value);
+
+        /**
+         * Sets the value of the Vary header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setVary(std::string_view value);
+
+        /**
+         * Sets the value of the Age header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setAge(std::string_view value);
+
+        /**
+         * Sets the value of the WWW-Authenticate header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setWwwAuthenticate(std::string_view value);
+
+        /**
+         * Sets the value of the Location header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setLocation(std::string_view value);
+
+        /**
+         * Sets the value of the Retry-After header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setRetryAfter(std::string_view value);
+
+        /**
+         * Sets the value of the Allow header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setAllow(std::string_view value);
+
+        /**
+         * Sets the value of the Link header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setLink(std::string_view value);
+
+        /**
+         * Sets the value of the Server header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setServer(std::string_view value);
+
+        /**
+         * Sets the value of the Date header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setDate(std::string_view value);
+
+        /**
+         * Sets the value of the Content-Security-Policy header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setContentSecurityPolicy(std::string_view value);
+
+        /**
+         * Sets the value of the Content-Security-Policy-Report-Only header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setContentSecurityPolicyReportOnly(std::string_view value);
+
+        /**
+         * Sets the value of the Strict-Transport-Security header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setStrictTransportSecurity(std::string_view value);
+
+        /**
+         * Sets the value of the X-Content-Type-Options header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setXContentTypeOptions(std::string_view value);
+
+        /**
+         * Sets the value of the X-Frame-Options header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setXFrameOptions(std::string_view value);
+
+        /**
+         * Sets the value of the Referrer-Policy header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setReferrerPolicy(std::string_view value);
+
+        /**
+         * Sets the value of the Permissions-Policy header.
+         *
+         * @param value The header value.
+         *
+         * @throws std::invalid_argument If the value contains carriage return or line feed
+         * characters.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setPermissionsPolicy(std::string_view value);
+
 
         // Cookies
 
