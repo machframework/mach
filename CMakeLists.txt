@@ -27,6 +27,7 @@ add_library(mach
     src/http/Response.cpp
     src/http/MediaType.cpp
     src/http/Context.cpp
+    src/http/ContentLength.cpp
 
     src/adapter/inbound/BeastRequestAdapter.cpp
     src/adapter/outbound/BeastResponseAdapter.cpp
@@ -77,7 +78,7 @@ add_library(mach
     src/csrf/CsrfMiddleware.cpp
     src/csrf/CsrfBuilder.cpp
 
-    src/results/Results.cpp   
+    src/results/Results.cpp
 )
 
 set_target_properties(mach PROPERTIES

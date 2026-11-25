@@ -833,6 +833,15 @@ namespace mach
          */
         [[nodiscard]] bool isFormUrlEncoded() const;
 
+        /**
+         * Returns the Content-Length header value in bytes.
+         *
+         * @return The content length in bytes, or std::nullopt if absent or invalid.
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::uint64_t> contentLengthBytes() const;
+
+
         // Cookies
 
         /**

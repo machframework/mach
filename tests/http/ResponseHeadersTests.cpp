@@ -691,3 +691,22 @@ TEST_CASE(
     CHECK_FALSE(context.response.isMultipartFormData());
     CHECK_FALSE(context.response.isFormUrlEncoded());
 }
+
+// Content length inspection
+
+TEST_CASE("Response content length inspection handles missing headers", "[response][headers]") {
+    auto context = TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+
+    CHECK_FALSE(context.response.contentLengthBytes().has_value());
+}
+
+TEST_CASE(
+    "Response content length inspection does not fall back to body size",
+    "[response][headers]") {
+    auto context = TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+
+    context.response.body("Hello, world!");
+
+    REQUIRE_FALSE(context.response.body().empty());
+    CHECK_FALSE(context.response.contentLengthBytes().has_value());
+}

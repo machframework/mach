@@ -7,7 +7,8 @@
 
 #include <mach/detail/http/MediaType.hpp>
 
-#include "HttpUtils.hpp"
+#include "ContentLength.hpp"
+#include "utility/StringUtils.hpp"
 #include "utility/HttpDate.hpp"
 
 namespace
@@ -71,14 +72,14 @@ namespace mach
 
     bool Response::containsHeader(std::string_view name) const {
         auto normalizedName = std::string(name);
-        detail::http::toLowercaseInPlace(normalizedName);
+        detail::toLowercaseInPlace(normalizedName);
 
         return m_headers.contains(normalizedName);
     }
 
     std::optional<std::string_view> Response::header(std::string_view name) const {
         auto normalizedName = std::string(name);
-        detail::http::toLowercaseInPlace(normalizedName);
+        detail::toLowercaseInPlace(normalizedName);
 
         if (const auto it = m_headers.find(normalizedName); it != m_headers.end()) {
             return it->second;
@@ -89,7 +90,7 @@ namespace mach
 
     void Response::setHeader(std::string_view name, std::string_view value) {
         auto normalizedName = std::string(name);
-        detail::http::toLowercaseInPlace(normalizedName);
+        detail::toLowercaseInPlace(normalizedName);
 
         if (normalizedName.empty()) {
             throw std::invalid_argument("Header name cannot be empty");
@@ -409,6 +410,11 @@ namespace mach
 
     bool Response::isFormUrlEncoded() const {
         return this->isContentType("application/x-www-form-urlencoded");
+    }
+
+    std::optional<std::uint64_t> Response::contentLengthBytes() const {
+        const auto value = this->contentLength();
+        return value ? detail::http::parseContentLength(*value) : std::nullopt;
     }
 
     // Cookies

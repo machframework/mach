@@ -5,7 +5,8 @@
 
 #include <mach/detail/http/MediaType.hpp>
 
-#include "HttpUtils.hpp"
+#include "utility/StringUtils.hpp"
+#include "ContentLength.hpp"
 
 namespace mach
 {
@@ -43,7 +44,7 @@ namespace mach
 
     std::optional<std::string_view> Request::header(std::string_view name) const {
         auto normalizedName = std::string(name);
-        detail::http::toLowercaseInPlace(normalizedName);
+        detail::toLowercaseInPlace(normalizedName);
 
         if (const auto it = m_headers.find(normalizedName); it != m_headers.end()) {
             return it->second;
@@ -172,6 +173,11 @@ namespace mach
 
     bool Request::isFormUrlEncoded() const {
         return this->isContentType("application/x-www-form-urlencoded");
+    }
+
+    std::optional<std::uint64_t> Request::contentLengthBytes() const {
+        const auto value = this->contentLength();
+        return value ? detail::http::parseContentLength(*value) : std::nullopt;
     }
 
     // Route parameters

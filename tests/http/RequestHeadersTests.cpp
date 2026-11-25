@@ -1,12 +1,13 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include <mach/Request.hpp>
-
-#include "support/TestRequestBuilder.hpp"
-
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <string_view>
+
+#include <mach/Request.hpp>
+
+#include "support/TestRequestBuilder.hpp"
 
 namespace
 {
@@ -317,4 +318,54 @@ TEST_CASE(
 
     CHECK_FALSE(context.request.charset().has_value());
     CHECK(context.request.isJson());
+}
+
+// Content length inspection
+
+TEST_CASE("Request content length inspection handles missing headers", "[request][headers]") {
+    auto context = TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+
+    CHECK_FALSE(context.request.contentLengthBytes().has_value());
+}
+
+TEST_CASE("Request content length inspection parses valid header values", "[request][headers]") {
+    struct TestCase {
+        std::string_view value;
+        std::uint64_t expected;
+    };
+
+    constexpr TestCase testCases[] =
+        {{"0", 0}, {"1024", 1024}, {"001024", 1024}, {"4294967296", 4294967296ULL}};
+
+    for (const auto& testCase : testCases) {
+        CAPTURE(std::string(testCase.value));
+
+        auto context = TestRequestBuilder{}
+                           .method(mach::http::Method::Get)
+                           .target("/")
+                           .header("Content-Length", testCase.value)
+                           .build(false);
+
+        const auto result = context.request.contentLengthBytes();
+
+        REQUIRE(result.has_value());
+        CHECK(*result == testCase.expected);
+    }
+}
+
+TEST_CASE("Request content length inspection rejects invalid header values", "[request][headers]") {
+    constexpr std::string_view invalidValues[] =
+        {"", "-1", "1024abc", "1024, 1024", "18446744073709551616"};
+
+    for (const auto value : invalidValues) {
+        CAPTURE(std::string(value));
+
+        auto context = TestRequestBuilder{}
+                           .method(mach::http::Method::Get)
+                           .target("/")
+                           .header("Content-Length", value)
+                           .build(false);
+
+        CHECK_FALSE(context.request.contentLengthBytes().has_value());
+    }
 }
