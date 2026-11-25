@@ -6,331 +6,271 @@
 
 namespace
 {
-     constexpr char toAsciiLowercase(char c) noexcept {
-         if (c >= 'A' && c <= 'Z') {
-             return static_cast<char>(c + ('a' - 'A'));
-         }
+    using mach::detail::http::equalsIgnoreCase;
+    using mach::detail::http::isToken;
+    using mach::detail::http::isTokenCharacter;
 
-         return c;
-     }
+    constexpr bool isValidMediaType(std::string_view value) noexcept {
+        const auto slash = value.find('/');
 
-     constexpr bool equalsIgnoreCase(std::string_view lhs, std::string_view rhs) noexcept {
-         if (lhs.size() != rhs.size()) {
-             return false;
-         }
+        if (slash == std::string_view::npos) {
+            return false;
+        }
 
-         for (std::size_t i = 0; i < lhs.size(); ++i) {
-             if (toAsciiLowercase(lhs[i]) != toAsciiLowercase(rhs[i])) {
-                 return false;
-             }
-         }
+        const auto type = value.substr(0, slash);
+        const auto subtype = value.substr(slash + 1);
 
-         return true;
-     }
+        return isToken(type) && isToken(subtype) && type != "*" && subtype != "*";
+    }
 
-     constexpr bool isTokenCharacter(char c) noexcept {
-         if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) {
-             return true;
-         }
+    constexpr bool isQuotedTextCharacter(char c) noexcept {
+        const auto byte = static_cast<unsigned char>(c);
 
-         switch (c) {
-         case '!':
-         case '#':
-         case '$':
-         case '%':
-         case '&':
-         case '\'':
-         case '*':
-         case '+':
-         case '-':
-         case '.':
-         case '^':
-         case '_':
-         case '`':
-         case '|':
-         case '~':
-             return true;
+        return byte == '\t' || byte == ' ' || byte == 0x21 || (byte >= 0x23 && byte <= 0x5B) ||
+               (byte >= 0x5D && byte <= 0x7E) || byte >= 0x80;
+    }
 
-         default:
-             return false;
-         }
-     }
+    constexpr bool isQuotedPairCharacter(char c) noexcept {
+        const auto byte = static_cast<unsigned char>(c);
 
-     constexpr bool isToken(std::string_view value) noexcept {
-         if (value.empty()) {
-             return false;
-         }
+        return byte == '\t' || byte == ' ' || (byte >= 0x21 && byte <= 0x7E) || byte >= 0x80;
+    }
 
-         for (const auto c : value) {
-             if (!isTokenCharacter(c)) {
-                 return false;
-             }
-         }
+    enum class CharsetStatus {
+        Missing,
+        Valid,
+        Invalid
+    };
 
-         return true;
-     }
+    struct CharsetResult {
+        CharsetStatus status = CharsetStatus::Missing;
+        std::string_view value;
+    };
 
-     constexpr bool isValidMediaType(std::string_view value) noexcept {
-         const auto slash = value.find('/');
+    struct Parameter {
+        std::string_view name;
+        std::string_view value;
+        bool containsEscapes = false;
+    };
 
-         if (slash == std::string_view::npos) {
-             return false;
-         }
+    bool parseParameter(std::string_view& remaining, Parameter& parameter) noexcept {
+        parameter = {};
 
-         const auto type = value.substr(0, slash);
-         const auto subtype = value.substr(slash + 1);
+        remaining = mach::detail::http::trimOws(remaining);
 
-         return isToken(type) && isToken(subtype) && type != "*" && subtype != "*";
-     }
+        // Parse the parameter name.
+        std::size_t nameLength = 0;
 
-     constexpr bool isQuotedTextCharacter(char c) noexcept {
-         const auto byte = static_cast<unsigned char>(c);
+        while (nameLength < remaining.size() && isTokenCharacter(remaining[nameLength])) {
+            ++nameLength;
+        }
 
-         return byte == '\t' || byte == ' ' || byte == 0x21 || (byte >= 0x23 && byte <= 0x5B) ||
-                (byte >= 0x5D && byte <= 0x7E) || byte >= 0x80;
-     }
+        if (nameLength == 0) {
+            return false;
+        }
 
-     constexpr bool isQuotedPairCharacter(char c) noexcept {
-         const auto byte = static_cast<unsigned char>(c);
+        parameter.name = remaining.substr(0, nameLength);
 
-         return byte == '\t' || byte == ' ' || (byte >= 0x21 && byte <= 0x7E) || byte >= 0x80;
-     }
+        remaining.remove_prefix(nameLength);
+        remaining = mach::detail::http::trimOws(remaining);
 
-     enum class CharsetStatus {
-         Missing,
-         Valid,
-         Invalid
-     };
+        // Consume the equals sign.
+        if (remaining.empty() || remaining.front() != '=') {
+            return false;
+        }
 
-     struct CharsetResult {
-         CharsetStatus status = CharsetStatus::Missing;
-         std::string_view value;
-     };
+        remaining.remove_prefix(1);
+        remaining = mach::detail::http::trimOws(remaining);
 
-     struct Parameter {
-         std::string_view name;
-         std::string_view value;
-         bool containsEscapes = false;
-     };
+        if (remaining.empty()) {
+            return false;
+        }
 
-     bool parseParameter(std::string_view& remaining, Parameter& parameter) noexcept {
-         parameter = {};
+        // Parse a quoted-string or token value.
+        if (remaining.front() == '"') {
+            remaining.remove_prefix(1);
 
-         remaining = mach::detail::http::trimOws(remaining);
+            std::size_t position = 0;
 
-         // Parse the parameter name.
-         std::size_t nameLength = 0;
+            while (position < remaining.size()) {
+                const auto c = remaining[position];
 
-         while (nameLength < remaining.size() && isTokenCharacter(remaining[nameLength])) {
-             ++nameLength;
-         }
+                if (c == '"') {
+                    break;
+                }
 
-         if (nameLength == 0) {
-             return false;
-         }
+                if (c == '\\') {
+                    parameter.containsEscapes = true;
 
-         parameter.name = remaining.substr(0, nameLength);
+                    ++position;
 
-         remaining.remove_prefix(nameLength);
-         remaining = mach::detail::http::trimOws(remaining);
+                    if (position == remaining.size() ||
+                        !isQuotedPairCharacter(remaining[position])) {
+                        return false;
+                    }
+                } else if (!isQuotedTextCharacter(c)) {
+                    return false;
+                }
 
-         // Consume the equals sign.
-         if (remaining.empty() || remaining.front() != '=') {
-             return false;
-         }
+                ++position;
+            }
 
-         remaining.remove_prefix(1);
-         remaining = mach::detail::http::trimOws(remaining);
+            if (position == remaining.size()) {
+                return false;
+            }
 
-         if (remaining.empty()) {
-             return false;
-         }
+            parameter.value = remaining.substr(0, position);
 
-         // Parse a quoted-string or token value.
-         if (remaining.front() == '"') {
-             remaining.remove_prefix(1);
+            remaining.remove_prefix(position + 1);
+        } else {
+            std::size_t valueLength = 0;
 
-             std::size_t position = 0;
+            while (valueLength < remaining.size() && isTokenCharacter(remaining[valueLength])) {
+                ++valueLength;
+            }
 
-             while (position < remaining.size()) {
-                 const auto c = remaining[position];
+            if (valueLength == 0) {
+                return false;
+            }
 
-                 if (c == '"') {
-                     break;
-                 }
+            parameter.value = remaining.substr(0, valueLength);
 
-                 if (c == '\\') {
-                     parameter.containsEscapes = true;
+            remaining.remove_prefix(valueLength);
+        }
 
-                     ++position;
+        remaining = mach::detail::http::trimOws(remaining);
 
-                     if (position == remaining.size() ||
-                         !isQuotedPairCharacter(remaining[position])) {
-                         return false;
-                     }
-                 } else if (!isQuotedTextCharacter(c)) {
-                     return false;
-                 }
+        return remaining.empty() || remaining.front() == ';';
+    }
 
-                 ++position;
-             }
+    CharsetResult parseCharset(std::string_view contentType) noexcept {
+        const auto parametersStart = contentType.find(';');
 
-             if (position == remaining.size()) {
-                 return false;
-             }
+        if (parametersStart == std::string_view::npos) {
+            return {};
+        }
 
-             parameter.value = remaining.substr(0, position);
+        auto remaining = contentType.substr(parametersStart);
 
-             remaining.remove_prefix(position + 1);
-         } else {
-             std::size_t valueLength = 0;
+        CharsetResult result;
 
-             while (valueLength < remaining.size() && isTokenCharacter(remaining[valueLength])) {
-                 ++valueLength;
-             }
+        while (!remaining.empty()) {
+            if (remaining.front() != ';') {
+                return {CharsetStatus::Invalid, {}};
+            }
 
-             if (valueLength == 0) {
-                 return false;
-             }
+            remaining.remove_prefix(1);
+            remaining = mach::detail::http::trimOws(remaining);
 
-             parameter.value = remaining.substr(0, valueLength);
+            // Ignore empty parameter segments.
+            if (remaining.empty() || remaining.front() == ';') {
+                continue;
+            }
 
-             remaining.remove_prefix(valueLength);
-         }
+            Parameter parameter;
 
-         remaining = mach::detail::http::trimOws(remaining);
+            if (!parseParameter(remaining, parameter)) {
+                return {CharsetStatus::Invalid, {}};
+            }
 
-         return remaining.empty() || remaining.front() == ';';
-     }
+            if (!equalsIgnoreCase(parameter.name, "charset")) {
+                continue;
+            }
 
-     CharsetResult parseCharset(std::string_view contentType) noexcept {
-         const auto parametersStart = contentType.find(';');
+            // Reject duplicate charset parameters.
+            if (result.status != CharsetStatus::Missing) {
+                return {CharsetStatus::Invalid, {}};
+            }
 
-         if (parametersStart == std::string_view::npos) {
-             return {};
-         }
+            // A charset must be a non-empty token.
+            // Escaped values cannot be returned as a decoded string_view.
+            if (parameter.containsEscapes || !isToken(parameter.value)) {
+                return {CharsetStatus::Invalid, {}};
+            }
 
-         auto remaining = contentType.substr(parametersStart);
+            result = {CharsetStatus::Valid, parameter.value};
+        }
 
-         CharsetResult result;
+        return result;
+    }
+}
 
-         while (!remaining.empty()) {
-             if (remaining.front() != ';') {
-                 return {CharsetStatus::Invalid, {}};
-             }
-
-             remaining.remove_prefix(1);
-             remaining = mach::detail::http::trimOws(remaining);
-
-             // Ignore empty parameter segments.
-             if (remaining.empty() || remaining.front() == ';') {
-                 continue;
-             }
-
-             Parameter parameter;
-
-             if (!parseParameter(remaining, parameter)) {
-                 return {CharsetStatus::Invalid, {}};
-             }
-
-             if (!equalsIgnoreCase(parameter.name, "charset")) {
-                 continue;
-             }
-
-             // Reject duplicate charset parameters.
-             if (result.status != CharsetStatus::Missing) {
-                 return {CharsetStatus::Invalid, {}};
-             }
-
-             // A charset must be a non-empty token.
-             // Escaped values cannot be returned as a decoded string_view.
-             if (parameter.containsEscapes || !isToken(parameter.value)) {
-                 return {CharsetStatus::Invalid, {}};
-             }
-
-             result = {CharsetStatus::Valid, parameter.value};
-         }
-
-         return result;
-     }
- }
-
- namespace mach::detail::http
+namespace mach::detail::http
 {
-     std::optional<std::string_view> extractMediaType(std::string_view contentType) noexcept {
-         const auto parametersStart = contentType.find(';');
-         const auto mediaType = trimOws(contentType.substr(0, parametersStart));
+    std::optional<std::string_view> extractMediaType(std::string_view contentType) noexcept {
+        const auto parametersStart = contentType.find(';');
+        const auto mediaType = trimOws(contentType.substr(0, parametersStart));
 
-         if (!isValidMediaType(mediaType)) {
-             return std::nullopt;
-         }
+        if (!isValidMediaType(mediaType)) {
+            return std::nullopt;
+        }
 
-         return mediaType;
-     }
+        return mediaType;
+    }
 
-     std::optional<std::string_view> extractCharset(std::string_view contentType) noexcept {
-         if (!extractMediaType(contentType)) {
-             return std::nullopt;
-         }
+    std::optional<std::string_view> extractCharset(std::string_view contentType) noexcept {
+        if (!extractMediaType(contentType)) {
+            return std::nullopt;
+        }
 
-         const auto result = parseCharset(contentType);
+        const auto result = parseCharset(contentType);
 
-         if (result.status != CharsetStatus::Valid) {
-             return std::nullopt;
-         }
+        if (result.status != CharsetStatus::Valid) {
+            return std::nullopt;
+        }
 
-         return result.value;
-     }
+        return result.value;
+    }
 
-     bool matchesMediaType(
-         std::string_view contentType,
-         std::string_view expectedMediaType) noexcept {
-         const auto mediaType = extractMediaType(contentType);
+    bool matchesMediaType(
+        std::string_view contentType,
+        std::string_view expectedMediaType) noexcept {
+        const auto mediaType = extractMediaType(contentType);
 
-         expectedMediaType = trimOws(expectedMediaType);
+        expectedMediaType = trimOws(expectedMediaType);
 
-         return mediaType.has_value() && isValidMediaType(expectedMediaType) &&
-                equalsIgnoreCase(*mediaType, expectedMediaType);
-     }
+        return mediaType.has_value() && isValidMediaType(expectedMediaType) &&
+               equalsIgnoreCase(*mediaType, expectedMediaType);
+    }
 
-     bool isJsonMediaType(std::string_view contentType) noexcept {
-         const auto mediaType = extractMediaType(contentType);
+    bool isJsonMediaType(std::string_view contentType) noexcept {
+        const auto mediaType = extractMediaType(contentType);
 
-         if (!mediaType) {
-             return false;
-         }
+        if (!mediaType) {
+            return false;
+        }
 
-         if (equalsIgnoreCase(*mediaType, "application/json")) {
-             return true;
-         }
+        if (equalsIgnoreCase(*mediaType, "application/json")) {
+            return true;
+        }
 
-         constexpr std::string_view suffix = "+json";
+        constexpr std::string_view suffix = "+json";
 
-         const auto slash = mediaType->find('/');
-         const auto subtype = mediaType->substr(slash + 1);
+        const auto slash = mediaType->find('/');
+        const auto subtype = mediaType->substr(slash + 1);
 
-         return subtype.size() > suffix.size() &&
-                equalsIgnoreCase(subtype.substr(subtype.size() - suffix.size()), suffix);
-     }
+        return subtype.size() > suffix.size() &&
+               equalsIgnoreCase(subtype.substr(subtype.size() - suffix.size()), suffix);
+    }
 
-     bool hasUnsupportedJsonCharset(std::string_view contentType) noexcept {
-         if (!extractMediaType(contentType)) {
-             return true;
-         }
+    bool hasUnsupportedJsonCharset(std::string_view contentType) noexcept {
+        if (!extractMediaType(contentType)) {
+            return true;
+        }
 
-         const auto result = parseCharset(contentType);
+        const auto result = parseCharset(contentType);
 
-         switch (result.status) {
-         case CharsetStatus::Missing:
-             return false;
+        switch (result.status) {
+        case CharsetStatus::Missing:
+            return false;
 
-         case CharsetStatus::Valid:
-             return !equalsIgnoreCase(result.value, "utf-8");
+        case CharsetStatus::Valid:
+            return !equalsIgnoreCase(result.value, "utf-8");
 
-         case CharsetStatus::Invalid:
-             return true;
-         }
+        case CharsetStatus::Invalid:
+            return true;
+        }
 
-         return true;
-     }
- }
+        return true;
+    }
+}
