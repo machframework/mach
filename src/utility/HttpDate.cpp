@@ -1,6 +1,10 @@
 #include "HttpDate.hpp"
 
 #include <array>
+#include <chrono>
+#include <format>
+#include <stdexcept>
+#include <string_view>
 
 namespace
 {
@@ -14,24 +18,27 @@ namespace
 namespace mach::detail
 {
     std::string formatHttpDate(std::chrono::system_clock::time_point time) {
-        const std::time_t t = std::chrono::system_clock::to_time_t(time);
+        using namespace std::chrono;
 
-        std::tm utc{};
+        const auto wholeSeconds = floor<seconds>(time);
+        const auto day = floor<days>(wholeSeconds);
 
-#ifdef _WIN32
-        gmtime_s(&utc, &t);
-#else
-        gmtime_r(&t, &utc);
-#endif
+        if (day < sys_days{year{0} / January / 1} || day > sys_days{year{9999} / December / 31}) {
+            throw std::invalid_argument("HTTP date is outside the supported range");
+        }
+
+        const year_month_day date{day};
+        const weekday weekDay{day};
+        const hh_mm_ss timeOfDay{wholeSeconds - day};
 
         return std::format(
             "{}, {:02} {} {:04} {:02}:{:02}:{:02} GMT",
-            Weekdays[utc.tm_wday],
-            utc.tm_mday,
-            Months[utc.tm_mon],
-            utc.tm_year + 1900,
-            utc.tm_hour,
-            utc.tm_min,
-            utc.tm_sec);
+            Weekdays[weekDay.c_encoding()],
+            static_cast<unsigned>(date.day()),
+            Months[static_cast<unsigned>(date.month()) - 1],
+            static_cast<int>(date.year()),
+            timeOfDay.hours().count(),
+            timeOfDay.minutes().count(),
+            timeOfDay.seconds().count());
     }
 }

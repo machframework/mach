@@ -2,6 +2,8 @@
 
 #include <mach/Response.hpp>
 
+#include <chrono>
+#include <initializer_list>
 #include <optional>
 #include <stdexcept>
 #include <string>
@@ -328,4 +330,159 @@ TEST_CASE(
         REQUIRE(result.has_value());
         CHECK(std::string(*result) == std::string(value));
     }
+}
+
+// Typed header setters
+
+TEST_CASE("Response date setters format and overwrite header values", "[response][headers]") {
+    using namespace std::chrono;
+
+    const system_clock::time_point value =
+        sys_days{year{2026} / November / 25} + hours{13} + minutes{5} + seconds{9};
+    constexpr std::string_view expected = "Wed, 25 Nov 2026 13:05:09 GMT";
+
+    struct DateTestCase {
+        std::string_view name;
+        void (mach::Response::*setter)(system_clock::time_point);
+    };
+
+    constexpr DateTestCase testCases[] = {
+        {"Last-Modified", &mach::Response::setLastModified},
+        {"Expires", &mach::Response::setExpires},
+        {"Retry-After", &mach::Response::setRetryAfter},
+        {"Date", &mach::Response::setDate},
+    };
+
+    for (const auto& testCase : testCases) {
+        CAPTURE(std::string(testCase.name));
+
+        auto context =
+            TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+
+        (context.response.*testCase.setter)(value);
+
+        auto result = context.response.header(testCase.name);
+        REQUIRE(result.has_value());
+        CHECK(std::string(*result) == std::string(expected));
+
+        context.response.setHeader(testCase.name, "initial-value");
+        (context.response.*testCase.setter)(value);
+
+        result = context.response.header(testCase.name);
+        REQUIRE(result.has_value());
+        CHECK(std::string(*result) == std::string(expected));
+    }
+}
+
+TEST_CASE("Response duration setters format non-negative durations", "[response][headers]") {
+    using namespace std::chrono;
+
+    struct DurationTestCase {
+        std::string_view name;
+        void (mach::Response::*setter)(seconds);
+    };
+
+    constexpr DurationTestCase testCases[] = {
+        {"Age", &mach::Response::setAge},
+        {"Retry-After", &mach::Response::setRetryAfter},
+    };
+
+    for (const auto& testCase : testCases) {
+        CAPTURE(std::string(testCase.name));
+
+        auto context =
+            TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+
+        for (const auto value : {seconds{120}, seconds{0}, seconds::max()}) {
+            CAPTURE(value.count());
+
+            (context.response.*testCase.setter)(value);
+
+            const auto result = context.response.header(testCase.name);
+            REQUIRE(result.has_value());
+            CHECK(std::string(*result) == std::to_string(value.count()));
+        }
+    }
+}
+
+TEST_CASE("Response duration setters reject negative durations", "[response][headers]") {
+    using namespace std::chrono;
+
+    struct DurationTestCase {
+        std::string_view name;
+        void (mach::Response::*setter)(seconds);
+    };
+
+    constexpr DurationTestCase testCases[] = {
+        {"Age", &mach::Response::setAge},
+        {"Retry-After", &mach::Response::setRetryAfter},
+    };
+
+    for (const auto& testCase : testCases) {
+        CAPTURE(std::string(testCase.name));
+
+        auto context =
+            TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+
+        context.response.setHeader(testCase.name, "120");
+
+        CHECK_THROWS_AS((context.response.*testCase.setter)(seconds{-1}), std::invalid_argument);
+
+        const auto result = context.response.header(testCase.name);
+        REQUIRE(result.has_value());
+        CHECK(std::string(*result) == "120");
+    }
+}
+
+TEST_CASE("Response Allow setter formats HTTP method lists", "[response][headers]") {
+    using mach::http::Method;
+
+    auto context = TestRequestBuilder{}.method(Method::Get).target("/").build(false);
+
+    context.response.setAllow(
+        {Method::Get,
+         Method::Post,
+         Method::Put,
+         Method::Patch,
+         Method::Delete,
+         Method::Head,
+         Method::Options});
+
+    auto result = context.response.header("Allow");
+    REQUIRE(result.has_value());
+    CHECK(std::string(*result) == "GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS");
+
+    context.response.setAllow({Method::Get});
+
+    result = context.response.header("Allow");
+    REQUIRE(result.has_value());
+    CHECK(std::string(*result) == "GET");
+
+    context.response.setAllow({Method::Post, Method::Get, Method::Post});
+
+    result = context.response.header("Allow");
+    REQUIRE(result.has_value());
+    CHECK(std::string(*result) == "POST, GET, POST");
+
+    context.response.setAllow(std::initializer_list<Method>{});
+
+    result = context.response.header("Allow");
+    REQUIRE(result.has_value());
+    CHECK(result->empty());
+}
+
+TEST_CASE("Response Allow setter rejects invalid HTTP methods", "[response][headers]") {
+    using mach::http::Method;
+
+    auto context = TestRequestBuilder{}.method(Method::Get).target("/").build(false);
+
+    context.response.setAllow("GET");
+
+    CHECK_THROWS_AS(
+        context.response.setAllow({Method::Post, static_cast<Method>(255)}),
+        std::invalid_argument);
+
+    const auto result = context.response.header("Allow");
+    REQUIRE(result.has_value());
+    CHECK(std::string(*result) == "GET");
 }

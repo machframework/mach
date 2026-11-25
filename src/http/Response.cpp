@@ -6,6 +6,7 @@
 #include <unordered_set>
 
 #include "HttpUtils.hpp"
+#include "utility/HttpDate.hpp"
 
 namespace
 {
@@ -256,8 +257,16 @@ namespace mach
         this->setHeader("Last-Modified", value);
     }
 
+    void Response::setLastModified(std::chrono::system_clock::time_point value) {
+        this->setLastModified(detail::formatHttpDate(value));
+    }
+
     void Response::setExpires(std::string_view value) {
         this->setHeader("Expires", value);
+    }
+
+    void Response::setExpires(std::chrono::system_clock::time_point value) {
+        this->setExpires(detail::formatHttpDate(value));
     }
 
     void Response::setVary(std::string_view value) {
@@ -266,6 +275,14 @@ namespace mach
 
     void Response::setAge(std::string_view value) {
         this->setHeader("Age", value);
+    }
+
+    void Response::setAge(std::chrono::seconds value) {
+        if (value.count() < 0) {
+            throw std::invalid_argument("Age cannot be negative");
+        }
+
+        this->setAge(std::to_string(value.count()));
     }
 
     void Response::setWwwAuthenticate(std::string_view value) {
@@ -280,8 +297,40 @@ namespace mach
         this->setHeader("Retry-After", value);
     }
 
+    void Response::setRetryAfter(std::chrono::seconds value) {
+        if (value.count() < 0) {
+            throw std::invalid_argument("Retry-After cannot be negative");
+        }
+
+        this->setRetryAfter(std::to_string(value.count()));
+    }
+
+    void Response::setRetryAfter(std::chrono::system_clock::time_point value) {
+        this->setRetryAfter(detail::formatHttpDate(value));
+    }
+
     void Response::setAllow(std::string_view value) {
         this->setHeader("Allow", value);
+    }
+
+    void Response::setAllow(std::initializer_list<http::Method> methods) {
+        std::string value;
+
+        for (const auto method : methods) {
+            const auto name = http::toString(method);
+
+            if (name == "UNKNOWN") {
+                throw std::invalid_argument("Invalid HTTP method");
+            }
+
+            if (!value.empty()) {
+                value += ", ";
+            }
+
+            value += name;
+        }
+
+        this->setAllow(value);
     }
 
     void Response::setLink(std::string_view value) {
@@ -294,6 +343,10 @@ namespace mach
 
     void Response::setDate(std::string_view value) {
         this->setHeader("Date", value);
+    }
+
+    void Response::setDate(std::chrono::system_clock::time_point value) {
+        this->setDate(detail::formatHttpDate(value));
     }
 
     void Response::setContentSecurityPolicy(std::string_view value) {

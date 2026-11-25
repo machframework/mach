@@ -341,3 +341,8 @@ add_mach_catch_test(
     ResponseHeadersTests
     http/ResponseHeadersTests.cpp
 )
+
+add_mach_catch_test(
+    HttpDateTests
+    http/HttpDateTests.cpp
+)

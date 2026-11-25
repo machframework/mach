@@ -1,11 +1,14 @@
 #pragma once
 
+#include <chrono>
+#include <initializer_list>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 
 #include <mach/http/Cookie.hpp>
+#include <mach/http/Method.hpp>
 #include <mach/http/StatusCode.hpp>
 #include <mach/http/Version.hpp>
 
@@ -497,6 +500,17 @@ namespace mach
         void setLastModified(std::string_view value);
 
         /**
+         * Sets the value of the Last-Modified header to the specified time.
+         *
+         * @param value The last modification time.
+         *
+         * @throws std::invalid_argument If the time is outside the supported HTTP date range.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setLastModified(std::chrono::system_clock::time_point value);
+
+        /**
          * Sets the value of the Expires header.
          *
          * @param value The header value.
@@ -507,6 +521,17 @@ namespace mach
          * @thread_safety This function is not thread-safe.
          */
         void setExpires(std::string_view value);
+
+        /**
+         * Sets the value of the Expires header to the specified time.
+         *
+         * @param value The expiration time.
+         *
+         * @throws std::invalid_argument If the time is outside the supported HTTP date range.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setExpires(std::chrono::system_clock::time_point value);
 
         /**
          * Sets the value of the Vary header.
@@ -531,6 +556,17 @@ namespace mach
          * @thread_safety This function is not thread-safe.
          */
         void setAge(std::string_view value);
+
+        /**
+         * Sets the value of the Age header to the specified duration in seconds.
+         *
+         * @param value The age of the response.
+         *
+         * @throws std::invalid_argument If the duration is negative.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setAge(std::chrono::seconds value);
 
         /**
          * Sets the value of the WWW-Authenticate header.
@@ -569,6 +605,28 @@ namespace mach
         void setRetryAfter(std::string_view value);
 
         /**
+         * Sets the value of the Retry-After header to the specified delay in seconds.
+         *
+         * @param value The duration to wait before retrying.
+         *
+         * @throws std::invalid_argument If the duration is negative.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setRetryAfter(std::chrono::seconds value);
+
+        /**
+         * Sets the value of the Retry-After header to the specified time.
+         *
+         * @param value The time after which a request may be retried.
+         *
+         * @throws std::invalid_argument If the time is outside the supported HTTP date range.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setRetryAfter(std::chrono::system_clock::time_point value);
+
+        /**
          * Sets the value of the Allow header.
          *
          * @param value The header value.
@@ -579,6 +637,17 @@ namespace mach
          * @thread_safety This function is not thread-safe.
          */
         void setAllow(std::string_view value);
+
+        /**
+         * Sets the value of the Allow header to the specified HTTP methods.
+         *
+         * @param methods The allowed HTTP methods.
+         *
+         * @throws std::invalid_argument If any method is unknown or invalid.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setAllow(std::initializer_list<mach::http::Method> methods);
 
         /**
          * Sets the value of the Link header.
@@ -615,6 +684,17 @@ namespace mach
          * @thread_safety This function is not thread-safe.
          */
         void setDate(std::string_view value);
+
+        /**
+         * Sets the value of the Date header to the specified time.
+         *
+         * @param value The time at which the response was originated.
+         *
+         * @throws std::invalid_argument If the time is outside the supported HTTP date range.
+         *
+         * @thread_safety This function is not thread-safe.
+         */
+        void setDate(std::chrono::system_clock::time_point value);
 
         /**
          * Sets the value of the Content-Security-Policy header.
