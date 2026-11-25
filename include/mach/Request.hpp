@@ -387,6 +387,22 @@ namespace mach
          */
         [[nodiscard]] std::optional<std::uint64_t> contentLengthBytes() const;
 
+        /**
+         * Returns the authentication scheme specified by the Authorization header.
+         *
+         * @return A view into the authentication scheme, or std::nullopt if absent or invalid.
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> authorizationScheme() const;
+
+        /**
+         * Returns the Bearer token specified by the Authorization header.
+         *
+         * @return A view into the Bearer token, or std::nullopt if absent or invalid.
+         * @thread_safety This function is thread-safe.
+         */
+        [[nodiscard]] std::optional<std::string_view> bearerToken() const;
+
 
         // Route parameters
 

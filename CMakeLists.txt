@@ -28,6 +28,7 @@ add_library(mach
     src/http/MediaType.cpp
     src/http/Context.cpp
     src/http/ContentLength.cpp
+    "src/http/AuthorizationHeader.cpp"
 
     src/adapter/inbound/BeastRequestAdapter.cpp
     src/adapter/outbound/BeastResponseAdapter.cpp

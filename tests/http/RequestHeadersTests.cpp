@@ -369,3 +369,139 @@ TEST_CASE("Request content length inspection rejects invalid header values", "[r
         CHECK_FALSE(context.request.contentLengthBytes().has_value());
     }
 }
+
+// Authentication inspection
+
+TEST_CASE(
+    "Request authentication inspection handles missing Authorization headers",
+    "[request][headers]") {
+    auto context = TestRequestBuilder{}.method(mach::http::Method::Get).target("/").build(false);
+
+    CHECK_FALSE(context.request.authorizationScheme().has_value());
+    CHECK_FALSE(context.request.bearerToken().has_value());
+}
+
+TEST_CASE(
+    "Request authentication inspection extracts valid Bearer credentials",
+    "[request][headers]") {
+    struct TestCase {
+        std::string_view authorization;
+        std::string_view scheme;
+        std::string_view token;
+    };
+
+    constexpr TestCase testCases[] = {
+        {"Bearer abc123", "Bearer", "abc123"},
+        {"bearer AbC123", "bearer", "AbC123"},
+        {"BEARER abc123==", "BEARER", "abc123=="},
+        {"Bearer   abc.def.ghi", "Bearer", "abc.def.ghi"}};
+
+    for (const auto& testCase : testCases) {
+        CAPTURE(std::string(testCase.authorization));
+
+        auto context = TestRequestBuilder{}
+                           .method(mach::http::Method::Get)
+                           .target("/")
+                           .header("Authorization", testCase.authorization)
+                           .build(false);
+
+        const auto scheme = context.request.authorizationScheme();
+        const auto token = context.request.bearerToken();
+
+        REQUIRE(scheme.has_value());
+        REQUIRE(token.has_value());
+
+        CHECK(std::string(*scheme) == std::string(testCase.scheme));
+        CHECK(std::string(*token) == std::string(testCase.token));
+    }
+}
+
+TEST_CASE("Request authentication inspection recognizes non-Bearer schemes", "[request][headers]") {
+    struct TestCase {
+        std::string_view authorization;
+        std::string_view scheme;
+    };
+
+    constexpr TestCase testCases[] = {
+        {"Basic dXNlcjpwYXNz", "Basic"},
+        {"Digest username=\"user\"", "Digest"},
+        {"Custom credentials", "Custom"}};
+
+    for (const auto& testCase : testCases) {
+        CAPTURE(std::string(testCase.authorization));
+
+        auto context = TestRequestBuilder{}
+                           .method(mach::http::Method::Get)
+                           .target("/")
+                           .header("Authorization", testCase.authorization)
+                           .build(false);
+
+        const auto scheme = context.request.authorizationScheme();
+
+        REQUIRE(scheme.has_value());
+        CHECK(std::string(*scheme) == std::string(testCase.scheme));
+        CHECK_FALSE(context.request.bearerToken().has_value());
+    }
+}
+
+TEST_CASE(
+    "Request authentication inspection rejects empty and malformed schemes",
+    "[request][headers]") {
+    constexpr std::string_view invalidValues[] =
+        {"", "Bear@er abc123", "Bearer: abc123", "Bearer\tabc123"};
+
+    for (const auto value : invalidValues) {
+        CAPTURE(std::string(value));
+
+        auto context = TestRequestBuilder{}
+                           .method(mach::http::Method::Get)
+                           .target("/")
+                           .header("Authorization", value)
+                           .build(false);
+
+        CHECK_FALSE(context.request.authorizationScheme().has_value());
+        CHECK_FALSE(context.request.bearerToken().has_value());
+    }
+}
+
+TEST_CASE(
+    "Request authentication inspection preserves valid schemes with invalid credentials",
+    "[request][headers]") {
+    constexpr std::string_view invalidValues[] =
+        {"Bearer", "Bearer abc def", "Bearer abc=def", "Bearer ==", "Bearer \"abc123\""};
+
+    for (const auto value : invalidValues) {
+        CAPTURE(std::string(value));
+
+        auto context = TestRequestBuilder{}
+                           .method(mach::http::Method::Get)
+                           .target("/")
+                           .header("Authorization", value)
+                           .build(false);
+
+        const auto scheme = context.request.authorizationScheme();
+
+        REQUIRE(scheme.has_value());
+        CHECK(std::string(*scheme) == "Bearer");
+        CHECK_FALSE(context.request.bearerToken().has_value());
+    }
+}
+
+TEST_CASE(
+    "Request authentication inspection performs case-insensitive header lookup",
+    "[request][headers]") {
+    auto context = TestRequestBuilder{}
+                       .method(mach::http::Method::Get)
+                       .target("/")
+                       .header("authorization", "Bearer abc123")
+                       .build(false);
+
+    const auto scheme = context.request.authorizationScheme();
+    const auto token = context.request.bearerToken();
+
+    REQUIRE(scheme.has_value());
+    REQUIRE(token.has_value());
+
+    CHECK(std::string(*scheme) == "Bearer");
+    CHECK(std::string(*token) == "abc123");
+}

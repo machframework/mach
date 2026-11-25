@@ -356,3 +356,8 @@ add_mach_catch_test(
     ContentLengthTests
     http/ContentLengthTests.cpp
 )
+
+add_mach_catch_test(
+    AuthorizationHeaderTests
+    http/AuthorizationHeaderTests.cpp
+)

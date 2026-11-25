@@ -5,6 +5,7 @@
 
 #include <mach/detail/http/MediaType.hpp>
 
+#include "AuthorizationHeader.hpp"
 #include "utility/StringUtils.hpp"
 #include "ContentLength.hpp"
 
@@ -178,6 +179,18 @@ namespace mach
     std::optional<std::uint64_t> Request::contentLengthBytes() const {
         const auto value = this->contentLength();
         return value ? detail::http::parseContentLength(*value) : std::nullopt;
+    }
+
+    std::optional<std::string_view> Request::authorizationScheme() const {
+        const auto value = this->authorization();
+
+        return value ? detail::http::extractAuthorizationScheme(*value) : std::nullopt;
+    }
+
+    std::optional<std::string_view> Request::bearerToken() const {
+        const auto value = this->authorization();
+
+        return value ? detail::http::extractBearerToken(*value) : std::nullopt;
     }
 
     // Route parameters
