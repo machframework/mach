@@ -21,8 +21,9 @@ namespace mach::detail::server
         di::Container container,
         middleware::MiddlewarePipeline middlewarePipeline,
         const mach::Logger& logger)
-        : m_appOptions(std::move(appOptions)),
-          m_endpoint(boost::asio::ip::make_address(m_appOptions.host), m_appOptions.port),
+        : m_appOptions(std::move(appOptions)), m_endpoint(
+                                                   boost::asio::ip::make_address(m_appOptions.host),
+                                                   static_cast<std::uint16_t>(m_appOptions.port)),
           m_ioc(static_cast<int>(m_appOptions.threadCount)),
           m_runtime(m_appOptions, std::move(container), std::move(middlewarePipeline), logger),
           m_logger(logger) {}
@@ -32,7 +33,7 @@ namespace mach::detail::server
     }
 
     std::uint16_t Server::port() const noexcept {
-        return m_appOptions.port;
+        return static_cast<std::uint16_t>(m_appOptions.port);
     }
 
     std::size_t Server::threadCount() const noexcept {

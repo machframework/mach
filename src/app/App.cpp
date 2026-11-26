@@ -204,7 +204,7 @@ namespace mach
     }
 
     std::uint16_t App::Impl::port() const noexcept {
-        return m_appOptions.port;
+        return static_cast<std::uint16_t>(m_appOptions.port);
     }
 
     std::size_t App::Impl::threadCount() const noexcept {

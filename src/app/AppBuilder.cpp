@@ -1,6 +1,7 @@
 #include <mach/AppBuilder.hpp>
 
 #include <stdexcept>
+#include <cstdint>
 
 #include <mach/Logger.hpp>
 #include <mach/diagnostics/TerminateHandler.hpp>
@@ -27,7 +28,7 @@ namespace
         }
     }
 
-    void validatePort(std::int32_t port) {
+    void validatePort(std::uint32_t port) {
         if (port < 1 || port > 65535) {
             throw std::invalid_argument("Invalid port. Port must be between 1 and 65535.");
         }
@@ -80,7 +81,7 @@ namespace mach
         return *this;
     }
 
-    AppBuilder& AppBuilder::port(std::uint16_t value) {
+    AppBuilder& AppBuilder::port(std::uint32_t value) {
         m_appOptions.port = value;
         return *this;
     }

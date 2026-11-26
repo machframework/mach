@@ -213,6 +213,11 @@ add_mach_compile_failure_test(
     "${overflow_diagnostic}"
 )
 
+add_mach_catch_test(
+    AppBuilderTests
+    core/AppBuilderTests.cpp
+)
+
 
 # Binding
 
