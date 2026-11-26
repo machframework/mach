@@ -1,6 +1,7 @@
 #pragma once
 
 #include <concepts>
+#include <cstdint>
 #include <functional>
 #include <optional>
 #include <utility>
@@ -160,6 +161,7 @@ namespace mach
          * Sets the port the application will listen on.
          *
          * Defaults to 3143. The port must be between 1 and 65535.
+         * The port is validated when building the application.
          *
          * @param value The port number.
          *
@@ -168,7 +170,7 @@ namespace mach
          *
          * @thread_safety This function is not thread-safe.
          */
-        AppBuilder& port(std::uint16_t value);
+        AppBuilder& port(std::uint32_t value);
 
         /**
          * Sets the number of worker threads used by the application.

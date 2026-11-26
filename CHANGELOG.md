@@ -28,6 +28,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Strengthen HTTP media type and charset parsing, including validation of malformed and duplicate charset parameters.
 - Simplify the CMake testing infrastructure and eliminate redundant test registrations while preserving existing test coverage.
+- Change `AppOptions::port` and the parameter type of `AppBuilder::port()` from `std::uint16_t` to `std::uint32_t`.
 
 ### Deprecated
 
@@ -38,6 +39,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Respect the configured MSVC runtime during builds.
 - Separate package generation from installation.
 - Remove incorrect `noexcept` specifications from HTTP lookup methods that may allocate memory. Code explicitly relying on their non-throwing exception specifications may require adjustments.
+- Prevent silent truncation of out-of-range port values supplied through `AppBuilder::port()` or `AppOptions::port`, ensuring that invalid values within the `std::uint32_t` range are rejected during application construction.
 
 ## [1.0.0] - 2026-09-24
 

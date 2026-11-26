@@ -1,6 +1,8 @@
 #pragma once
 
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <string>
 
 #include <mach/byte_literals.hpp>
@@ -18,7 +20,7 @@ namespace mach
      */
     struct AppOptions {
         std::string host = "127.0.0.1";
-        std::uint16_t port = 3143;
+        std::uint32_t port = 3143;
         std::size_t threadCount = 4;
 
         std::chrono::seconds requestTimeout = std::chrono::seconds(30);
